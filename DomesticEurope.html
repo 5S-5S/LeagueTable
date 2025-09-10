@@ -1274,17 +1274,31 @@
     </div>
 
     <script>
+        // Fallback original URLs (for when base64 decoding fails on mobile)
+        const FALLBACK_URLS = [
+            'https://gist.githubusercontent.com/5S-5S/9988a1333c430aad518ebb438c5d8db1/raw/b9b5350b3e674a7830cb7d739e60fab42b6d6fe4/bundesliga.csv',
+            'https://gist.githubusercontent.com/5S-5S/7435fa69f5a63d5f3ccca53b4d049fdf/raw/8e174e12f259abb6f9eae871c684e89964b3b073/laliga.csv',
+            'https://gist.githubusercontent.com/5S-5S/948e1305620af3a172b4339abba31e67/raw/b24f47e26e5207bb1de39a1af6d38498e7c16f32/ligue.csv',
+            'https://gist.githubusercontent.com/5S-5S/beaa1cac8fb3709dc7c2f4bb3d799b41/raw/295bc5db9eac771cd717efdcf7f3be5c3724a17c/seriea.csv',
+            'https://gist.githubusercontent.com/5S-5S/c895dc7f8817bf37cff7ae90cda31fe1/raw/9079bdb6aac0583a380e2c5aecdd9d6f9b998e34/prem.csv',
+            'https://gist.githubusercontent.com/5S-5S/fa353dfa11e18395ff657f2196a45129/raw/d2a086ec0a78cc8325503be211fe1aea1322bdbe/2526prem.csv',
+            'https://gist.githubusercontent.com/5S-5S/03928e4a8ea1899826fa8507de7a7753/raw/a34c84610a599ef7175c5ebaf63eaa77de3627a4/2526laliga.csv',
+            'https://gist.githubusercontent.com/5S-5S/bcf66a873318f8287362194bf54e1c9b/raw/24d2f03e3853585c1dddcda2e376ce4cbb3e5eed/2526seriea.csv',
+            'https://gist.githubusercontent.com/5S-5S/8178038874c8328042527d460b0677ed/raw/125d319e54c2adceaa40c9c3a334d60e2c0f0525/2526bundesliga.csv',
+            'https://gist.githubusercontent.com/5S-5S/1f3282f6f02422622c47b7a7a7512c91/raw/aa94823df99826b509c7df5064e8891b89406484/2526ligue.csv'
+        ];
+
         // Pre-configured Gist URLs (Double Base64 Encoded)
         const GIST_URLS = [
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVPVGc0WVRFek16TmpORE13WVdGa05URTRaV0ppTkRNNFl6VmtPR1JpTVM5eVlYY3ZZamxpTlRNMU1HSXpaVFkzTkdFM09ETXdZMkkzWkRjek9XVTJNR1poWWpReVlqWmtObVpsTkM5aWRXNWtaWE5zYVdkaExtTnpkZz09',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
+            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ZDNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6YTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVORGhsTVRNd05UWXlNR0ZtTTJFeE56SmlORE16T1dGaVltRXpNV1UyTnk5eVlYY3ZZakkwWmpRM1pUSTJaVFV5TURkaVlqRmtaVE01WVRGaFpqWmtNemcwT1RobE4yTXhObVl6TWk5c2FXZDFaUzVqYzNZPQ==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlaV0ZoTVdOaFl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNamsxWW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5elpYSnBaV0V1WTNOMg==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWpPRGsxWkdNM1pqZzRNVGRpWmpNM1kyWm1OMkZsT1RCalpHRXpNV1psTVM5eVlYY3ZPVEEzT1dKa1lqWmhZV013TlRnellUTTRNR1V5WXpWaFpXTmtaRGxrTm1ZNVlqazVPR1V6TkM5d2NtVnRMbU56ZGc9PQ==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OW1ZVE0xTTJSbVlURXhaVEU0TXprMVptWTJOVGRtTWpFNU5tRTBOVEV5T1M5eVlYY3ZaREpoTURnMlpXTXdZVGM0WTJNNE16STJOVEF6WW1VeU1URm1aVEZoWldFeE16SXlZbVJpWlM4eU5USTJjSEpsYlM1amMzWT0=',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHdNemt5T0dVMFlUaGxZVEU0T1RrNE1qWm1ZVGcxTURka1pUZGhOemMxTXk5eVlYY3ZZVE0wWXpnME5qRXdZVFU1T1dWbU56RTNOV00xWldKaFpqWXpaV0ZoTnpka1pUTTJNamRoTkM4eU5USTJiR0ZzYVdkaExtTnpkZz09',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlZMlkyTm1FNE56TXpNVGhtT0RJNE56TTJNakU1TkdKbU5UUmxNV001WWk5eVlYY3ZNalJrTW1Zd00yVXpPRFV6TlRnMVl6RmtaR1JqWkdFeVpUTTNObU5sTkdOaVlqTmxOV1ZsWkM4eU5USTJjMlZ5YVdWaExtTnpkZz09',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODRNVGM0TURNNE9EYzBZemd6TWpnd05ESTFNamRrTkRZd1lqQTJOemRsWkM5eVlYY3ZNVEkxWkRNeE9XVTFOR015WVdSalpXRmhOREJqT1dNellUTXpOR1EyTUdVeVl6Qm1NRFV5TlM4eU5USTJZblZ1WkdWemJHbG5ZUzVqYzNZPQ==',
+            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlZMlkyTm1FNE56TXpNVGhtT0RJNE56TTJNakU1TkdKbU5UUmxNV005WWk5eVlYY3ZNalJrTW1Zd00yVXpPRFV6TlRnMVl6RmtaR1JqWkdFeVpUTTNObU5sTkdOaVlqTmxOV1ZsWkM4eU5USTJjMlZ5YVdWaExtTnpkZz09',
+            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODRNVGM0TURN+E9EYzBZemd6TWpnd05ESTFNamRrTkRZd1lqQTJOemRsWkM5eVlYY3ZNVEkxWkRNeE9XVTFOR015WVdSalpXRmhOREJqT1dNellUTXpOR1EyTUdVeVl6Qm1NRFV5TlM4eU5USTJZblZ1WkdWemJHbG5ZUzVqYzNZPQ==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHhaak15T0RKbU5tWXdNalF5TWpZeU1tTTBOMkkzWVRkaE56VXhNbU01TVM5eVlYY3ZZV0U1TkRneU0yUm1PVGs0TWpaaU5UQTVZemRrWmpVd05qUmxPRGc1TVdJNE9UUXdOalE0TkM4eU5USTJiR2xuZFdVdVkzTjI='
         ];
 
@@ -3161,8 +3175,10 @@
 
         // Load data from GitHub Gists
         async function loadGistData() {
-            const gistUrls = GIST_URLS;
             const isMobile = isMobileDevice();
+            
+            // For mobile devices, try fallback URLs first to avoid base64 issues
+            const gistUrls = isMobile ? FALLBACK_URLS : GIST_URLS;
             
             state.error = '';
             console.log('Starting data load...');
@@ -3179,7 +3195,7 @@
                 let loadedGists = 0;
 
                 for (let i = 0; i < gistUrls.length; i++) {
-                    const encodedUrl = gistUrls[i];
+                    const urlInput = gistUrls[i];
                     console.log(`Processing URL ${i + 1}/${gistUrls.length}`);
                     
                     // Add delay for mobile devices to prevent stack overflow
@@ -3187,11 +3203,26 @@
                         await mobileDelay(100); // Small delay between requests
                     }
                     
-                    const url = decodeDoubleBase64Url(encodedUrl);
+                    let url;
                     
-                    // Skip if URL decoding failed
+                    // Check if this is already a plain URL (fallback mode) or encoded
+                    if (urlInput.startsWith('https://')) {
+                        // Plain URL (fallback mode)
+                        url = urlInput;
+                        console.log('Using fallback URL (mobile mode)');
+                    } else {
+                        // Try to decode base64
+                        url = decodeDoubleBase64Url(urlInput);
+                        if (!url) {
+                            console.warn(`Base64 decoding failed for URL ${i + 1}, trying fallback`);
+                            // Fallback to original URL if base64 fails
+                            url = FALLBACK_URLS[i];
+                        }
+                    }
+                    
+                    // Skip if no valid URL available
                     if (!url) {
-                        console.warn(`Skipping invalid URL at index ${i}`);
+                        console.warn(`No valid URL available at index ${i}`);
                         continue;
                     }
                     
