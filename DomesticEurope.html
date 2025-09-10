@@ -709,7 +709,7 @@
             <!-- Football Section -->
             <div class="menu-section">
                 <h3 class="menu-section-title">Football</h3>
-                <a href="#" class="menu-item active" data-page="domestic">
+                <a href="#" id="domesticFootballLink" class="menu-item active" data-page="domestic">
                     <span class="menu-icon">⚽</span>
                     <span>Domestic Football - Top 5 Leagues</span>
                 </a>
@@ -1274,18 +1274,19 @@
     </div>
 
     <script>
-        // Pre-configured Gist URLs (Double Base64 Encoded)
+        // Pre-configured Gist URLs (Single Base64 Encoded)
+        // Updated GIST URLs with single base64 encoding (encoded with new user-provided URLs)
         const GIST_URLS = [
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExpTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVORGhsTVRNd05UWXlNR0ZtTTJFeE56SmlORE16T1dGaVltRXpNV1UyTnk5eVlYY3ZZakkwWmpRM1pUSTJaVFV5TURkaVlqRmtaVE01WVRGaFpqWmtNemcwT1RobE4yTXhObVl6TWk5c2FXZDFaUzVqYzNZPQ==',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlaV0ZoTVdOaFl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNamsxWW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5elpYSnBaV0V1WTNOMg==',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWpPRGsxWkdNM1pqZzRNVGRpWmpNM1kyWm1OMkZsT1RCalpHRXpNV1psTVM5eVlYY3ZPVEEzT1dKa1lqWmhZV013TlRnellUTTRNR1V5WXpWaFpXTmtaRGxrTm1ZNVlqazVPR1V6TkM5d2NtVnRMbU56ZGc9PQ==',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OW1ZVE0xTTJSbVlURXhaVEU0TXprMVptWTJOVGRtTWpFNU5tRTBOVEV5T1M5eVlYY3ZaREpoTURnMlpXTXdZVGM0WTJNNE16STJOVEF6WW1VeU1URm1aVEZoWldFeE16SXlZbVJpWlM4eU5USTJjSEpsYlM1amMzWT0=',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHdNemt5T0dVMFlUaGxZVEU0T1RrNE1qWm1ZVGcxTURka1pUZGhOemMxTXk5eVlYY3ZZVE0wWXpnME5qRXdZVFU1T1dWbU56RTNOV00xWldKaFpqWXpaV0ZoTnpka1pUTTJNamRoTkM4eU5USTJiR0ZzYVdkaExtTnpkZz09',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlZMlkyTm1FNE56TXpNVGhtT0RJNE56TTJNakU1TkdKbU5UUmxNV001WWk5eVlYY3ZNalJrTW1Zd00yVXpPRFV6TlRnMVl6RmtaR1JqWkdFeVpUTTNObU5sTkdOaVlqTmxOV1ZsWkM4eU5USTJjMlZ5YVdWaExtTnpkZz09',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODRNVGM0TURNNE9EYzBZemd6TWpnd05ESTFNamRrTkRZd1lqQTJOemRsWkM5eVlYY3ZNVEkxWkRNeE9XVTFOR015WVdSalpXRmhOREJqT1dNellUTXpOR1EyTUdVeVl6Qm1NRFV5TlM4eU5USTJZblZ1WkdWemJHbG5ZUzVqYzNZPQ==',
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHhaak15T0RKbU5tWXdNalF5TWpZeU1tTTBOMkkzWVRkaE56VXhNbU01TVM5eVlYY3ZZV0U1TkRneU0yUm1PVGs0TWpaaU5UQTVZemRrWmpVd05qUmxPRGc1TVdJNE9UUXdOalE0TkM4eU5USTJiR2xuZFdVdVkzTjI='
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy85OTg4YTEzMzNjNDMwYWFkNTE4ZWJiNDM4YzVkOGRiMS9yYXcvYjliNTM1MGIzZTY3NGE3ODMwY2I3ZDczOWU2MGZhYjQyYjZkNmZlNC9idW5kZXNsaWdhLmNzdg==',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy83NDM1ZmE2OWY1YTYzZDVmM2NjY2E1M2I0ZDA0OWZkZi9yYXcvOGUxNzRlMTJmMjU5YWJiNmY5ZWFlODcxYzY4NGU4OTk2NGIzYjA3My9sYWxpZ2EuY3N2',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy85NDhlMTMwNTYyMGFmM2ExNzJiNDMzOWFiYmEzMWU2Ny9yYXcvYjI0ZjQ3ZTI2ZTUyMDdiYjFkZTM5YTFhZjZkMzg0OThlN2MxNmYzMi9saWd1ZS5jc3Y=',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iZWFhMWNhYzhmYjM3MDlkYzdjMmY0YmIzZDc5OWI0MS9yYXcvMjk1YmM1ZGI5ZWFjNzcxY2Q3MTdlZmRjZjdmM2JlNWMzNzI0YTE3Yy9zZXJpZWEuY3N2',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9jODk1ZGM3Zjg4MTdiZjM3Y2ZmN2FlOTBjZGEzMWZlMS9yYXcvOTA3OWJkYjZhYWMwNTgzYTM4MGUyYzVhZWNkZDlkNmY5Yjk5OGUzNC9wcmVtLmNzdg==',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9mYTM1M2RmYTExZTE4Mzk1ZmY2NTdmMjE5NmE0NTEyOS9yYXcvZDJhMDg2ZWMwYTc4Y2M4MzI1NTAzYmUyMTFmZTFhZWExMzIyYmRiZS8yNTI2cHJlbS5jc3Y=',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8wMzkyOGU0YThlYTE4OTk4MjZmYTg1MDdkZTdhNzc1My9yYXcvYTM0Yzg0NjEwYTU5OWVmNzE3NWM1ZWJhZjYzZWFhNzdkZTM2MjdhNC8yNTI2bGFsaWdhLmNzdg==',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iY2Y2NmE4NzMzMThmODI4NzM2MjE5NGJmNTRlMWM5Yi9yYXcvMjRkMmYwM2UzODUzNTg1YzFkZGRjZGEyZTM3NmNlNGNiYjNlNWVlZC8yNTI2c2VyaWVhLmNzdg==',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy84MTc4MDM4ODc0YzgzMjgwNDI1MjdkNDYwYjA2NzdlZC9yYXcvMTI1ZDMxOWU1NGMyYWRjZWFhNDBjOWMzYTMzNGQ2MGUyYzBmMDUyNS8yNTI2YnVuZGVzbGlnYS5jc3Y=',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8xZjMyODJmNmYwMjQyMjYyMmM0N2I3YTdhNzUxMmM5MS9yYXcvYWE5NDgyM2RmOTk4MjZiNTA5YzdkZjUwNjRlODg5MWI4OTQwNjQ4NC8yNTI2bGlndWUuY3N2'
         ];
         
         // League code mapping for filtering data
@@ -3110,8 +3111,8 @@
             loadGistData();
         }
 
-        // Decode double base64 encoded URL with fallback for browser compatibility
-        function decodeDoubleBase64Url(encodedUrl) {
+        // Decode base64 encoded URL with backward compatibility for double encoding
+        function decodeSingleBase64Url(encodedUrl) {
             try {
                 // Validate input
                 if (!encodedUrl || typeof encodedUrl !== 'string') {
@@ -3122,44 +3123,37 @@
                 // Clean the input
                 const cleanedInput = encodedUrl.trim().replace(/\s/g, '');
                 
-                // First decode from base64 with error handling
-                let singleDecoded;
+                // Try single decode first
+                let decoded;
                 try {
-                    singleDecoded = atob(cleanedInput);
+                    decoded = atob(cleanedInput);
                 } catch (atobError) {
-                    console.error('First atob failed:', atobError.message);
+                    console.error('Base64 decode failed:', atobError.message);
                     return null;
                 }
                 
-                if (!singleDecoded) {
-                    console.warn('First base64 decode returned empty');
-                    return null;
+                // Check if the result is a valid URL (single encoding)
+                if (decoded && decoded.startsWith('https://gist.githubusercontent.com')) {
+                    console.log('Successfully decoded single base64 URL:', decoded.substring(0, 80) + '...');
+                    return decoded;
                 }
                 
-                // Second decode from base64 to get the original URL
-                let originalUrl;
+                // If not a valid URL, try double decode (backward compatibility)
                 try {
-                    originalUrl = atob(singleDecoded);
-                } catch (atobError2) {
-                    console.error('Second atob failed:', atobError2.message);
-                    return null;
+                    const doubleDecoded = atob(decoded);
+                    if (doubleDecoded && doubleDecoded.startsWith('https://gist.githubusercontent.com')) {
+                        console.log('Successfully decoded double base64 URL:', doubleDecoded.substring(0, 80) + '...');
+                        return doubleDecoded;
+                    }
+                } catch (error) {
+                    // Ignore double decode errors
                 }
                 
-                if (!originalUrl) {
-                    console.warn('Second base64 decode returned empty');
-                    return null;
-                }
+                console.warn('Could not decode URL as single or double base64:', encodedUrl.substring(0, 50) + '...');
+                return null;
                 
-                // Validate that it's a proper URL
-                if (!originalUrl.startsWith('https://gist.githubusercontent.com')) {
-                    console.warn('Decoded URL is not a valid gist URL:', originalUrl);
-                    return null;
-                }
-                
-                console.log('Successfully decoded URL:', originalUrl.substring(0, 80) + '...');
-                return originalUrl;
             } catch (error) {
-                console.error('Error in decodeDoubleBase64Url:', error);
+                console.error('Error in decodeSingleBase64Url:', error);
                 console.error('Stack trace:', error.stack);
                 return null;
             }
@@ -3236,7 +3230,7 @@
                     const encodedUrl = gistUrls[i];
                     
                     try {
-                        const url = decodeDoubleBase64Url(encodedUrl);
+                        const url = decodeSingleBase64Url(encodedUrl);
                         if (!url) {
                             console.warn(`Skipping invalid URL at index ${i}`);
                             continue;
@@ -3411,7 +3405,7 @@
                     const encodedUrl = gistUrls[i];
                     console.log(`Processing URL ${i + 1}/${gistUrls.length}`);
                     
-                    const url = decodeDoubleBase64Url(encodedUrl);
+                    const url = decodeSingleBase64Url(encodedUrl);
                     
                     // Skip if URL decoding failed
                     if (!url) {
