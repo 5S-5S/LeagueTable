@@ -3147,8 +3147,36 @@
             }
         }
 
+        // Mobile device detection
+        function isMobileDevice() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const screenWidth = window.innerWidth;
+            
+            // Check for explicit mobile indicators (excluding just 'chrome' to avoid false positives)
+            const mobileKeywords = ['android', 'iphone', 'ipad', 'ipod', 'tablet', 'phone', 'mobile'];
+            const hasMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
+            
+            // Check for small screen size (less than 768px typically indicates mobile/tablet)
+            const hasSmallScreen = screenWidth < 768;
+            
+            // Touch device detection (more accurate for mobile)
+            const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // Only consider mobile if we have explicit mobile UA AND (small screen OR touch)
+            return hasMobileUA && (hasSmallScreen || hasTouchScreen);
+        }
+        
         // Load data from GitHub Gists
         async function loadGistData() {
+            const isMobile = isMobileDevice();
+            
+            // Mobile devices use league-specific loading
+            if (isMobile) {
+                console.log('Mobile device detected - using league-specific loading');
+                await loadLeagueDataMobile(state.selectedLeague);
+                return;
+            }
+            
             const gistUrls = GIST_URLS;
             
             state.error = '';
@@ -3209,13 +3237,36 @@
                         
                         if (parsed.data && parsed.data.length > 0) {
                             console.log(`Successfully parsed ${parsed.data.length} rows from ${url.substring(url.lastIndexOf('/') + 1)}`);
-                            allData.push(...parsed.data);
+                            
+                            // Chunked processing for Chrome stability
+                            const isChrome = navigator.userAgent.toLowerCase().includes('chrome');
+                            if (isChrome && parsed.data.length > 1000) {
+                                // Process in chunks for Chrome
+                                const chunkSize = 500;
+                                for (let i = 0; i < parsed.data.length; i += chunkSize) {
+                                    const chunk = parsed.data.slice(i, i + chunkSize);
+                                    allData.push(...chunk);
+                                    
+                                    // Small delay to prevent stack overflow
+                                    if (i + chunkSize < parsed.data.length) {
+                                        await new Promise(resolve => setTimeout(resolve, 10));
+                                    }
+                                }
+                            } else {
+                                allData.push(...parsed.data);
+                            }
                             loadedGists++;
                         } else {
                             console.warn('No data found in parsed CSV');
                         }
                     } catch (gistError) {
                         console.warn(`Failed to load ${url}:`, gistError.message);
+                    }
+                    
+                    // Add delay between files for Chrome stability
+                    const isChrome = navigator.userAgent.toLowerCase().includes('chrome');
+                    if (isChrome && i < gistUrls.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 20));
                     }
                 }
                 
