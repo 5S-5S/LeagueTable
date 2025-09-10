@@ -3234,10 +3234,7 @@
                             transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
                         };
                         
-                        // For mobile, add preview limit to prevent memory issues
-                        if (isMobile) {
-                            parseConfig.preview = 8000; // Limit rows for mobile
-                        }
+                        // No preview limit - mobile gets full data, just processed in chunks
                         
                         const parsed = Papa.parse(text, parseConfig);
                         
