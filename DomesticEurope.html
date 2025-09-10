@@ -3173,12 +3173,116 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
+        // EMERGENCY: Ultra-safe mobile data loading
+        async function loadGistDataMobileEmergency() {
+            state.error = '';
+            console.log('MOBILE EMERGENCY MODE: Starting minimal data load...');
+            
+            try {
+                // Load only Premier League data for mobile as a test
+                const url = 'https://gist.githubusercontent.com/5S-5S/c895dc7f8817bf37cff7ae90cda31fe1/raw/9079bdb6aac0583a380e2c5aecdd9d6f9b998e34/prem.csv';
+                
+                console.log('Mobile: Fetching single URL...');
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                console.log(`Mobile: Received ${text.length} characters`);
+                
+                // Minimal parsing - just take first 1000 rows
+                const lines = text.split('\n').slice(0, 1000);
+                const minimalCsv = lines.join('\n');
+                
+                console.log('Mobile: Starting Papa Parse...');
+                const parsed = Papa.parse(minimalCsv, { 
+                    header: true, 
+                    dynamicTyping: false,
+                    skipEmptyLines: true
+                });
+                
+                console.log('Mobile: Papa Parse completed');
+                
+                if (parsed.data && parsed.data.length > 0) {
+                    console.log(`Mobile: Processing ${parsed.data.length} rows...`);
+                    
+                    // Ultra-minimal processing - no chunking, just basic filtering
+                    const processed = [];
+                    for (let i = 0; i < Math.min(parsed.data.length, 500); i++) {
+                        const row = parsed.data[i];
+                        
+                        if (row && row.HomeTeam && row.AwayTeam && row.Date) {
+                            try {
+                                const dateObj = new Date(row.Date);
+                                if (!isNaN(dateObj.getTime())) {
+                                    processed.push({
+                                        ...row,
+                                        dateObj: dateObj,
+                                        HomeTeam: String(row.HomeTeam).trim(),
+                                        AwayTeam: String(row.AwayTeam).trim(),
+                                        FTHG: parseInt(row.FTHG) || 0,
+                                        FTAG: parseInt(row.FTAG) || 0,
+                                        Div: String(row.Div || 'E0').trim()
+                                    });
+                                }
+                            } catch (err) {
+                                console.warn('Mobile: Row processing error:', err);
+                            }
+                        }
+                        
+                        // Add delay every 100 rows
+                        if (i % 100 === 0 && i > 0) {
+                            await mobileDelay(50);
+                        }
+                    }
+                    
+                    console.log(`Mobile: Processed ${processed.length} rows successfully`);
+                    
+                    // Set minimal data
+                    state.data = processed;
+                    state.teams = [...new Set([
+                        ...processed.map(row => row.HomeTeam),
+                        ...processed.map(row => row.AwayTeam)
+                    ])].filter(team => team).sort();
+                    
+                    // Set date range
+                    const dates = processed.map(row => row.dateObj);
+                    if (dates.length > 0) {
+                        const minDate = new Date(Math.min(...dates));
+                        const maxDate = new Date(Math.max(...dates));
+                        state.dateFrom = minDate.toISOString().split('T')[0];
+                        state.dateTo = maxDate.toISOString().split('T')[0];
+                    }
+                    
+                    console.log('Mobile: Emergency load completed successfully');
+                    updateUI();
+                    updateTeamSelects();
+                    updateSeasonOptions();
+                    updateTable();
+                } else {
+                    throw new Error('No data found in mobile emergency load');
+                }
+                
+            } catch (error) {
+                console.error('Mobile emergency load failed:', error);
+                state.error = `Mobile Emergency Mode: ${error.message}`;
+                updateUI();
+            }
+        }
+
         // Load data from GitHub Gists
         async function loadGistData() {
             const isMobile = isMobileDevice();
             
-            // For mobile devices, try fallback URLs first to avoid base64 issues
-            const gistUrls = isMobile ? FALLBACK_URLS : GIST_URLS;
+            // EMERGENCY: Mobile-only minimal loading mode
+            if (isMobile) {
+                return loadGistDataMobileEmergency();
+            }
+            
+            // Desktop mode - use encoded URLs
+            const gistUrls = GIST_URLS;
             
             state.error = '';
             console.log('Starting data load...');
