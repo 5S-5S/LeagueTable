@@ -3092,7 +3092,7 @@
             loadGistData();
         }
 
-        // Decode double base64 encoded URL
+        // Decode double base64 encoded URL with fallback for browser compatibility
         function decodeDoubleBase64Url(encodedUrl) {
             try {
                 // Validate input
@@ -3101,17 +3101,34 @@
                     return null;
                 }
                 
-                // First decode from base64
-                const singleDecoded = atob(encodedUrl.trim());
+                // Clean the input
+                const cleanedInput = encodedUrl.trim().replace(/\s/g, '');
+                
+                // First decode from base64 with error handling
+                let singleDecoded;
+                try {
+                    singleDecoded = atob(cleanedInput);
+                } catch (atobError) {
+                    console.error('First atob failed:', atobError.message);
+                    return null;
+                }
+                
                 if (!singleDecoded) {
-                    console.warn('First base64 decode failed');
+                    console.warn('First base64 decode returned empty');
                     return null;
                 }
                 
                 // Second decode from base64 to get the original URL
-                const originalUrl = atob(singleDecoded);
+                let originalUrl;
+                try {
+                    originalUrl = atob(singleDecoded);
+                } catch (atobError2) {
+                    console.error('Second atob failed:', atobError2.message);
+                    return null;
+                }
+                
                 if (!originalUrl) {
-                    console.warn('Second base64 decode failed');
+                    console.warn('Second base64 decode returned empty');
                     return null;
                 }
                 
@@ -3121,10 +3138,12 @@
                     return null;
                 }
                 
+                console.log('Successfully decoded URL:', originalUrl.substring(0, 80) + '...');
                 return originalUrl;
             } catch (error) {
-                console.error('Error decoding double base64 URL:', error);
-                return null; // Return null instead of encoded URL to prevent issues
+                console.error('Error in decodeDoubleBase64Url:', error);
+                console.error('Stack trace:', error.stack);
+                return null;
             }
         }
 
@@ -3180,11 +3199,8 @@
                             header: true, 
                             dynamicTyping: false,
                             skipEmptyLines: true,
-                            preview: 10000, // Limit to first 10,000 rows to prevent stack overflow
                             transformHeader: (header) => header.trim().replace(/\r/g, ''),
-                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value,
-                            worker: false, // Disable worker to prevent issues
-                            fastMode: true // Use fast mode for better performance
+                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
                         });
                         
                         if (parsed.errors && parsed.errors.length > 0) {
@@ -3193,7 +3209,7 @@
                         
                         if (parsed.data && parsed.data.length > 0) {
                             console.log(`Successfully parsed ${parsed.data.length} rows from ${url.substring(url.lastIndexOf('/') + 1)}`);
-                            allData.push(...parsed.data.slice(0, 10000)); // Limit to prevent memory issues
+                            allData.push(...parsed.data);
                             loadedGists++;
                         } else {
                             console.warn('No data found in parsed CSV');
@@ -3250,32 +3266,19 @@
 
         // Process raw CSV data
         function processRawData(allData) {
-            console.log(`Processing ${allData.length} raw data rows`);
-            
-            if (!allData || allData.length === 0) {
-                console.warn('No data to process');
-                return [];
-            }
-            
-            // Limit data to prevent stack overflow
-            const dataToProcess = allData.slice(0, 50000); // Limit to 50k rows
-            
-            const filtered = dataToProcess.filter(row => {
-                return row && 
-                       row.HomeTeam && 
-                       row.AwayTeam && 
-                       row.Date &&
-                       row.Div &&
-                       typeof row.HomeTeam === 'string' &&
-                       typeof row.AwayTeam === 'string' &&
-                       row.HomeTeam.length > 0 &&
-                       row.AwayTeam.length > 0 &&
-                       row.Div.length > 0;
-            });
-            
-            console.log(`${filtered.length} rows passed initial filter`);
-            
-            return filtered
+            return allData
+                .filter(row => {
+                    return row && 
+                           row.HomeTeam && 
+                           row.AwayTeam && 
+                           row.Date &&
+                           row.Div &&
+                           typeof row.HomeTeam === 'string' &&
+                           typeof row.AwayTeam === 'string' &&
+                           row.HomeTeam.length > 0 &&
+                           row.AwayTeam.length > 0 &&
+                           row.Div.length > 0;
+                })
                 .map(row => {
                     try {
                         let dateStr = String(row.Date).trim().replace(/\r/g, '');
@@ -4939,10 +4942,9 @@
             // Apply ranking overrides for historic seasons to the points-sorted array
             if (!state.sortConfig.key) {
                 pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
-                tableArray = pointsSortedArray;
             } else {
-                // Apply custom sorting if requested
-                tableArray.sort((a, b) => {
+                // Apply custom sorting if requested - work with pointsSortedArray to preserve position logic
+                pointsSortedArray.sort((a, b) => {
                     let aVal = a[state.sortConfig.key];
                     let bVal = b[state.sortConfig.key];
                     
@@ -4954,65 +4956,73 @@
                 });
             }
             
-            // Add original position based on the final points/override ranking
-            // Calculate positions properly handling ties and gaps
-            
-            // Step 1: Find all override positions and calculate blocked positions
-            const overridePositions = [];
-            const blockedPositions = new Set();
-            
-            pointsSortedArray.forEach(team => {
-                if (team.sharedPosition) {
-                    overridePositions.push(team.sharedPosition);
-                }
-            });
-            
-            // Group override positions and calculate blocked ranges
-            const positionCounts = {};
-            overridePositions.forEach(pos => {
-                positionCounts[pos] = (positionCounts[pos] || 0) + 1;
-            });
-            
-            // Block positions based on ties (e.g., two 4s block positions 4 and 5)
-            Object.keys(positionCounts).forEach(pos => {
-                const position = parseInt(pos);
-                const count = positionCounts[pos];
+            // Only apply position assignment logic when not using custom sorting
+            if (!state.sortConfig.key) {
+                // Add original position based on the final points/override ranking
+                // Calculate positions properly handling ties and gaps
                 
-                // Block 'count' positions starting from 'position'
-                for (let i = 0; i < count; i++) {
-                    blockedPositions.add(position + i);
-                }
-            });
-            
-            // Step 2: Assign positions to regular teams (skip blocked positions)
-            let currentPosition = 1;
-            const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
-            
-            regularTeams.forEach(team => {
-                // Find next available position (skip blocked ones)
-                while (blockedPositions.has(currentPosition)) {
+                // Step 1: Find all override positions and calculate blocked positions
+                const overridePositions = [];
+                const blockedPositions = new Set();
+                
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        overridePositions.push(team.sharedPosition);
+                    }
+                });
+                
+                // Group override positions and calculate blocked ranges
+                const positionCounts = {};
+                overridePositions.forEach(pos => {
+                    positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+                });
+                
+                // Block positions based on ties (e.g., two 4s block positions 4 and 5)
+                Object.keys(positionCounts).forEach(pos => {
+                    const position = parseInt(pos);
+                    const count = positionCounts[pos];
+                    
+                    // Block 'count' positions starting from 'position'
+                    for (let i = 0; i < count; i++) {
+                        blockedPositions.add(position + i);
+                    }
+                });
+                
+                // Step 2: Assign positions to regular teams (skip blocked positions)
+                let currentPosition = 1;
+                const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
+                
+                regularTeams.forEach(team => {
+                    // Find next available position (skip blocked ones)
+                    while (blockedPositions.has(currentPosition)) {
+                        currentPosition++;
+                    }
+                    
+                    team.originalPosition = currentPosition;
                     currentPosition++;
-                }
+                });
                 
-                team.originalPosition = currentPosition;
-                currentPosition++;
-            });
-            
-            // Step 3: Set override positions
-            pointsSortedArray.forEach(team => {
-                if (team.sharedPosition) {
-                    team.originalPosition = team.sharedPosition;
-                }
-            });
-            
-            // Step 4: Sort teams by their final position for proper display order
-            pointsSortedArray.sort((a, b) => {
-                if (a.originalPosition !== b.originalPosition) {
-                    return a.originalPosition - b.originalPosition;
-                }
-                // If positions are equal, maintain original order (sub-order for tied teams)
-                return 0;
-            });
+                // Step 3: Set override positions
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        team.originalPosition = team.sharedPosition;
+                    }
+                });
+                
+                // Step 4: Sort teams by their final position for proper display order
+                pointsSortedArray.sort((a, b) => {
+                    if (a.originalPosition !== b.originalPosition) {
+                        return a.originalPosition - b.originalPosition;
+                    }
+                    // If positions are equal, maintain original order (sub-order for tied teams)
+                    return 0;
+                });
+            } else {
+                // For custom sorting, just assign sequential positions based on current order
+                pointsSortedArray.forEach((team, index) => {
+                    team.originalPosition = index + 1;
+                });
+            }
             
             // Use the properly sorted array for display
             tableArray = pointsSortedArray;
@@ -6164,7 +6174,7 @@
                     }
                 } else {
                     // Single team mode - use original display function
-                    displayTeamHistory(window.currentTeamHistoryName, window.currentTeamHistoryData);
+                    displayTeamHistory(window.currentTeamHistoryName, window.currentTeamHistoryData, state.teamSeasonsSelectedLeague);
                 }
             }
         }
