@@ -1287,6 +1287,36 @@
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODRNVGM0TURNNE9EYzBZemd6TWpnd05ESTFNamRrTkRZd1lqQTJOemRsWkM5eVlYY3ZNVEkxWkRNeE9XVTFOR015WVdSalpXRmhOREJqT1dNellUTXpOR1EyTUdVeVl6Qm1NRFV5TlM4eU5USTJZblZ1WkdWemJHbG5ZUzVqYzNZPQ==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHhaak15T0RKbU5tWXdNalF5TWpZeU1tTTBOMkkzWVRkaE56VXhNbU01TVM5eVlYY3ZZV0U1TkRneU0yUm1PVGs0TWpaaU5UQTVZemRrWmpVd05qUmxPRGc1TVdJNE9UUXdOalE0TkM4eU5USTJiR2xuZFdVdVkzTjI='
         ];
+        
+        // League-specific URL mapping for on-demand loading
+        const LEAGUE_URLS = {
+            'serie-a': [
+                // Serie A URLs (typically contain 'I1' in decoded form)
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVPVGc0WVRFek16TmpORE13WVdGa05URTRaV0ppTkRNNFl6VmtPR1JpTVM5eVlYY3ZZamxpTlRNMU1HSXpaVFkzTkdFM09ETXdZMkkzWkRjek9XVTJNR1poWWpReVlqWmtObVpsTkM5aWRXNWtaWE5zYVdkaExtTnpkZz09',
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OGpaV0ZoTVdOaFl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNamsxWW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5elpYSnBaV0V1WTNOMg==',
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlZMlkyTm1FNE56TXpNVGhtT0RJNE56TTJNakU1TkdKbU5UUmxNV001WWk5eVlYY3ZNalJrTW1Zd00yVXpPRFV6TlRnMVl6RmtaR1JqWkdFeVpUTTNObU5sTkdOaVlqTmxOV1ZsWkM4eU5USTJjMlZ5YVdWaExtTnpkZz09'
+            ],
+            'premier-league': [
+                // Premier League URLs (typically contain 'E0' in decoded form)  
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVPVGc0WVRFek16TmpORE13WVdGa05URTRaV0ppTkRNNFl6VmtPR1JpTVM5eVlYY3ZZamxpTlRNMU1HSXpaVFkzTkdFM09ETXdZMkkzWkRjek9XVTJNR1poWWpReVlqWmtObVpsTkM5aWRXNWtaWE5zYVdkaExtTnpkZz09',
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OG1ZVEF6TlRNeVpHWmhNVUZzWVRFNE96azVOVFptWmpZMU4yWXlNVGs1WW1FME5URXlPUzl5WVhjdlpESmhNRGcyWlRnd1lUYzRZMk00TXpJMk5UUXpZbVV5TVRGbVpURmhkV0V4TXpJeVltUmlaVTl6TlRJMmNISmxiUzVqYzNZPQ=='
+            ],
+            'la-liga': [
+                // La Liga URLs (typically contain 'SP1' in decoded form)
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHdNemt5T0dVMFlUaGxZVEU0T1RrNE1qWm1ZVGcxTURka1pUZGhOemMxTXk5eVlYY3ZZVE0wWXpnME5qRXdZVFU1T1dWbU56RTNOV00xWldKaFpqWXpaV0ZoTnpka1pUTTJNamRoTkM4eU5USTJiR0ZzYVdkaExtTnpkZz09'
+            ],
+            'bundesliga': [
+                // Bundesliga URLs (typically contain 'D1' in decoded form)
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVORGhsTVRNd05UWXlNR0ZtTTJFeE56SmlORE16T1dGaVltRXpNV1UyTnk5eVlYY3ZZakkwWmpRM1pUSTJaVFV5TURkaVlqRmtaVE01WVRGaFpqWmtNemcwT1RobE4yTXhObVl6TWk5c2FXZDFaUzVqYzNZPQ==',
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODRNVGM0TURNNE9EYzBZemd6TWpnd05ESTFNamRrTkRZd1lqQTJOemRsWkM5eVlYY3ZNVEkxWkRNeE9XVTFOR015WVdSalpXRmhOREJqT1dNellUTXpOR1EyTUdVeVl6Qm1NRFV5TlM4eU5USTJZblZ1WkdWemJHbG5ZUzVqYzNZPQ=='
+            ],
+            'ligue-1': [
+                // Ligue 1 URLs (typically contain 'F1' in decoded form)
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODJNekl5T1dFNVl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNams1WW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5bWNtVnVZMmd1WTNOMg==',
+                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHhaak15T0RKbU5tWXdNalF5TWpZeU1tTTBOMkkzWVRkaE56VXhNbU01TVM5eVlYY3ZZV0U1TkRneU0yUm1PVGs0TWpaaU5UQTVZemRrWmpVd05qUmxPRGc1TVdJNE9UUXdOalE0TkM4eU5USTJiR2xuZFdVdVkzTjI='
+            ]
+        };
 
         // Application state
         const state = {
@@ -2634,8 +2664,17 @@
         }
 
         // Handle Team Streaks league change
-        function handleTeamStreaksLeagueChange(newLeague) {
+        async function handleTeamStreaksLeagueChange(newLeague) {
             state.selectedLeague = newLeague;
+            
+            // Load league data if not already loaded
+            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
+                await loadLeagueDataForDevice(newLeague);
+            } else {
+                // If already loaded, just filter/update UI
+                filterDataForCurrentLeague();
+            }
+            
             createTeamStreaksLeagueButtons();
             updateTeamStreaksSelects();
         }
@@ -3166,20 +3205,179 @@
             return hasMobileUA && (hasSmallScreen || hasTouchScreen);
         }
         
-        // Load data from GitHub Gists
+        // Load data from GitHub Gists - now uses league-specific loading for all devices
         async function loadGistData() {
-            const isMobile = isMobileDevice();
+            console.log('Using league-specific loading for optimal performance');
+            await loadLeagueDataForDevice(state.selectedLeague);
+        }
+        
+        // Universal league-specific loading for all devices
+        async function loadLeagueDataForDevice(leagueId) {
+            console.log(`Loading data for league: ${leagueId}`);
             
-            // Mobile devices use league-specific loading
-            if (isMobile) {
-                console.log('Mobile device detected - using league-specific loading');
-                await loadLeagueDataMobile(state.selectedLeague);
+            // Check if already loaded
+            if (state.loadedLeagues && state.loadedLeagues.has(leagueId)) {
+                console.log(`League ${leagueId} already loaded, filtering existing data`);
+                filterDataForCurrentLeague();
                 return;
             }
             
-            // For desktop, use chunked loading to prevent stack overflow
-            console.log('Desktop detected - using chunked loading for stability');
-            await loadGistDataChunked();
+            // Initialize loadedLeagues if not exists
+            if (!state.loadedLeagues) {
+                state.loadedLeagues = new Set();
+            }
+            
+            // Prevent double loading
+            if (state.currentlyLoadingLeague === leagueId) {
+                console.log(`League ${leagueId} already loading, please wait...`);
+                return;
+            }
+            
+            state.currentlyLoadingLeague = leagueId;
+            state.error = '';
+            
+            // Show loading indicator
+            const leagueName = getLeagueName(leagueId);
+            state.error = `⚽ Loading ${leagueName} data...`;
+            updateUI();
+            
+            try {
+                const leagueUrls = LEAGUE_URLS[leagueId];
+                if (!leagueUrls) {
+                    throw new Error(`No URLs found for league: ${leagueId}`);
+                }
+                
+                console.log(`Fetching ${leagueUrls.length} files for ${leagueId}`);
+                const allData = [];
+                
+                for (let i = 0; i < leagueUrls.length; i++) {
+                    const encodedUrl = leagueUrls[i];
+                    
+                    try {
+                        const url = decodeDoubleBase64Url(encodedUrl);
+                        if (!url) {
+                            console.warn(`Skipping invalid URL at index ${i}`);
+                            continue;
+                        }
+                        
+                        console.log(`Fetching: ${url.substring(0, 80)}...`);
+                        
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 15000);
+                        
+                        const response = await fetch(url, { 
+                            signal: controller.signal,
+                            headers: { 'Accept': 'text/csv,text/plain,*/*' }
+                        });
+                        clearTimeout(timeoutId);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        const text = await response.text();
+                        if (!text || text.length === 0) {
+                            throw new Error('Empty response from server');
+                        }
+                        
+                        const parsed = Papa.parse(text, { 
+                            header: true, 
+                            dynamicTyping: false,
+                            skipEmptyLines: true,
+                            transformHeader: (header) => header.trim().replace(/\r/g, ''),
+                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
+                        });
+                        
+                        if (parsed.errors && parsed.errors.length > 0) {
+                            console.warn('CSV parsing errors:', parsed.errors);
+                        }
+                        
+                        if (parsed.data && parsed.data.length > 0) {
+                            console.log(`Successfully parsed ${parsed.data.length} rows`);
+                            allData.push(...parsed.data);
+                        }
+                        
+                        // Update progress
+                        const progress = Math.round(((i + 1) / leagueUrls.length) * 100);
+                        state.error = `⚽ Loading ${leagueName}... ${progress}%`;
+                        updateUI();
+                        
+                        // Small delay to keep UI responsive
+                        await new Promise(resolve => setTimeout(resolve, 50));
+                        
+                    } catch (fileError) {
+                        console.warn(`Failed to load file ${i}:`, fileError.message);
+                    }
+                }
+                
+                // Mark league as loaded and clear loading message
+                state.loadedLeagues.add(leagueId);
+                state.currentlyLoadingLeague = null;
+                state.error = '';
+                
+                // Process the data for this league only
+                console.log('Processing league data...');
+                const cleanedData = processRawData(allData);
+                
+                if (cleanedData.length === 0) {
+                    throw new Error(`No valid match data found for ${leagueName}`);
+                }
+                
+                // Update state with league data
+                state.data = cleanedData;
+                
+                const allTeams = [...new Set([
+                    ...cleanedData.map(row => row.HomeTeam),
+                    ...cleanedData.map(row => row.AwayTeam)
+                ])].filter(team => team && team.length > 1).sort();
+                
+                state.teams = allTeams;
+                
+                const dates = cleanedData.map(row => row.dateObj);
+                const minDate = new Date(Math.min(...dates));
+                const maxDate = new Date(Math.max(...dates));
+                
+                state.dateFrom = minDate.toISOString().split('T')[0];
+                state.dateTo = maxDate.toISOString().split('T')[0];
+                
+                console.log(`${leagueName} data loaded successfully:`, cleanedData.length, 'matches');
+                updateUI();
+                updateTeamSelects();
+                updateTeamSeasonsTeamSelect();
+                updateSeasonOptions();
+                updateTable();
+                
+            } catch (error) {
+                console.error(`Error loading league ${leagueId}:`, error);
+                state.error = `Failed to load ${getLeagueName(leagueId)}: ${error.message}`;
+                state.currentlyLoadingLeague = null;
+                updateUI();
+            }
+        }
+        
+        // Get human-readable league name
+        function getLeagueName(leagueId) {
+            const leagueMap = {
+                'serie-a': 'Serie A',
+                'premier-league': 'Premier League',
+                'la-liga': 'La Liga',
+                'bundesliga': 'Bundesliga',
+                'ligue-1': 'Ligue 1'
+            };
+            return leagueMap[leagueId] || leagueId;
+        }
+        
+        // Filter existing data for current league (when switching between loaded leagues)
+        function filterDataForCurrentLeague() {
+            if (!state.data || state.data.length === 0) return;
+            
+            // Since we now load league-specific data, no filtering needed
+            // Just update the UI with current data
+            updateUI();
+            updateTeamSelects();
+            updateTeamSeasonsTeamSelect();
+            updateSeasonOptions();
+            updateTable();
         }
         
         // Chunked loading for desktop browsers (prevents stack overflow)
@@ -3507,11 +3705,19 @@
         }
 
         // Handle team seasons league change
-        function handleTeamSeasonsLeagueChange(newLeague) {
+        async function handleTeamSeasonsLeagueChange(newLeague) {
             state.teamSeasonsSelectedLeague = newLeague;
             state.teamSeasonsSelectedTeam = '';
             state.teamSeasonsSelectedSeason = '';
             state.teamSeasonsSelectedPosition = '';
+            
+            // Load league data if not already loaded
+            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
+                await loadLeagueDataForDevice(newLeague);
+            } else {
+                // If already loaded, just filter/update UI
+                filterDataForCurrentLeague();
+            }
             
             createTeamSeasonsLeagueButtons();
             updateTeamSeasonsTeamSelect();
@@ -4191,11 +4397,19 @@
         }
 
         // Handle league change
-        function handleLeagueChange(newLeague) {
+        async function handleLeagueChange(newLeague) {
             state.selectedLeague = newLeague;
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
             state.selectedSeason = '';
+            
+            // Load league data if not already loaded
+            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
+                await loadLeagueDataForDevice(newLeague);
+            } else {
+                // If already loaded, just filter/update UI
+                filterDataForCurrentLeague();
+            }
             
             // Reset Last Time When state
             state.lastTimeTeam1 = '';
