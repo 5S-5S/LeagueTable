@@ -3173,112 +3173,16 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        // EMERGENCY: Ultra-safe mobile data loading
-        async function loadGistDataMobileEmergency() {
-            state.error = '';
-            console.log('MOBILE EMERGENCY MODE: Starting minimal data load...');
-            
-            try {
-                // Load only Premier League data for mobile as a test
-                const url = 'https://gist.githubusercontent.com/5S-5S/c895dc7f8817bf37cff7ae90cda31fe1/raw/9079bdb6aac0583a380e2c5aecdd9d6f9b998e34/prem.csv';
-                
-                console.log('Mobile: Fetching single URL...');
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const text = await response.text();
-                console.log(`Mobile: Received ${text.length} characters`);
-                
-                // Minimal parsing - just take first 1000 rows
-                const lines = text.split('\n').slice(0, 1000);
-                const minimalCsv = lines.join('\n');
-                
-                console.log('Mobile: Starting Papa Parse...');
-                const parsed = Papa.parse(minimalCsv, { 
-                    header: true, 
-                    dynamicTyping: false,
-                    skipEmptyLines: true
-                });
-                
-                console.log('Mobile: Papa Parse completed');
-                
-                if (parsed.data && parsed.data.length > 0) {
-                    console.log(`Mobile: Processing ${parsed.data.length} rows...`);
-                    
-                    // Ultra-minimal processing - no chunking, just basic filtering
-                    const processed = [];
-                    for (let i = 0; i < Math.min(parsed.data.length, 500); i++) {
-                        const row = parsed.data[i];
-                        
-                        if (row && row.HomeTeam && row.AwayTeam && row.Date) {
-                            try {
-                                const dateObj = new Date(row.Date);
-                                if (!isNaN(dateObj.getTime())) {
-                                    processed.push({
-                                        ...row,
-                                        dateObj: dateObj,
-                                        HomeTeam: String(row.HomeTeam).trim(),
-                                        AwayTeam: String(row.AwayTeam).trim(),
-                                        FTHG: parseInt(row.FTHG) || 0,
-                                        FTAG: parseInt(row.FTAG) || 0,
-                                        Div: String(row.Div || 'E0').trim()
-                                    });
-                                }
-                            } catch (err) {
-                                console.warn('Mobile: Row processing error:', err);
-                            }
-                        }
-                        
-                        // Add delay every 100 rows
-                        if (i % 100 === 0 && i > 0) {
-                            await mobileDelay(50);
-                        }
-                    }
-                    
-                    console.log(`Mobile: Processed ${processed.length} rows successfully`);
-                    
-                    // Set minimal data
-                    state.data = processed;
-                    state.teams = [...new Set([
-                        ...processed.map(row => row.HomeTeam),
-                        ...processed.map(row => row.AwayTeam)
-                    ])].filter(team => team).sort();
-                    
-                    // Set date range
-                    const dates = processed.map(row => row.dateObj);
-                    if (dates.length > 0) {
-                        const minDate = new Date(Math.min(...dates));
-                        const maxDate = new Date(Math.max(...dates));
-                        state.dateFrom = minDate.toISOString().split('T')[0];
-                        state.dateTo = maxDate.toISOString().split('T')[0];
-                    }
-                    
-                    console.log('Mobile: Emergency load completed successfully');
-                    updateUI();
-                    updateTeamSelects();
-                    updateSeasonOptions();
-                    updateTable();
-                } else {
-                    throw new Error('No data found in mobile emergency load');
-                }
-                
-            } catch (error) {
-                console.error('Mobile emergency load failed:', error);
-                state.error = `Mobile Emergency Mode: ${error.message}`;
-                updateUI();
-            }
-        }
 
         // Load data from GitHub Gists
         async function loadGistData() {
             const isMobile = isMobileDevice();
             
-            // EMERGENCY: Mobile-only minimal loading mode
+            // Mobile devices not supported
             if (isMobile) {
-                return loadGistDataMobileEmergency();
+                state.error = 'Mobile Support Currently Unavailable - This website requires a desktop or tablet device due to the large dataset processing requirements. Please visit from a desktop computer for the full experience.';
+                updateUI();
+                return;
             }
             
             // Desktop mode - use encoded URLs
@@ -3299,44 +3203,22 @@
                 let loadedGists = 0;
 
                 for (let i = 0; i < gistUrls.length; i++) {
-                    const urlInput = gistUrls[i];
+                    const encodedUrl = gistUrls[i];
                     console.log(`Processing URL ${i + 1}/${gistUrls.length}`);
                     
-                    // Add delay for mobile devices to prevent stack overflow
-                    if (isMobile && i > 0) {
-                        await mobileDelay(100); // Small delay between requests
-                    }
+                    const url = decodeDoubleBase64Url(encodedUrl);
                     
-                    let url;
-                    
-                    // Check if this is already a plain URL (fallback mode) or encoded
-                    if (urlInput.startsWith('https://')) {
-                        // Plain URL (fallback mode)
-                        url = urlInput;
-                        console.log('Using fallback URL (mobile mode)');
-                    } else {
-                        // Try to decode base64
-                        url = decodeDoubleBase64Url(urlInput);
-                        if (!url) {
-                            console.warn(`Base64 decoding failed for URL ${i + 1}, trying fallback`);
-                            // Fallback to original URL if base64 fails
-                            url = FALLBACK_URLS[i];
-                        }
-                    }
-                    
-                    // Skip if no valid URL available
+                    // Skip if URL decoding failed
                     if (!url) {
-                        console.warn(`No valid URL available at index ${i}`);
+                        console.warn(`Skipping invalid URL at index ${i}`);
                         continue;
                     }
                     
                     try {
                         console.log(`Fetching: ${url.substring(0, 80)}...`);
                         
-                        // Add timeout to fetch - shorter timeout for mobile
                         const controller = new AbortController();
-                        const timeoutMs = isMobile ? 8000 : 10000; // 8s for mobile, 10s for desktop
-                        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                        const timeoutId = setTimeout(() => controller.abort(), 10000);
                         
                         const response = await fetch(url, { 
                             signal: controller.signal,
@@ -3345,6 +3227,7 @@
                             }
                         });
                         clearTimeout(timeoutId);
+                        
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
@@ -3356,22 +3239,13 @@
                             throw new Error('Empty response from server');
                         }
                         
-                        // Add mobile delay before parsing
-                        if (isMobile) {
-                            await mobileDelay(50);
-                        }
-                        
-                        const parseConfig = {
+                        const parsed = Papa.parse(text, { 
                             header: true, 
                             dynamicTyping: false,
                             skipEmptyLines: true,
                             transformHeader: (header) => header.trim().replace(/\r/g, ''),
                             transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
-                        };
-                        
-                        // No preview limit - mobile gets full data, just processed in chunks
-                        
-                        const parsed = Papa.parse(text, parseConfig);
+                        });
                         
                         if (parsed.errors && parsed.errors.length > 0) {
                             console.warn('CSV parsing errors:', parsed.errors);
@@ -3379,18 +3253,7 @@
                         
                         if (parsed.data && parsed.data.length > 0) {
                             console.log(`Successfully parsed ${parsed.data.length} rows from ${url.substring(url.lastIndexOf('/') + 1)}`);
-                            
-                            // For mobile, add data in chunks to prevent stack overflow
-                            if (isMobile && parsed.data.length > 2000) {
-                                // Add data in chunks of 2000 rows
-                                for (let j = 0; j < parsed.data.length; j += 2000) {
-                                    const chunk = parsed.data.slice(j, j + 2000);
-                                    allData.push(...chunk);
-                                    await mobileDelay(10); // Small delay between chunks
-                                }
-                            } else {
-                                allData.push(...parsed.data);
-                            }
+                            allData.push(...parsed.data);
                             loadedGists++;
                         } else {
                             console.warn('No data found in parsed CSV');
@@ -3407,13 +3270,7 @@
                 
                 // Process the data
                 console.log('Starting data processing...');
-                
-                // Add mobile delay before processing
-                if (isMobile) {
-                    await mobileDelay(100);
-                }
-                
-                const cleanedData = await processRawDataAsync(allData, isMobile);
+                const cleanedData = processRawData(allData);
                 console.log('Data processing completed');
                 
                 if (cleanedData.length === 0) {
