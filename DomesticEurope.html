@@ -1288,34 +1288,13 @@
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHhaak15T0RKbU5tWXdNalF5TWpZeU1tTTBOMkkzWVRkaE56VXhNbU01TVM5eVlYY3ZZV0U1TkRneU0yUm1PVGs0TWpaaU5UQTVZemRrWmpVd05qUmxPRGc1TVdJNE9UUXdOalE0TkM4eU5USTJiR2xuZFdVdVkzTjI='
         ];
         
-        // League-specific URL mapping for on-demand loading
-        const LEAGUE_URLS = {
-            'serie-a': [
-                // Serie A URLs (typically contain 'I1' in decoded form)
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVPVGc0WVRFek16TmpORE13WVdGa05URTRaV0ppTkRNNFl6VmtPR1JpTVM5eVlYY3ZZamxpTlRNMU1HSXpaVFkzTkdFM09ETXdZMkkzWkRjek9XVTJNR1poWWpReVlqWmtObVpsTkM5aWRXNWtaWE5zYVdkaExtTnpkZz09',
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OGpaV0ZoTVdOaFl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNamsxWW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5elpYSnBaV0V1WTNOMg==',
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlZMlkyTm1FNE56TXpNVGhtT0RJNE56TTJNakU1TkdKbU5UUmxNV001WWk5eVlYY3ZNalJrTW1Zd00yVXpPRFV6TlRnMVl6RmtaR1JqWkdFeVpUTTNObU5sTkdOaVlqTmxOV1ZsWkM4eU5USTJjMlZ5YVdWaExtTnpkZz09'
-            ],
-            'premier-league': [
-                // Premier League URLs (typically contain 'E0' in decoded form)  
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVPVGc0WVRFek16TmpORE13WVdGa05URTRaV0ppTkRNNFl6VmtPR1JpTVM5eVlYY3ZZamxpTlRNMU1HSXpaVFkzTkdFM09ETXdZMkkzWkRjek9XVTJNR1poWWpReVlqWmtObVpsTkM5aWRXNWtaWE5zYVdkaExtTnpkZz09',
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OG1ZVEF6TlRNeVpHWmhNVUZzWVRFNE96azVOVFptWmpZMU4yWXlNVGs1WW1FME5URXlPUzl5WVhjdlpESmhNRGcyWlRnd1lUYzRZMk00TXpJMk5UUXpZbVV5TVRGbVpURmhkV0V4TXpJeVltUmlaVTl6TlRJMmNISmxiUzVqYzNZPQ=='
-            ],
-            'la-liga': [
-                // La Liga URLs (typically contain 'SP1' in decoded form)
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHdNemt5T0dVMFlUaGxZVEU0T1RrNE1qWm1ZVGcxTURka1pUZGhOemMxTXk5eVlYY3ZZVE0wWXpnME5qRXdZVFU1T1dWbU56RTNOV00xWldKaFpqWXpaV0ZoTnpka1pUTTJNamRoTkM4eU5USTJiR0ZzYVdkaExtTnpkZz09'
-            ],
-            'bundesliga': [
-                // Bundesliga URLs (typically contain 'D1' in decoded form)
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVORGhsTVRNd05UWXlNR0ZtTTJFeE56SmlORE16T1dGaVltRXpNV1UyTnk5eVlYY3ZZakkwWmpRM1pUSTJaVFV5TURkaVlqRmtaVE01WVRGaFpqWmtNemcwT1RobE4yTXhObVl6TWk5c2FXZDFaUzVqYzNZPQ==',
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODRNVGM0TURNNE9EYzBZemd6TWpnd05ESTFNamRrTkRZd1lqQTJOemRsWkM5eVlYY3ZNVEkxWkRNeE9XVTFOR015WVdSalpXRmhOREJqT1dNellUTXpOR1EyTUdVeVl6Qm1NRFV5TlM4eU5USTJZblZ1WkdWemJHbG5ZUzVqYzNZPQ=='
-            ],
-            'ligue-1': [
-                // Ligue 1 URLs (typically contain 'F1' in decoded form)
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODJNekl5T1dFNVl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNams1WW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5bWNtVnVZMmd1WTNOMg==',
-                'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OHhaak15T0RKbU5tWXdNalF5TWpZeU1tTTBOMkkzWVRkaE56VXhNbU01TVM5eVlYY3ZZV0U1TkRneU0yUm1PVGs0TWpaaU5UQTVZemRrWmpVd05qUmxPRGc1TVdJNE9UUXdOalE0TkM4eU5USTJiR2xuZFdVdVkzTjI='
-            ]
+        // League code mapping for filtering data
+        const LEAGUE_CODES = {
+            'serie-a': 'I1',
+            'premier-league': 'E0',
+            'la-liga': 'SP1',
+            'bundesliga': 'D1',
+            'ligue-1': 'F1'
         };
 
         // Application state
@@ -2672,7 +2651,7 @@
                 await loadLeagueDataForDevice(newLeague);
             } else {
                 // If already loaded, just filter/update UI
-                filterDataForCurrentLeague();
+                filterDataForCurrentLeague(newLeague);
             }
             
             createTeamStreaksLeagueButtons();
@@ -3218,13 +3197,18 @@
             // Check if already loaded
             if (state.loadedLeagues && state.loadedLeagues.has(leagueId)) {
                 console.log(`League ${leagueId} already loaded, filtering existing data`);
-                filterDataForCurrentLeague();
+                filterDataForCurrentLeague(leagueId);
                 return;
             }
             
             // Initialize loadedLeagues if not exists
             if (!state.loadedLeagues) {
                 state.loadedLeagues = new Set();
+            }
+            
+            // Initialize allLeagueData to store all data if not exists
+            if (!state.allLeagueData) {
+                state.allLeagueData = [];
             }
             
             // Prevent double loading
@@ -3242,16 +3226,14 @@
             updateUI();
             
             try {
-                const leagueUrls = LEAGUE_URLS[leagueId];
-                if (!leagueUrls) {
-                    throw new Error(`No URLs found for league: ${leagueId}`);
-                }
+                // Load ALL gist URLs since each contains data for all leagues
+                const gistUrls = GIST_URLS;
                 
-                console.log(`Fetching ${leagueUrls.length} files for ${leagueId}`);
+                console.log(`Fetching ${gistUrls.length} files (contains all leagues)`);
                 const allData = [];
                 
-                for (let i = 0; i < leagueUrls.length; i++) {
-                    const encodedUrl = leagueUrls[i];
+                for (let i = 0; i < gistUrls.length; i++) {
+                    const encodedUrl = gistUrls[i];
                     
                     try {
                         const url = decodeDoubleBase64Url(encodedUrl);
@@ -3298,8 +3280,8 @@
                         }
                         
                         // Update progress
-                        const progress = Math.round(((i + 1) / leagueUrls.length) * 100);
-                        state.error = `⚽ Loading ${leagueName}... ${progress}%`;
+                        const progress = Math.round(((i + 1) / gistUrls.length) * 100);
+                        state.error = `⚽ Loading data... ${progress}%`;
                         updateUI();
                         
                         // Small delay to keep UI responsive
@@ -3310,46 +3292,35 @@
                     }
                 }
                 
-                // Mark league as loaded and clear loading message
-                state.loadedLeagues.add(leagueId);
-                state.currentlyLoadingLeague = null;
-                state.error = '';
-                
-                // Process the data for this league only
-                console.log('Processing league data...');
+                // Process all the raw data
+                console.log('Processing all league data...');
                 const cleanedData = processRawData(allData);
                 
                 if (cleanedData.length === 0) {
-                    throw new Error(`No valid match data found for ${leagueName}`);
+                    throw new Error(`No valid match data found`);
                 }
                 
-                // Update state with league data
-                state.data = cleanedData;
+                // Store all data for future league switches
+                state.allLeagueData = cleanedData;
                 
-                const allTeams = [...new Set([
-                    ...cleanedData.map(row => row.HomeTeam),
-                    ...cleanedData.map(row => row.AwayTeam)
-                ])].filter(team => team && team.length > 1).sort();
+                // Mark all leagues as loaded since we loaded everything
+                state.loadedLeagues.add('serie-a');
+                state.loadedLeagues.add('premier-league');
+                state.loadedLeagues.add('la-liga');
+                state.loadedLeagues.add('bundesliga');
+                state.loadedLeagues.add('ligue-1');
                 
-                state.teams = allTeams;
+                state.currentlyLoadingLeague = null;
+                state.error = '';
                 
-                const dates = cleanedData.map(row => row.dateObj);
-                const minDate = new Date(Math.min(...dates));
-                const maxDate = new Date(Math.max(...dates));
+                // Filter data for the requested league
+                filterDataForCurrentLeague(leagueId);
                 
-                state.dateFrom = minDate.toISOString().split('T')[0];
-                state.dateTo = maxDate.toISOString().split('T')[0];
-                
-                console.log(`${leagueName} data loaded successfully:`, cleanedData.length, 'matches');
-                updateUI();
-                updateTeamSelects();
-                updateTeamSeasonsTeamSelect();
-                updateSeasonOptions();
-                updateTable();
+                console.log(`All data loaded successfully. Showing ${leagueName}:`, state.data.length, 'matches');
                 
             } catch (error) {
-                console.error(`Error loading league ${leagueId}:`, error);
-                state.error = `Failed to load ${getLeagueName(leagueId)}: ${error.message}`;
+                console.error(`Error loading data:`, error);
+                state.error = `Failed to load data: ${error.message}`;
                 state.currentlyLoadingLeague = null;
                 updateUI();
             }
@@ -3368,11 +3339,42 @@
         }
         
         // Filter existing data for current league (when switching between loaded leagues)
-        function filterDataForCurrentLeague() {
-            if (!state.data || state.data.length === 0) return;
+        function filterDataForCurrentLeague(leagueId) {
+            if (!state.allLeagueData || state.allLeagueData.length === 0) return;
             
-            // Since we now load league-specific data, no filtering needed
-            // Just update the UI with current data
+            const leagueCode = LEAGUE_CODES[leagueId];
+            if (!leagueCode) {
+                console.warn(`Unknown league ID: ${leagueId}`);
+                return;
+            }
+            
+            // Filter data for the specific league
+            const filteredData = state.allLeagueData.filter(row => row.Div === leagueCode);
+            
+            console.log(`Filtered ${filteredData.length} matches for ${leagueId} (${leagueCode})`);
+            
+            // Update state with filtered data
+            state.data = filteredData;
+            
+            // Update teams list for this league
+            const allTeams = [...new Set([
+                ...filteredData.map(row => row.HomeTeam),
+                ...filteredData.map(row => row.AwayTeam)
+            ])].filter(team => team && team.length > 1).sort();
+            
+            state.teams = allTeams;
+            
+            // Update date range for this league
+            if (filteredData.length > 0) {
+                const dates = filteredData.map(row => row.dateObj);
+                const minDate = new Date(Math.min(...dates));
+                const maxDate = new Date(Math.max(...dates));
+                
+                state.dateFrom = minDate.toISOString().split('T')[0];
+                state.dateTo = maxDate.toISOString().split('T')[0];
+            }
+            
+            // Update the UI with filtered data
             updateUI();
             updateTeamSelects();
             updateTeamSeasonsTeamSelect();
@@ -3716,7 +3718,7 @@
                 await loadLeagueDataForDevice(newLeague);
             } else {
                 // If already loaded, just filter/update UI
-                filterDataForCurrentLeague();
+                filterDataForCurrentLeague(newLeague);
             }
             
             createTeamSeasonsLeagueButtons();
@@ -4408,7 +4410,7 @@
                 await loadLeagueDataForDevice(newLeague);
             } else {
                 // If already loaded, just filter/update UI
-                filterDataForCurrentLeague();
+                filterDataForCurrentLeague(newLeague);
             }
             
             // Reset Last Time When state
