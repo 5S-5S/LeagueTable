@@ -3177,16 +3177,31 @@
                 return;
             }
             
+            // For desktop, use chunked loading to prevent stack overflow
+            console.log('Desktop detected - using chunked loading for stability');
+            await loadGistDataChunked();
+        }
+        
+        // Chunked loading for desktop browsers (prevents stack overflow)
+        async function loadGistDataChunked() {
             const gistUrls = GIST_URLS;
             
             state.error = '';
-            console.log('Starting data load...');
+            console.log('Starting chunked data load...');
 
             try {
                 const allData = [];
                 let loadedGists = 0;
-
-                for (let i = 0; i < gistUrls.length; i++) {
+                
+                // Process files in smaller batches to prevent stack overflow
+                const batchSize = 5; // Process 5 files at a time
+                
+                for (let batchStart = 0; batchStart < gistUrls.length; batchStart += batchSize) {
+                    const batchEnd = Math.min(batchStart + batchSize, gistUrls.length);
+                    console.log(`Processing batch ${Math.floor(batchStart/batchSize) + 1}/${Math.ceil(gistUrls.length/batchSize)} (files ${batchStart + 1}-${batchEnd})`);
+                    
+                    // Process batch of files
+                    for (let i = batchStart; i < batchEnd; i++) {
                     const encodedUrl = gistUrls[i];
                     console.log(`Processing URL ${i + 1}/${gistUrls.length}`);
                     
@@ -3238,18 +3253,17 @@
                         if (parsed.data && parsed.data.length > 0) {
                             console.log(`Successfully parsed ${parsed.data.length} rows from ${url.substring(url.lastIndexOf('/') + 1)}`);
                             
-                            // Chunked processing for Chrome stability
-                            const isChrome = navigator.userAgent.toLowerCase().includes('chrome');
-                            if (isChrome && parsed.data.length > 1000) {
-                                // Process in chunks for Chrome
-                                const chunkSize = 500;
+                            // Always use chunked processing for desktop stability
+                            if (parsed.data.length > 500) {
+                                // Process in chunks for all browsers
+                                const chunkSize = 300;
                                 for (let i = 0; i < parsed.data.length; i += chunkSize) {
                                     const chunk = parsed.data.slice(i, i + chunkSize);
                                     allData.push(...chunk);
                                     
                                     // Small delay to prevent stack overflow
                                     if (i + chunkSize < parsed.data.length) {
-                                        await new Promise(resolve => setTimeout(resolve, 10));
+                                        await new Promise(resolve => setTimeout(resolve, 25));
                                     }
                                 }
                             } else {
@@ -3263,10 +3277,19 @@
                         console.warn(`Failed to load ${url}:`, gistError.message);
                     }
                     
-                    // Add delay between files for Chrome stability
-                    const isChrome = navigator.userAgent.toLowerCase().includes('chrome');
-                    if (isChrome && i < gistUrls.length - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 20));
+                    // Small delay between files within batch
+                    if (i < batchEnd - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 10));
+                    }
+                    }
+                    
+                    // Delay between batches to prevent stack overflow  
+                    if (batchEnd < gistUrls.length) {
+                        const progress = Math.round((batchEnd / gistUrls.length) * 100);
+                        state.error = `🔄 Loading data... ${progress}% complete (${loadedGists} files processed)`;
+                        updateUI();
+                        console.log(`Batch complete. Progress: ${progress}%`);
+                        await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 }
                 
@@ -3274,6 +3297,9 @@
                     throw new Error('No valid data could be loaded from any Gist');
                 }
                 
+                // Clear loading message and show processing status
+                state.error = '⚙️ Processing data...';
+                updateUI();
                 
                 // Process the data
                 console.log('Starting data processing...');
@@ -3299,6 +3325,7 @@
                 state.teams = allTeams;
                 state.dateFrom = minDate.toISOString().split('T')[0];
                 state.dateTo = maxDate.toISOString().split('T')[0];
+                state.error = ''; // Clear loading message
                 
                 console.log('Data loaded successfully:', cleanedData.length, 'matches');
                 updateUI();
