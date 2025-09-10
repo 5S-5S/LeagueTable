@@ -1276,7 +1276,7 @@
     <script>
         // Pre-configured Gist URLs (Double Base64 Encoded)
         const GIST_URLS = [
-            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVPVGc0WVRFek16TmpORE13WVdGa05URTRaV0ppTkRNNFl6VmtPR1JpTVM5eVlYY3ZZamxpTlRNMU1HSXpaVFkzTkdFM09ETXdZMkkzWkRjek9XVTJNR1poWWpReVlqWmtObVpsTkM5aWRXNWtaWE5zYVdkaExtTnpkZz09',
+            'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExpTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODNORE0xWm1FMk9XWTFZVFl6WkRWbU0yTmpZMkUxTTJJMFpEQTBPV1prWmk5eVlYY3ZPR1V4TnpSbE1USm1NalU1WVdKaU5tWjVaV0ZsT0RjeFl6WTROR1U0T1RrMk5HSXpZakEzTXk5c1lXeHBaMkV1WTNOMg==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5ODVORGhsTVRNd05UWXlNR0ZtTTJFeE56SmlORE16T1dGaVltRXpNV1UyTnk5eVlYY3ZZakkwWmpRM1pUSTJaVFV5TURkaVlqRmtaVE01WVRGaFpqWmtNemcwT1RobE4yTXhObVl6TWk5c2FXZDFaUzVqYzNZPQ==',
             'YUhSMGNITTZMeTluYVhOMExtZHBkR2gxWW5WelpYSmpiMjUwWlc1MExtTnZiUzgxVXkwMVV5OWlaV0ZoTVdOaFl6aG1Zak0zTURsa1l6ZGpNbVkwWW1JelpEYzVPV0kwTVM5eVlYY3ZNamsxWW1NMVpHSTVaV0ZqTnpjeFkyUTNNVGRsWm1SalpqZG1NMkpsTldNek56STBZVEUzWXk5elpYSnBaV0V1WTNOMg==',
@@ -3242,6 +3242,12 @@
                             continue;
                         }
                         
+                        // Check for obviously malformed URLs
+                        if (!url.startsWith('http')) {
+                            console.warn(`Skipping malformed URL at index ${i}: ${url.substring(0, 50)}...`);
+                            continue;
+                        }
+                        
                         console.log(`Fetching: ${url.substring(0, 80)}...`);
                         
                         const controller = new AbortController();
@@ -3428,6 +3434,10 @@
                         });
                         clearTimeout(timeoutId);
                         if (!response.ok) {
+                            if (response.status === 404) {
+                                console.warn(`File not found (404) at index ${i}, skipping: ${url.substring(url.lastIndexOf('/') + 1)}`);
+                                continue;
+                            }
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
                         
