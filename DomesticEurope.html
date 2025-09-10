@@ -25,14 +25,20 @@
         .bg-gradient-purple { background: linear-gradient(to right, #7c3aed, #6d28d9); }
         .bg-gradient-gray { background: linear-gradient(to right, #374151, #1f2937); }
         .text-white { color: white; }
-        .text-gray-700 { color: #374151; }
-        .text-gray-600 { color: #4b5563; }
-        .text-gray-500 { color: #6b7280; }
-        .text-gray-400 { color: #9ca3af; }
+        .text-gray-700 { color: #000000; }
+        .text-gray-600 { color: #000000; }
+        .text-gray-500 { color: #000000; }
+        .text-gray-400 { color: #000000; }
         .text-blue-700 { color: #1d4ed8; }
         .text-green-700 { color: #047857; }
         .text-red-600 { color: #dc2626; }
         .bg-white { background-color: white; }
+        
+        /* High contrast text for better readability */
+        body, p, span, div, td, th, label, select, input { color: #000000 !important; }
+        
+        /* Exceptions for specific colored elements */
+        .text-blue-700, .text-green-700, .text-red-600 { color: inherit !important; }
         .bg-gray-50 { background: #f9fafb; }
         .bg-blue-100 { background: #dbeafe; }
         .bg-blue-50 { background: #eff6ff; }
@@ -694,7 +700,7 @@
     <!-- Sidebar Menu -->
     <div id="sideMenu" class="side-menu">
         <div class="menu-header">
-            <h2 class="text-xl font-bold text-gray-800">Navigation</h2>
+            <h2 class="text-xl font-bold" style="color: black;">Navigation</h2>
             <button id="closeMenuBtn" class="close-btn">&times;</button>
         </div>
         <nav class="menu-nav">
@@ -1274,7 +1280,31 @@
     </div>
 
     <script>
-        // Fallback original URLs (for when base64 decoding fails on mobile)
+        // League-specific URL mapping for mobile on-demand loading
+        const LEAGUE_URLS = {
+            'serie-a': [
+                'https://gist.githubusercontent.com/5S-5S/beaa1cac8fb3709dc7c2f4bb3d799b41/raw/295bc5db9eac771cd717efdcf7f3be5c3724a17c/seriea.csv',
+                'https://gist.githubusercontent.com/5S-5S/bcf66a873318f8287362194bf54e1c9b/raw/24d2f03e3853585c1dddcda2e376ce4cbb3e5eed/2526seriea.csv'
+            ],
+            'premier-league': [
+                'https://gist.githubusercontent.com/5S-5S/c895dc7f8817bf37cff7ae90cda31fe1/raw/9079bdb6aac0583a380e2c5aecdd9d6f9b998e34/prem.csv',
+                'https://gist.githubusercontent.com/5S-5S/fa353dfa11e18395ff657f2196a45129/raw/d2a086ec0a78cc8325503be211fe1aea1322bdbe/2526prem.csv'
+            ],
+            'la-liga': [
+                'https://gist.githubusercontent.com/5S-5S/7435fa69f5a63d5f3ccca53b4d049fdf/raw/8e174e12f259abb6f9eae871c684e89964b3b073/laliga.csv',
+                'https://gist.githubusercontent.com/5S-5S/03928e4a8ea1899826fa8507de7a7753/raw/a34c84610a599ef7175c5ebaf63eaa77de3627a4/2526laliga.csv'
+            ],
+            'bundesliga': [
+                'https://gist.githubusercontent.com/5S-5S/9988a1333c430aad518ebb438c5d8db1/raw/b9b5350b3e674a7830cb7d739e60fab42b6d6fe4/bundesliga.csv',
+                'https://gist.githubusercontent.com/5S-5S/8178038874c8328042527d460b0677ed/raw/125d319e54c2adceaa40c9c3a334d60e2c0f0525/2526bundesliga.csv'
+            ],
+            'ligue-1': [
+                'https://gist.githubusercontent.com/5S-5S/948e1305620af3a172b4339abba31e67/raw/b24f47e26e5207bb1de39a1af6d38498e7c16f32/ligue.csv',
+                'https://gist.githubusercontent.com/5S-5S/1f3282f6f02422622c47b7a7a7512c91/raw/aa94823df99826b509c7df5064e8891b89406484/2526ligue.csv'
+            ]
+        };
+
+        // Fallback original URLs (all leagues - for desktop)
         const FALLBACK_URLS = [
             'https://gist.githubusercontent.com/5S-5S/9988a1333c430aad518ebb438c5d8db1/raw/b9b5350b3e674a7830cb7d739e60fab42b6d6fe4/bundesliga.csv',
             'https://gist.githubusercontent.com/5S-5S/7435fa69f5a63d5f3ccca53b4d049fdf/raw/8e174e12f259abb6f9eae871c684e89964b3b073/laliga.csv',
@@ -1307,6 +1337,11 @@
             data: [],
             teams: [],
             error: '',
+            
+            // Mobile-specific state
+            isMobileMode: false,
+            loadedLeagues: new Set(), // Track which leagues have been loaded
+            mobileLoadingLeague: null, // Track which league is currently loading
             
             // Filter states
             dateFrom: '',
@@ -2648,8 +2683,16 @@
         }
 
         // Handle Team Streaks league change
-        function handleTeamStreaksLeagueChange(newLeague) {
+        async function handleTeamStreaksLeagueChange(newLeague) {
+            const isMobile = isMobileDevice();
+            
             state.selectedLeague = newLeague;
+            
+            // For mobile devices, load league data if not already loaded
+            if (isMobile && !state.loadedLeagues.includes(newLeague)) {
+                await loadLeagueDataMobile(newLeague);
+            }
+            
             createTeamStreaksLeagueButtons();
             updateTeamStreaksSelects();
         }
@@ -3173,15 +3216,159 @@
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
+        // Get human-readable league name
+        function getLeagueName(leagueId) {
+            const leagueMap = {
+                'serie-a': 'Serie A',
+                'premier-league': 'Premier League',
+                'la-liga': 'La Liga',
+                'bundesliga': 'Bundesliga',
+                'ligue-1': 'Ligue 1'
+            };
+            return leagueMap[leagueId] || leagueId;
+        }
+        
+        // Mobile-specific: Load data for a specific league only
+        async function loadLeagueDataMobile(leagueId) {
+            console.log(`Mobile: Loading data for league ${leagueId}`);
+            
+            // Check if already loaded
+            if (state.loadedLeagues.has(leagueId)) {
+                console.log(`Mobile: League ${leagueId} already loaded, filtering existing data`);
+                filterDataForCurrentLeague();
+                return;
+            }
+            
+            // Prevent double loading
+            if (state.mobileLoadingLeague === leagueId) {
+                console.log(`Mobile: League ${leagueId} already loading, please wait...`);
+                return;
+            }
+            
+            state.mobileLoadingLeague = leagueId;
+            state.error = '';
+            
+            // Show loading indicator
+            const leagueName = getLeagueName(leagueId);
+            state.error = `📱 Loading ${leagueName} data for mobile...`;
+            updateUI();
+            
+            try {
+                const leagueUrls = LEAGUE_URLS[leagueId];
+                if (!leagueUrls) {
+                    throw new Error(`No URLs found for league: ${leagueId}`);
+                }
+                
+                console.log(`Mobile: Fetching ${leagueUrls.length} files for ${leagueId}`);
+                
+                for (let i = 0; i < leagueUrls.length; i++) {
+                    const url = leagueUrls[i];
+                    
+                    try {
+                        console.log(`Mobile: Fetching file ${i + 1}/${leagueUrls.length}: ${url.substring(url.lastIndexOf('/') + 1)}`);
+                        
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                        }
+                        
+                        const text = await response.text();
+                        console.log(`Mobile: Received ${text.length} characters`);
+                        
+                        // Add small delay for mobile
+                        await mobileDelay(100);
+                        
+                        const parsed = Papa.parse(text, {
+                            header: true,
+                            dynamicTyping: false,
+                            skipEmptyLines: true,
+                            transformHeader: (header) => header.trim().replace(/\r/g, ''),
+                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
+                        });
+                        
+                        if (parsed.data && parsed.data.length > 0) {
+                            console.log(`Mobile: Successfully parsed ${parsed.data.length} rows`);
+                            
+                            // Process data in chunks for mobile
+                            const processed = [];
+                            const chunkSize = 1000;
+                            
+                            for (let j = 0; j < parsed.data.length; j += chunkSize) {
+                                const chunk = parsed.data.slice(j, j + chunkSize);
+                                const processedChunk = processDataChunk(chunk);
+                                processed.push(...processedChunk.filter(item => item !== null));
+                                
+                                // Small delay between chunks
+                                if (j + chunkSize < parsed.data.length) {
+                                    await mobileDelay(20);
+                                }
+                            }
+                            
+                            // Add to existing data instead of replacing
+                            state.data.push(...processed);
+                            
+                        } else {
+                            console.warn(`Mobile: No data found in ${url}`);
+                        }
+                        
+                    } catch (fileError) {
+                        console.warn(`Mobile: Failed to load ${url}:`, fileError.message);
+                    }
+                }
+                
+                // Mark league as loaded and clear loading message
+                state.loadedLeagues.add(leagueId);
+                state.mobileLoadingLeague = null;
+                state.error = '';
+                
+                // Update teams and UI
+                const allTeams = [...new Set([
+                    ...state.data.map(row => row.HomeTeam),
+                    ...state.data.map(row => row.AwayTeam)
+                ])].filter(team => team && team.length > 1).sort();
+                
+                state.teams = allTeams;
+                
+                // Set date ranges
+                const dates = state.data.map(row => row.dateObj).filter(date => date);
+                if (dates.length > 0) {
+                    const minDate = new Date(Math.min(...dates));
+                    const maxDate = new Date(Math.max(...dates));
+                    state.dateFrom = minDate.toISOString().split('T')[0];
+                    state.dateTo = maxDate.toISOString().split('T')[0];
+                }
+                
+                console.log(`Mobile: Successfully loaded ${leagueId} with ${state.data.length} total matches`);
+                
+                // Update UI
+                updateUI();
+                updateTeamSelects();
+                updateSeasonOptions();
+                updateTable();
+                
+            } catch (error) {
+                console.error(`Mobile: Error loading league ${leagueId}:`, error);
+                state.error = `Failed to load ${leagueId}: ${error.message}`;
+                state.mobileLoadingLeague = null;
+                updateUI();
+            }
+        }
+
+        // Filter existing data for current league (mobile mode)
+        function filterDataForCurrentLeague() {
+            console.log(`Mobile: Filtering data for league ${state.selectedLeague}`);
+            updateTable();
+        }
+
 
         // Load data from GitHub Gists
         async function loadGistData() {
             const isMobile = isMobileDevice();
             
-            // Mobile devices not supported
+            // Mobile devices use league-specific loading
             if (isMobile) {
-                state.error = 'Mobile Support Currently Unavailable - This website requires a desktop or tablet device due to the large dataset processing requirements. Please visit from a desktop computer for the full experience.';
-                updateUI();
+                console.log('Mobile device detected - using league-specific loading');
+                await loadLeagueDataMobile(state.selectedLeague);
                 return;
             }
             
@@ -3579,11 +3766,18 @@
         }
 
         // Handle team seasons league change
-        function handleTeamSeasonsLeagueChange(newLeague) {
+        async function handleTeamSeasonsLeagueChange(newLeague) {
+            const isMobile = isMobileDevice();
+            
             state.teamSeasonsSelectedLeague = newLeague;
             state.teamSeasonsSelectedTeam = '';
             state.teamSeasonsSelectedSeason = '';
             state.teamSeasonsSelectedPosition = '';
+            
+            // For mobile devices, load league data if not already loaded
+            if (isMobile && !state.loadedLeagues.includes(newLeague)) {
+                await loadLeagueDataMobile(newLeague);
+            }
             
             createTeamSeasonsLeagueButtons();
             updateTeamSeasonsTeamSelect();
@@ -3919,7 +4113,7 @@
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                         <td class="px-3 py-4 font-semibold text-left">${season.season}</td>
                         <td class="px-3 py-4 text-center font-semibold">${season.count}</td>
-                        <td class="px-4 py-4 font-semibold text-gray-900">
+                        <td class="px-4 py-4 font-semibold" style="color: black;">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${season.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                                 <span class="cursor-pointer hover:text-blue-600" onclick="handleTeamClick('${season.team}')">${season.team}</span>
@@ -4263,11 +4457,18 @@
         }
 
         // Handle league change
-        function handleLeagueChange(newLeague) {
+        async function handleLeagueChange(newLeague) {
+            const isMobile = isMobileDevice();
+            
             state.selectedLeague = newLeague;
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
             state.selectedSeason = '';
+            
+            // For mobile devices, load league data if not already loaded
+            if (isMobile && !state.loadedLeagues.includes(newLeague)) {
+                await loadLeagueDataMobile(newLeague);
+            }
             
             // Reset Last Time When state
             state.lastTimeTeam1 = '';
@@ -6164,7 +6365,7 @@
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                         <td class="px-3 py-4 font-semibold text-left">${season.season}</td>
-                        <td class="px-4 py-4 font-semibold text-gray-900">
+                        <td class="px-4 py-4 font-semibold" style="color: black;">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                                 <span>${teamName}</span>
