@@ -512,6 +512,7 @@
         .icon-plane::before { content: "✈️"; }
         .icon-link::before { content: "🔗"; }
         .icon-alert::before { content: "⚠️"; }
+        .icon-loading::before { content: "⏳"; }
 
         /* Hamburger Menu Styles */
         .hamburger-btn {
@@ -1225,10 +1226,10 @@
             <!-- Table Section -->
             <div class="table-section">
 
-                <div id="errorState" class="text-center text-white hidden">
-                    <div class="icon-alert w-16 h-16 mx-auto mb-4" style="font-size: 4rem;"></div>
-                    <div class="text-2xl mb-4">Error Loading Data</div>
-                    <div class="text-lg mb-6" id="errorMessage"></div>
+                <div id="errorState" class="text-center text-black hidden">
+                    <div class="icon-loading w-16 h-16 mx-auto mb-4" style="font-size: 4rem;"></div>
+                    <div class="text-2xl mb-4">Loading Data</div>
+                    <div class="text-lg mb-6 text-black" id="errorMessage"></div>
                     <button id="retryBtn" class="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all">
                         Try Again
                     </button>
