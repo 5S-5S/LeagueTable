@@ -3095,14 +3095,36 @@
         // Decode double base64 encoded URL
         function decodeDoubleBase64Url(encodedUrl) {
             try {
+                // Validate input
+                if (!encodedUrl || typeof encodedUrl !== 'string') {
+                    console.warn('Invalid encoded URL provided');
+                    return null;
+                }
+                
                 // First decode from base64
-                const singleDecoded = atob(encodedUrl);
+                const singleDecoded = atob(encodedUrl.trim());
+                if (!singleDecoded) {
+                    console.warn('First base64 decode failed');
+                    return null;
+                }
+                
                 // Second decode from base64 to get the original URL
                 const originalUrl = atob(singleDecoded);
+                if (!originalUrl) {
+                    console.warn('Second base64 decode failed');
+                    return null;
+                }
+                
+                // Validate that it's a proper URL
+                if (!originalUrl.startsWith('https://gist.githubusercontent.com')) {
+                    console.warn('Decoded URL is not a valid gist URL:', originalUrl);
+                    return null;
+                }
+                
                 return originalUrl;
             } catch (error) {
                 console.error('Error decoding double base64 URL:', error);
-                return encodedUrl; // Return original if decoding fails
+                return null; // Return null instead of encoded URL to prevent issues
             }
         }
 
@@ -3111,6 +3133,7 @@
             const gistUrls = GIST_URLS;
             
             state.error = '';
+            console.log('Starting data load...');
 
             try {
                 const allData = [];
@@ -3118,28 +3141,62 @@
 
                 for (let i = 0; i < gistUrls.length; i++) {
                     const encodedUrl = gistUrls[i];
+                    console.log(`Processing URL ${i + 1}/${gistUrls.length}`);
+                    
                     const url = decodeDoubleBase64Url(encodedUrl);
+                    
+                    // Skip if URL decoding failed
+                    if (!url) {
+                        console.warn(`Skipping invalid URL at index ${i}`);
+                        continue;
+                    }
+                    
                     try {
+                        console.log(`Fetching: ${url.substring(0, 80)}...`);
                         
-                        const response = await fetch(url);
+                        // Add timeout to fetch
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                        
+                        const response = await fetch(url, { 
+                            signal: controller.signal,
+                            headers: {
+                                'Accept': 'text/csv,text/plain,*/*'
+                            }
+                        });
+                        clearTimeout(timeoutId);
                         if (!response.ok) {
                             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
                         
                         const text = await response.text();
+                        console.log(`Received ${text.length} characters of CSV data`);
+                        
+                        if (!text || text.length === 0) {
+                            throw new Error('Empty response from server');
+                        }
                         
                         const parsed = Papa.parse(text, { 
                             header: true, 
                             dynamicTyping: false,
                             skipEmptyLines: true,
+                            preview: 10000, // Limit to first 10,000 rows to prevent stack overflow
                             transformHeader: (header) => header.trim().replace(/\r/g, ''),
-                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
+                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value,
+                            worker: false, // Disable worker to prevent issues
+                            fastMode: true // Use fast mode for better performance
                         });
                         
+                        if (parsed.errors && parsed.errors.length > 0) {
+                            console.warn('CSV parsing errors:', parsed.errors);
+                        }
+                        
                         if (parsed.data && parsed.data.length > 0) {
-                            console.log(`Loaded ${url}: ${parsed.data.length} rows`);
-                            allData.push(...parsed.data);
+                            console.log(`Successfully parsed ${parsed.data.length} rows from ${url.substring(url.lastIndexOf('/') + 1)}`);
+                            allData.push(...parsed.data.slice(0, 10000)); // Limit to prevent memory issues
                             loadedGists++;
+                        } else {
+                            console.warn('No data found in parsed CSV');
                         }
                     } catch (gistError) {
                         console.warn(`Failed to load ${url}:`, gistError.message);
@@ -3152,7 +3209,9 @@
                 
                 
                 // Process the data
+                console.log('Starting data processing...');
                 const cleanedData = processRawData(allData);
+                console.log('Data processing completed');
                 
                 if (cleanedData.length === 0) {
                     throw new Error('No valid match data found in the loaded Gists');
@@ -3191,19 +3250,32 @@
 
         // Process raw CSV data
         function processRawData(allData) {
-            return allData
-                .filter(row => {
-                    return row && 
-                           row.HomeTeam && 
-                           row.AwayTeam && 
-                           row.Date &&
-                           row.Div &&
-                           typeof row.HomeTeam === 'string' &&
-                           typeof row.AwayTeam === 'string' &&
-                           row.HomeTeam.length > 0 &&
-                           row.AwayTeam.length > 0 &&
-                           row.Div.length > 0;
-                })
+            console.log(`Processing ${allData.length} raw data rows`);
+            
+            if (!allData || allData.length === 0) {
+                console.warn('No data to process');
+                return [];
+            }
+            
+            // Limit data to prevent stack overflow
+            const dataToProcess = allData.slice(0, 50000); // Limit to 50k rows
+            
+            const filtered = dataToProcess.filter(row => {
+                return row && 
+                       row.HomeTeam && 
+                       row.AwayTeam && 
+                       row.Date &&
+                       row.Div &&
+                       typeof row.HomeTeam === 'string' &&
+                       typeof row.AwayTeam === 'string' &&
+                       row.HomeTeam.length > 0 &&
+                       row.AwayTeam.length > 0 &&
+                       row.Div.length > 0;
+            });
+            
+            console.log(`${filtered.length} rows passed initial filter`);
+            
+            return filtered
                 .map(row => {
                     try {
                         let dateStr = String(row.Date).trim().replace(/\r/g, '');
