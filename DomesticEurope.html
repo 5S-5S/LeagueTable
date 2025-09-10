@@ -386,6 +386,8 @@
             width: 100%;
             margin-bottom: 2rem;
             border-bottom: 2px solid #e5e7eb;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tab-button {
@@ -400,6 +402,8 @@
             transition: all 0.3s ease;
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
+            white-space: nowrap;
+            min-width: fit-content;
         }
 
         .tab-button:not(:last-child) {
@@ -424,6 +428,36 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        /* Mobile responsive styles for tabs */
+        @media (max-width: 768px) {
+            .tab-container {
+                gap: 0;
+            }
+            
+            .tab-button {
+                flex: none;
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+                min-width: 120px;
+            }
+            
+            .tab-button:first-child {
+                min-width: 140px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .tab-button {
+                padding: 0.75rem 0.75rem;
+                font-size: 0.8rem;
+                min-width: 100px;
+            }
+            
+            .tab-button:first-child {
+                min-width: 120px;
+            }
         }
 
 
@@ -764,10 +798,10 @@
                 
                 <!-- Tab Container -->
                 <div class="tab-container">
-                    <button class="tab-button active" id="leagueFiltersTab">League Tables & Head to Head Stats</button>
-                    <button class="tab-button" id="teamSeasonsTab">Team Seasons</button>
-                    <button class="tab-button" id="lastTimeWhenTab">The Last Time When...</button>
-                    <button class="tab-button" id="teamStreaksTab">Team Streaks</button>
+                    <button class="tab-button active" id="leagueFiltersTab" data-mobile-text="Tables & H2H">League Tables & Head to Head Stats</button>
+                    <button class="tab-button" id="teamSeasonsTab" data-mobile-text="Team Seasons">Team Seasons</button>
+                    <button class="tab-button" id="lastTimeWhenTab" data-mobile-text="Last Time">The Last Time When...</button>
+                    <button class="tab-button" id="teamStreaksTab" data-mobile-text="Streaks">Team Streaks</button>
                 </div>
 
                 <!-- League Filters Tab Content -->
@@ -6639,6 +6673,29 @@
             });
         }
 
+        // Handle responsive tab text
+        function updateTabText() {
+            const tabButtons = document.querySelectorAll('.tab-button[data-mobile-text]');
+            const isMobile = window.innerWidth <= 768;
+            
+            tabButtons.forEach(button => {
+                const mobileText = button.getAttribute('data-mobile-text');
+                const originalText = button.textContent.trim();
+                
+                if (isMobile && mobileText) {
+                    if (!button.getAttribute('data-original-text')) {
+                        button.setAttribute('data-original-text', originalText);
+                    }
+                    button.textContent = mobileText;
+                } else {
+                    const savedOriginalText = button.getAttribute('data-original-text');
+                    if (savedOriginalText) {
+                        button.textContent = savedOriginalText;
+                    }
+                }
+            });
+        }
+
         // Make functions global for onclick handlers
         window.handleSort = handleSort;
         window.handleH2hSort = handleH2hSort;
@@ -6647,6 +6704,10 @@
         // Initialize the application
         init();
         initHamburgerMenu();
+        updateTabText();
+        
+        // Handle window resize for responsive tabs
+        window.addEventListener('resize', updateTabText);
     </script>
 </body>
 </html>
