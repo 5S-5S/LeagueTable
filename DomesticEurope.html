@@ -4709,10 +4709,20 @@
                 (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
             ).sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
             
-            // Apply recent matches filter
+            // Apply home/away filtering first (same logic as in updateH2HMatchesTable)
+            if (state.homeFilter && !state.awayFilter) {
+                // Only include matches where Team 1 is home
+                h2hMatches = h2hMatches.filter(match => match.HomeTeam === state.selectedTeam1);
+            } else if (state.awayFilter && !state.homeFilter) {
+                // Only include matches where Team 1 is away  
+                h2hMatches = h2hMatches.filter(match => match.AwayTeam === state.selectedTeam1);
+            }
+            // If both are selected, show all matches (no additional filtering)
+            
+            // Then apply recent match count limit to the already filtered matches
             if (state.recentH2HCount !== 'All') {
-                const limitCount = parseInt(state.recentH2HCount);
-                h2hMatches = h2hMatches.slice(0, limitCount);
+                const limit = parseInt(state.recentH2HCount) || 0;
+                h2hMatches = h2hMatches.slice(0, limit);
             }
             
             // Calculate stats (abbreviated logic)
@@ -4862,66 +4872,80 @@
                 const team1Style = team1Color ? `background: ${team1Color} !important; color: ${getContrastColor(team1Color)} !important;` : '';
                 const team2Style = team2Color ? `background: ${team2Color} !important; color: ${getContrastColor(team2Color)} !important;` : '';
                 
-                // Create H2H visualizations
-                elements.h2hVisualizations.innerHTML = `
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-semibold">${state.selectedTeam1} vs ${state.selectedTeam2} (Overall)</span>
-                            <span class="text-sm text-gray-600">${h2hResult.overallStats.team1Wins}W - ${h2hResult.overallStats.draws}D - ${h2hResult.overallStats.team2Wins}W</span>
-                        </div>
-                        <div class="h2h-viz-bar">
-                            <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.overallStats.team1Wins / h2hResult.overallStats.total) * 100}%; ${team1Style}">
-                                ${h2hResult.overallStats.team1Wins > 0 ? h2hResult.overallStats.team1Wins : ''}
+                // Create H2H visualizations based on home/away filter selection
+                let visualizationHTML = '';
+                
+                // Show overall stats only if both home and away are selected
+                if (state.homeFilter && state.awayFilter) {
+                    visualizationHTML += `
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold">${state.selectedTeam1} vs ${state.selectedTeam2} (Overall)</span>
+                                <span class="text-sm text-gray-600">${h2hResult.overallStats.team1Wins}W - ${h2hResult.overallStats.draws}D - ${h2hResult.overallStats.team2Wins}W</span>
                             </div>
-                            <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.overallStats.draws / h2hResult.overallStats.total) * 100}%">
-                                ${h2hResult.overallStats.draws > 0 ? h2hResult.overallStats.draws : ''}
+                            <div class="h2h-viz-bar">
+                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.overallStats.team1Wins / h2hResult.overallStats.total) * 100}%; ${team1Style}">
+                                    ${h2hResult.overallStats.team1Wins > 0 ? h2hResult.overallStats.team1Wins : ''}
+                                </div>
+                                <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.overallStats.draws / h2hResult.overallStats.total) * 100}%">
+                                    ${h2hResult.overallStats.draws > 0 ? h2hResult.overallStats.draws : ''}
+                                </div>
+                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.overallStats.team2Wins / h2hResult.overallStats.total) * 100}%; ${team2Style}">
+                                    ${h2hResult.overallStats.team2Wins > 0 ? h2hResult.overallStats.team2Wins : ''}
+                                </div>
                             </div>
-                            <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.overallStats.team2Wins / h2hResult.overallStats.total) * 100}%; ${team2Style}">
-                                ${h2hResult.overallStats.team2Wins > 0 ? h2hResult.overallStats.team2Wins : ''}
+                        </div>`;
+                }
+                
+                // Show Team1 Home scenario if home is selected (when HOME button is checked, show Team1 home matches)
+                if (state.homeFilter) {
+                    visualizationHTML += `
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold">${state.selectedTeam1} (Home) vs ${state.selectedTeam2} (Away)</span>
+                                <span class="text-sm text-gray-600">${h2hResult.team1HomeStats.wins}W - ${h2hResult.team1HomeStats.draws}D - ${h2hResult.team1HomeStats.losses}W</span>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-semibold">${state.selectedTeam1} (Home) vs ${state.selectedTeam2} (Away)</span>
-                            <span class="text-sm text-gray-600">${h2hResult.team1HomeStats.wins}W - ${h2hResult.team1HomeStats.draws}D - ${h2hResult.team1HomeStats.losses}W</span>
-                        </div>
-                        ${h2hResult.team1HomeStats.total > 0 ? `
-                        <div class="h2h-viz-bar">
-                            <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team1HomeStats.wins / h2hResult.team1HomeStats.total) * 100}%; ${team1Style}">
-                                ${h2hResult.team1HomeStats.wins > 0 ? h2hResult.team1HomeStats.wins : ''}
+                            ${h2hResult.team1HomeStats.total > 0 ? `
+                            <div class="h2h-viz-bar">
+                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team1HomeStats.wins / h2hResult.team1HomeStats.total) * 100}%; ${team1Style}">
+                                    ${h2hResult.team1HomeStats.wins > 0 ? h2hResult.team1HomeStats.wins : ''}
+                                </div>
+                                <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team1HomeStats.draws / h2hResult.team1HomeStats.total) * 100}%">
+                                    ${h2hResult.team1HomeStats.draws > 0 ? h2hResult.team1HomeStats.draws : ''}
+                                </div>
+                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team1HomeStats.losses / h2hResult.team1HomeStats.total) * 100}%; ${team2Style}">
+                                    ${h2hResult.team1HomeStats.losses > 0 ? h2hResult.team1HomeStats.losses : ''}
+                                </div>
                             </div>
-                            <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team1HomeStats.draws / h2hResult.team1HomeStats.total) * 100}%">
-                                ${h2hResult.team1HomeStats.draws > 0 ? h2hResult.team1HomeStats.draws : ''}
+                            ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
+                        </div>`;
+                }
+                
+                // Show Team2 Home scenario if away is selected (when AWAY button is checked, show Team2 home matches)
+                if (state.awayFilter) {
+                    visualizationHTML += `
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold">${state.selectedTeam2} (Home) vs ${state.selectedTeam1} (Away)</span>
+                                <span class="text-sm text-gray-600">${h2hResult.team2HomeStats.wins}W - ${h2hResult.team2HomeStats.draws}D - ${h2hResult.team2HomeStats.losses}W</span>
                             </div>
-                            <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team1HomeStats.losses / h2hResult.team1HomeStats.total) * 100}%; ${team2Style}">
-                                ${h2hResult.team1HomeStats.losses > 0 ? h2hResult.team1HomeStats.losses : ''}
+                            ${h2hResult.team2HomeStats.total > 0 ? `
+                            <div class="h2h-viz-bar">
+                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team2HomeStats.wins / h2hResult.team2HomeStats.total) * 100}%; ${team2Style}">
+                                    ${h2hResult.team2HomeStats.wins > 0 ? h2hResult.team2HomeStats.wins : ''}
+                                </div>
+                                <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team2HomeStats.draws / h2hResult.team2HomeStats.total) * 100}%">
+                                    ${h2hResult.team2HomeStats.draws > 0 ? h2hResult.team2HomeStats.draws : ''}
+                                </div>
+                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team2HomeStats.losses / h2hResult.team2HomeStats.total) * 100}%; ${team1Style}">
+                                    ${h2hResult.team2HomeStats.losses > 0 ? h2hResult.team2HomeStats.losses : ''}
+                                </div>
                             </div>
-                        </div>
-                        ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
-                    </div>
-                    
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-sm font-semibold">${state.selectedTeam2} (Home) vs ${state.selectedTeam1} (Away)</span>
-                            <span class="text-sm text-gray-600">${h2hResult.team2HomeStats.wins}W - ${h2hResult.team2HomeStats.draws}D - ${h2hResult.team2HomeStats.losses}W</span>
-                        </div>
-                        ${h2hResult.team2HomeStats.total > 0 ? `
-                        <div class="h2h-viz-bar">
-                            <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team2HomeStats.wins / h2hResult.team2HomeStats.total) * 100}%; ${team2Style}">
-                                ${h2hResult.team2HomeStats.wins > 0 ? h2hResult.team2HomeStats.wins : ''}
-                            </div>
-                            <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team2HomeStats.draws / h2hResult.team2HomeStats.total) * 100}%">
-                                ${h2hResult.team2HomeStats.draws > 0 ? h2hResult.team2HomeStats.draws : ''}
-                            </div>
-                            <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team2HomeStats.losses / h2hResult.team2HomeStats.total) * 100}%; ${team1Style}">
-                                ${h2hResult.team2HomeStats.losses > 0 ? h2hResult.team2HomeStats.losses : ''}
-                            </div>
-                        </div>
-                        ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
-                    </div>
-                `;
+                            ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
+                        </div>`;
+                }
+                
+                elements.h2hVisualizations.innerHTML = visualizationHTML;
                 
                 // Update H2H matches table based on filter state
                 updateH2HMatchesTable(h2hResult);
@@ -5034,21 +5058,8 @@
                 };
             });
 
-            // Filter matches based on home/away checkboxes and Team 1's location
-            if (state.homeFilter && !state.awayFilter) {
-                // Only show matches where Team 1 is home
-                matchesData = matchesData.filter(match => match.homeTeam === state.selectedTeam1);
-            } else if (state.awayFilter && !state.homeFilter) {
-                // Only show matches where Team 1 is away
-                matchesData = matchesData.filter(match => match.awayTeam === state.selectedTeam1);
-            }
-            // If both are selected, show all matches (no filtering needed)
-
-            // Apply recent match count limit
-            if (state.recentH2HCount !== 'All') {
-                const limit = parseInt(state.recentH2HCount) || 0;
-                matchesData = matchesData.slice(0, limit);
-            }
+            // Note: Filtering and recent match count limiting is now done in calculateHeadToHead()
+            // The matches passed here are already filtered and limited
 
             // Sort by current sort config
             if (state.h2hSortConfig.key) {
