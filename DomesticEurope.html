@@ -5,716 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Domestic League Filters - Filter and Process Europe's Top 5</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-    <style>
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-        }
-
-        /* Utility classes (Tailwind-like) */
-        .min-h-screen { min-height: 100vh; }
-        .bg-gradient-blue { background: linear-gradient(135deg, #1e3a8a, #1d4ed8); }
-        .bg-gradient-green { background: linear-gradient(to right, #059669, #047857); }
-        .bg-gradient-purple { background: linear-gradient(to right, #7c3aed, #6d28d9); }
-        .bg-gradient-gray { background: linear-gradient(to right, #374151, #1f2937); }
-        .text-white { color: white; }
-        .text-gray-700 { color: #374151; }
-        .text-gray-600 { color: #4b5563; }
-        .text-gray-500 { color: #6b7280; }
-        .text-gray-400 { color: #9ca3af; }
-        .text-blue-700 { color: #1d4ed8; }
-        .text-green-700 { color: #047857; }
-        .text-red-600 { color: #dc2626; }
-        .bg-white { background-color: white; }
-        .bg-gray-50 { background: #f9fafb; }
-        .bg-blue-100 { background: #dbeafe; }
-        .bg-blue-50 { background: #eff6ff; }
-        .bg-green-100 { background: #dcfce7; }
-        .text-blue-800 { color: #1e40af; }
-        .text-blue-600 { color: #2563eb; }
-        .bg-blue-600 { background-color: #2563eb; }
-        .bg-blue-700 { background-color: #1d4ed8; }
-        /* .bg-green-50 { background: #f0fdf4; } */
-        .rounded-3xl { border-radius: 1.5rem; }
-        .rounded-2xl { border-radius: 1rem; }
-        .rounded-xl { border-radius: 0.75rem; }
-        .rounded-lg { border-radius: 0.5rem; }
-        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-        .p-8 { padding: 2rem; }
-        .p-6 { padding: 1.5rem; }
-        .p-4 { padding: 1rem; }
-        .p-3 { padding: 0.75rem; }
-        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mb-6 { margin-bottom: 1.5rem; }
-        .mb-8 { margin-bottom: 2rem; }
-        .mt-4 { margin-top: 1rem; }
-        .mt-8 { margin-top: 2rem; }
-        .mr-2 { margin-right: 0.5rem; }
-        .mr-3 { margin-right: 0.75rem; }
-        .ml-2 { margin-left: 0.5rem; }
-        .mx-auto { margin-left: auto; margin-right: auto; }
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .text-4xl { font-size: 2.25rem; }
-        .text-2xl { font-size: 1.5rem; }
-        .text-xl { font-size: 1.25rem; }
-        .text-lg { font-size: 1.125rem; }
-        .text-sm { font-size: 0.875rem; }
-        .font-bold { font-weight: 700; }
-        .font-black { font-weight: 900; }
-        .font-semibold { font-weight: 600; }
-        .font-medium { font-weight: 500; }
-        .max-w-6xl { max-width: 72rem; }
-        .max-w-2xl { max-width: 42rem; }
-        .w-full { width: 100%; }
-        .w-5 { width: 1.25rem; }
-        .w-4 { width: 1rem; }
-        .w-2 { width: 0.5rem; }
-        .w-16 { width: 4rem; }
-        .h-5 { height: 1.25rem; }
-        .h-4 { height: 1rem; }
-        .h-2 { height: 0.5rem; }
-        .h-3 { height: 0.75rem; }
-        .h-8 { height: 2rem; }
-        .h-16 { height: 4rem; }
-        .flex { display: flex; }
-        .grid { display: grid; }
-        .hidden { display: none; }
-        .block { display: block; }
-        .items-center { align-items: center; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-2 { gap: 0.5rem; }
-        .gap-3 { gap: 0.75rem; }
-        .gap-4 { gap: 1rem; }
-        .gap-6 { gap: 1.5rem; }
-        .border { border: 1px solid #d1d5db; }
-        .border-2 { border: 2px solid #d1d5db; }
-        .border-b { border-bottom: 1px solid #e5e7eb; }
-        .border-gray-200 { border-color: #e5e7eb; }
-        .border-gray-300 { border-color: #d1d5db; }
-        .border-green-500 { border-color: #10b981; }
-        .border-green-600 { border-color: #059669; }
-        .cursor-pointer { cursor: pointer; }
-        .overflow-hidden { overflow: hidden; }
-        .overflow-x-auto { overflow-x: auto; }
-        .opacity-90 { opacity: 0.9; }
-        .bg-opacity-95 { background-color: rgba(255, 255, 255, 0.95); }
-        .hover\\:bg-gray-50:hover { background-color: #f9fafb; }
-        .hover\\:bg-gray-600:hover { background-color: #4b5563; }
-        .hover\\:bg-green-700:hover { background-color: #047857; }
-        .hover\\:bg-blue-700:hover { background-color: #1d4ed8; }
-        .hover\\:border-green-500:hover { border-color: #10b981; }
-        .hover\\:underline:hover { text-decoration: underline; }
-        .hover\\:bg-gray-100:hover { background-color: #f3f4f6; }
-        
-        /* Team clickable styles */
-        .team-clickable {
-            transition: all 0.2s ease;
-        }
-        .team-clickable:hover {
-            background-color: #f3f4f6 !important;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .team-name-text:hover {
-            text-decoration: underline;
-            color: #2563eb;
-        }
-        .focus\\:border-green-500:focus { border-color: #10b981; }
-        .focus\\:outline-none:focus { outline: none; }
-        .transition-all { transition: all 0.3s ease; }
-        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-
-        /* Grid layouts */
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-
-        @media (min-width: 768px) {
-            .md\\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-        }
-
-        /* Custom styles */
-        .league-table-container {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-            padding: 1.25rem;
-        }
-
-        .main-card {
-            max-width: 72rem;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(to right, #059669, #047857);
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .controls-section {
-            padding: 2rem;
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .table-section {
-            padding: 2rem;
-        }
-
-        .league-button {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            padding: 0.75rem;
-            background: white;
-            border-radius: 0.75rem;
-            border: 2px solid #e5e7eb;
-            transition: all 0.3s ease;
-        }
-
-        .league-button:hover {
-            border-color: #10b981;
-        }
-
-        .league-button.active {
-            border-color: #059669;
-        }
-
-        .radio-dot {
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid #d1d5db;
-            border-radius: 50%;
-            margin-right: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .radio-dot.active {
-            background: #059669;
-            border-color: #059669;
-        }
-
-        .radio-dot.active::after {
-            content: '';
-            width: 0.5rem;
-            height: 0.5rem;
-            background: white;
-            border-radius: 50%;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #d1d5db;
-            border-radius: 0.75rem;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: #10b981;
-            outline: none;
-        }
-
-        .checkbox {
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid #d1d5db;
-            border-radius: 0.25rem;
-            margin-right: 0.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .checkbox.checked {
-            background: #059669;
-            border-color: #059669;
-        }
-
-        .checkbox.checked::after {
-            content: '';
-            width: 0.5rem;
-            height: 0.75rem;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
-            margin-top: -1px;
-        }
-
-        .btn {
-            padding: 0.5rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: #059669;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #047857;
-        }
-
-        .btn-secondary {
-            background: #4b5563;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #374151;
-        }
-
-        .btn-blue {
-            background: #2563eb;
-            color: white;
-        }
-
-        .btn-blue:hover {
-            background: #1d4ed8;
-        }
-
-        .league-table {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-        }
-
-        .league-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .league-table th {
-            background: linear-gradient(to right, #374151, #1f2937);
-            color: white;
-            padding: 1rem 0.75rem;
-            font-weight: 700;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .league-table th:hover {
-            background: #4b5563;
-        }
-
-        .league-table td {
-            padding: 1rem 0.75rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .league-table tr:hover {
-            background: #f9fafb;
-        }
-
-        /* .league-table tr.highlight {
-            background: #f0fdf4;
-        } */
-
-        .points-badge {
-            font-size: 1.25rem;
-            font-weight: 900;
-            color: #1d4ed8;
-            background: #dbeafe;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.5rem;
-        }
-
-        .team1-highlight {
-            font-size: 1rem;
-            font-weight: 900;
-            background: #dcfce7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            border-radius: 0.375rem;
-        }
-
-        .team2-highlight {
-            font-size: 1rem;
-            font-weight: 900;
-            background: #dbeafe;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            padding: 0;
-            margin: 0;
-            border-radius: 0.375rem;
-        }
-
-        /* Tab styles */
-        .tab-container {
-            display: flex;
-            width: 100%;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid #e5e7eb;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            background: #f9fafb;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #6b7280;
-            transition: all 0.3s ease;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            white-space: nowrap;
-            min-width: fit-content;
-        }
-
-        .tab-button:not(:last-child) {
-            border-right: 1px solid #e5e7eb;
-        }
-
-        .tab-button.active {
-            background: white;
-            color: #059669;
-            border-bottom: 2px solid #059669;
-            margin-bottom: -2px;
-        }
-
-        .tab-button:hover:not(.active) {
-            background: #f3f4f6;
-            color: #374151;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Mobile responsive styles for tabs */
-        @media (max-width: 768px) {
-            .tab-container {
-                gap: 0;
-            }
-            
-            .tab-button {
-                flex: none;
-                padding: 0.75rem 1rem;
-                font-size: 0.875rem;
-                min-width: 120px;
-            }
-            
-            .tab-button:first-child {
-                min-width: 140px;
-            }
-        }
-
-        @media (max-width: 640px) {
-            .tab-button {
-                padding: 0.75rem 0.75rem;
-                font-size: 0.8rem;
-                min-width: 100px;
-            }
-            
-            .tab-button:first-child {
-                min-width: 120px;
-            }
-        }
-
-
-        .h2h-viz-bar {
-            display: flex;
-            width: 100%;
-            height: 2rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .h2h-segment {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 700;
-            transition: all 0.2s ease;
-        }
-
-        .h2h-segment:first-child {
-            border-top-left-radius: 0.75rem;
-            border-bottom-left-radius: 0.75rem;
-        }
-
-        .h2h-segment:last-child {
-            border-top-right-radius: 0.75rem;
-            border-bottom-right-radius: 0.75rem;
-        }
-
-        .h2h-wins {
-            background: linear-gradient(135deg, #1f2937, #374151);
-        }
-
-        .h2h-wins:hover {
-            background: linear-gradient(135deg, #374151, #4b5563);
-        }
-
-        .h2h-draws {
-            background: linear-gradient(135deg, #6b7280, #9ca3af);
-        }
-
-        .h2h-draws:hover {
-            background: linear-gradient(135deg, #9ca3af, #d1d5db);
-        }
-
-        .h2h-losses {
-            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
-            color: #1f2937;
-            border-left: 1px solid #d1d5db;
-        }
-
-        .h2h-losses:hover {
-            background: linear-gradient(135deg, #e5e7eb, #d1d5db);
-        }
-
-        .status-message {
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            text-align: center;
-        }
-
-        .status-success {
-            background: #dcfce7;
-            color: #065f46;
-        }
-
-        .status-error {
-            background: #fecaca;
-            color: #991b1b;
-        }
-
-        .status-info {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        /* Icons using Unicode symbols */
-        .icon-calendar::before { content: "📅"; }
-        .icon-download::before { content: "⬇️"; }
-        .icon-search::before { content: "🔍"; }
-        .icon-home::before { content: "🏠"; }
-        .icon-plane::before { content: "✈️"; }
-        .icon-link::before { content: "🔗"; }
-        .icon-alert::before { content: "⚠️"; }
-        .icon-loading::before { content: "⏳"; }
-
-        /* Hamburger Menu Styles */
-        .hamburger-btn {
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background: white;
-            border: none;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            transition: all 0.3s ease;
-        }
-
-        .hamburger-btn.active {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .hamburger-line {
-            width: 1.5rem;
-            height: 0.125rem;
-            background: #374151;
-            transition: all 0.3s ease;
-            border-radius: 0.125rem;
-        }
-
-        .hamburger-btn.active .hamburger-line:nth-child(1) {
-            transform: rotate(45deg) translate(0.25rem, 0.25rem);
-        }
-
-        .hamburger-btn.active .hamburger-line:nth-child(2) {
-            opacity: 0;
-        }
-
-        .hamburger-btn.active .hamburger-line:nth-child(3) {
-            transform: rotate(-45deg) translate(0.25rem, -0.25rem);
-        }
-
-        .menu-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .menu-overlay.active {
-            opacity: 1;
-        }
-
-        .side-menu {
-            position: fixed;
-            top: 0;
-            left: -320px;
-            width: 320px;
-            height: 100vh;
-            background: white;
-            box-shadow: 2px 0 20px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transition: left 0.3s ease;
-            overflow-y: auto;
-        }
-
-        .side-menu.open {
-            left: 0;
-        }
-
-        .menu-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-            background: #f9fafb;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 2rem;
-            color: #6b7280;
-            cursor: pointer;
-            padding: 0.25rem;
-            line-height: 1;
-            transition: color 0.2s ease;
-        }
-
-        .close-btn:hover {
-            color: #374151;
-        }
-
-        .menu-nav {
-            padding: 1rem 0;
-        }
-
-        .menu-section {
-            margin-bottom: 1.5rem;
-        }
-
-        .menu-section-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.5rem 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            text-decoration: none;
-            color: #374151;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .menu-item:hover:not(.disabled) {
-            background: #f3f4f6;
-            color: #1d4ed8;
-        }
-
-        .menu-item.active {
-            background: #dbeafe;
-            color: #1d4ed8;
-            border-right: 3px solid #1d4ed8;
-        }
-
-        .menu-item.disabled {
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .menu-item.disabled:hover {
-            background: none;
-            color: #9ca3af;
-        }
-
-        .menu-icon {
-            font-size: 1.25rem;
-            margin-right: 0.75rem;
-            width: 1.5rem;
-            text-align: center;
-        }
-
-        .menu-item.disabled .menu-icon {
-            opacity: 0.5;
-        }
-
-        /* Ensure main content doesn't overlap hamburger button */
-        .league-table-container {
-            position: relative;
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="DomesticEurope.css">
 <body>
     <!-- Hamburger Menu Button -->
     <button id="hamburgerBtn" class="hamburger-btn">
@@ -789,8 +80,18 @@
         <div class="main-card">
             <!-- Header -->
             <div class="header">
-                <h1 class="text-4xl font-bold mb-2">Domestic League Filters</h1>
-                <p class="text-lg opacity-90">Last Data Update: September 4th, 2025</p>
+                <div class="header-content">
+                    <div>
+                        <h1 class="text-4xl font-bold mb-2">Domestic League Filters</h1>
+                        <p class="text-lg opacity-90">Last Data Update: September 4th, 2025</p>
+                    </div>
+                    <div class="dark-mode-toggle">
+                        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                        <label for="darkModeToggle" class="toggle-label">
+                            <span class="toggle-button"></span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <!-- Controls Section -->
@@ -822,7 +123,7 @@
                     </div>
                 
                 <!-- Filters -->
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-search mr-2"></span>Season
@@ -3169,7 +2470,7 @@
                 
                 // Check if the result is a valid URL (single encoding)
                 if (decoded && decoded.startsWith('https://gist.githubusercontent.com')) {
-                    console.log('Successfully decoded single base64 URL:', decoded.substring(0, 80) + '...');
+                    // Successfully decoded single base64 URL
                     return decoded;
                 }
                 
@@ -3177,7 +2478,7 @@
                 try {
                     const doubleDecoded = atob(decoded);
                     if (doubleDecoded && doubleDecoded.startsWith('https://gist.githubusercontent.com')) {
-                        console.log('Successfully decoded double base64 URL:', doubleDecoded.substring(0, 80) + '...');
+                        // Successfully decoded double base64 URL
                         return doubleDecoded;
                     }
                 } catch (error) {
@@ -3215,17 +2516,17 @@
         
         // Load data from GitHub Gists - now uses league-specific loading for all devices
         async function loadGistData() {
-            console.log('Using league-specific loading for optimal performance');
+            // Using league-specific loading for optimal performance
             await loadLeagueDataForDevice(state.selectedLeague);
         }
         
         // Universal league-specific loading for all devices
         async function loadLeagueDataForDevice(leagueId) {
-            console.log(`Loading data for league: ${leagueId}`);
+            // Loading data for league
             
             // Check if already loaded
             if (state.loadedLeagues && state.loadedLeagues.has(leagueId)) {
-                console.log(`League ${leagueId} already loaded, filtering existing data`);
+                // League already loaded, filtering existing data
                 filterDataForCurrentLeague(leagueId);
                 return;
             }
@@ -3242,7 +2543,7 @@
             
             // Prevent double loading
             if (state.currentlyLoadingLeague === leagueId) {
-                console.log(`League ${leagueId} already loading, please wait...`);
+                // League already loading, please wait
                 return;
             }
             
@@ -3258,7 +2559,7 @@
                 // Load ALL gist URLs since each contains data for all leagues
                 const gistUrls = GIST_URLS;
                 
-                console.log(`Fetching ${gistUrls.length} files (contains all leagues)`);
+                // Fetching files (contains all leagues)
                 const allData = [];
                 
                 for (let i = 0; i < gistUrls.length; i++) {
@@ -3277,7 +2578,7 @@
                             continue;
                         }
                         
-                        console.log(`Fetching: ${url.substring(0, 80)}...`);
+                        // Fetching URL
                         
                         const controller = new AbortController();
                         const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -3310,7 +2611,7 @@
                         }
                         
                         if (parsed.data && parsed.data.length > 0) {
-                            console.log(`Successfully parsed ${parsed.data.length} rows`);
+                            // Successfully parsed rows
                             allData.push(...parsed.data);
                         }
                         
@@ -3328,7 +2629,7 @@
                 }
                 
                 // Process all the raw data
-                console.log('Processing all league data...');
+                // Processing all league data
                 const cleanedData = processRawData(allData);
                 
                 if (cleanedData.length === 0) {
@@ -3351,7 +2652,7 @@
                 // Filter data for the requested league
                 filterDataForCurrentLeague(leagueId);
                 
-                console.log(`All data loaded successfully. Showing ${leagueName}:`, state.data.length, 'matches');
+                // All data loaded successfully
                 
             } catch (error) {
                 console.error(`Error loading data:`, error);
@@ -3386,7 +2687,7 @@
             // Filter data for the specific league
             const filteredData = state.allLeagueData.filter(row => row.Div === leagueCode);
             
-            console.log(`Filtered ${filteredData.length} matches for ${leagueId} (${leagueCode})`);
+            // Filtered matches for league
             
             // Update state with filtered data
             state.data = filteredData;
@@ -3422,7 +2723,7 @@
             const gistUrls = GIST_URLS;
             
             state.error = '';
-            console.log('Starting chunked data load...');
+            // Starting chunked data load
 
             try {
                 const allData = [];
@@ -3433,12 +2734,12 @@
                 
                 for (let batchStart = 0; batchStart < gistUrls.length; batchStart += batchSize) {
                     const batchEnd = Math.min(batchStart + batchSize, gistUrls.length);
-                    console.log(`Processing batch ${Math.floor(batchStart/batchSize) + 1}/${Math.ceil(gistUrls.length/batchSize)} (files ${batchStart + 1}-${batchEnd})`);
+                    // Processing batch
                     
                     // Process batch of files
                     for (let i = batchStart; i < batchEnd; i++) {
                     const encodedUrl = gistUrls[i];
-                    console.log(`Processing URL ${i + 1}/${gistUrls.length}`);
+                    // Processing URL
                     
                     const url = decodeSingleBase64Url(encodedUrl);
                     
@@ -3449,7 +2750,7 @@
                     }
                     
                     try {
-                        console.log(`Fetching: ${url.substring(0, 80)}...`);
+                        // Fetching URL
                         
                         // Add timeout to fetch
                         const controller = new AbortController();
@@ -3471,7 +2772,7 @@
                         }
                         
                         const text = await response.text();
-                        console.log(`Received ${text.length} characters of CSV data`);
+                        // Received CSV data
                         
                         if (!text || text.length === 0) {
                             throw new Error('Empty response from server');
@@ -3490,7 +2791,7 @@
                         }
                         
                         if (parsed.data && parsed.data.length > 0) {
-                            console.log(`Successfully parsed ${parsed.data.length} rows from ${url.substring(url.lastIndexOf('/') + 1)}`);
+                            // Successfully parsed rows from file
                             
                             // Always use chunked processing for desktop stability
                             if (parsed.data.length > 500) {
@@ -3527,7 +2828,7 @@
                         const progress = Math.round((batchEnd / gistUrls.length) * 100);
                         state.error = `🔄 Loading data... ${progress}% complete (${loadedGists} files processed)`;
                         updateUI();
-                        console.log(`Batch complete. Progress: ${progress}%`);
+                        // Batch complete
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
                 }
@@ -3541,9 +2842,9 @@
                 updateUI();
                 
                 // Process the data
-                console.log('Starting data processing...');
+                // Starting data processing
                 const cleanedData = processRawData(allData);
-                console.log('Data processing completed');
+                // Data processing completed
                 
                 if (cleanedData.length === 0) {
                     throw new Error('No valid match data found in the loaded Gists');
@@ -3566,7 +2867,7 @@
                 state.dateTo = maxDate.toISOString().split('T')[0];
                 state.error = ''; // Clear loading message
                 
-                console.log('Data loaded successfully:', cleanedData.length, 'matches');
+                // Data loaded successfully
                 updateUI();
                 updateTeamSelects();
                 updateTeamSeasonsTeamSelect();
@@ -4133,7 +3434,7 @@
 
         // Handle team seasons team selection
         function handleTeamSeasonsTeamChange(selectedTeam) {
-            console.log('handleTeamSeasonsTeamChange called with:', selectedTeam, 'league:', state.teamSeasonsSelectedLeague);
+            // handleTeamSeasonsTeamChange called
             state.teamSeasonsSelectedTeam = selectedTeam;
             state.teamSeasonsSelectedPosition = ''; // Reset position filter
             
@@ -4367,9 +3668,9 @@
             });
             
             elements.lastTimeLocationSelect.addEventListener('change', (e) => {
-                console.log('Location dropdown changed to:', e.target.value);
+                // Location dropdown changed
                 state.lastTimeLocation = e.target.value;
-                console.log('State updated to:', state.lastTimeLocation);
+                // State updated
                 calculateLastTimeWhen();
             });
             elements.retryBtn.addEventListener('click', () => {
@@ -4761,23 +4062,23 @@
             }
             
             // Apply location filter if selected
-            console.log('Location filter state:', state.lastTimeLocation);
-            console.log('Matches before location filter:', matches.length);
+            // Location filter state
+            // Matches before location filter
             if (state.lastTimeLocation !== '') {
                 matches = matches.filter(row => {
                     if (state.lastTimeLocation === 'home') {
                         // Only show matches where Team 1 was playing at home
-                        console.log('Filtering for home matches, Team 1:', state.lastTimeTeam1);
+                        // Filtering for home matches
                         return row.HomeTeam === state.lastTimeTeam1;
                     } else if (state.lastTimeLocation === 'away') {
                         // Only show matches where Team 1 was playing away
-                        console.log('Filtering for away matches, Team 1:', state.lastTimeTeam1);
+                        // Filtering for away matches
                         return row.AwayTeam === state.lastTimeTeam1;
                     }
                     // If 'Both Home and Away' or empty, show all matches (no filtering)
                     return true;
                 });
-                console.log('Matches after location filter:', matches.length);
+                // Matches after location filter
             }
             
             // Sort matches by date (most recent first)
@@ -4879,23 +4180,23 @@
             }
             
             // Apply location filter if selected
-            console.log('Single team - Location filter state:', state.lastTimeLocation);
-            console.log('Single team - Matches before location filter:', matches.length);
+            // Single team - Location filter state
+            // Single team - Matches before location filter
             if (state.lastTimeLocation !== '') {
                 matches = matches.filter(row => {
                     if (state.lastTimeLocation === 'home') {
                         // Only show matches where Team 1 was playing at home
-                        console.log('Single team - Filtering for home matches, Team 1:', state.lastTimeTeam1);
+                        // Single team - Filtering for home matches
                         return row.HomeTeam === state.lastTimeTeam1;
                     } else if (state.lastTimeLocation === 'away') {
                         // Only show matches where Team 1 was playing away
-                        console.log('Single team - Filtering for away matches, Team 1:', state.lastTimeTeam1);
+                        // Single team - Filtering for away matches
                         return row.AwayTeam === state.lastTimeTeam1;
                     }
                     // If 'Both Home and Away' or empty, show all matches (no filtering)
                     return true;
                 });
-                console.log('Single team - Matches after location filter:', matches.length);
+                // Single team - Matches after location filter
             }
             
             // Sort matches by date (most recent first)
@@ -5461,6 +4762,9 @@
             updateTableDisplay(tableResult);
             updateHeadToHeadDisplay(h2hResult);
             updateTableInfo(tableResult);
+            
+            // Handle position colors for dark mode
+            setTimeout(handlePositionColors, 50);
         }
 
         // Update table display
@@ -5531,7 +4835,7 @@
                 
                 // Add event delegation for team clicks
                 elements.tableBody.addEventListener('click', handleTeamClick);
-                console.log('Team click event listener added to table body');
+                // Team click event listener added to table body
                 
                 // Only show table if we're on the League Filters tab
                 const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
@@ -5549,8 +4853,6 @@
         function updateHeadToHeadDisplay(h2hResult) {
             if (h2hResult && state.selectedTeam1 && state.selectedTeam2) {
                 elements.h2hSection.classList.remove('hidden');
-                const matchCount = state.recentH2HCount === 'All' ? h2hResult.totalMatches : Math.min(parseInt(state.recentH2HCount) || 0, h2hResult.totalMatches);
-                elements.h2hMatchCount.textContent = `(${matchCount} matches)`;
                 
                 // Get team colors
                 const team1Color = getTeamColor(state.selectedTeam1, state.selectedLeague);
@@ -5621,7 +4923,7 @@
                     </div>
                 `;
                 
-                // Update H2H matches table
+                // Update H2H matches table based on filter state
                 updateH2HMatchesTable(h2hResult);
             } else {
                 elements.h2hSection.classList.add('hidden');
@@ -5632,6 +4934,12 @@
         // Update H2H matches table
         function updateH2HMatchesTable(h2hResult) {
             if (!h2hResult || !h2hResult.matches || h2hResult.matches.length === 0) {
+                elements.h2hMatchesTable.classList.add('hidden');
+                return;
+            }
+
+            // Hide the Match History table if both home and away filters are unchecked
+            if (!state.homeFilter && !state.awayFilter) {
                 elements.h2hMatchesTable.classList.add('hidden');
                 return;
             }
@@ -5726,6 +5034,22 @@
                 };
             });
 
+            // Filter matches based on home/away checkboxes and Team 1's location
+            if (state.homeFilter && !state.awayFilter) {
+                // Only show matches where Team 1 is home
+                matchesData = matchesData.filter(match => match.homeTeam === state.selectedTeam1);
+            } else if (state.awayFilter && !state.homeFilter) {
+                // Only show matches where Team 1 is away
+                matchesData = matchesData.filter(match => match.awayTeam === state.selectedTeam1);
+            }
+            // If both are selected, show all matches (no filtering needed)
+
+            // Apply recent match count limit
+            if (state.recentH2HCount !== 'All') {
+                const limit = parseInt(state.recentH2HCount) || 0;
+                matchesData = matchesData.slice(0, limit);
+            }
+
             // Sort by current sort config
             if (state.h2hSortConfig.key) {
                 matchesData.sort((a, b) => {
@@ -5745,6 +5069,9 @@
                     }
                 });
             }
+
+            // Update match count display with filtered count
+            elements.h2hMatchCount.textContent = `(${matchesData.length} matches)`;
 
             // Create table headers
             const headers = [
@@ -5901,29 +5228,29 @@
 
         // Handle team click events
         function handleTeamClick(event) {
-            console.log('Team click event triggered:', event.target);
+            // Team click event triggered
             const teamClickable = event.target.closest('.team-clickable');
-            console.log('Found team clickable element:', teamClickable);
+            // Found team clickable element
             if (teamClickable) {
                 event.preventDefault();
                 event.stopPropagation();
                 const teamName = teamClickable.getAttribute('data-team');
-                console.log('Team name:', teamName);
+                // Team name found
                 if (teamName) {
-                    console.log('Calling showTeamHistory for:', teamName);
+                    // Calling showTeamHistory
                     showTeamHistory(teamName);
                 } else {
-                    console.log('No team name found in data-team attribute');
+                    // No team name found in data-team attribute
                 }
             } else {
-                console.log('No team-clickable element found');
+                // No team-clickable element found
             }
         }
 
         // Show team history across seasons
         function showTeamHistory(teamName, sourceLeague = null) {
-            console.log('showTeamHistory called with team:', teamName, 'sourceLeague:', sourceLeague);
-            console.log('Current state.data length:', state.data.length);
+            // showTeamHistory called
+            // Current state.data length
             
             // Determine which league to use based on source
             let leagueToUse;
@@ -5938,7 +5265,7 @@
             }
             
             state.teamSeasonsSelectedTeam = teamName;
-            console.log('Using league:', leagueToUse);
+            // Using league
             
             const leagueMapping = {
                 'premier-league': 'E0',
@@ -5953,7 +5280,7 @@
             
             // Get all available seasons for this league
             const availableSeasons = getAvailableSeasons(leagueToUse);
-            console.log('Available seasons for', leagueToUse, ':', availableSeasons);
+            // Available seasons found
             const teamHistoryData = [];
             
             // Filter seasons based on Team Seasons selection (if any)
@@ -6004,7 +5331,7 @@
                     return;
                 }
                 
-                console.log('Processing season:', seasonFilter, 'for team:', teamName);
+                // Processing season for team
                 
                 // Get season date range
                 const originalSelectedLeague = state.selectedLeague;
@@ -6012,10 +5339,10 @@
                 const seasonDates = getSeasonDateRange(seasonFilter);
                 state.selectedLeague = originalSelectedLeague; // Restore original
                 if (!seasonDates) {
-                    console.log('No season dates found for:', seasonFilter);
+                    // No season dates found
                     return;
                 }
-                console.log('Season dates for', seasonFilter, ':', seasonDates);
+                // Season dates found
                 
                 // Filter data for this season - use date-only comparisons
                 const seasonStart = new Date(seasonDates.start);
@@ -6209,16 +5536,16 @@
                 return yearB - yearA;
             });
             
-            console.log('Team history data found:', teamHistoryData.length, 'seasons');
-            console.log('Sample data:', teamHistoryData.slice(0, 2));
+            // Team history data found
+            // Sample data processed
             
             displayTeamHistory(teamName, teamHistoryData, leagueToUse);
         }
 
         // Display team history table
         function displayTeamHistory(teamName, historyData, leagueToUse) {
-            console.log('displayTeamHistory called for:', teamName);
-            console.log('History data length:', historyData.length);
+            // displayTeamHistory called
+            // History data processed
             
             // Filter by position if selected
             let filteredData = [...historyData];
@@ -6386,9 +5713,9 @@
             createTeamSeasonsLeagueButtons();
             updateTeamSeasonsTeamSelect();
             
-            console.log('Final teamHistoryData length:', historyData.length);
+            // Final teamHistoryData processed
             elements.teamHistoryTable.classList.remove('hidden');
-            console.log('Team history table should now be visible');
+            // Team history table should now be visible
         }
 
         // Handle sorting
@@ -6575,7 +5902,7 @@
 
         // Update UI based on current state
         function updateUI() {
-            console.log('UpdateUI called, data length:', state.data.length, 'error:', state.error);
+            // UpdateUI called
 
             if (state.error) {
                 elements.controlsSection.classList.add('hidden');
@@ -6591,7 +5918,7 @@
             elements.errorState.classList.add('hidden');
 
             if (state.data.length > 0) {
-                console.log('Showing controls section');
+                // Showing controls section
                 elements.controlsSection.classList.remove('hidden');
                 
                 // Only show table-related sections if we're on the League Filters tab
@@ -6612,7 +5939,7 @@
                     elements.tableInfo.classList.add('hidden');
                 }
             } else {
-                console.log('Data length is 0, keeping controls hidden');
+                // Data length is 0, keeping controls hidden
             }
 
 
@@ -6696,6 +6023,85 @@
             });
         }
 
+        // Dark Mode Functionality
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            // Check for saved dark mode preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                darkModeToggle.checked = true;
+                setTimeout(handlePositionColors, 100); // Delay to ensure table is rendered
+            }
+            
+            // Add event listener for toggle
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    handlePositionColors();
+                } else {
+                    body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    handlePositionColors();
+                }
+            });
+        }
+        
+        // Handle table colors by specific column headers
+        function handlePositionColors() {
+            const isDark = document.body.getAttribute('data-theme') === 'dark';
+            if (!isDark) {
+                // Remove all inline styles in light mode
+                document.querySelectorAll('.league-table tbody tr td').forEach(cell => {
+                    cell.style.color = '';
+                });
+                return;
+            }
+            
+            const headers = document.querySelectorAll('.league-table thead th');
+            const columnRules = {
+                'Season': 'white',
+                'Team': 'white', 
+                'P': 'white',
+                'W': 'white',
+                'D': 'white',
+                'L': 'white',
+                'GF': 'white',
+                'GA': 'white',
+                'GD': 'white',
+                'Pts': 'default',
+                'Pos': 'special' // Special handling for 1,2,3
+            };
+            
+            headers.forEach((header, columnIndex) => {
+                const headerText = header.textContent.trim();
+                const rule = columnRules[headerText];
+                
+                if (rule) {
+                    const cells = document.querySelectorAll(`.league-table tbody tr td:nth-child(${columnIndex + 1})`);
+                    cells.forEach(cell => {
+                        if (rule === 'white') {
+                            cell.style.color = 'white';
+                        } else if (rule === 'default') {
+                            cell.style.color = '';
+                            cell.style.removeProperty('color');
+                        } else if (rule === 'special' && headerText === 'Pos') {
+                            const text = cell.textContent.trim();
+                            if (text === '1' || text === '2' || text === '3') {
+                                cell.style.color = '';
+                                cell.style.removeProperty('color');
+                            } else {
+                                cell.style.color = 'white';
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
         // Make functions global for onclick handlers
         window.handleSort = handleSort;
         window.handleH2hSort = handleH2hSort;
@@ -6704,6 +6110,7 @@
         // Initialize the application
         init();
         initHamburgerMenu();
+        initDarkMode();
         updateTabText();
         
         // Handle window resize for responsive tabs
