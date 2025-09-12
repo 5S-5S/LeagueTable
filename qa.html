@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A - League Table Analytics</title>
+    <link rel="stylesheet" href="Qa.css">
+</head>
+<body>
+    <!-- Hamburger Menu Button -->
+    <button id="hamburgerBtn" class="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div id="menuOverlay" class="menu-overlay hidden"></div>
+
+    <!-- Sidebar Menu -->
+    <div id="sideMenu" class="side-menu">
+        <div class="menu-header">
+            <h2 class="text-xl font-bold text-gray-800">Navigation</h2>
+            <button id="closeMenuBtn" class="close-btn">&times;</button>
+        </div>
+        <nav class="menu-nav">
+            <!-- Home Section -->
+            <div class="menu-section">
+                <a href="index.html" class="menu-item">
+                    <span class="menu-icon">🏠</span>
+                    <span>Home Page</span>
+                </a>
+            </div>
+            
+            <!-- Football Section -->
+            <div class="menu-section">
+                <h3 class="menu-section-title">Football</h3>
+                <a href="DomesticEurope.html" class="menu-item" data-page="domestic">
+                    <span class="menu-icon">⚽</span>
+                    <span>Domestic Football - Top 5 Leagues</span>
+                </a>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🏆</span>
+                    <span>Continental Football - Coming Soon</span>
+                </div>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🌍</span>
+                    <span>International Football - Coming Soon</span>
+                </div>
+            </div>
+
+            <!-- Other Sports Section -->
+            <div class="menu-section">
+                <h3 class="menu-section-title">Other Sports</h3>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🏈</span>
+                    <span>NFL - Coming Soon</span>
+                </div>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🏀</span>
+                    <span>NBA - Coming Soon</span>
+                </div>
+            </div>
+
+            <!-- Support Section -->
+            <div class="menu-section">
+                <a href="qa.html" class="menu-item active">
+                    <span class="menu-icon">❓</span>
+                    <span>Q&A</span>
+                </a>
+                <a href="contact.html" class="menu-item">
+                    <span class="menu-icon">📧</span>
+                    <span>Contact & Support</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="league-table-container min-h-screen">
+        <div class="main-card">
+            <div class="header">
+                <div class="header-content">
+                    <div>
+                        <h1 class="text-4xl font-black mb-2">Questions & Answers</h1>
+                        <p class="text-xl opacity-90">Find answers to common questions about the website.</p>
+                    </div>
+                    <div class="dark-mode-toggle">
+                        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                        <label for="darkModeToggle" class="toggle-label">
+                            <span class="toggle-button"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <!-- Q&A Items -->
+                <div id="qaContainer">
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>What exactly is this website?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>In short, it's a collection of different team statistics all compiled in one place.</p>
+                            <p>It's a way to find niche and mainstream team information all on one easy to use website.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>How reliable is this data?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>All data has been verified by multiple sources to ensure its accuracy.</p>
+                            <p>Of course, with such a large data set spanning across so many years, it's hard to double check every single statistic. So if you discover something you believe to be wrong, contact us through the Contact & Support tab. We'll investigate your claim as quick as we can.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>Do you plan to add player statistics?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>There are no plans to include player statistics in the short or long term futures. Sorry to disappoint, but there are plenty of other sites which provide these functionalities.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>Which leagues are covered?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>We currently cover the top 5 European leagues: the English Premier Liga, Spanish La Liga, German Bundesliga, Italian Serie A, and the French Ligue 1. All statistics on this website are only from these 5 leagues, in this point of time.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>Are there plans to add other leagues and domestic competitons?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Not at this time. The current focus is on continental and international competitions, and other sports.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>How often is data updated?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Currently every Thursday. In the near future, it will be done more often.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>How many years of data is covered on this website?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Every single professional season from the major five leagues in their current setup, with their current name and format has been included. Examples of exclusions include Oberliga seasons in Germany, Divisione Nazionale seasons in Italy, and Amateur Football Champions in France.</p>
+                        </div>
+                    </div>
+
+                    <!-- Features Questions -->
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-table mr-2"></span>How does the League Tables tab work?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>The League Tables tab allows you to grab historic league tables or access head-to-head data with various filters:</p>
+                            <ul>
+                                <li><strong>Date Range</strong> - Filter matches by specific date ranges, or look at past league tables.</li>
+                                <li><strong>Day of Week</strong> - See performance on specific days (e.g., weekend vs weekday games).</li>
+                                <li><strong>Home/Away</strong> - Toggle between home and away performance.</li>
+                                <li><strong>Point Deductions</strong> - Include or exclude point penalties.</li>
+                                <li><strong>Head-To-Head Stats</strong> - Get accurate head-to-head stats with a list games played.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-calendar mr-2"></span>How does the Team Seasons tab work?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Team Seasons provides a list of team performances across multiple seasons. You can:</p>
+                            <ul>
+                                <li>View a team's performance across all available seasons.</li>
+                                <li>Filter out a team's seasons by league positions.</li>
+                                <li>Find out how many times a team finished in a position, and when was the last time.</li>
+                                <li>See which teams finished in specific positions across seasons.</li>
+                                <li>Find out which teams have finished in a position the most times.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-calendar mr-2">How does the "The Last Time When..." tab work?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>"The Last Time When..." tab helps you find the last time a team won, drew or lost against all teams, or a specific opponent.</p>
+                            <ul>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="qa-item">
+                        <div class="qa-question">
+                            <h3><span class="icon-team mr-2"></span>How does the Team Streaks tab work?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Team Streaks help you filter streaks between a club and other clubs You can:</p>
+                            <ul>
+                                <li>Filter between Home, Away, or Both types of Games.</li>
+                                <li>Filter between one club against all opponents or against a specific opponent. </li>
+                                <li>Filter with four types of streaks: Winning, Unbeaten, Winless, or Losing.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    
+                <!-- No Results Message -->
+                <div id="noResults" class="text-center py-8 hidden">
+                    <p class="text-xl text-gray-500">No questions found matching your search.</p>
+                    <p class="text-gray-400 mt-2">Try adjusting your search terms or category filters.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hamburger Menu Functionality
+        function initHamburgerMenu() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const sideMenu = document.getElementById('sideMenu');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const closeBtn = document.getElementById('closeMenuBtn');
+            
+            // Toggle menu function
+            function toggleMenu() {
+                const isOpen = sideMenu.classList.contains('open');
+                
+                if (isOpen) {
+                    // Close menu
+                    sideMenu.classList.remove('open');
+                    menuOverlay.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
+                    document.body.style.overflow = '';
+                } else {
+                    // Open menu
+                    sideMenu.classList.add('open');
+                    menuOverlay.classList.add('active');
+                    hamburgerBtn.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            // Event listeners
+            hamburgerBtn.addEventListener('click', toggleMenu);
+            closeBtn.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', toggleMenu);
+            
+            // Prevent menu from closing when clicking inside the menu
+            sideMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Close menu with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sideMenu.classList.contains('open')) {
+                    toggleMenu();
+                }
+            });
+        }
+
+        // Q&A Functionality
+        function initQA() {
+            const qaItems = document.querySelectorAll('.qa-item');
+
+            // Toggle Q&A items
+            qaItems.forEach(item => {
+                const question = item.querySelector('.qa-question');
+                const answer = item.querySelector('.qa-answer');
+                
+                question.addEventListener('click', () => {
+                    const isOpen = item.classList.contains('open');
+                    
+                    if (isOpen) {
+                        item.classList.remove('open');
+                        answer.classList.remove('open');
+                    } else {
+                        item.classList.add('open');
+                        answer.classList.add('open');
+                    }
+                });
+            });
+        }
+
+        // Dark Mode Functionality
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            // Check for saved dark mode preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                darkModeToggle.checked = true;
+            }
+            
+            // Add event listener for toggle
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initHamburgerMenu();
+            initQA();
+            initDarkMode();
+        });
+    </script>
+</body>
+</html>
