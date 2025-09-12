@@ -491,6 +491,14 @@
                         </div>
                     </div>
 
+                    <!-- Status Selection -->
+                    <div class="mb-8">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Status:</label>
+                        <select id="teamStreaksStatusSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
+                            <option value="active">Active Streak</option>
+                            <option value="historic">Historic Streaks</option>
+                        </select>
+                    </div>
                     <!-- Location Selection -->
                     <div class="mb-8">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Location:</label>
@@ -669,7 +677,11 @@
             teamSeasonsSelectedLeague: 'serie-a',
             teamSeasonsSelectedTeam: '',
             teamSeasonsSelectedSeason: '',
-            teamSeasonsSelectedPosition: ''
+            teamSeasonsSelectedPosition: '',
+            
+            // Historic Streaks sort state
+            historicStreaksSortConfig: { key: null, direction: null },
+            lastHistoricStreaksParams: null
         };
 
         // Ranking overrides for historic seasons
@@ -1937,6 +1949,7 @@
             teamSeasonsPositionInfo: document.getElementById('teamSeasonsPositionInfo'),
             // Team Streaks elements
             teamStreaksLeagueButtons: document.getElementById('teamStreaksLeagueButtons'),
+            teamStreaksStatusSelect: document.getElementById('teamStreaksStatusSelect'),
             teamStreaksLocationSelect: document.getElementById('teamStreaksLocationSelect'),
             teamStreaksTypeSelect: document.getElementById('teamStreaksTypeSelect'),
             teamStreaksTeam1Select: document.getElementById('teamStreaksTeam1Select'),
@@ -1995,6 +2008,10 @@
             updateTeamStreaksSelects();
         }
 
+        // Handle Team Streaks status change
+        function handleTeamStreaksStatusChange(status) {
+            calculateTeamStreaks();
+        }
         // Handle Team Streaks location change
         function handleTeamStreaksLocationChange(location) {
             calculateTeamStreaks();
@@ -2019,6 +2036,7 @@
         function calculateTeamStreaks() {
             const team1 = elements.teamStreaksTeam1Select.value;
             const team2 = elements.teamStreaksTeam2Select.value;
+            const status = elements.teamStreaksStatusSelect.value;
             const location = elements.teamStreaksLocationSelect.value;
             const streakType = elements.teamStreaksTypeSelect.value;
             
@@ -2026,6 +2044,17 @@
                 elements.teamStreaksResults.classList.add('hidden');
                 return;
             }
+            
+            // Handle different status modes
+            if (status === 'active') {
+                calculateActiveStreaks(team1, team2, location, streakType);
+            } else if (status === 'historic') {
+                calculateHistoricStreaks(team1, team2, location, streakType);
+            }
+        }
+        
+        // Calculate active streaks (original logic)
+        function calculateActiveStreaks(team1, team2, location, streakType) {
 
             // Get league mapping
             const leagueMapping = {
@@ -2069,6 +2098,341 @@
             
             // Display results
             displayStreakResults(streak, team1, team2, streakType, location);
+        }
+        
+        // Calculate historic streaks - find all streaks of 3+ games throughout history
+        function calculateHistoricStreaks(team1, team2, location, streakType) {
+            // Check if data is loaded
+            if (!state.data || state.data.length === 0) {
+                elements.teamStreaksResults.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-600">Loading data...</p>
+                    </div>
+                `;
+                elements.teamStreaksResults.classList.remove('hidden');
+                return;
+            }
+            
+            // Reset sort config when parameters change (except when called from sort handler)
+            const currentParams = `${team1}-${team2}-${location}-${streakType}`;
+            if (!state.lastHistoricStreaksParams || state.lastHistoricStreaksParams !== currentParams) {
+                state.historicStreaksSortConfig = { key: null, direction: null };
+                state.lastHistoricStreaksParams = currentParams;
+            }
+            
+            // Get league mapping
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+
+            // Filter matches by league
+            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
+            
+            // Filter by teams
+            if (team2) {
+                // Two teams selected - head-to-head matches only
+                matches = matches.filter(row => 
+                    (row.HomeTeam === team1 && row.AwayTeam === team2) ||
+                    (row.HomeTeam === team2 && row.AwayTeam === team1)
+                );
+            } else {
+                // One team selected - matches against all opponents
+                matches = matches.filter(row => 
+                    row.HomeTeam === team1 || row.AwayTeam === team1
+                );
+            }
+
+            // Filter by location
+            if (location === 'home') {
+                matches = matches.filter(row => row.HomeTeam === team1);
+            } else if (location === 'away') {
+                matches = matches.filter(row => row.AwayTeam === team1);
+            }
+
+            // Sort matches by date (oldest first for historic analysis)
+            matches.sort((a, b) => new Date(a.dateObj) - new Date(b.dateObj));
+
+            // Find all historic streaks
+            const allStreaks = findAllHistoricStreaks(matches, team1, streakType);
+            
+            // Filter streaks to only include those with 3+ games
+            const significantStreaks = allStreaks.filter(streak => streak.count >= 3);
+            
+            // Display results
+            displayHistoricStreaksResults(significantStreaks, team1, team2, streakType, location);
+        }
+        
+        // Find all historic streaks throughout the data
+        function findAllHistoricStreaks(matches, team, streakType) {
+            if (matches.length === 0) return [];
+            
+            const allStreaks = [];
+            let currentStreak = [];
+            
+            for (const match of matches) {
+                const isHome = match.HomeTeam === team;
+                const teamScore = isHome ? parseInt(match.FTHG) || 0 : parseInt(match.FTAG) || 0;
+                const opponentScore = isHome ? parseInt(match.FTAG) || 0 : parseInt(match.FTHG) || 0;
+                
+                let result;
+                if (teamScore > opponentScore) {
+                    result = 'win';
+                } else if (teamScore === opponentScore) {
+                    result = 'draw';
+                } else {
+                    result = 'loss';
+                }
+
+                // Check if this match continues the current streak
+                const continuesStreak = checkStreakContinuation(result, streakType);
+                
+                if (continuesStreak) {
+                    currentStreak.push({
+                        ...match,
+                        result: result,
+                        teamScore: teamScore,
+                        opponentScore: opponentScore,
+                        isHome: isHome
+                    });
+                } else {
+                    // Current streak ends, save it if it exists
+                    if (currentStreak.length > 0) {
+                        const startDate = currentStreak[0].dateObj;
+                        const endDate = currentStreak[currentStreak.length - 1].dateObj;
+                        const lengthInDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                        
+                        allStreaks.push({
+                            matches: [...currentStreak],
+                            count: currentStreak.length,
+                            startDate: startDate,
+                            endDate: endDate,
+                            lengthInDays: lengthInDays,
+                            streakType: streakType
+                        });
+                    }
+                    
+                    // Reset current streak since this match doesn't continue it
+                    currentStreak = [];
+                }
+            }
+            
+            // Don't forget the last streak if it exists
+            if (currentStreak.length > 0) {
+                const startDate = currentStreak[0].dateObj;
+                const endDate = currentStreak[currentStreak.length - 1].dateObj;
+                const lengthInDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                
+                allStreaks.push({
+                    matches: [...currentStreak],
+                    count: currentStreak.length,
+                    startDate: startDate,
+                    endDate: endDate,
+                    lengthInDays: lengthInDays,
+                    streakType: streakType
+                });
+            }
+            
+            return allStreaks;
+        }
+        
+        // Get sort icon for historic streaks columns
+        function getSortIcon(columnKey) {
+            if (state.historicStreaksSortConfig.key !== columnKey) {
+                return ' ↕️'; // Up-down arrows when not sorted (sortable indicator)
+            }
+            
+            switch (state.historicStreaksSortConfig.direction) {
+                case 'desc': return ' ↓';
+                case 'asc': return ' ↑';
+                default: return ' ↕️';
+            }
+        }
+        
+        // Handle historic streaks table sorting
+        function handleHistoricStreaksSort(columnKey) {
+            // Determine next sort direction (tri-state: desc → asc → reset)
+            let nextDirection;
+            if (state.historicStreaksSortConfig.key !== columnKey || state.historicStreaksSortConfig.direction === null) {
+                nextDirection = 'desc'; // First click: descending (largest/most recent first)
+            } else if (state.historicStreaksSortConfig.direction === 'desc') {
+                nextDirection = 'asc';  // Second click: ascending (smallest/oldest first)
+            } else {
+                nextDirection = null;   // Third click: reset to original order
+            }
+            
+            // Update sort config
+            state.historicStreaksSortConfig.key = nextDirection ? columnKey : null;
+            state.historicStreaksSortConfig.direction = nextDirection;
+            
+            // Re-trigger the calculation to refresh the display with new sorting
+            calculateTeamStreaks();
+        }
+        
+        // Display historic streaks results in table format
+        function displayHistoricStreaksResults(streaks, team1, team2, streakType, location) {
+            if (streaks.length === 0) {
+                elements.teamStreaksResults.innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-gray-600">No historic ${streakType.replace('-', ' ')} streaks of 3+ games found for the selected criteria.</p>
+                    </div>
+                `;
+                elements.teamStreaksResults.classList.remove('hidden');
+                return;
+            }
+
+            // Apply custom sorting if requested, otherwise use default sorting
+            if (state.historicStreaksSortConfig.key && state.historicStreaksSortConfig.direction) {
+                const sortKey = state.historicStreaksSortConfig.key;
+                const sortDirection = state.historicStreaksSortConfig.direction;
+                
+                streaks.sort((a, b) => {
+                    let aVal = a[sortKey];
+                    let bVal = b[sortKey];
+                    
+                    // Handle date sorting
+                    if (sortKey === 'startDate' || sortKey === 'endDate') {
+                        aVal = new Date(aVal);
+                        bVal = new Date(bVal);
+                    }
+                    
+                    // Sort based on direction
+                    if (sortDirection === 'desc') {
+                        return bVal > aVal ? 1 : bVal < aVal ? -1 : 0;
+                    } else {
+                        return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+                    }
+                });
+            } else {
+                // Default sorting: by count (longest first), then by end date (most recent first)
+                streaks.sort((a, b) => {
+                    if (b.count !== a.count) return b.count - a.count;
+                    return new Date(b.endDate) - new Date(a.endDate);
+                });
+            }
+
+            // Create title
+            const streakName = getStreakDisplayName(streakType);
+            const locationText = location === 'both' ? '' : ` (${location.charAt(0).toUpperCase() + location.slice(1)})`;
+            const team1Color = getTeamColor(team1, state.selectedLeague);
+            const team2Color = team2 ? getTeamColor(team2, state.selectedLeague) : null;
+            
+            let title;
+            if (team2) {
+                title = `Historic ${streakName} Streaks${locationText}: <span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>`;
+            } else {
+                title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName} Streaks${locationText}`;
+            }
+
+            // Create table headers based on mode (single team vs head-to-head)
+            let tableHeaders;
+            if (team2) {
+                // Head-to-head mode
+                tableHeaders = `
+                    <th class="text-center">Team 1</th>
+                    <th class="text-center">Team 2</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('startDate')">Start Date ${getSortIcon('startDate')}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('endDate')">End Date ${getSortIcon('endDate')}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count ${getSortIcon('count')}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Length (Days) ${getSortIcon('lengthInDays')}</th>
+                `;
+            } else {
+                // Single team mode - adjust header based on location
+                let teamColumnHeader;
+                if (location === 'home') {
+                    teamColumnHeader = 'Home Team';
+                } else if (location === 'away') {
+                    teamColumnHeader = 'Away Team';
+                } else {
+                    teamColumnHeader = 'Team';
+                }
+                
+                tableHeaders = `
+                    <th class="text-center">${teamColumnHeader}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('startDate')">Start Date ${getSortIcon('startDate')}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('endDate')">End Date ${getSortIcon('endDate')}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count ${getSortIcon('count')}</th>
+                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Length (Days) ${getSortIcon('lengthInDays')}</th>
+                `;
+            }
+
+            // Create table rows
+            const tableRows = streaks.map(streak => {
+                const startDateStr = streak.startDate.toLocaleDateString('en-US');
+                const endDateStr = streak.endDate.toLocaleDateString('en-US');
+                
+                if (team2) {
+                    // Head-to-head mode
+                    const team1Logo = getTeamLogoUrl(team1, state.selectedLeague);
+                    const team2Logo = getTeamLogoUrl(team2, state.selectedLeague);
+                    
+                    return `
+                        <tr>
+                            <td class="text-center">
+                                <div class="flex items-center justify-center">
+                                    ${team1Logo ? `<img src="${team1Logo}" alt="${team1}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                    <span class="team1-highlight" style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="flex items-center justify-center">
+                                    ${team2Logo ? `<img src="${team2Logo}" alt="${team2}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                    <span class="team2-highlight" style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">${startDateStr}</td>
+                            <td class="text-center">${endDateStr}</td>
+                            <td class="text-center font-bold">${streak.count}</td>
+                            <td class="text-center">${streak.lengthInDays}</td>
+                        </tr>
+                    `;
+                } else {
+                    // Single team mode - show team name with logo
+                    const teamName = team1;
+                    const teamLogo = getTeamLogoUrl(teamName, state.selectedLeague);
+                    const teamColor = getTeamColor(teamName, state.selectedLeague);
+                    
+                    return `
+                        <tr>
+                            <td class="text-center">
+                                <div class="flex items-center justify-center">
+                                    ${teamLogo ? `<img src="${teamLogo}" alt="${teamName}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                    <span class="team1-highlight" style="color: ${teamColor || '#374151'}; font-weight: bold;">${teamName}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">${startDateStr}</td>
+                            <td class="text-center">${endDateStr}</td>
+                            <td class="text-center font-bold">${streak.count}</td>
+                            <td class="text-center">${streak.lengthInDays}</td>
+                        </tr>
+                    `;
+                }
+            }).join('');
+
+            const tableHTML = `
+                <div class="league-table">
+                    <div class="text-center py-4 bg-white border-b">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-1">${title}</h2>
+                        <p class="text-sm text-gray-600">${streaks.length} streak${streaks.length === 1 ? '' : 's'} of 3+ games found</p>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                ${tableHeaders}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            elements.teamStreaksResults.innerHTML = tableHTML;
+            elements.teamStreaksResults.classList.remove('hidden');
         }
 
         // Calculate streak based on type and team
@@ -3710,6 +4074,10 @@
                 if (button) {
                     handleTeamStreaksLeagueChange(button.dataset.league);
                 }
+            });
+            
+            elements.teamStreaksStatusSelect.addEventListener('change', (e) => {
+                handleTeamStreaksStatusChange(e.target.value);
             });
             
             elements.teamStreaksLocationSelect.addEventListener('change', (e) => {
