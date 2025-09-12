@@ -515,6 +515,7 @@
                         <select id="teamStreaksTypeSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
                             <option value="winning">Winning Streak (Wins Only)</option>
                             <option value="unbeaten">Unbeaten Streak (Wins + Draws)</option>
+                            <option value="draw">Draw Streak (Draws Only)</option>
                             <option value="winless">Winless Streak (Draws + Losses)</option>
                             <option value="losing">Losing Streak (Losses Only)</option>
                         </select>
@@ -2322,9 +2323,9 @@
             
             let title;
             if (team2) {
-                title = `Historic ${streakName} Streaks${locationText}: <span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>`;
+                title = `Historic ${streakName}s${locationText}: <span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>`;
             } else {
-                title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName} Streaks${locationText}`;
+                title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName}s${locationText}`;
             }
 
             // Create table headers based on mode (single team vs head-to-head)
@@ -2482,6 +2483,8 @@
                     return result === 'win';
                 case 'unbeaten':
                     return result === 'win' || result === 'draw';
+                case 'draw':
+                    return result === 'draw';
                 case 'winless':
                     return result === 'draw' || result === 'loss';
                 case 'losing':
@@ -2672,6 +2675,8 @@
                     return result === 'draw' || result === 'loss'; // Non-win
                 case 'unbeaten':
                     return result === 'loss'; // Loss
+                case 'draw':
+                    return result === 'win' || result === 'loss'; // Non-draw
                 case 'winless':
                     return result === 'win'; // Win
                 case 'losing':
@@ -2686,6 +2691,7 @@
             switch (streakType) {
                 case 'winning': return 'Non-Win (Draw/Loss)';
                 case 'unbeaten': return 'Loss';
+                case 'draw': return 'Non-Draw (Win/Loss)';
                 case 'winless': return 'Win';
                 case 'losing': return 'Non-Loss (Draw/Win)';
                 default: return 'Opposite';
@@ -2697,6 +2703,7 @@
             switch (streakType) {
                 case 'winning': return 'Winning Streak';
                 case 'unbeaten': return 'Unbeaten Streak';
+                case 'draw': return 'Draw Streak';
                 case 'winless': return 'Winless Streak';
                 case 'losing': return 'Losing Streak';
                 default: return 'Streak';
