@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact & Support - League Table Analytics</title>
+    <link rel="stylesheet" href="Contact.css">
+</head>
+<body>
+    <!-- Hamburger Menu Button -->
+    <button id="hamburgerBtn" class="hamburger-btn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div id="menuOverlay" class="menu-overlay hidden"></div>
+
+    <!-- Sidebar Menu -->
+    <div id="sideMenu" class="side-menu">
+        <div class="menu-header">
+            <h2 class="text-xl font-bold text-gray-800">Navigation</h2>
+            <button id="closeMenuBtn" class="close-btn">&times;</button>
+        </div>
+        <nav class="menu-nav">
+            <!-- Home Section -->
+            <div class="menu-section">
+                <a href="index.html" class="menu-item">
+                    <span class="menu-icon">🏠</span>
+                    <span>Home Page</span>
+                </a>
+            </div>
+            
+            <!-- Football Section -->
+            <div class="menu-section">
+                <h3 class="menu-section-title">Football</h3>
+                <a href="DomesticEurope.html" class="menu-item" data-page="domestic">
+                    <span class="menu-icon">⚽</span>
+                    <span>Domestic Football - Top 5 Leagues</span>
+                </a>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🏆</span>
+                    <span>Continental Football - Coming Soon</span>
+                </div>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🌍</span>
+                    <span>International Football - Coming Soon</span>
+                </div>
+            </div>
+
+            <!-- Other Sports Section -->
+            <div class="menu-section">
+                <h3 class="menu-section-title">Other Sports</h3>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🏈</span>
+                    <span>NFL - Coming Soon</span>
+                </div>
+                <div class="menu-item disabled">
+                    <span class="menu-icon">🏀</span>
+                    <span>NBA - Coming Soon</span>
+                </div>
+            </div>
+
+            <!-- Support Section -->
+            <div class="menu-section">
+                <a href="qa.html" class="menu-item">
+                    <span class="menu-icon">❓</span>
+                    <span>Q&A</span>
+                </a>
+                <a href="contact.html" class="menu-item active">
+                    <span class="menu-icon">📧</span>
+                    <span>Contact & Support</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="league-table-container min-h-screen">
+        <div class="main-card">
+            <div class="header">
+                <div class="header-content">
+                    <div>
+                        <h1 class="text-4xl font-black mb-2">Contact & Support</h1>
+                        <p class="text-xl opacity-90">Get in touch with us to suggest new features or report bugs and erors</p>
+                    </div>
+                    <div class="dark-mode-toggle">
+                        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                        <label for="darkModeToggle" class="toggle-label">
+                            <span class="toggle-button"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <!-- Contact Form -->
+                <div class="contact-form">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-700">Send us a Message</h2>
+                    <form id="contactForm" action="https://script.google.com/macros/s/AKfycbyJrJSCRmVKQyWQ2iFsYtO2Y-qsdrSohAO2-eJvquQ/exec" method="POST" target="hiddenFrame">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" id="name" name="name" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject" class="form-label">Subject</label>
+                            <select id="subject" name="subject" class="form-input" required>
+                                <option value="">Select a topic...</option>
+                                <option value="bug">Bug Report</option>
+                                <option value="feature">Feature Request</option>
+                                <option value="data">Data Issue</option>
+                                <option value="general">General Question</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea id="message" name="message" class="form-input form-textarea" placeholder="Please describe your issue or question in detail..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <span class="icon-email"></span>
+                            Send Message
+                        </button>
+                    </form>
+                    <iframe name="hiddenFrame" style="display:none;"></iframe>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="contact-info">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-700">Get in Touch</h2>
+                    
+                    <div class="contact-item">
+                        <span class="contact-icon icon-email"></span>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Email Support</h4>
+                            <p class="text-gray-600">placeholder@placeholder</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-item">
+                        <span class="contact-icon icon-time"></span>
+                        <div>
+                            <h4 class="font-semibold text-gray-700">Response Time</h4>
+                            <p class="text-gray-600">We typically respond within 24-48 hours</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hamburger Menu Functionality
+        function initHamburgerMenu() {
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const sideMenu = document.getElementById('sideMenu');
+            const menuOverlay = document.getElementById('menuOverlay');
+            const closeBtn = document.getElementById('closeMenuBtn');
+            
+            // Toggle menu function
+            function toggleMenu() {
+                const isOpen = sideMenu.classList.contains('open');
+                
+                if (isOpen) {
+                    // Close menu
+                    sideMenu.classList.remove('open');
+                    menuOverlay.classList.remove('active');
+                    hamburgerBtn.classList.remove('active');
+                    document.body.style.overflow = '';
+                } else {
+                    // Open menu
+                    sideMenu.classList.add('open');
+                    menuOverlay.classList.add('active');
+                    hamburgerBtn.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            // Event listeners
+            hamburgerBtn.addEventListener('click', toggleMenu);
+            closeBtn.addEventListener('click', toggleMenu);
+            menuOverlay.addEventListener('click', toggleMenu);
+            
+            // Prevent menu from closing when clicking inside the menu
+            sideMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Close menu with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && sideMenu.classList.contains('open')) {
+                    toggleMenu();
+                }
+            });
+        }
+
+        // Contact Form Functionality
+        function initContactForm() {
+            const contactForm = document.getElementById('contactForm');
+            const submitBtn = contactForm.querySelector('button[type="submit"]');
+            
+            contactForm.addEventListener('submit', function(e) {
+                // Basic validation
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+                
+                if (!name || !email || !subject || !message) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Email validation
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    alert('Please enter a valid email address.');
+                    return;
+                }
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="icon-email"></span>Sending...';
+                
+                // Show success message after form submission
+                setTimeout(function() {
+                    alert('Thank you for your message! We\'ll get back to you within 24-48 hours.');
+                    contactForm.reset();
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span class="icon-email"></span>Send Message';
+                }, 1000);
+            });
+        }
+
+        // Dark Mode Functionality
+        function initDarkMode() {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            // Check for saved dark mode preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                darkModeToggle.checked = true;
+            }
+            
+            // Add event listener for toggle
+            darkModeToggle.addEventListener('change', function() {
+                if (this.checked) {
+                    body.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    body.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            initHamburgerMenu();
+            initContactForm();
+            initDarkMode();
+        });
+    </script>
+</body>
+</html>
