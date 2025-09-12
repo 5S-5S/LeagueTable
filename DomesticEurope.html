@@ -4444,10 +4444,21 @@
             }
             
             if (state.selectedTeam1 && state.selectedTeam2) {
+                // First filter for H2H matches
                 filtered = filtered.filter(row => 
                     (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
                     (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
                 );
+                
+                // Apply home/away filtering based on state (same logic as calculateHeadToHead)
+                if (state.homeFilter && !state.awayFilter) {
+                    // Show only matches where Team 1 is home
+                    filtered = filtered.filter(row => row.HomeTeam === state.selectedTeam1);
+                } else if (state.awayFilter && !state.homeFilter) {
+                    // Show only matches where Team 1 is away
+                    filtered = filtered.filter(row => row.AwayTeam === state.selectedTeam1);
+                }
+                // If both are checked or both unchecked, show all H2H matches
                 
                 // Apply recent H2H filter if specified
                 if (state.recentH2HCount !== 'All') {
@@ -4523,7 +4534,7 @@
                 }
                 
                 // Home team stats
-                if (homeTeam && state.homeFilter) {
+                if (homeTeam && (state.homeFilter || (state.selectedTeam1 && state.selectedTeam2))) {
                     homeTeam.played++;
                     homeTeam.goalsFor += homeGoals;
                     homeTeam.goalsAgainst += awayGoals;
@@ -4540,7 +4551,7 @@
                 }
                 
                 // Away team stats
-                if (awayTeam && state.awayFilter) {
+                if (awayTeam && (state.awayFilter || (state.selectedTeam1 && state.selectedTeam2))) {
                     awayTeam.played++;
                     awayTeam.goalsFor += awayGoals;
                     awayTeam.goalsAgainst += homeGoals;
