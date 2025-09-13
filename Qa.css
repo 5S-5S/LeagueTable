@@ -377,6 +377,58 @@ body {
     position: relative;
 }
 
+/* Q&A Filter Buttons Styles */
+.qa-filter-buttons {
+    margin-bottom: 2rem;
+}
+
+.filter-buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+    .filter-buttons-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+}
+
+.filter-btn {
+    padding: 0.75rem 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    background: white;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.filter-btn:hover {
+    border-color: #059669;
+    background: #f0fdfa;
+    color: #047857;
+    transform: translateY(-1px);
+}
+
+.filter-btn.active {
+    border-color: #059669;
+    background: #059669;
+    color: white;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.filter-btn.active:hover {
+    background: #047857;
+    border-color: #047857;
+    transform: translateY(-1px);
+}
+
 /* Q&A Specific Styles */
 .qa-item {
     background: white;
@@ -452,6 +504,23 @@ body {
     margin-bottom: 0.5rem;
 }
 
+.qa-screenshot {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1rem 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border: 1px solid #e5e7eb;
+}
+
+.qa-screenshot-caption {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
 
 
 /* Icons using Unicode symbols */
@@ -502,6 +571,38 @@ body {
 
 [data-theme="dark"] .qa-answer {
     color: white;
+}
+
+/* Q&A filter buttons dark mode styles */
+[data-theme="dark"] .filter-btn {
+    background: var(--bg-white);
+    color: white;
+    border-color: #555;
+}
+
+[data-theme="dark"] .filter-btn:hover {
+    background: var(--bg-gray-50);
+    border-color: #059669;
+    color: #10b981;
+}
+
+[data-theme="dark"] .filter-btn.active {
+    background: #059669;
+    border-color: #059669;
+    color: white;
+}
+
+[data-theme="dark"] .filter-btn.active:hover {
+    background: #047857;
+    border-color: #047857;
+}
+
+[data-theme="dark"] .qa-screenshot {
+    border-color: #555;
+}
+
+[data-theme="dark"] .qa-screenshot-caption {
+    color: #ccc;
 }
 
 /* Dark mode text colors */
