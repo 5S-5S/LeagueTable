@@ -3827,6 +3827,9 @@
 
         // Switch tabs
         function switchTab(tabName) {
+            // Store the current league before switching
+            let preservedLeague = state.selectedLeague;
+            
             // Remove active class from all tabs and content
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -3835,6 +3838,9 @@
             if (tabName === 'league-filters') {
                 document.getElementById('leagueFiltersTab').classList.add('active');
                 document.getElementById('leagueFiltersContent').classList.add('active');
+                
+                // Preserve league selection
+                state.selectedLeague = preservedLeague;
                 
                 // Reset Last Time When state
                 state.lastTimeTeam1 = '';
@@ -3850,11 +3856,17 @@
                 // Show league table and related sections
                 elements.tableContainer.classList.remove('hidden');
                 elements.h2hSection.classList.remove('hidden');
+                
+                // Update league buttons and table
+                createLeagueButtons();
                 updateTable();
                 
             } else if (tabName === 'team-seasons') {
                 document.getElementById('teamSeasonsTab').classList.add('active');
                 document.getElementById('teamSeasonsContent').classList.add('active');
+                
+                // Preserve league selection for Team Seasons
+                state.teamSeasonsSelectedLeague = preservedLeague;
                 
                 // Reset both other tab states
                 state.selectedTeam1 = '';
@@ -3880,7 +3892,7 @@
                 elements.tableInfo.classList.add('hidden');
                 elements.lastTimeResults.classList.add('hidden');
                 
-                // Initialize Team Seasons controls
+                // Initialize Team Seasons controls with preserved league
                 createTeamSeasonsLeagueButtons();
                 updateTeamSeasonsTeamSelect();
                 updateTeamSeasonsPositionSelect();
@@ -3888,6 +3900,9 @@
             } else if (tabName === 'last-time-when') {
                 document.getElementById('lastTimeWhenTab').classList.add('active');
                 document.getElementById('lastTimeWhenContent').classList.add('active');
+                
+                // Simple approach: just set the league and update
+                state.selectedLeague = preservedLeague;
                 
                 // Reset League Filters state  
                 state.selectedTeam1 = '';
@@ -3905,12 +3920,16 @@
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
                 
-                // Update team selects (including Last Time When)
+                // Update league buttons and team selects for Last Time When
+                createLeagueButtons(); // This will update the league buttons with correct selection
                 updateTeamSelects();
                 
             } else if (tabName === 'team-streaks') {
                 document.getElementById('teamStreaksTab').classList.add('active');
                 document.getElementById('teamStreaksContent').classList.add('active');
+                
+                // Simple approach: just set the league and update
+                state.selectedLeague = preservedLeague;
                 
                 // Reset other tab states
                 state.selectedTeam1 = '';
@@ -3936,7 +3955,7 @@
                 elements.tableInfo.classList.add('hidden');
                 elements.lastTimeResults.classList.add('hidden');
                 
-                // Initialize Team Streaks controls
+                // Initialize Team Streaks controls with correct league selected
                 createTeamStreaksLeagueButtons();
                 updateTeamStreaksSelects();
             }
