@@ -660,7 +660,7 @@
             awayFilter: true,
             pointDeductionsEnabled: true,
             threePointSystem: false,
-            selectedLeague: 'serie-a',
+            selectedLeague: 'premier-league',
             sortConfig: { key: null, direction: null },
             teamHistorySortConfig: { key: null, direction: null },
             recentH2HCount: 'All',
@@ -675,7 +675,7 @@
             lastTimeLocation: '',
             
             // Team Seasons state
-            teamSeasonsSelectedLeague: 'serie-a',
+            teamSeasonsSelectedLeague: 'premier-league',
             teamSeasonsSelectedTeam: '',
             teamSeasonsSelectedSeason: '',
             teamSeasonsSelectedPosition: '',
@@ -3865,8 +3865,8 @@
                 document.getElementById('teamSeasonsTab').classList.add('active');
                 document.getElementById('teamSeasonsContent').classList.add('active');
                 
-                // Preserve league selection for Team Seasons
-                state.teamSeasonsSelectedLeague = preservedLeague;
+                // Preserve current Team Seasons league selection - don't overwrite
+                // state.teamSeasonsSelectedLeague should maintain its current value
                 
                 // Reset both other tab states
                 state.selectedTeam1 = '';
@@ -5642,6 +5642,7 @@
             }
         }
 
+
         // Handle team click events
         function handleTeamClick(event) {
             // Team click event triggered
@@ -5653,7 +5654,8 @@
                 const teamName = teamClickable.getAttribute('data-team');
                 // Team name found
                 if (teamName) {
-                    // Calling showTeamHistory
+                    // Calling showTeamHistory without auto-detecting league
+                    // This preserves the current league selection
                     showTeamHistory(teamName);
                 } else {
                     // No team name found in data-team attribute
@@ -5675,9 +5677,10 @@
                 leagueToUse = sourceLeague;
                 state.teamSeasonsSelectedLeague = sourceLeague;
             } else {
-                // Called from League Filters clicking - sync with main state
-                leagueToUse = state.selectedLeague;
-                state.teamSeasonsSelectedLeague = state.selectedLeague;
+                // Called from team click - preserve current Team Seasons league state
+                // Don't sync with main state to avoid unwanted league switching
+                leagueToUse = state.teamSeasonsSelectedLeague || state.selectedLeague;
+                // Keep current teamSeasonsSelectedLeague, don't change it
             }
             
             state.teamSeasonsSelectedTeam = teamName;
@@ -6293,7 +6296,8 @@
             state.awayFilter = true;
             state.threePointSystem = false;
             state.pointDeductionsEnabled = true;
-            state.selectedLeague = 'serie-a';
+            // Preserve current league when clearing filters
+            // state.selectedLeague should not be reset here
             state.sortConfig = { key: null, direction: null };
             state.recentH2HCount = 'All';
             
