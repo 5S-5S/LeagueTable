@@ -261,13 +261,31 @@
                         <select id="teamSeasonsPositionSelect" class="form-input w-full">
                             <option value="">All Positions</option>
                         </select>
+
+                        <!-- Include Better Results Checkbox -->
+                        <div id="includeBetterResultsContainer" class="mt-3 flex items-center gap-2 hidden">
+                            <label class="flex items-center cursor-pointer">
+                                <div id="includeBetterResultsCheckbox" class="checkbox"></div>
+                                <span class="text-sm font-medium text-gray-700 ml-2">Include better results</span>
+                            </label>
+                        </div>
+
                         <div id="teamSeasonsPositionInfo" class="mt-2 text-sm text-gray-600"></div>
                     </div>
 
                     <!-- Team History Table -->
                     <div id="teamHistoryTable" class="mt-8 hidden" style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                         <div class="league-table">
-                            <div class="text-center py-4 bg-blue-50 border-b">
+                            <div class="text-center py-4 bg-blue-50 border-b relative">
+                                <!-- Back Arrow for Team History -->
+                                <div id="teamHistoryBackArrow" class="absolute left-4 top-1/2 transform -translate-y-1/2 hidden">
+                                    <button class="flex items-center text-blue-600 hover:text-blue-800 transition-colors cursor-pointer" onclick="goBackToLeagueTables()">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium">Back</span>
+                                    </button>
+                                </div>
                                 <h2 class="text-xl font-semibold text-blue-800 mb-1">🏆 Team History</h2>
                                 <p class="text-sm text-blue-600 font-medium" id="teamHistoryTitle"></p>
                             </div>
@@ -679,6 +697,10 @@
             teamSeasonsSelectedTeam: '',
             teamSeasonsSelectedSeason: '',
             teamSeasonsSelectedPosition: '',
+            includeBetterResults: false,
+
+            // Previous League Tables state (for back navigation)
+            previousLeagueTablesState: null,
             
             // Historic Streaks sort state
             historicStreaksSortConfig: { key: null, direction: null },
@@ -1941,12 +1963,15 @@
             teamHistoryTitle: document.getElementById('teamHistoryTitle'),
             teamHistoryHeader: document.getElementById('teamHistoryHeader'),
             teamHistoryBody: document.getElementById('teamHistoryBody'),
+            teamHistoryBackArrow: document.getElementById('teamHistoryBackArrow'),
             teamSeasonsLeagueButtons: document.getElementById('teamSeasonsLeagueButtons'),
             teamSeasonsTeamSelect: document.getElementById('teamSeasonsTeamSelect'),
             teamSeasonsSeasonContainer: document.getElementById('teamSeasonsSeasonContainer'),
             teamSeasonsSeasonSelect: document.getElementById('teamSeasonsSeasonSelect'),
             teamSeasonsPositionContainer: document.getElementById('teamSeasonsPositionContainer'),
             teamSeasonsPositionSelect: document.getElementById('teamSeasonsPositionSelect'),
+            includeBetterResultsContainer: document.getElementById('includeBetterResultsContainer'),
+            includeBetterResultsCheckbox: document.getElementById('includeBetterResultsCheckbox'),
             teamSeasonsPositionInfo: document.getElementById('teamSeasonsPositionInfo'),
             // Team Streaks elements
             teamStreaksLeagueButtons: document.getElementById('teamStreaksLeagueButtons'),
@@ -3491,10 +3516,28 @@
         // Handle team seasons position selection
         function handleTeamSeasonsPositionChange(selectedPosition) {
             state.teamSeasonsSelectedPosition = selectedPosition;
-            
+
             if (state.teamSeasonsSelectedTeam) {
                 // If a team is selected, refresh the team history with the new position filter
                 showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+
+                // Show/hide checkbox AFTER showTeamHistory runs (to avoid being overridden)
+                setTimeout(() => {
+                    if (selectedPosition) {
+                        console.log('Showing checkbox - team and position selected (after showTeamHistory)');
+                        if (elements.includeBetterResultsContainer) {
+                            // Clear all conflicting styles and classes
+                            elements.includeBetterResultsContainer.className = 'mt-3 flex items-center gap-2';
+                            elements.includeBetterResultsContainer.removeAttribute('style');
+                            elements.includeBetterResultsContainer.style.display = 'flex';
+                        }
+                    } else {
+                        console.log('Hiding checkbox - no position selected (after showTeamHistory)');
+                        if (elements.includeBetterResultsContainer) {
+                            elements.includeBetterResultsContainer.classList.add('hidden');
+                        }
+                    }
+                }, 100);
             } else if (selectedPosition) {
                 // If no team selected but position is selected, show all teams at that position
                 // Reset team selection to ensure clean position-only view
@@ -3808,17 +3851,23 @@
             // handleTeamSeasonsTeamChange called
             state.teamSeasonsSelectedTeam = selectedTeam;
             state.teamSeasonsSelectedPosition = ''; // Reset position filter
-            
+            state.includeBetterResults = false;
+
             if (selectedTeam) {
                 // Reset position dropdown UI when team is selected
                 elements.teamSeasonsPositionSelect.value = '';
+
+                // Team selected but no position = hide checkbox
+                elements.includeBetterResultsContainer.classList.add('hidden');
+
                 showTeamHistory(selectedTeam, state.teamSeasonsSelectedLeague);
             } else {
                 // Team unselected - clear everything
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamHistoryTitle.textContent = '';
-                
+                elements.includeBetterResultsContainer.classList.add('hidden');
+
                 // Clear stored team history data and name to prevent contamination
                 window.currentTeamHistoryData = null;
                 window.currentTeamHistoryName = null;
@@ -3838,10 +3887,16 @@
             if (tabName === 'league-filters') {
                 document.getElementById('leagueFiltersTab').classList.add('active');
                 document.getElementById('leagueFiltersContent').classList.add('active');
-                
+
                 // Preserve league selection
                 state.selectedLeague = preservedLeague;
-                
+
+                // Reset Team Seasons state when switching away
+                state.teamSeasonsSelectedTeam = '';
+                state.teamSeasonsSelectedSeason = '';
+                state.teamSeasonsSelectedPosition = '';
+                state.includeBetterResults = false;
+
                 // Reset Last Time When state
                 state.lastTimeTeam1 = '';
                 state.lastTimeTeam2 = '';
@@ -3884,14 +3939,46 @@
                 elements.lastTimeTeam2Select.value = '';
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
-                
+
                 // Hide other tab sections
                 elements.tableContainer.classList.add('hidden');
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
                 elements.lastTimeResults.classList.add('hidden');
-                
+
+                // Ensure checkbox is hidden when switching TO Team Seasons tab
+                if (elements.includeBetterResultsContainer) {
+                    elements.includeBetterResultsContainer.classList.add('hidden');
+                    elements.includeBetterResultsContainer.style.display = 'none';
+                }
+                const containerById = document.getElementById('includeBetterResultsContainer');
+                if (containerById) {
+                    containerById.classList.add('hidden');
+                    containerById.style.display = 'none';
+                }
+
+                // Clear Team Seasons visual elements to match cleared state
+                elements.teamHistoryTable.classList.add('hidden');
+                elements.teamSeasonsPositionInfo.textContent = '';
+                elements.teamSeasonsTeamSelect.value = '';
+                elements.teamSeasonsSeasonSelect.value = '';
+                elements.teamSeasonsPositionSelect.value = '';
+                // Reset checkbox and ensure it's hidden when no team is selected
+                if (elements.includeBetterResultsCheckbox) {
+                    elements.includeBetterResultsCheckbox.className = 'checkbox';
+                }
+                if (elements.includeBetterResultsContainer) {
+                    elements.includeBetterResultsContainer.classList.add('hidden');
+                    elements.includeBetterResultsContainer.style.display = 'none';
+                }
+                // Also force hide using ID selector to catch any stale references
+                const containerById = document.getElementById('includeBetterResultsContainer');
+                if (containerById) {
+                    containerById.classList.add('hidden');
+                    containerById.style.display = 'none';
+                }
+
                 // Initialize Team Seasons controls with preserved league
                 createTeamSeasonsLeagueButtons();
                 updateTeamSeasonsTeamSelect();
@@ -3900,11 +3987,17 @@
             } else if (tabName === 'last-time-when') {
                 document.getElementById('lastTimeWhenTab').classList.add('active');
                 document.getElementById('lastTimeWhenContent').classList.add('active');
-                
+
                 // Simple approach: just set the league and update
                 state.selectedLeague = preservedLeague;
-                
-                // Reset League Filters state  
+
+                // Reset Team Seasons state when switching away
+                state.teamSeasonsSelectedTeam = '';
+                state.teamSeasonsSelectedSeason = '';
+                state.teamSeasonsSelectedPosition = '';
+                state.includeBetterResults = false;
+
+                // Reset League Filters state
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
                 state.selectedSeason = '';
@@ -3919,7 +4012,29 @@
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
-                
+
+                // Clear Team Seasons visual elements when switching away
+                elements.teamHistoryTable.classList.add('hidden');
+                elements.teamSeasonsPositionInfo.textContent = '';
+                elements.teamSeasonsTeamSelect.value = '';
+                elements.teamSeasonsSeasonSelect.value = '';
+                elements.teamSeasonsPositionSelect.value = '';
+                // Force hide checkbox using multiple methods
+                if (elements.includeBetterResultsContainer) {
+                    elements.includeBetterResultsContainer.classList.add('hidden');
+                    elements.includeBetterResultsContainer.style.display = 'none';
+                }
+                if (elements.includeBetterResultsCheckbox) {
+                    elements.includeBetterResultsCheckbox.className = 'checkbox';
+                }
+                // Also try to find it by ID in case the reference is stale
+                const containerById = document.getElementById('includeBetterResultsContainer');
+                if (containerById) {
+                    containerById.classList.add('hidden');
+                    containerById.style.display = 'none';
+                }
+                console.log('Hiding checkbox when switching tabs');
+
                 // Update league buttons and team selects for Last Time When
                 createLeagueButtons(); // This will update the league buttons with correct selection
                 updateTeamSelects();
@@ -3927,10 +4042,16 @@
             } else if (tabName === 'team-streaks') {
                 document.getElementById('teamStreaksTab').classList.add('active');
                 document.getElementById('teamStreaksContent').classList.add('active');
-                
+
                 // Simple approach: just set the league and update
                 state.selectedLeague = preservedLeague;
-                
+
+                // Reset Team Seasons state when switching away
+                state.teamSeasonsSelectedTeam = '';
+                state.teamSeasonsSelectedSeason = '';
+                state.teamSeasonsSelectedPosition = '';
+                state.includeBetterResults = false;
+
                 // Reset other tab states
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
@@ -3947,14 +4068,44 @@
                 elements.lastTimeTeam2Select.value = '';
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
-                
+
                 // Hide other tab sections
                 elements.tableContainer.classList.add('hidden');
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
                 elements.lastTimeResults.classList.add('hidden');
-                
+
+                // Clear Team Seasons visual elements when switching away
+                elements.teamHistoryTable.classList.add('hidden');
+                elements.teamSeasonsPositionInfo.textContent = '';
+                elements.teamSeasonsTeamSelect.value = '';
+                elements.teamSeasonsSeasonSelect.value = '';
+                elements.teamSeasonsPositionSelect.value = '';
+                // Force hide checkbox using multiple methods
+                if (elements.includeBetterResultsContainer) {
+                    elements.includeBetterResultsContainer.classList.add('hidden');
+                    elements.includeBetterResultsContainer.style.display = 'none';
+                }
+                if (elements.includeBetterResultsCheckbox) {
+                    elements.includeBetterResultsCheckbox.className = 'checkbox';
+                }
+                // Also try to find it by ID in case the reference is stale
+                const containerById = document.getElementById('includeBetterResultsContainer');
+                if (containerById) {
+                    containerById.classList.add('hidden');
+                    containerById.style.display = 'none';
+                }
+                console.log('Hiding checkbox when switching tabs');
+
+                // Clear Team Streaks visual elements to match cleared state
+                elements.teamStreaksResults.classList.add('hidden');
+                elements.teamStreaksStatusSelect.value = 'active'; // Reset to default
+                elements.teamStreaksLocationSelect.value = 'both'; // Reset to default
+                elements.teamStreaksTypeSelect.value = 'winning'; // Reset to default
+                elements.teamStreaksTeam1Select.value = '';
+                elements.teamStreaksTeam2Select.value = '';
+
                 // Initialize Team Streaks controls with correct league selected
                 createTeamStreaksLeagueButtons();
                 updateTeamStreaksSelects();
@@ -4093,7 +4244,42 @@
             elements.teamSeasonsPositionSelect.addEventListener('change', (e) => {
                 handleTeamSeasonsPositionChange(e.target.value);
             });
-            
+
+            elements.includeBetterResultsCheckbox.addEventListener('click', () => {
+                state.includeBetterResults = !state.includeBetterResults;
+                elements.includeBetterResultsCheckbox.className = `checkbox ${state.includeBetterResults ? 'checked' : ''}`;
+
+                // Refresh the current view
+                if (state.teamSeasonsSelectedTeam) {
+                    showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+
+                    // Re-show checkbox after showTeamHistory runs (same as position change logic)
+                    setTimeout(() => {
+                        if (state.teamSeasonsSelectedPosition) {
+                            console.log('Re-showing checkbox after click');
+                            if (elements.includeBetterResultsContainer) {
+                                elements.includeBetterResultsContainer.className = 'mt-3 flex items-center gap-2';
+                                elements.includeBetterResultsContainer.removeAttribute('style');
+                                elements.includeBetterResultsContainer.style.display = 'flex';
+
+                                // Apply proper checkbox styling
+                                if (state.includeBetterResults) {
+                                    elements.includeBetterResultsCheckbox.style.backgroundColor = '#059669';
+                                    elements.includeBetterResultsCheckbox.style.borderColor = '#059669';
+                                    elements.includeBetterResultsCheckbox.style.border = '2px solid #059669';
+                                    elements.includeBetterResultsCheckbox.innerHTML = '<div style="width: 0.5rem; height: 0.75rem; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -1px;"></div>';
+                                } else {
+                                    elements.includeBetterResultsCheckbox.style.backgroundColor = '';
+                                    elements.includeBetterResultsCheckbox.style.borderColor = '#d1d5db';
+                                    elements.includeBetterResultsCheckbox.style.border = '2px solid #d1d5db';
+                                    elements.includeBetterResultsCheckbox.innerHTML = '';
+                                }
+                            }
+                        }
+                    }, 100);
+                }
+            });
+
             // Team Streaks controls
             elements.teamStreaksLeagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -5665,24 +5851,84 @@
             }
         }
 
+        // Go back to League Tables with restored state
+        function goBackToLeagueTables() {
+            if (!state.previousLeagueTablesState) return;
+
+            const savedState = state.previousLeagueTablesState;
+
+            // Restore all League Tables state
+            state.selectedLeague = savedState.selectedLeague;
+            state.selectedTeam1 = savedState.selectedTeam1;
+            state.selectedTeam2 = savedState.selectedTeam2;
+            state.selectedSeason = savedState.selectedSeason;
+            state.dateFrom = savedState.dateFrom;
+            state.dateTo = savedState.dateTo;
+            state.selectedDayOfWeek = savedState.selectedDayOfWeek;
+            state.homeFilter = savedState.homeFilter;
+            state.awayFilter = savedState.awayFilter;
+            state.pointDeductionsEnabled = savedState.pointDeductionsEnabled;
+            state.threePointSystem = savedState.threePointSystem;
+            state.recentH2HCount = savedState.recentH2HCount;
+
+            // Restore UI elements
+            elements.team1Select.value = savedState.selectedTeam1;
+            elements.team2Select.value = savedState.selectedTeam2;
+            elements.seasonSelect.value = savedState.selectedSeason;
+            elements.dayOfWeekSelect.value = savedState.selectedDayOfWeek;
+            elements.recentH2HSelect.value = savedState.recentH2HCount;
+
+            // Restore checkboxes
+            elements.homeCheckbox.className = `checkbox ${savedState.homeFilter ? 'checked' : ''}`;
+            elements.awayCheckbox.className = `checkbox ${savedState.awayFilter ? 'checked' : ''}`;
+            elements.deductionsCheckbox.className = `checkbox ${savedState.pointDeductionsEnabled ? 'checked' : ''}`;
+            elements.threePointCheckbox.className = `checkbox ${savedState.threePointSystem ? 'checked' : ''}`;
+
+            // Switch back to League Tables tab
+            switchTab('league-filters');
+
+            // Clear the saved state
+            state.previousLeagueTablesState = null;
+        }
+
         // Show team history across seasons
         function showTeamHistory(teamName, sourceLeague = null) {
             // showTeamHistory called
             // Current state.data length
-            
+
             // Determine which league to use based on source
             let leagueToUse;
             if (sourceLeague) {
                 // Called from Team Seasons dropdown - use the specified league
                 leagueToUse = sourceLeague;
                 state.teamSeasonsSelectedLeague = sourceLeague;
+                // Hide back arrow when navigating from within Team Seasons
+                elements.teamHistoryBackArrow.classList.add('hidden');
             } else {
-                // Called from team click - preserve current Team Seasons league state
-                // Don't sync with main state to avoid unwanted league switching
+                // Called from League Filters clicking - save current state and show back arrow
                 leagueToUse = state.teamSeasonsSelectedLeague || state.selectedLeague;
                 // Keep current teamSeasonsSelectedLeague, don't change it
+
+                // Save current League Tables state for back navigation
+                state.previousLeagueTablesState = {
+                    selectedLeague: state.selectedLeague,
+                    selectedTeam1: state.selectedTeam1,
+                    selectedTeam2: state.selectedTeam2,
+                    selectedSeason: state.selectedSeason,
+                    dateFrom: state.dateFrom,
+                    dateTo: state.dateTo,
+                    selectedDayOfWeek: state.selectedDayOfWeek,
+                    homeFilter: state.homeFilter,
+                    awayFilter: state.awayFilter,
+                    pointDeductionsEnabled: state.pointDeductionsEnabled,
+                    threePointSystem: state.threePointSystem,
+                    recentH2HCount: state.recentH2HCount
+                };
+
+                // Show back arrow when navigating from League Tables
+                elements.teamHistoryBackArrow.classList.remove('hidden');
             }
-            
+
             state.teamSeasonsSelectedTeam = teamName;
             // Using league
             
@@ -5946,7 +6192,7 @@
                     points
                 });
             });
-            
+
             // Sort by season (most recent first)
             teamHistoryData.sort((a, b) => {
                 // Extract year from season string (e.g., "2023-24" -> 2023)
@@ -5954,10 +6200,10 @@
                 const yearB = parseInt(b.season.split('-')[0]);
                 return yearB - yearA;
             });
-            
+
             // Team history data found
             // Sample data processed
-            
+
             displayTeamHistory(teamName, teamHistoryData, leagueToUse);
         }
 
@@ -5974,7 +6220,16 @@
                 const selectedPos = parseInt(state.teamSeasonsSelectedPosition);
                 // Filter by position, excluding only current season if under 34 games
                 filteredData = historyData.filter(season => {
-                    if (season.position !== selectedPos) return false;
+                    // Apply position filtering with Include Better Results logic
+                    let positionMatch;
+                    if (state.includeBetterResults) {
+                        // Include positions equal to or better than selected (lower numbers are better)
+                        positionMatch = season.position <= selectedPos;
+                    } else {
+                        // Include only exact position match
+                        positionMatch = season.position === selectedPos;
+                    }
+                    if (!positionMatch) return false;
                     
                     // Always include seasons with 34+ games
                     if (season.played >= 34) return true;
@@ -6020,14 +6275,31 @@
                                      seasonsSince === 1 ? '1 Season Ago' : `${seasonsSince} Seasons Ago`;
                     
                     const countText = totalCount === 1 ? 'Time' : 'Times';
-                    positionInfo = `Most Recent: ${qualifyingSeason.season} Season, ${seasonText}. Finished ${getOrdinal(selectedPos)} a total of ${totalCount} ${countText}.`;
+                    const positionText = state.includeBetterResults ?
+                        `${getOrdinal(selectedPos)} or better` :
+                        getOrdinal(selectedPos);
+                    positionInfo = `Most Recent: ${qualifyingSeason.season} Season, ${seasonText}. Finished ${positionText} a total of ${totalCount} ${countText}.`;
                 } else {
-                    positionInfo = `No seasons found where ${teamName} finished ${getOrdinal(selectedPos)} (excluding incomplete current season)`;
+                    const positionText = state.includeBetterResults ?
+                        `${getOrdinal(selectedPos)} or better` :
+                        getOrdinal(selectedPos);
+                    positionInfo = `No seasons found where ${teamName} finished ${positionText} (excluding incomplete current season)`;
                 }
             }
             
-            // Update position info display
-            elements.teamSeasonsPositionInfo.textContent = positionInfo;
+            // Update position info display and ensure it persists
+            elements.teamSeasonsPositionInfo.innerHTML = positionInfo || 'NO POSITION INFO';
+
+            // Apply proper subtle styling to match website design
+            elements.teamSeasonsPositionInfo.style.cssText = 'margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280; line-height: 1.25;';
+            elements.teamSeasonsPositionInfo.style.display = 'block';
+
+            // Double-check and force the text to stay after a brief delay
+            setTimeout(() => {
+                if (positionInfo && positionInfo.trim() && (!elements.teamSeasonsPositionInfo.textContent || elements.teamSeasonsPositionInfo.textContent.trim() === '')) {
+                    elements.teamSeasonsPositionInfo.innerHTML = positionInfo;
+                }
+            }, 100);
             
             // Store data globally for sorting
             window.currentTeamHistoryData = [...filteredData];
