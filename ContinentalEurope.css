@@ -664,9 +664,30 @@ body {
         font-size: 0.8rem;
         min-width: 100px;
     }
-    
+
     .tab-button:first-child {
         min-width: 120px;
+    }
+
+    /* Mobile fixes for Match History and H2H sections */
+    #matchHistorySection .flex.items-center.justify-between,
+    #h2hSection .flex.items-center.justify-between {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    #matchHistorySection .flex.items-center.gap-6,
+    #h2hSection .flex.items-center.gap-6 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+
+    #matchHistorySection .flex.items-center.gap-4,
+    #h2hSection .flex.items-center.gap-4 {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
     }
 }
 

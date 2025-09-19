@@ -3584,7 +3584,6 @@
             }
             options.push('<option value="All">All</option>');
             elements.recentH2HSelect.innerHTML = options.join('');
-            elements.recentH2HSelect.value = state.recentH2HCount;
         }
 
         // Create league buttons for Team Seasons tab
@@ -8824,7 +8823,6 @@
             elements.matchHistoryHomeCheckbox.className = 'checkbox checked cursor-pointer flex items-center gap-1';
             elements.matchHistoryAwayCheckbox.className = 'checkbox checked cursor-pointer flex items-center gap-1';
             elements.matchHistoryPenaltyCheckbox.className = 'checkbox';
-            elements.recentH2HSelect.value = 'All';
             elements.homeCheckbox.className = 'checkbox checked';
             elements.awayCheckbox.className = 'checkbox checked';
             elements.deductionsCheckbox.className = 'checkbox checked';
