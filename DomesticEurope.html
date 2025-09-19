@@ -2944,7 +2944,6 @@
             setupEventListeners();
             createLeagueButtons();
             createTeamSeasonsLeagueButtons();
-            setRecentH2HValue();
             updateUI();
             // Auto-load data on page load
             loadGistData();
@@ -3479,7 +3478,7 @@
 
         // Set Recent H2H input value
         function setRecentH2HValue() {
-            elements.recentH2HSelect.value = state.recentH2HCount === 'All' ? 'All' : state.recentH2HCount;
+            // Removed to show placeholder text instead of pre-filled 'All'
         }
 
         // Create league buttons for Team Seasons tab
@@ -5816,8 +5815,6 @@
                 // Hide the team stats table since main league table is shown above by updateUI
                 elements.matchHistoryStatsTable.classList.add('hidden');
 
-                // Set the recent matches input value
-                setRecentMatchesValue();
 
                 // Update the match history table and get filtered count
                 const filteredCount = updateMatchHistoryTable(matchHistoryResult);
@@ -6073,7 +6070,7 @@
 
         // Set recent matches input value
         function setRecentMatchesValue() {
-            elements.recentMatchesSelect.value = state.recentMatchesCount === 'All' ? 'All' : state.recentMatchesCount;
+            // Removed to show placeholder text instead of pre-filled 'All'
         }
 
         // Update match history visualizations (Team Record)
@@ -6729,7 +6726,6 @@
             elements.team2Select.value = savedState.selectedTeam2;
             elements.seasonSelect.value = savedState.selectedSeason;
             elements.dayOfWeekSelect.value = savedState.selectedDayOfWeek;
-            elements.recentH2HSelect.value = savedState.recentH2HCount;
 
             // Restore checkboxes
             elements.homeCheckbox.className = `checkbox ${savedState.homeFilter ? 'checked' : ''}`;
@@ -7483,7 +7479,6 @@
             elements.team2Select.value = '';
             elements.seasonSelect.value = '';
             elements.dayOfWeekSelect.value = '';
-            elements.recentH2HSelect.value = 'All';
             elements.homeCheckbox.className = 'checkbox checked';
             elements.awayCheckbox.className = 'checkbox checked';
             elements.deductionsCheckbox.className = 'checkbox checked';
