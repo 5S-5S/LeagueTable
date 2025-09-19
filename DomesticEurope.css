@@ -1039,3 +1039,40 @@ body {
     background: transparent !important;
     color: white !important;
 }
+
+/* Dark mode for Match History visualization bar titles */
+[data-theme="dark"] #matchHistoryVisualizations .text-sm.font-semibold {
+    color: white !important;
+}
+
+[data-theme="dark"] #matchHistoryVisualizations .text-sm.text-gray-600 {
+    color: #d1d5db !important; /* Light gray for stats text */
+}
+
+/* Dark mode for H2H visualization bar titles */
+[data-theme="dark"] #h2hVisualizations .text-sm.font-semibold {
+    color: white !important;
+}
+
+[data-theme="dark"] #h2hVisualizations .text-sm.text-gray-600 {
+    color: #d1d5db !important; /* Light gray for stats text */
+}
+
+/* Dark mode for Most Recent position info text */
+[data-theme="dark"] #teamSeasonsPositionInfo {
+    color: white !important;
+}
+
+/* Dark mode for winning scores in Last Time When tab */
+[data-theme="dark"] #lastTimeResults .win-score,
+[data-theme="dark"] #lastTimeResults td.win-score,
+[data-theme="dark"] #lastTimeResults .text-center.text-lg.win-score {
+    color: #059669 !important;
+}
+
+/* Dark mode for winning scores in Team Streaks tab */
+[data-theme="dark"] #teamStreaksResults .win-score,
+[data-theme="dark"] #teamStreaksResults td.win-score,
+[data-theme="dark"] #teamStreaksResults .text-center.text-lg.win-score {
+    color: #059669 !important;
+}
