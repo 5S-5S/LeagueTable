@@ -69,51 +69,6 @@
     background: var(--bg-gray-50);
 }
 
-/* Dark mode toggle visibility improvements */
-[data-theme="dark"] .toggle-label {
-    border: 2px solid #666;
-}
-
-[data-theme="dark"] .toggle-checkbox:checked + .toggle-label {
-    background-color: #333333;
-    border-color: #666;
-}
-
-/* Dark mode navigation header */
-[data-theme="dark"] .menu-header h2 {
-    color: white;
-}
-
-/* Keep losing scores red in dark mode */
-[data-theme="dark"] .text-red-600,
-[data-theme="dark"] .h2h-losses {
-    color: #dc2626 !important;
-}
-
-/* JavaScript now handles ALL table cell colors in dark mode */
-
-/* Head-to-Head section text colors in dark mode */
-[data-theme="dark"] #h2hSection .text-sm,
-[data-theme="dark"] #h2hSection span,
-[data-theme="dark"] #h2hVisualizations .text-sm,
-[data-theme="dark"] #h2hVisualizations span {
-    color: white !important;
-}
-
-/* Head-to-Head dropdown options should have black text */
-[data-theme="dark"] #recentH2HSelect option {
-    color: black !important;
-    background: white !important;
-}
-
-
-/* League buttons background in dark mode */
-[data-theme="dark"] .league-button {
-    background: #333333 !important;
-}
-
-/* JavaScript handles all position column colors */
-
 /* Reset and base styles */
 * {
     margin: 0;
@@ -211,6 +166,7 @@ body {
 .gap-3 { gap: 0.75rem; }
 .gap-4 { gap: 1rem; }
 .gap-6 { gap: 1.5rem; }
+.mt-3 { margin-top: 0.75rem; }
 .border { border: 1px solid #d1d5db; }
 .border-2 { border: 2px solid #d1d5db; }
 .border-b { border-bottom: 1px solid #e5e7eb; }
@@ -229,6 +185,7 @@ body {
 .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
 .hover\:border-green-500:hover { border-color: #10b981; }
 .hover\:underline:hover { text-decoration: underline; }
+.bg-gray-100 { background-color: #f3f4f6; }
 .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
 
 /* Team clickable styles */
@@ -370,6 +327,21 @@ body {
     background: white !important;
 }
 
+/* Head-to-Head Match History - winning scores should be green */
+#h2hTableBody .win-score {
+    color: #059669 !important;
+}
+
+/* Match History - winning scores should be green */
+#matchHistoryTableBody .win-score {
+    color: #059669 !important;
+}
+
+/* Dark mode support for winning scores */
+[data-theme="dark"] #h2hTableBody .win-score,
+[data-theme="dark"] #matchHistoryTableBody .win-score {
+    color: #059669 !important;
+}
 
 /* League buttons background in dark mode */
 [data-theme="dark"] .league-button {
@@ -377,6 +349,49 @@ body {
 }
 
 /* JavaScript handles all position column colors */
+
+/* Dark mode background colors */
+[data-theme="dark"] .bg-gray-100 {
+    background-color: var(--bg-gray-50);
+}
+
+[data-theme="dark"] .bg-gray-50 {
+    background-color: #444444;
+}
+
+[data-theme="dark"] .bg-white {
+    background-color: var(--bg-white);
+}
+
+/* Dark mode section containers */
+[data-theme="dark"] #matchHistorySection,
+[data-theme="dark"] #h2hSection {
+    background: var(--bg-white);
+}
+
+/* Dark mode table container - keep gray background */
+[data-theme="dark"] #tableContainer {
+    background-color: var(--bg-gray-50);
+}
+
+/* Dark mode hover states */
+[data-theme="dark"] .hover\:bg-gray-50:hover {
+    background-color: #444444;
+}
+
+[data-theme="dark"] .hover\:bg-gray-100:hover {
+    background-color: var(--bg-gray-50);
+}
+
+/* Dark mode league table backgrounds */
+[data-theme="dark"] #tableContainer .league-table {
+    background: var(--bg-gray-50);
+}
+
+/* Ensure winning scores stay green in dark mode */
+[data-theme="dark"] .league-table td[style*="#059669"] {
+    color: #059669 !important;
+}
 
 
 .toggle-checkbox:checked + .toggle-label .toggle-button {
@@ -521,6 +536,11 @@ body {
     overflow-x: auto;
 }
 
+/* Gray background for main table container only */
+#tableContainer .league-table {
+    background: #f3f4f6;
+}
+
 .league-table table {
     width: 100%;
     border-collapse: collapse;
@@ -549,9 +569,9 @@ body {
     background: var(--bg-gray-50);
 }
 
-/* .league-table tr.highlight {
+.league-table tr.highlight {
     background: #f0fdf4;
-} */
+}
 
 .points-badge {
     font-size: 1.25rem;
@@ -669,25 +689,26 @@ body {
         min-width: 120px;
     }
 
-    /* Mobile fixes for Match History and H2H sections */
-    #matchHistorySection .flex.items-center.justify-between,
-    #h2hSection .flex.items-center.justify-between {
+    /* Mobile-only: Force Most Recent containers to stack */
+    #matchHistorySection div:has(#recentMatchesSelect),
+    #h2hSection div:has(#recentH2HSelect) {
+        display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 1rem !important;
-    }
-
-    #matchHistorySection .flex.items-center.gap-6,
-    #h2hSection .flex.items-center.gap-6 {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 0.75rem !important;
-    }
-
-    #matchHistorySection .flex.items-center.gap-4,
-    #h2hSection .flex.items-center.gap-4 {
-        flex-wrap: wrap !important;
         gap: 0.5rem !important;
+    }
+
+    /* Force individual elements to take full width */
+    #recentMatchesSelect,
+    #recentH2HSelect {
+        width: 100% !important;
+        max-width: 200px !important;
+    }
+
+    #matchHistoryMatchCount,
+    #h2hMatchCount {
+        display: block !important;
+        width: 100% !important;
     }
 
     /* Mobile-only: Fix Point Deductions and 3 Points buttons */
@@ -960,90 +981,7 @@ body {
     position: relative;
 }
 
-/* Static inline styles moved from HTML */
-.icon-alert {
-    color: #6b7280;
-}
-
-#teamHistoryTable {
-    border-radius: 8px; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.icon-loading {
-    font-size: 4rem;
-}
-
-/* Team Seasons table dark mode styles */
-[data-theme="dark"] #teamHistoryTable .league-table td {
-    color: white;
-}
-
-/* Team names should be white in dark mode (this overrides the black from above) */
-[data-theme="dark"] #teamHistoryTable .league-table td span[style*="color: #000000"] {
-    color: white !important;
-}
-
-/* Position column should have special colors for 1st, 2nd, 3rd regardless of theme */
-/* These positions have inline styles that will override the white text above */
-
-/* Progression column uses inline styles and should maintain those colors */
-/* The inline styles will naturally override the white text rule above */
-
-/* Head-to-Head Match History - winning scores should be green */
-#h2hTableBody .win-score,
-#h2hTableBody td.win-score,
-#h2hTableBody td.text-center.text-lg.win-score,
-.league-table #h2hTableBody .win-score,
-.league-table #h2hTableBody td.win-score,
-.league-table #h2hTableBody td.text-center.text-lg.win-score {
-    color: #059669 !important;
-}
-/* Match History - winning scores should be green */
-#matchHistoryTableBody .win-score,
-#matchHistoryTableBody td.win-score {
-    color: #059669 !important;
-}
-/* Dark mode support for winning scores */
-[data-theme="dark"] #h2hTableBody .win-score,
-[data-theme="dark"] #h2hTableBody td.win-score,
-[data-theme="dark"] #h2hTableBody td.text-center.text-lg.win-score,
-[data-theme="dark"] .league-table #h2hTableBody .win-score,
-[data-theme="dark"] .league-table #h2hTableBody td.win-score,
-[data-theme="dark"] .league-table #h2hTableBody td.text-center.text-lg.win-score,
-[data-theme="dark"] #matchHistoryTableBody .win-score,
-[data-theme="dark"] #matchHistoryTableBody td.win-score {
-    color: #059669 !important;
-}
-
-/* Head-to-Head Match History - draw scores should be gray */
-#h2hTableBody .draw-score,
-#h2hTableBody td.draw-score,
-.league-table #h2hTableBody .draw-score,
-.league-table #h2hTableBody td.draw-score {
-    color: #9ca3af !important;
-}
-/* Match History - draw scores should be gray */
-#matchHistoryTableBody .draw-score,
-#matchHistoryTableBody td.draw-score {
-    color: #9ca3af !important;
-}
-/* Dark mode support for draw scores */
-[data-theme="dark"] #h2hTableBody .draw-score,
-[data-theme="dark"] #h2hTableBody td.draw-score,
-[data-theme="dark"] .league-table #h2hTableBody .draw-score,
-[data-theme="dark"] .league-table #h2hTableBody td.draw-score,
-[data-theme="dark"] #matchHistoryTableBody .draw-score,
-[data-theme="dark"] #matchHistoryTableBody td.draw-score {
-    color: #9ca3af !important;
-}
-
-/* Ensure winning scores stay green in dark mode */
-[data-theme="dark"] .league-table td[style*="#059669"] {
-    color: #059669 !important;
-}
-
-/* Fix: Reset and standardize all non-selected teams to match team1-highlight exactly */
+/* Apply transparent highlighting to non-selected teams in Match History */
 #matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
     /* Reset any conflicting styles */
     font-family: inherit !important;
@@ -1054,8 +992,8 @@ body {
     text-transform: none !important;
     letter-spacing: normal !important;
     line-height: normal !important;
-    /* Apply team1-highlight styling */
-    background: transparent !important; /* Transparent to match page background */
+    /* Apply transparent styling */
+    background: transparent !important;
     border-radius: 0.5rem !important;
     display: flex !important;
     align-items: center !important;
@@ -1069,9 +1007,9 @@ body {
     -moz-osx-font-smoothing: grayscale !important;
 }
 
-/* Dark mode: background should match page background exactly */
+/* Dark mode for Match History */
 [data-theme="dark"] #matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
-    background: transparent !important; /* Transparent to match page background */
+    background: transparent !important;
     color: white !important;
 }
 
@@ -1173,31 +1111,5 @@ body {
 [data-theme="dark"] #teamStreaksResults .win-score,
 [data-theme="dark"] #teamStreaksResults td.win-score,
 [data-theme="dark"] #teamStreaksResults .text-center.text-lg.win-score {
-    color: #059669 !important;
-}
-
-/* Nuclear option - force home scores to be green */
-#h2hTableBody td.text-center.text-lg.font-bold.win-score,
-.league-table #h2hTableBody td.text-center.text-lg.font-bold.win-score,
-[data-theme="dark"] #h2hTableBody td.text-center.text-lg.font-bold.win-score,
-[data-theme="dark"] .league-table #h2hTableBody td.text-center.text-lg.font-bold.win-score {
-    color: #059669 !important;
-}
-
-/* Super nuclear option - force ALL win-score elements to be green */
-#h2hTableBody .win-score {
-    color: #059669 !important;
-}
-[data-theme="dark"] #h2hTableBody .win-score {
-    color: #059669 !important;
-}
-
-/* Most specific possible - target the third column in h2h table */
-#h2hTableBody tr td:nth-child(3).win-score,
-#h2hTableBody tr td:nth-child(5).win-score {
-    color: #059669 !important;
-}
-[data-theme="dark"] #h2hTableBody tr td:nth-child(3).win-score,
-[data-theme="dark"] #h2hTableBody tr td:nth-child(5).win-score {
     color: #059669 !important;
 }

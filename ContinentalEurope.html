@@ -6822,7 +6822,7 @@
                 match.awayTeamStyle = awayTeamStyle;
 
                 let rowHTML = `
-                    <tr class="${(match.homeTeam === state.selectedTeam1 || match.awayTeam === state.selectedTeam1) ? 'highlight' : ''}">
+                    <tr class="">
                         <td class="text-center text-sm">${match.date}</td>
                         <td class="text-center text-sm">${match.stage}</td>
                         <td class="text-center">
@@ -6993,7 +6993,7 @@
                                                     const logoUrl = getTeamLogoUrl(team.team, state.selectedLeague);
                                                     return logoUrl ? `<img src="${logoUrl}" alt="${team.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : '';
                                                 })()}
-                                                <span class="hover:underline team-name-text ${highlightClass}" style="${teamColorStyle} font-weight: bold;">${team.team}</span>
+                                                <span class="hover:underline team-name-text ${highlightClass}" style="${teamColorStyle}">${team.team}</span>
                                             </div>
                                         </td>
                                         <td class="px-3 py-4 text-center">${team.played}</td>
@@ -7470,7 +7470,7 @@
                                         const logoUrl = getTeamLogoUrl(team.team, state.selectedLeague);
                                         return logoUrl ? `<img src="${logoUrl}" alt="${team.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : '';
                                     })()}
-                                    <span class="hover:underline team-name-text ${highlightClass}" style="${teamColorStyle} font-weight: bold;">${team.team}</span>
+                                    <span class="hover:underline team-name-text ${highlightClass}" style="${teamColorStyle}">${team.team}</span>
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-center">${team.played}</td>
@@ -7839,7 +7839,7 @@
                 const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
                 
                 return `
-                    <tr class="${(isTeam1Home || isTeam1Away) ? 'highlight' : ''}">
+                    <tr class="">
                         <td class="text-center text-sm">${match.date}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
