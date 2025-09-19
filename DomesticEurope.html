@@ -167,16 +167,26 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-search mr-2"></span>Team 1
                         </label>
-                        <select id="team1Select" class="form-input">
+                        <div class="combobox-container" id="team1ComboboxContainer">
+                            <input type="text" id="team1ComboboxInput" class="combobox-input" placeholder="All Teams" autocomplete="off">
+                            <span class="combobox-arrow">▼</span>
+                            <div class="combobox-dropdown" id="team1ComboboxDropdown"></div>
+                        </div>
+                        <select id="team1Select" class="form-input" style="display: none;">
                             <option value="">All Teams</option>
                         </select>
                     </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-search mr-2"></span>Team 2
                         </label>
-                        <select id="team2Select" class="form-input">
+                        <div class="combobox-container" id="team2ComboboxContainer">
+                            <input type="text" id="team2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
+                            <span class="combobox-arrow">▼</span>
+                            <div class="combobox-dropdown" id="team2ComboboxDropdown"></div>
+                        </div>
+                        <select id="team2Select" class="form-input" style="display: none;">
                             <option value="">No Team</option>
                         </select>
                     </div>
@@ -240,7 +250,12 @@
                     <!-- Team Selection -->
                     <div class="mb-8">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Select Team:</label>
-                        <select id="teamSeasonsTeamSelect" class="form-input w-full">
+                        <div class="combobox-container" id="teamSeasonsComboboxContainer">
+                            <input type="text" id="teamSeasonsComboboxInput" class="combobox-input" placeholder="Choose a team..." autocomplete="off">
+                            <span class="combobox-arrow">▼</span>
+                            <div class="combobox-dropdown" id="teamSeasonsComboboxDropdown"></div>
+                        </div>
+                        <select id="teamSeasonsTeamSelect" class="form-input w-full" style="display: none;">
                             <option value="">Choose a team...</option>
                         </select>
                     </div>
@@ -347,14 +362,24 @@
                         
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1</label>
-                            <select id="lastTimeTeam1Select" class="form-input">
+                            <div class="combobox-container" id="lastTimeTeam1ComboboxContainer">
+                                <input type="text" id="lastTimeTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="lastTimeTeam1ComboboxDropdown"></div>
+                            </div>
+                            <select id="lastTimeTeam1Select" class="form-input" style="display: none;">
                                 <option value="">Select Team 1</option>
                             </select>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2</label>
-                            <select id="lastTimeTeam2Select" class="form-input">
+                            <div class="combobox-container" id="lastTimeTeam2ComboboxContainer">
+                                <input type="text" id="lastTimeTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="lastTimeTeam2ComboboxDropdown"></div>
+                            </div>
+                            <select id="lastTimeTeam2Select" class="form-input" style="display: none;">
                                 <option value="">Select Team 2</option>
                             </select>
                         </div>
@@ -543,14 +568,24 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1:</label>
-                            <select id="teamStreaksTeam1Select" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
+                            <div class="combobox-container" id="teamStreaksTeam1ComboboxContainer">
+                                <input type="text" id="teamStreaksTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="teamStreaksTeam1ComboboxDropdown"></div>
+                            </div>
+                            <select id="teamStreaksTeam1Select" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none" style="display: none;">
                                 <option value="">Select Team 1</option>
                             </select>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2 (Optional):</label>
-                            <select id="teamStreaksTeam2Select" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
+                            <div class="combobox-container" id="teamStreaksTeam2ComboboxContainer">
+                                <input type="text" id="teamStreaksTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="teamStreaksTeam2ComboboxDropdown"></div>
+                            </div>
+                            <select id="teamStreaksTeam2Select" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none" style="display: none;">
                                 <option value="">Select Team 2</option>
                             </select>
                         </div>
@@ -2003,6 +2038,27 @@
             dayOfWeekSelect: document.getElementById('dayOfWeekSelect'),
             team1Select: document.getElementById('team1Select'),
             team2Select: document.getElementById('team2Select'),
+            team1ComboboxContainer: document.getElementById('team1ComboboxContainer'),
+            team1ComboboxInput: document.getElementById('team1ComboboxInput'),
+            team1ComboboxDropdown: document.getElementById('team1ComboboxDropdown'),
+            team2ComboboxContainer: document.getElementById('team2ComboboxContainer'),
+            team2ComboboxInput: document.getElementById('team2ComboboxInput'),
+            team2ComboboxDropdown: document.getElementById('team2ComboboxDropdown'),
+            teamSeasonsComboboxContainer: document.getElementById('teamSeasonsComboboxContainer'),
+            teamSeasonsComboboxInput: document.getElementById('teamSeasonsComboboxInput'),
+            teamSeasonsComboboxDropdown: document.getElementById('teamSeasonsComboboxDropdown'),
+            lastTimeTeam1ComboboxContainer: document.getElementById('lastTimeTeam1ComboboxContainer'),
+            lastTimeTeam1ComboboxInput: document.getElementById('lastTimeTeam1ComboboxInput'),
+            lastTimeTeam1ComboboxDropdown: document.getElementById('lastTimeTeam1ComboboxDropdown'),
+            lastTimeTeam2ComboboxContainer: document.getElementById('lastTimeTeam2ComboboxContainer'),
+            lastTimeTeam2ComboboxInput: document.getElementById('lastTimeTeam2ComboboxInput'),
+            lastTimeTeam2ComboboxDropdown: document.getElementById('lastTimeTeam2ComboboxDropdown'),
+            teamStreaksTeam1ComboboxContainer: document.getElementById('teamStreaksTeam1ComboboxContainer'),
+            teamStreaksTeam1ComboboxInput: document.getElementById('teamStreaksTeam1ComboboxInput'),
+            teamStreaksTeam1ComboboxDropdown: document.getElementById('teamStreaksTeam1ComboboxDropdown'),
+            teamStreaksTeam2ComboboxContainer: document.getElementById('teamStreaksTeam2ComboboxContainer'),
+            teamStreaksTeam2ComboboxInput: document.getElementById('teamStreaksTeam2ComboboxInput'),
+            teamStreaksTeam2ComboboxDropdown: document.getElementById('teamStreaksTeam2ComboboxDropdown'),
             homeCheckbox: document.getElementById('homeCheckbox'),
             awayCheckbox: document.getElementById('awayCheckbox'),
             deductionsCheckbox: document.getElementById('deductionsCheckbox'),
@@ -4706,29 +4762,345 @@
             return null;
         }
 
+        // Combobox functionality
+        class Combobox {
+            constructor(containerId, inputId, dropdownId, placeholder, onSelect) {
+                this.container = document.getElementById(containerId);
+                this.input = document.getElementById(inputId);
+                this.dropdown = document.getElementById(dropdownId);
+                this.placeholder = placeholder;
+                this.onSelect = onSelect;
+                this.options = [];
+                this.filteredOptions = [];
+                this.selectedIndex = -1;
+                this.isOpen = false;
+
+                this.init();
+            }
+
+            init() {
+                // Input events
+                this.input.addEventListener('focus', () => this.open());
+                this.input.addEventListener('blur', () => {
+                    // Delay close to allow for option click
+                    setTimeout(() => this.close(), 150);
+                });
+                this.input.addEventListener('input', (e) => this.filterOptions(e.target.value));
+                this.input.addEventListener('keydown', (e) => this.handleKeyDown(e));
+
+                // Click arrow to toggle
+                this.container.querySelector('.combobox-arrow').addEventListener('click', () => {
+                    if (this.isOpen) {
+                        this.close();
+                    } else {
+                        this.input.focus();
+                        this.open();
+                    }
+                });
+
+                // Click outside to close
+                document.addEventListener('click', (e) => {
+                    if (!this.container.contains(e.target)) {
+                        this.close();
+                    }
+                });
+            }
+
+            setOptions(options) {
+                this.options = options;
+                this.filteredOptions = [...options];
+                this.renderOptions();
+            }
+
+            filterOptions(query) {
+                const lowerQuery = query.toLowerCase();
+                this.filteredOptions = this.options.filter(option =>
+                    option.text.toLowerCase().includes(lowerQuery)
+                );
+                this.selectedIndex = -1;
+                this.renderOptions();
+
+                // If user empties the field, select the empty option
+                if (query === '') {
+                    const emptyOption = this.options.find(opt => opt.value === '');
+                    if (emptyOption && this.onSelect) {
+                        this.onSelect(emptyOption.value, emptyOption.text);
+                    }
+                }
+
+                if (!this.isOpen) {
+                    this.open();
+                }
+            }
+
+            renderOptions() {
+                if (this.filteredOptions.length === 0) {
+                    this.dropdown.innerHTML = '<div class="combobox-no-results">No teams found</div>';
+                    return;
+                }
+
+                this.dropdown.innerHTML = this.filteredOptions.map((option, index) =>
+                    `<div class="combobox-option ${index === this.selectedIndex ? 'highlighted' : ''}"
+                          data-value="${option.value}" data-index="${index}">
+                        ${option.text}
+                     </div>`
+                ).join('');
+
+                // Add click events to options
+                this.dropdown.querySelectorAll('.combobox-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        this.selectOption(option.dataset.value, option.textContent.trim());
+                    });
+                });
+            }
+
+            handleKeyDown(e) {
+                if (!this.isOpen) return;
+
+                switch(e.key) {
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        this.selectedIndex = Math.min(this.selectedIndex + 1, this.filteredOptions.length - 1);
+                        this.updateHighlight();
+                        break;
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
+                        this.updateHighlight();
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        if (this.selectedIndex >= 0) {
+                            const option = this.filteredOptions[this.selectedIndex];
+                            this.selectOption(option.value, option.text);
+                        }
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        this.close();
+                        break;
+                }
+            }
+
+            updateHighlight() {
+                this.dropdown.querySelectorAll('.combobox-option').forEach((option, index) => {
+                    option.classList.toggle('highlighted', index === this.selectedIndex);
+                });
+            }
+
+            selectOption(value, text) {
+                this.input.value = text;
+                this.close();
+                if (this.onSelect) {
+                    this.onSelect(value, text);
+                }
+            }
+
+            open() {
+                this.isOpen = true;
+                this.container.classList.add('open');
+                this.renderOptions();
+            }
+
+            close() {
+                this.isOpen = false;
+                this.container.classList.remove('open');
+                this.selectedIndex = -1;
+            }
+
+            setValue(value, text) {
+                this.input.value = text || this.placeholder;
+            }
+        }
+
+        // Initialize comboboxes
+        let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox;
+
         // Update team selects
         function updateTeamSelects() {
             const leagueTeams = getLeagueTeams();
-            
-            const team1Options = '<option value="">All Teams</option>' + 
+
+            const team1Options = '<option value="">All Teams</option>' +
                 leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            const team2Options = '<option value="">No Team</option>' + 
+            const team2Options = '<option value="">No Team</option>' +
                 leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            
+
             elements.team1Select.innerHTML = team1Options;
             elements.team2Select.innerHTML = team2Options;
-            
-            // Also populate Last Time When team selects
-            const lastTimeTeam1Options = '<option value="">Select Team 1</option>' + 
+
+            // Initialize comboboxes if they don't exist
+            if (!team1Combobox) {
+                team1Combobox = new Combobox(
+                    'team1ComboboxContainer',
+                    'team1ComboboxInput',
+                    'team1ComboboxDropdown',
+                    'All Teams',
+                    (value, text) => {
+                        state.selectedTeam1 = value;
+                        elements.team1Select.value = value;
+                        console.log('Team 1 selected:', value);
+                        // Trigger same logic as original dropdown
+                        updateTable();
+                    }
+                );
+            }
+
+            if (!team2Combobox) {
+                team2Combobox = new Combobox(
+                    'team2ComboboxContainer',
+                    'team2ComboboxInput',
+                    'team2ComboboxDropdown',
+                    'No Team',
+                    (value, text) => {
+                        state.selectedTeam2 = value;
+                        elements.team2Select.value = value;
+                        console.log('Team 2 selected:', value);
+                        // Trigger same logic as original dropdown
+                        updateTable();
+                    }
+                );
+            }
+
+            // Populate combobox options
+            const team1ComboOptions = [
+                { value: '', text: 'All Teams' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            const team2ComboOptions = [
+                { value: '', text: 'No Team' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+
+            team1Combobox.setOptions(team1ComboOptions);
+            team2Combobox.setOptions(team2ComboOptions);
+
+            // Initialize Team Seasons combobox
+            if (!teamSeasonsCombobox) {
+                teamSeasonsCombobox = new Combobox(
+                    'teamSeasonsComboboxContainer',
+                    'teamSeasonsComboboxInput',
+                    'teamSeasonsComboboxDropdown',
+                    'Choose a team...',
+                    (value, text) => {
+                        console.log('Team Seasons team selected:', value);
+                        handleTeamSeasonsTeamChange(value);
+                    }
+                );
+            }
+
+            // Initialize Last Time When comboboxes
+            if (!lastTimeTeam1Combobox) {
+                lastTimeTeam1Combobox = new Combobox(
+                    'lastTimeTeam1ComboboxContainer',
+                    'lastTimeTeam1ComboboxInput',
+                    'lastTimeTeam1ComboboxDropdown',
+                    'Select Team 1',
+                    (value, text) => {
+                        console.log('Last Time Team 1 selected:', value);
+                        elements.lastTimeTeam1Select.value = value;
+                        elements.lastTimeTeam1Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
+            if (!lastTimeTeam2Combobox) {
+                lastTimeTeam2Combobox = new Combobox(
+                    'lastTimeTeam2ComboboxContainer',
+                    'lastTimeTeam2ComboboxInput',
+                    'lastTimeTeam2ComboboxDropdown',
+                    'Select Team 2',
+                    (value, text) => {
+                        console.log('Last Time Team 2 selected:', value);
+                        elements.lastTimeTeam2Select.value = value;
+                        elements.lastTimeTeam2Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
+            // Initialize Team Streaks comboboxes
+            if (!teamStreaksTeam1Combobox) {
+                teamStreaksTeam1Combobox = new Combobox(
+                    'teamStreaksTeam1ComboboxContainer',
+                    'teamStreaksTeam1ComboboxInput',
+                    'teamStreaksTeam1ComboboxDropdown',
+                    'Select Team 1',
+                    (value, text) => {
+                        console.log('Team Streaks Team 1 selected:', value);
+                        elements.teamStreaksTeam1Select.value = value;
+                        elements.teamStreaksTeam1Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
+            if (!teamStreaksTeam2Combobox) {
+                teamStreaksTeam2Combobox = new Combobox(
+                    'teamStreaksTeam2ComboboxContainer',
+                    'teamStreaksTeam2ComboboxInput',
+                    'teamStreaksTeam2ComboboxDropdown',
+                    'Select Team 2',
+                    (value, text) => {
+                        console.log('Team Streaks Team 2 selected:', value);
+                        elements.teamStreaksTeam2Select.value = value;
+                        elements.teamStreaksTeam2Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
+            // Populate all combobox options
+            const teamComboOptions = [
+                { value: '', text: 'Choose a team...' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            const lastTimeTeam1ComboOptions = [
+                { value: '', text: 'Select Team 1' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            const lastTimeTeam2ComboOptions = [
+                { value: '', text: 'Select Team 2' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            const teamStreaksTeam1ComboOptions = [
+                { value: '', text: 'Select Team 1' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            const teamStreaksTeam2ComboOptions = [
+                { value: '', text: 'Select Team 2' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+
+            teamSeasonsCombobox.setOptions(teamComboOptions);
+            lastTimeTeam1Combobox.setOptions(lastTimeTeam1ComboOptions);
+            lastTimeTeam2Combobox.setOptions(lastTimeTeam2ComboOptions);
+            teamStreaksTeam1Combobox.setOptions(teamStreaksTeam1ComboOptions);
+            teamStreaksTeam2Combobox.setOptions(teamStreaksTeam2ComboOptions);
+
+            // Also populate Last Time When team selects (for backward compatibility)
+            const lastTimeTeam1Options = '<option value="">Select Team 1</option>' +
                 leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            const lastTimeTeam2Options = '<option value="">Select Team 2</option>' + 
+            const lastTimeTeam2Options = '<option value="">Select Team 2</option>' +
                 leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            
+
             elements.lastTimeTeam1Select.innerHTML = lastTimeTeam1Options;
             elements.lastTimeTeam2Select.innerHTML = lastTimeTeam2Options;
-            
+
             elements.team1Select.value = state.selectedTeam1;
             elements.team2Select.value = state.selectedTeam2;
+
+            // Update combobox values
+            const team1Text = state.selectedTeam1 || 'All Teams';
+            const team2Text = state.selectedTeam2 || 'No Team';
+            team1Combobox.setValue(state.selectedTeam1, team1Text);
+            team2Combobox.setValue(state.selectedTeam2, team2Text);
+
+            // Update other combobox values
+            const teamSeasonsText = state.teamSeasonsSelectedTeam || 'Choose a team...';
+            teamSeasonsCombobox.setValue(state.teamSeasonsSelectedTeam, teamSeasonsText);
+
+            // Set default values for Last Time When and Team Streaks comboboxes
+            lastTimeTeam1Combobox.setValue('', 'Select Team 1');
+            lastTimeTeam2Combobox.setValue('', 'Select Team 2');
+            teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
+            teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
         }
 
         // Helper function to hide all Last Time sections
@@ -6754,6 +7126,32 @@
             // Restore UI elements
             elements.team1Select.value = savedState.selectedTeam1;
             elements.team2Select.value = savedState.selectedTeam2;
+
+            // Update comboboxes if they exist
+            if (team1Combobox) {
+                const team1Text = savedState.selectedTeam1 || 'All Teams';
+                team1Combobox.setValue(savedState.selectedTeam1, team1Text);
+            }
+            if (team2Combobox) {
+                const team2Text = savedState.selectedTeam2 || 'No Team';
+                team2Combobox.setValue(savedState.selectedTeam2, team2Text);
+            }
+            if (teamSeasonsCombobox) {
+                const teamSeasonsText = savedState.teamSeasonsSelectedTeam || 'Choose a team...';
+                teamSeasonsCombobox.setValue(savedState.teamSeasonsSelectedTeam, teamSeasonsText);
+            }
+            if (lastTimeTeam1Combobox) {
+                lastTimeTeam1Combobox.setValue('', 'Select Team 1');
+            }
+            if (lastTimeTeam2Combobox) {
+                lastTimeTeam2Combobox.setValue('', 'Select Team 2');
+            }
+            if (teamStreaksTeam1Combobox) {
+                teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
+            }
+            if (teamStreaksTeam2Combobox) {
+                teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
+            }
             elements.seasonSelect.value = savedState.selectedSeason;
             elements.dayOfWeekSelect.value = savedState.selectedDayOfWeek;
 

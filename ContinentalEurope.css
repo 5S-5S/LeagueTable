@@ -476,6 +476,129 @@ body {
     outline: none;
 }
 
+/* Combobox Styles */
+.combobox-container {
+    position: relative;
+    width: 100%;
+}
+
+.combobox-input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.75rem;
+    transition: border-color 0.3s ease;
+    background: white;
+    cursor: text;
+}
+
+.combobox-input:focus {
+    border-color: #10b981;
+    outline: none;
+}
+
+.combobox-arrow {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+    transition: transform 0.2s ease;
+}
+
+.combobox-container.open .combobox-arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.combobox-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #10b981;
+    border-top: none;
+    border-radius: 0 0 0.75rem 0.75rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.combobox-container.open .combobox-dropdown {
+    display: block;
+}
+
+.combobox-option {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.combobox-option:last-child {
+    border-bottom: none;
+}
+
+.combobox-option:hover,
+.combobox-option.highlighted {
+    background-color: #f0fdfa;
+    color: #047857;
+}
+
+.combobox-option.selected {
+    background-color: #059669;
+    color: white;
+}
+
+.combobox-no-results {
+    padding: 0.75rem 1rem;
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+}
+
+/* Dark mode combobox styles */
+[data-theme="dark"] .combobox-input {
+    background: var(--bg-white);
+    color: white;
+    border-color: #555;
+}
+
+[data-theme="dark"] .combobox-input:focus {
+    border-color: #10b981;
+}
+
+[data-theme="dark"] .combobox-dropdown {
+    background: var(--bg-white);
+    border-color: #10b981;
+}
+
+[data-theme="dark"] .combobox-option {
+    color: white;
+    border-color: #555;
+}
+
+[data-theme="dark"] .combobox-option:hover,
+[data-theme="dark"] .combobox-option.highlighted {
+    background-color: var(--bg-gray-50);
+    color: #10b981;
+}
+
+[data-theme="dark"] .combobox-option.selected {
+    background-color: #059669;
+    color: white;
+}
+
+[data-theme="dark"] .combobox-no-results {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .combobox-arrow {
+    color: #9ca3af;
+}
+
 .checkbox {
     width: 1.25rem;
     height: 1.25rem;
@@ -612,6 +735,20 @@ body {
     font-size: 1rem;
     font-weight: 700;
     background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border-radius: 0.375rem;
+}
+
+.team-transparent-highlight {
+    font-size: 1rem;
+    font-weight: 700;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -994,14 +1131,19 @@ body {
 }
 
 
+/* Dark mode for transparent highlight */
+[data-theme="dark"] .team-transparent-highlight {
+    background: transparent;
+}
+
 /* Dark mode for Match History */
-[data-theme="dark"] #matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+[data-theme="dark"] #matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
     background: transparent !important;
     color: white !important;
 }
 
 /* Apply same transparent highlighting to Last Time When section */
-#lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+#lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
@@ -1027,13 +1169,13 @@ body {
 }
 
 /* Dark mode for Last Time When */
-[data-theme="dark"] #lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+[data-theme="dark"] #lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
     background: transparent !important;
     color: white !important;
 }
 
 /* Apply same transparent highlighting to Team Streaks section */
-#teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+#teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
@@ -1059,7 +1201,7 @@ body {
 }
 
 /* Dark mode for Team Streaks */
-[data-theme="dark"] #teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+[data-theme="dark"] #teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
     background: transparent !important;
     color: white !important;
 }
