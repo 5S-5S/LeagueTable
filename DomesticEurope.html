@@ -6057,7 +6057,8 @@
             // Update table body
             if (tableResult.tableData.length > 0) {
                 elements.tableBody.innerHTML = tableResult.tableData.map((team, index) => {
-                    const isHighlighted = (state.selectedTeam1 === team.team || state.selectedTeam2 === team.team);
+                    // Only highlight when Team 1 is selected, or when both teams are selected
+                    const isHighlighted = state.selectedTeam1 && (state.selectedTeam1 === team.team || state.selectedTeam2 === team.team);
                     
                     // Alternating row colors: only if 3+ teams, otherwise all white
                     const rowBackgroundClass = tableResult.tableData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
@@ -6071,7 +6072,7 @@
                                         const logoUrl = getTeamLogoUrl(team.team, state.selectedLeague);
                                         return logoUrl ? `<img src="${logoUrl}" alt="${team.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : '';
                                     })()}
-                                    <span class="hover:underline team-name-text ${state.selectedTeam1 === team.team ? 'team1-highlight' : state.selectedTeam2 === team.team ? 'team2-highlight' : ''}" ${(state.selectedTeam1 || state.selectedTeam2) ? `style="color: ${getTeamColor(team.team, state.selectedLeague)} !important; font-weight: bold;"` : ''}>${team.team}</span>
+                                    <span class="hover:underline team-name-text ${isHighlighted && state.selectedTeam1 === team.team ? 'team1-highlight' : isHighlighted && state.selectedTeam2 === team.team ? 'team2-highlight' : ''}" ${isHighlighted ? `style="color: ${getTeamColor(team.team, state.selectedLeague)} !important; font-weight: bold;"` : ''}>${team.team}</span>
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-center">${team.played}</td>

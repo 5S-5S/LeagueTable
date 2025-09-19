@@ -7417,12 +7417,13 @@
                             ${phaseData.tableData.map((team, index) => {
                                 const isTeam1 = state.selectedTeam1 === team.team;
                                 const isTeam2 = state.selectedTeam2 === team.team;
-                                const isHighlighted = isTeam1 || isTeam2;
+                                // Only highlight when Team 1 is selected, or when both teams are selected
+                                const isHighlighted = state.selectedTeam1 && (isTeam1 || isTeam2);
 
                                 // Determine highlight class: team1-highlight for Team 1, team2-highlight for Team 2
-                                const highlightClass = isTeam1 ? 'team1-highlight' : isTeam2 ? 'team2-highlight' : '';
+                                const highlightClass = isHighlighted && isTeam1 ? 'team1-highlight' : isHighlighted && isTeam2 ? 'team2-highlight' : '';
 
-                                // Only apply team color when team is selected (Team 1 or Team 2)
+                                // Only apply team color when team is highlighted
                                 let teamColorStyle = '';
                                 if (isHighlighted) {
                                     const teamColor = getTeamColor(team.team, state.selectedLeague);
@@ -7893,12 +7894,13 @@
                 elements.tableBody.innerHTML = tableResult.tableData.map((team, index) => {
                     const isTeam1 = state.selectedTeam1 === team.team;
                     const isTeam2 = state.selectedTeam2 === team.team;
-                    const isHighlighted = isTeam1 || isTeam2;
+                    // Only highlight when Team 1 is selected, or when both teams are selected
+                    const isHighlighted = state.selectedTeam1 && (isTeam1 || isTeam2);
 
                     // Determine highlight class: team1-highlight for Team 1, team2-highlight for Team 2
-                    const highlightClass = isTeam1 ? 'team1-highlight' : isTeam2 ? 'team2-highlight' : '';
+                    const highlightClass = isHighlighted && isTeam1 ? 'team1-highlight' : isHighlighted && isTeam2 ? 'team2-highlight' : '';
 
-                    // Only apply team color when team is selected (Team 1 or Team 2)
+                    // Only apply team color when team is highlighted
                     let teamColorStyle = '';
                     if (isHighlighted) {
                         const teamColor = getTeamColor(team.team, state.selectedLeague);
