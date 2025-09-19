@@ -7840,6 +7840,7 @@
                 return {
                     date: match.dateObj.toLocaleDateString(),
                     dateSort: match.dateObj,
+                    stage: match.CompetitionPhase || '',
                     homeTeam: match.HomeTeam,
                     homeTeamColor: homeTeamColor,
                     homeTeamStyle: homeTeamFinalStyle,
@@ -7867,12 +7868,15 @@
                     const key = state.h2hSortConfig.key;
                     let aVal = key === 'date' ? a.dateSort : a[key];
                     let bVal = key === 'date' ? b.dateSort : b[key];
-                    
+
                     if (key === 'homeScore' || key === 'awayScore') {
                         aVal = parseInt(aVal) || 0;
                         bVal = parseInt(bVal) || 0;
+                    } else if (key === 'homeTeam' || key === 'awayTeam' || key === 'result' || key === 'stage') {
+                        aVal = (aVal || '').toLowerCase();
+                        bVal = (bVal || '').toLowerCase();
                     }
-                    
+
                     if (state.h2hSortConfig.direction === 'asc') {
                         return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
                     } else {
@@ -7887,6 +7891,7 @@
             // Create table headers
             const headers = [
                 { key: 'date', label: 'Date' },
+                { key: 'stage', label: 'Competition Stage' },
                 { key: 'homeTeam', label: 'Home Team' },
                 { key: 'homeScore', label: 'Home Score' },
                 { key: 'awayTeam', label: 'Away Team' },
@@ -7916,6 +7921,7 @@
                 return `
                     <tr class="">
                         <td class="text-center text-sm">${match.date}</td>
+                        <td class="text-center text-sm">${match.stage || ''}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.homeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -7946,7 +7952,7 @@
         // Handle H2H table sorting (tri-click: none -> asc -> desc -> none)
         function handleH2hSort(key) {
             let defaultDirection = 'desc';
-            if (key === 'homeTeam' || key === 'awayTeam' || key === 'result') {
+            if (key === 'homeTeam' || key === 'awayTeam' || key === 'result' || key === 'stage') {
                 defaultDirection = 'asc';
             }
             
