@@ -493,6 +493,22 @@ body {
     background: var(--bg-gray-50);
 }
 
+[data-theme="dark"] .menu-item {
+    color: white;
+}
+
+[data-theme="dark"] .menu-item:hover:not(.disabled) {
+    color: #1d4ed8;
+}
+
+[data-theme="dark"] .menu-item.active {
+    color: #1d4ed8;
+}
+
+[data-theme="dark"] .menu-item.disabled {
+    color: #9ca3af;
+}
+
 /* Contact specific dark mode styles */
 [data-theme="dark"] .contact-form {
     background: var(--bg-white);

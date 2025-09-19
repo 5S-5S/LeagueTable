@@ -555,6 +555,22 @@ body {
     background: var(--bg-gray-50);
 }
 
+[data-theme="dark"] .menu-item {
+    color: white;
+}
+
+[data-theme="dark"] .menu-item:hover:not(.disabled) {
+    color: #1d4ed8;
+}
+
+[data-theme="dark"] .menu-item.active {
+    color: #1d4ed8;
+}
+
+[data-theme="dark"] .menu-item.disabled {
+    color: #9ca3af;
+}
+
 /* Q&A specific dark mode styles */
 [data-theme="dark"] .qa-item {
     background: var(--bg-white);

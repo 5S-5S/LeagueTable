@@ -305,6 +305,18 @@ body {
     color: white;
 }
 
+[data-theme="dark"] .menu-item:hover:not(.disabled) {
+    color: #1d4ed8;
+}
+
+[data-theme="dark"] .menu-item.active {
+    color: #1d4ed8;
+}
+
+[data-theme="dark"] .menu-item.disabled {
+    color: #9ca3af;
+}
+
 /* Keep losing scores red in dark mode */
 [data-theme="dark"] .text-red-600,
 [data-theme="dark"] .h2h-losses {
