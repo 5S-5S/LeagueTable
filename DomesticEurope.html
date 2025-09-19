@@ -83,7 +83,7 @@
                 <div class="header-content">
                     <div>
                         <h1 class="text-4xl font-bold mb-2">Domestic League Filters</h1>
-                        <p class="text-lg opacity-90">Last Data Update: September 14th, 2025</p>
+                        <p class="text-lg opacity-90" id="lastDataUpdate">Last Data Update: Loading...</p>
                     </div>
                     <div class="dark-mode-toggle">
                         <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
@@ -1986,6 +1986,7 @@
 
         // DOM elements
         const elements = {
+            lastDataUpdate: document.getElementById('lastDataUpdate'),
             controlsSection: document.getElementById('controlsSection'),
             reloadGistsBtn: document.getElementById('reloadGistsBtn'),
             errorState: document.getElementById('errorState'),
@@ -3155,7 +3156,7 @@
                 filterDataForCurrentLeague(leagueId);
                 
                 // All data loaded successfully
-                
+                updateLastDataUpdate();
             } catch (error) {
                 console.error(`Error loading data:`, error);
                 state.error = `Failed to load data: ${error.message}`;
@@ -3217,6 +3218,7 @@
             updateTeamSelects();
             updateTeamSeasonsTeamSelect();
             updateSeasonOptions();
+            updateLastDataUpdate();
             updateTable();
         }
         
@@ -6609,6 +6611,34 @@
         function getH2hSortIndicator(key) {
             if (state.h2hSortConfig.key !== key) return ' ↕️';
             return state.h2hSortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+        }
+
+        // Update last data update based on most recent game
+        function updateLastDataUpdate() {
+            if (!state.data || state.data.length === 0) {
+                elements.lastDataUpdate.textContent = 'Last Data Update: No data available';
+                return;
+            }
+
+            // Find the most recent game date
+            let mostRecentDate = null;
+
+            state.data.forEach(match => {
+                if (match.dateObj && match.dateObj instanceof Date && !isNaN(match.dateObj)) {
+                    if (!mostRecentDate || match.dateObj > mostRecentDate) {
+                        mostRecentDate = match.dateObj;
+                    }
+                }
+            });
+
+            if (mostRecentDate) {
+                // Format the date as "Month Day, Year"
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = mostRecentDate.toLocaleDateString('en-US', options);
+                elements.lastDataUpdate.textContent = `Last Data Update: ${formattedDate}`;
+            } else {
+                elements.lastDataUpdate.textContent = 'Last Data Update: Unknown';
+            }
         }
 
         // Update table info display
