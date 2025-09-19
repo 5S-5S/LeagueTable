@@ -1476,7 +1476,7 @@
                     ['Wigan Athletic', '#1d59af', 3116],
                     ['Hull City', '#F5A12D', 3111],
                     ['Bradford Park Avenue', '#FB090B', 4195],
-                    ['Accrington FC', '#FF0000', 0],
+                    ['Accrington FC', '#FF0000', 418],
                     ['Reading FC', '#0000FF', 3285],
                     ['Oxford United', '#FFFF00', 3272],
                     ['Millwall FC', '#00194A', 2250],
@@ -1542,7 +1542,7 @@
                     ['US Catanzaro', '#FFE226', 2827],
                     ['AS Varese 1910', '#FF0000', 2830],
                     ['US Salernitana 1919', '#831D1C', 2820],
-                    ['AC Liguria', '#FB090B', 0],
+                    ['AC Liguria', '#FB090B', 418],
                     ['ACR Messina', '#C70808', 2834],
                     ['Delfino Pescara', '#59A9E6', 2823],
                     ['Casale', '#030303', 2849],
@@ -1617,7 +1617,7 @@
                     ['CF Extremadura', '#800000', 2305],
                     ['Mérida AD', '#000000', 3186],
                     ['Real Unión', '#000000', 741],
-                    ['AD Almería', '#EE1119', 0],
+                    ['AD Almería', '#EE1119', 418],
                     ['SD Huesca', '#CF122D', 9659],
                     ['CE Europa', '#2596BE', 3200],
                     ['Lleida Esportiu', '#76B5C5', 3112],
@@ -4894,17 +4894,24 @@
                     return;
                 }
 
-                this.dropdown.innerHTML = this.filteredOptions.map((option, index) =>
-                    `<div class="combobox-option ${index === this.selectedIndex ? 'highlighted' : ''}"
-                          data-value="${option.value}" data-index="${index}">
-                        ${option.text}
-                     </div>`
-                ).join('');
+                this.dropdown.innerHTML = this.filteredOptions.map((option, index) => {
+                    // Get team logo if this is a team option (not empty option)
+                    const logoHtml = option.value && option.value !== '' ? (() => {
+                        const logoUrl = getTeamLogoUrl(option.value, state.selectedLeague);
+                        return logoUrl ? `<img src="${logoUrl}" alt="${option.value} logo" class="combobox-team-logo" onerror="this.style.display='none'">` : '';
+                    })() : '';
+
+                    return `<div class="combobox-option ${index === this.selectedIndex ? 'highlighted' : ''}"
+                              data-value="${option.value}" data-index="${index}">
+                            ${logoHtml}
+                            <span class="combobox-option-text">${option.text}</span>
+                         </div>`;
+                }).join('');
 
                 // Add click events to options
                 this.dropdown.querySelectorAll('.combobox-option').forEach(option => {
                     option.addEventListener('click', () => {
-                        this.selectOption(option.dataset.value, option.textContent.trim());
+                        this.selectOption(option.dataset.value, option.querySelector('.combobox-option-text').textContent.trim());
                     });
                 });
             }

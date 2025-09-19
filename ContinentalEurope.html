@@ -5327,17 +5327,24 @@
                     return;
                 }
 
-                this.dropdown.innerHTML = this.filteredOptions.map((option, index) =>
-                    `<div class="combobox-option ${index === this.selectedIndex ? 'highlighted' : ''}"
-                          data-value="${option.value}" data-index="${index}">
-                        ${option.text}
-                     </div>`
-                ).join('');
+                this.dropdown.innerHTML = this.filteredOptions.map((option, index) => {
+                    // Get team logo if this is a team option (not empty option)
+                    const logoHtml = option.value && option.value !== '' ? (() => {
+                        const logoUrl = getTeamLogoUrl(option.value, state.selectedLeague);
+                        return logoUrl ? `<img src="${logoUrl}" alt="${option.value} logo" class="combobox-team-logo" onerror="this.style.display='none'">` : '';
+                    })() : '';
+
+                    return `<div class="combobox-option ${index === this.selectedIndex ? 'highlighted' : ''}"
+                              data-value="${option.value}" data-index="${index}">
+                            ${logoHtml}
+                            <span class="combobox-option-text">${option.text}</span>
+                         </div>`;
+                }).join('');
 
                 // Add click events to options
                 this.dropdown.querySelectorAll('.combobox-option').forEach(option => {
                     option.addEventListener('click', () => {
-                        this.selectOption(option.dataset.value, option.textContent.trim());
+                        this.selectOption(option.dataset.value, option.querySelector('.combobox-option-text').textContent.trim());
                     });
                 });
             }
