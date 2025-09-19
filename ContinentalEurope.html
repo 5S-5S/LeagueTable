@@ -6702,16 +6702,22 @@
 
             elements.matchHistoryTable.classList.remove('hidden');
 
-            // Create table headers
-            elements.matchHistoryTableHeader.innerHTML = `
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('date')">Date</th>
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('stage')">Stage</th>
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('homeTeam')">Home Team</th>
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('homeScore')">Home Score</th>
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('awayTeam')">Away Team</th>
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('awayScore')">Away Score</th>
-                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('result')">Result</th>
-            `;
+            // Create table headers with sort indicators
+            const matchHistoryHeaders = [
+                { key: 'date', label: 'Date' },
+                { key: 'stage', label: 'Stage' },
+                { key: 'homeTeam', label: 'Home Team' },
+                { key: 'homeScore', label: 'Home Score' },
+                { key: 'awayTeam', label: 'Away Team' },
+                { key: 'awayScore', label: 'Away Score' },
+                { key: 'result', label: 'Result' }
+            ];
+
+            elements.matchHistoryTableHeader.innerHTML = matchHistoryHeaders.map(header => `
+                <th class="text-center cursor-pointer" onclick="handleMatchHistorySort('${header.key}')">
+                    ${header.label}${getMatchHistorySortIndicator(header.key)}
+                </th>
+            `).join('');
 
             // Create sorted matches data
             let matchesData = matchHistoryResult.matches.map(match => {
@@ -6798,6 +6804,53 @@
                 };
             });
 
+            // Apply sorting if configured
+            if (state.matchHistorySortConfig.key && state.matchHistorySortConfig.direction) {
+                const sortKey = state.matchHistorySortConfig.key;
+                const sortDirection = state.matchHistorySortConfig.direction;
+
+                matchesData.sort((a, b) => {
+                    let valueA, valueB;
+
+                    switch (sortKey) {
+                        case 'date':
+                            valueA = a.dateObj;
+                            valueB = b.dateObj;
+                            break;
+                        case 'stage':
+                            valueA = a.stage.toLowerCase();
+                            valueB = b.stage.toLowerCase();
+                            break;
+                        case 'homeTeam':
+                            valueA = a.homeTeam.toLowerCase();
+                            valueB = b.homeTeam.toLowerCase();
+                            break;
+                        case 'homeScore':
+                            valueA = a.homeScore;
+                            valueB = b.homeScore;
+                            break;
+                        case 'awayTeam':
+                            valueA = a.awayTeam.toLowerCase();
+                            valueB = b.awayTeam.toLowerCase();
+                            break;
+                        case 'awayScore':
+                            valueA = a.awayScore;
+                            valueB = b.awayScore;
+                            break;
+                        case 'result':
+                            valueA = a.result.toLowerCase();
+                            valueB = b.result.toLowerCase();
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+                    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
             // Create table body
             const tableHTML = matchesData.map((match, index) => {
                 // Get team logos
@@ -6867,7 +6920,29 @@
 
         // Handle match history table sorting (placeholder)
         function handleMatchHistorySort(key) {
-            // For now, just trigger a table update
+            let defaultDirection = 'desc';
+            if (key === 'homeTeam' || key === 'awayTeam' || key === 'result' || key === 'stage') {
+                defaultDirection = 'asc';
+            }
+
+            if (state.matchHistorySortConfig.key === key) {
+                // Cycle through: current -> opposite -> none
+                if (state.matchHistorySortConfig.direction === 'desc') {
+                    state.matchHistorySortConfig.direction = 'asc';
+                } else if (state.matchHistorySortConfig.direction === 'asc') {
+                    // Reset to no sorting
+                    state.matchHistorySortConfig.key = null;
+                    state.matchHistorySortConfig.direction = null;
+                } else {
+                    // This shouldn't happen, but fallback
+                    state.matchHistorySortConfig.direction = defaultDirection;
+                }
+            } else {
+                // New column selected
+                state.matchHistorySortConfig.key = key;
+                state.matchHistorySortConfig.direction = defaultDirection;
+            }
+
             updateTable();
         }
 
@@ -7900,6 +7975,11 @@
         function getH2hSortIndicator(key) {
             if (state.h2hSortConfig.key !== key) return ' ↕️';
             return state.h2hSortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+        }
+
+        function getMatchHistorySortIndicator(key) {
+            if (state.matchHistorySortConfig.key !== key) return ' ↕️';
+            return state.matchHistorySortConfig.direction === 'asc' ? ' ↑' : ' ↓';
         }
 
         // Update table info display
