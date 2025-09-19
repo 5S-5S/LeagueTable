@@ -815,7 +815,7 @@
             // Team Seasons state
             teamSeasonsSelectedLeague: 'premier-league',
             teamSeasonsSelectedTeam: '',
-            teamSeasonsSelectedSeason: '',
+            teamSeasonsSelectedSeason: 'all-english-seasons-1888-2025',
             teamSeasonsSelectedPosition: '',
             includeBetterResults: false,
 
@@ -3604,7 +3604,14 @@
         async function handleTeamSeasonsLeagueChange(newLeague) {
             state.teamSeasonsSelectedLeague = newLeague;
             state.teamSeasonsSelectedTeam = '';
-            state.teamSeasonsSelectedSeason = '';
+            // Set default season for leagues that support season filtering
+            if (newLeague === 'premier-league') {
+                state.teamSeasonsSelectedSeason = 'all-english-seasons-1888-2025';
+            } else if (newLeague === 'ligue-1') {
+                state.teamSeasonsSelectedSeason = 'all-french-seasons-1932-2025';
+            } else {
+                state.teamSeasonsSelectedSeason = '';
+            }
             state.teamSeasonsSelectedPosition = '';
             
             // Load league data if not already loaded
@@ -3725,9 +3732,50 @@
             
             const availableSeasons = getAvailableSeasons(league);
             const allPositionData = [];
-            
+
+            // Filter seasons based on Team Seasons selection (if any)
+            let seasonsToProcess = availableSeasons;
+            if (state.teamSeasonsSelectedSeason) {
+                // For era seasons, filter individual seasons to only those within the era date range
+                if (state.teamSeasonsSelectedSeason.includes('all-') || state.teamSeasonsSelectedSeason.includes('-era-') || state.teamSeasonsSelectedSeason.includes('french-division-1')) {
+                    const originalSelectedLeague = state.selectedLeague;
+                    state.selectedLeague = league;
+                    const eraSeasonDates = getSeasonDateRange(state.teamSeasonsSelectedSeason);
+                    state.selectedLeague = originalSelectedLeague;
+
+                    if (eraSeasonDates) {
+                        const eraStart = new Date(eraSeasonDates.start);
+                        const eraEnd = new Date(eraSeasonDates.end);
+
+                        // Filter individual seasons to only those that fall within the era
+                        seasonsToProcess = availableSeasons.filter(season => {
+                            // Skip era seasons themselves in this filtering
+                            if (season.includes('all-') || season.includes('-era-') || season.includes('french-division-1')) {
+                                return false;
+                            }
+
+                            const originalSelectedLeague2 = state.selectedLeague;
+                            state.selectedLeague = league;
+                            const seasonDates = getSeasonDateRange(season);
+                            state.selectedLeague = originalSelectedLeague2;
+
+                            if (!seasonDates) return false;
+
+                            const seasonStart = new Date(seasonDates.start);
+                            const seasonEnd = new Date(seasonDates.end);
+
+                            // Include season if it starts on or after era start and ends before or on era end
+                            return seasonStart >= eraStart && seasonEnd <= eraEnd;
+                        });
+                    }
+                } else {
+                    // For individual seasons (shouldn't happen in Team Seasons but keeping for safety)
+                    seasonsToProcess = [state.teamSeasonsSelectedSeason];
+                }
+            }
+
             // Process each season to build complete league tables
-            availableSeasons.forEach(seasonFilter => {
+            seasonsToProcess.forEach(seasonFilter => {
                 // Skip special seasons
                 if (seasonFilter.includes('all-') || seasonFilter.includes('-era-') || seasonFilter.includes('french-division-1')) {
                     return;
@@ -4121,7 +4169,8 @@
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamSeasonsTeamSelect.value = '';
-                elements.teamSeasonsSeasonSelect.value = '';
+                // Don't reset season dropdown - keep the current season selection
+                // elements.teamSeasonsSeasonSelect.value = '';
                 elements.teamSeasonsPositionSelect.value = '';
                 // Reset checkbox and ensure it's hidden when no team is selected
                 if (elements.includeBetterResultsCheckbox) {
@@ -4138,9 +4187,27 @@
                     containerById2.style.display = 'none';
                 }
 
+                // Show/hide season dropdown based on current league (same logic as handleTeamSeasonsLeagueChange)
+                if (state.teamSeasonsSelectedLeague === 'ligue-1' || state.teamSeasonsSelectedLeague === 'premier-league') {
+                    elements.teamSeasonsSeasonContainer.classList.remove('hidden');
+                } else {
+                    elements.teamSeasonsSeasonContainer.classList.add('hidden');
+                }
+
                 // Initialize Team Seasons controls with preserved league
                 createTeamSeasonsLeagueButtons();
                 updateTeamSeasonsTeamSelect();
+                updateTeamSeasonsSeasonSelect();
+
+                // Ensure default season is set for leagues that support season filtering
+                if (preservedLeague === 'premier-league' && !state.teamSeasonsSelectedSeason) {
+                    state.teamSeasonsSelectedSeason = 'all-english-seasons-1888-2025';
+                } else if (preservedLeague === 'ligue-1' && !state.teamSeasonsSelectedSeason) {
+                    state.teamSeasonsSelectedSeason = 'all-french-seasons-1932-2025';
+                }
+
+                // Set the season dropdown to the current state value
+                elements.teamSeasonsSeasonSelect.value = state.teamSeasonsSelectedSeason;
                 updateTeamSeasonsPositionSelect();
                 
             } else if (tabName === 'last-time-when') {
@@ -4149,12 +4216,6 @@
 
                 // Simple approach: just set the league and update
                 state.selectedLeague = preservedLeague;
-
-                // Reset Team Seasons state when switching away
-                state.teamSeasonsSelectedTeam = '';
-                state.teamSeasonsSelectedSeason = '';
-                state.teamSeasonsSelectedPosition = '';
-                state.includeBetterResults = false;
 
                 // Reset League Filters state
                 state.selectedTeam1 = '';
@@ -4205,12 +4266,6 @@
 
                 // Simple approach: just set the league and update
                 state.selectedLeague = preservedLeague;
-
-                // Reset Team Seasons state when switching away
-                state.teamSeasonsSelectedTeam = '';
-                state.teamSeasonsSelectedSeason = '';
-                state.teamSeasonsSelectedPosition = '';
-                state.includeBetterResults = false;
 
                 // Reset other tab states
                 state.selectedTeam1 = '';
@@ -4744,7 +4799,7 @@
                 return { start: '1888-09-08', end: '1992-05-25' };
             }
             if (seasonKey === 'all-english-seasons-1888-2025') {
-                return { start: '1888-09-08', end: '2026-06-30' };
+                return { start: '1888-08-01', end: '2026-06-30' };
             }
             if (seasonKey === 'all-spanish-seasons-1928-2025') {
                 return { start: '1929-01-01', end: '2026-06-30' };
@@ -7246,17 +7301,17 @@
                             if (season.includes('all-') || season.includes('-era-') || season.includes('french-division-1')) {
                                 return false;
                             }
-                            
+
                             const originalSelectedLeague2 = state.selectedLeague;
                             state.selectedLeague = leagueToUse;
                             const seasonDates = getSeasonDateRange(season);
                             state.selectedLeague = originalSelectedLeague2;
-                            
+
                             if (!seasonDates) return false;
-                            
+
                             const seasonStart = new Date(seasonDates.start);
                             const seasonEnd = new Date(seasonDates.end);
-                            
+
                             // Include season if it starts on or after era start and ends before or on era end
                             return seasonStart >= eraStart && seasonEnd <= eraEnd;
                         });
