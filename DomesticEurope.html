@@ -602,10 +602,12 @@
                             <span class="text-sm font-medium">Away</span>
                         </label>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                         <label class="text-sm font-medium text-gray-700">Most Recent Matches</label>
-                        <input type="text" id="recentMatchesSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
-                        <span class="text-sm text-gray-600" id="matchHistoryMatchCount"></span>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="recentMatchesSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
+                            <span class="text-sm text-gray-600" id="matchHistoryMatchCount"></span>
+                        </div>
                     </div>
                 </div>
                 <div id="matchHistoryVisualizations" class="mb-8">
@@ -670,10 +672,12 @@
                             <span class="text-sm font-medium">Away</span>
                         </label>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                         <label class="text-sm font-medium text-gray-700">Most Recent Head-to-Head</label>
-                        <input type="text" id="recentH2HSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
-                        <span class="text-sm text-gray-600" id="h2hMatchCount"></span>
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="recentH2HSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
+                            <span class="text-sm text-gray-600" id="h2hMatchCount"></span>
+                        </div>
                     </div>
                 </div>
                 <div id="h2hVisualizations">
