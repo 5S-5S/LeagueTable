@@ -943,3 +943,99 @@ body {
 .league-table-container {
     position: relative;
 }
+
+/* Apply transparent highlighting to non-selected teams in Match History */
+#matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    /* Reset any conflicting styles */
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+    /* Apply transparent styling */
+    background: transparent !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Force consistent rendering */
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Dark mode for Match History */
+[data-theme="dark"] #matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    background: transparent !important;
+    color: white !important;
+}
+
+/* Apply same transparent highlighting to Last Time When section */
+#lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    /* Reset any conflicting styles */
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+    /* Apply transparent styling */
+    background: transparent !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Force consistent rendering */
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Dark mode for Last Time When */
+[data-theme="dark"] #lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    background: transparent !important;
+    color: white !important;
+}
+
+/* Apply same transparent highlighting to Team Streaks section */
+#teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    /* Reset any conflicting styles */
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+    /* Apply transparent styling */
+    background: transparent !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    /* Force consistent rendering */
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Dark mode for Team Streaks */
+[data-theme="dark"] #teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    background: transparent !important;
+    color: white !important;
+}

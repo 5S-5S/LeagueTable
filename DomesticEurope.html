@@ -4016,10 +4016,10 @@
             } else if (tabName === 'team-seasons') {
                 document.getElementById('teamSeasonsTab').classList.add('active');
                 document.getElementById('teamSeasonsContent').classList.add('active');
-                
+
                 // Preserve current Team Seasons league selection - don't overwrite
                 // state.teamSeasonsSelectedLeague should maintain its current value
-                
+
                 // Reset both other tab states
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
@@ -4043,6 +4043,7 @@
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
                 elements.lastTimeResults.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
 
                 // Ensure checkbox is hidden when switching TO Team Seasons tab
                 if (elements.includeBetterResultsContainer) {
@@ -4109,6 +4110,7 @@
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
 
                 // Clear Team Seasons visual elements when switching away
                 elements.teamHistoryTable.classList.add('hidden');
@@ -4172,6 +4174,7 @@
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
                 elements.lastTimeResults.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
 
                 // Clear Team Seasons visual elements when switching away
                 elements.teamHistoryTable.classList.add('hidden');
