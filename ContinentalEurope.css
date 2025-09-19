@@ -689,6 +689,21 @@ body {
         flex-wrap: wrap !important;
         gap: 0.5rem !important;
     }
+
+    /* Mobile-only: Fix Point Deductions and 3 Points buttons */
+    div:has(#deductionsCheckbox),
+    div:has(#threePointCheckbox) {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+
+    /* Force the main controls container to stack on mobile */
+    .flex.flex-wrap.items-center.justify-between.gap-4 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
 }
 
 
