@@ -185,6 +185,7 @@ body {
 .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
 .hover\:border-green-500:hover { border-color: #10b981; }
 .hover\:underline:hover { text-decoration: underline; }
+.bg-gray-100 { background-color: #f3f4f6; }
 .hover\:bg-gray-100:hover { background-color: #f3f4f6; }
 
 /* Team clickable styles */
@@ -327,7 +328,18 @@ body {
 }
 
 /* Head-to-Head Match History - winning scores should be green */
-#h2hTableBody .font-bold:not(.text-red-600) {
+#h2hTableBody .win-score {
+    color: #059669 !important;
+}
+
+/* Match History - winning scores should be green */
+#matchHistoryTableBody .win-score {
+    color: #059669 !important;
+}
+
+/* Dark mode support for winning scores */
+[data-theme="dark"] #h2hTableBody .win-score,
+[data-theme="dark"] #matchHistoryTableBody .win-score {
     color: #059669 !important;
 }
 
@@ -337,6 +349,49 @@ body {
 }
 
 /* JavaScript handles all position column colors */
+
+/* Dark mode background colors */
+[data-theme="dark"] .bg-gray-100 {
+    background-color: var(--bg-gray-50);
+}
+
+[data-theme="dark"] .bg-gray-50 {
+    background-color: #444444;
+}
+
+[data-theme="dark"] .bg-white {
+    background-color: var(--bg-white);
+}
+
+/* Dark mode section containers */
+[data-theme="dark"] #matchHistorySection,
+[data-theme="dark"] #h2hSection {
+    background: var(--bg-white);
+}
+
+/* Dark mode table container - keep gray background */
+[data-theme="dark"] #tableContainer {
+    background-color: var(--bg-gray-50);
+}
+
+/* Dark mode hover states */
+[data-theme="dark"] .hover\:bg-gray-50:hover {
+    background-color: #444444;
+}
+
+[data-theme="dark"] .hover\:bg-gray-100:hover {
+    background-color: var(--bg-gray-50);
+}
+
+/* Dark mode league table backgrounds */
+[data-theme="dark"] #tableContainer .league-table {
+    background: var(--bg-gray-50);
+}
+
+/* Ensure winning scores stay green in dark mode */
+[data-theme="dark"] .league-table td[style*="#059669"] {
+    color: #059669 !important;
+}
 
 
 .toggle-checkbox:checked + .toggle-label .toggle-button {
@@ -481,6 +536,11 @@ body {
     overflow-x: auto;
 }
 
+/* Gray background for main table container only */
+#tableContainer .league-table {
+    background: #f3f4f6;
+}
+
 .league-table table {
     width: 100%;
     border-collapse: collapse;
@@ -509,9 +569,9 @@ body {
     background: var(--bg-gray-50);
 }
 
-/* .league-table tr.highlight {
+.league-table tr.highlight {
     background: #f0fdf4;
-} */
+}
 
 .points-badge {
     font-size: 1.25rem;

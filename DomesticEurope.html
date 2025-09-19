@@ -568,15 +568,111 @@
                 <span class="text-lg font-semibold text-gray-700" id="tableInfoText"></span>
             </div>
 
+            <!-- Main Table Container (shows above match history when single team selected) -->
+            <div id="tableContainer" class="hidden mt-4 mx-8 p-8 bg-gray-100 border-b rounded-xl">
+                <div class="league-table">
+                    <table>
+                        <thead>
+                            <tr id="tableHeader">
+                                <!-- Headers will be populated -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- Rows will be populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Match History Section (Single Team) -->
+            <div id="matchHistorySection" class="mt-8 mx-8 p-8 bg-white border-b rounded-xl hidden">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-6">
+                        <h3 class="text-lg font-semibold text-gray-700">Match History</h3>
+
+                        <label class="flex items-center cursor-pointer">
+                            <div id="matchHistoryHomeCheckbox" class="checkbox checked"></div>
+                            <span class="icon-home mr-1"></span>
+                            <span class="text-sm font-medium">Home</span>
+                        </label>
+
+                        <label class="flex items-center cursor-pointer">
+                            <div id="matchHistoryAwayCheckbox" class="checkbox checked"></div>
+                            <span class="icon-plane mr-1"></span>
+                            <span class="text-sm font-medium">Away</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700">Most Recent Matches</label>
+                        <input type="text" id="recentMatchesSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
+                        <span class="text-sm text-gray-600" id="matchHistoryMatchCount"></span>
+                    </div>
+                </div>
+                <div id="matchHistoryVisualizations" class="mb-8">
+                    <!-- Team Record visualizations will be populated here -->
+                </div>
+
+                <!-- Team Statistics Table -->
+                <div id="matchHistoryStatsTable" class="mt-8 mb-6 hidden">
+                    <div class="league-table">
+                        <div class="text-center py-4 bg-gray-50 border-b">
+                            <h2 class="text-xl font-semibold text-gray-700 mb-1" id="matchHistoryStatsTitle">Team Statistics</h2>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr id="matchHistoryStatsHeader">
+                                    <!-- Stats headers will be populated -->
+                                </tr>
+                            </thead>
+                            <tbody id="matchHistoryStatsBody">
+                                <!-- Stats rows will be populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Match History Table -->
+                <div id="matchHistoryTable" class="hidden">
+                    <div class="league-table mt-8">
+                        <div class="text-center py-4 bg-gray-50 border-b">
+                            <h2 class="text-xl font-semibold text-gray-700 mb-1">Match History</h2>
+                            <p class="text-sm text-gray-600" id="matchHistoryTableTitle"></p>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr id="matchHistoryTableHeader">
+                                    <!-- Headers will be populated -->
+                                </tr>
+                            </thead>
+                            <tbody id="matchHistoryTableBody">
+                                <!-- Rows will be populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Head-to-Head Section -->
             <div id="h2hSection" class="mt-8 mx-8 p-8 bg-white border-b rounded-xl hidden">
                 <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-700">Head-to-Head Record</h3>
+                    <div class="flex items-center gap-6">
+                        <h3 class="text-lg font-semibold text-gray-700">Head-to-Head Record</h3>
+
+                        <label class="flex items-center cursor-pointer">
+                            <div id="h2hHomeCheckbox" class="checkbox checked"></div>
+                            <span class="icon-home mr-1"></span>
+                            <span class="text-sm font-medium">Home</span>
+                        </label>
+
+                        <label class="flex items-center cursor-pointer">
+                            <div id="h2hAwayCheckbox" class="checkbox checked"></div>
+                            <span class="icon-plane mr-1"></span>
+                            <span class="text-sm font-medium">Away</span>
+                        </label>
+                    </div>
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700">Most Recent Head-to-Head</label>
-                        <select id="recentH2HSelect" class="px-3 py-1 border border-gray-300 rounded focus:border-green-500 focus:outline-none text-sm">
-                            <!-- Options will be populated -->
-                        </select>
+                        <input type="text" id="recentH2HSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
                         <span class="text-sm text-gray-600" id="h2hMatchCount"></span>
                     </div>
                 </div>
@@ -597,25 +693,10 @@
                     </button>
                 </div>
 
-                <div id="tableContainer" class="hidden">
-                    <div class="league-table">
-                        <table>
-                            <thead>
-                                <tr id="tableHeader">
-                                    <!-- Headers will be populated -->
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <!-- Rows will be populated -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
                 <!-- Head-to-Head Matches Table -->
                 <div id="h2hMatchesTable" class="mt-8 hidden">
                     <div class="league-table">
-                        <div class="text-center py-4 bg-white border-b">
+                        <div class="text-center py-4 bg-gray-50 border-b">
                             <h2 class="text-xl font-semibold text-gray-700 mb-1">Head-to-Head Match History</h2>
                             <p class="text-sm text-gray-600" id="h2hTableTitle"></p>
                         </div>
@@ -704,7 +785,13 @@
             
             // Historic Streaks sort state
             historicStreaksSortConfig: { key: null, direction: null },
-            lastHistoricStreaksParams: null
+            lastHistoricStreaksParams: null,
+
+            // Match history state
+            matchHistoryHomeFilter: true,
+            matchHistoryAwayFilter: true,
+            recentMatchesCount: 'All',
+            matchHistorySortConfig: { key: null, direction: null }
         };
 
         // Ranking overrides for historic seasons
@@ -1918,6 +2005,8 @@
             resetBtn: document.getElementById('resetBtn'),
             retryBtn: document.getElementById('retryBtn'),
             h2hSection: document.getElementById('h2hSection'),
+            h2hHomeCheckbox: document.getElementById('h2hHomeCheckbox'),
+            h2hAwayCheckbox: document.getElementById('h2hAwayCheckbox'),
             recentH2HSelect: document.getElementById('recentH2HSelect'),
             h2hMatchCount: document.getElementById('h2hMatchCount'),
             h2hVisualizations: document.getElementById('h2hVisualizations'),
@@ -1925,6 +2014,20 @@
             h2hTableTitle: document.getElementById('h2hTableTitle'),
             h2hTableHeader: document.getElementById('h2hTableHeader'),
             h2hTableBody: document.getElementById('h2hTableBody'),
+            matchHistorySection: document.getElementById('matchHistorySection'),
+            matchHistoryHomeCheckbox: document.getElementById('matchHistoryHomeCheckbox'),
+            matchHistoryAwayCheckbox: document.getElementById('matchHistoryAwayCheckbox'),
+            matchHistoryMatchCount: document.getElementById('matchHistoryMatchCount'),
+            matchHistoryStatsTable: document.getElementById('matchHistoryStatsTable'),
+            matchHistoryStatsTitle: document.getElementById('matchHistoryStatsTitle'),
+            matchHistoryStatsHeader: document.getElementById('matchHistoryStatsHeader'),
+            matchHistoryStatsBody: document.getElementById('matchHistoryStatsBody'),
+            matchHistoryTable: document.getElementById('matchHistoryTable'),
+            matchHistoryTableTitle: document.getElementById('matchHistoryTableTitle'),
+            matchHistoryTableHeader: document.getElementById('matchHistoryTableHeader'),
+            matchHistoryTableBody: document.getElementById('matchHistoryTableBody'),
+            recentMatchesSelect: document.getElementById('recentMatchesSelect'),
+            matchHistoryVisualizations: document.getElementById('matchHistoryVisualizations'),
             lastTimeLeagueButtons: document.getElementById('lastTimeLeagueButtons'),
             lastTimeDayOfWeekSelect: document.getElementById('lastTimeDayOfWeekSelect'),
             lastTimeLocationSelect: document.getElementById('lastTimeLocationSelect'),
@@ -2601,7 +2704,7 @@
 
                 tableHTML += `
                     <div class="league-table mb-4">
-                        <div class="text-center py-4 bg-white border-b">
+                        <div class="text-center py-4 bg-gray-50 border-b">
                             <h2 class="text-xl font-semibold text-gray-700 mb-1">${oppositeTitle}</h2>
                             <p class="text-sm text-gray-600">The match that ended the previous streak</p>
                         </div>
@@ -2754,7 +2857,7 @@
             
             if (homeScore > awayScore) {
                 winnerTeam = match.HomeTeam;
-                homeScoreClass = 'font-bold';
+                homeScoreClass = 'font-bold win-score';
                 awayScoreClass = 'text-red-600 font-bold';
                 resultStyle = homeTeamColor ? 
                     `color: ${homeTeamColor} !important; font-weight: bold;` : 
@@ -2762,14 +2865,14 @@
             } else if (awayScore > homeScore) {
                 winnerTeam = match.AwayTeam;
                 homeScoreClass = 'text-red-600 font-bold';
-                awayScoreClass = 'font-bold';
+                awayScoreClass = 'font-bold win-score';
                 resultStyle = awayTeamColor ? 
                     `color: ${awayTeamColor} !important; font-weight: bold;` : 
                     'color: #059669 !important; font-weight: bold;';
             } else {
                 winnerTeam = 'Draw';
-                homeScoreClass = 'text-gray-400 font-bold';
-                awayScoreClass = 'text-gray-400 font-bold';
+                homeScoreClass = 'text-gray-400 font-bold draw-score';
+                awayScoreClass = 'text-gray-400 font-bold draw-score';
                 resultStyle = 'color: #9ca3af !important; font-weight: bold;';
             }
 
@@ -2807,21 +2910,21 @@
             
             return `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString()}</td>
+                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString('en-US')}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                             <span class="${homeTeamClass}" style="${homeTeamStyle}">${match.HomeTeam}</span>
                         </div>
                     </td>
-                    <td class="text-center text-lg ${homeScoreClass}" ${homeScoreClass === 'font-bold' ? 'style="color: #047857;"' : ''}>${homeScore}</td>
+                    <td class="text-center text-lg ${homeScoreClass}" >${homeScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                             <span class="${awayTeamClass}" style="${awayTeamStyle}">${match.AwayTeam}</span>
                         </div>
                     </td>
-                    <td class="text-center text-lg ${awayScoreClass}" ${awayScoreClass === 'font-bold' ? 'style="color: #047857;"' : ''}>${awayScore}</td>
+                    <td class="text-center text-lg ${awayScoreClass}" >${awayScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -2837,7 +2940,7 @@
             setupEventListeners();
             createLeagueButtons();
             createTeamSeasonsLeagueButtons();
-            populateRecentH2HOptions();
+            setRecentH2HValue();
             updateUI();
             // Auto-load data on page load
             loadGistData();
@@ -3370,15 +3473,9 @@
             elements.lastTimeLeagueButtons.innerHTML = leagueButtonsHTML;
         }
 
-        // Populate Recent H2H dropdown options
-        function populateRecentH2HOptions() {
-            const options = [];
-            for (let i = 2; i <= 20; i++) {
-                options.push(`<option value="${i}">${i}</option>`);
-            }
-            options.push('<option value="All">All</option>');
-            elements.recentH2HSelect.innerHTML = options.join('');
-            elements.recentH2HSelect.value = state.recentH2HCount;
+        // Set Recent H2H input value
+        function setRecentH2HValue() {
+            elements.recentH2HSelect.value = state.recentH2HCount === 'All' ? 'All' : state.recentH2HCount;
         }
 
         // Create league buttons for Team Seasons tab
@@ -3802,7 +3899,7 @@
             
             // Create table rows
             elements.teamHistoryBody.innerHTML = allPositionData.map((season, index) => {
-                const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
                 const logoUrl = getTeamLogoUrl(season.team, league);
                 
                 return `
@@ -4158,16 +4255,57 @@
             // Checkboxes
             elements.homeCheckbox.addEventListener('click', () => {
                 state.homeFilter = !state.homeFilter;
+                // Sync match history home filter
+                state.matchHistoryHomeFilter = state.homeFilter;
+
+                // Update all three checkboxes
                 elements.homeCheckbox.className = `checkbox ${state.homeFilter ? 'checked' : ''}`;
+                elements.matchHistoryHomeCheckbox.className = `checkbox ${state.matchHistoryHomeFilter ? 'checked' : ''}`;
+                elements.h2hHomeCheckbox.className = `checkbox ${state.homeFilter ? 'checked' : ''}`;
+
                 updateTable();
             });
-            
+
             elements.awayCheckbox.addEventListener('click', () => {
                 state.awayFilter = !state.awayFilter;
+                // Sync match history away filter
+                state.matchHistoryAwayFilter = state.awayFilter;
+
+                // Update all three checkboxes
                 elements.awayCheckbox.className = `checkbox ${state.awayFilter ? 'checked' : ''}`;
+                elements.matchHistoryAwayCheckbox.className = `checkbox ${state.matchHistoryAwayFilter ? 'checked' : ''}`;
+                elements.h2hAwayCheckbox.className = `checkbox ${state.awayFilter ? 'checked' : ''}`;
+
                 updateTable();
             });
-            
+
+            // H2H Home/Away checkboxes (sync with main checkboxes)
+            elements.h2hHomeCheckbox.addEventListener('click', () => {
+                state.homeFilter = !state.homeFilter;
+                // Sync match history home filter
+                state.matchHistoryHomeFilter = state.homeFilter;
+
+                // Update all three checkboxes
+                elements.homeCheckbox.className = `checkbox ${state.homeFilter ? 'checked' : ''}`;
+                elements.matchHistoryHomeCheckbox.className = `checkbox ${state.matchHistoryHomeFilter ? 'checked' : ''}`;
+                elements.h2hHomeCheckbox.className = `checkbox ${state.homeFilter ? 'checked' : ''}`;
+
+                updateTable();
+            });
+
+            elements.h2hAwayCheckbox.addEventListener('click', () => {
+                state.awayFilter = !state.awayFilter;
+                // Sync match history away filter
+                state.matchHistoryAwayFilter = state.awayFilter;
+
+                // Update all three checkboxes
+                elements.awayCheckbox.className = `checkbox ${state.awayFilter ? 'checked' : ''}`;
+                elements.matchHistoryAwayCheckbox.className = `checkbox ${state.matchHistoryAwayFilter ? 'checked' : ''}`;
+                elements.h2hAwayCheckbox.className = `checkbox ${state.awayFilter ? 'checked' : ''}`;
+
+                updateTable();
+            });
+
             elements.deductionsCheckbox.addEventListener('click', () => {
                 state.pointDeductionsEnabled = !state.pointDeductionsEnabled;
                 elements.deductionsCheckbox.className = `checkbox ${state.pointDeductionsEnabled ? 'checked' : ''}`;
@@ -4187,6 +4325,101 @@
                 state.threePointSystem = !state.threePointSystem;
                 elements.threePointCheckbox.className = `checkbox ${state.threePointSystem ? 'checked' : ''}`;
                 updateTable();
+            });
+
+            // Match history checkboxes
+            elements.matchHistoryHomeCheckbox.addEventListener('click', () => {
+                state.matchHistoryHomeFilter = !state.matchHistoryHomeFilter;
+                // Sync main home filter
+                state.homeFilter = state.matchHistoryHomeFilter;
+
+                // Update all three checkboxes
+                elements.matchHistoryHomeCheckbox.className = `checkbox ${state.matchHistoryHomeFilter ? 'checked' : ''}`;
+                elements.homeCheckbox.className = `checkbox ${state.homeFilter ? 'checked' : ''}`;
+                elements.h2hHomeCheckbox.className = `checkbox ${state.homeFilter ? 'checked' : ''}`;
+
+                if (state.selectedTeam1 && !state.selectedTeam2) {
+                    // Update match history display
+                    const matchHistoryResult = calculateMatchHistory();
+                    updateMatchHistoryDisplay(matchHistoryResult);
+
+                    // Also update the main table to reflect filters
+                    const tableResult = calculateTable();
+                    updateTableDisplay(tableResult);
+                    updateTableInfo(tableResult);
+                }
+            });
+
+            elements.matchHistoryAwayCheckbox.addEventListener('click', () => {
+                state.matchHistoryAwayFilter = !state.matchHistoryAwayFilter;
+                // Sync main away filter
+                state.awayFilter = state.matchHistoryAwayFilter;
+
+                // Update all three checkboxes
+                elements.matchHistoryAwayCheckbox.className = `checkbox ${state.matchHistoryAwayFilter ? 'checked' : ''}`;
+                elements.awayCheckbox.className = `checkbox ${state.awayFilter ? 'checked' : ''}`;
+                elements.h2hAwayCheckbox.className = `checkbox ${state.awayFilter ? 'checked' : ''}`;
+
+                if (state.selectedTeam1 && !state.selectedTeam2) {
+                    // Update match history display
+                    const matchHistoryResult = calculateMatchHistory();
+                    updateMatchHistoryDisplay(matchHistoryResult);
+
+                    // Also update the main table to reflect filters
+                    const tableResult = calculateTable();
+                    updateTableDisplay(tableResult);
+                    updateTableInfo(tableResult);
+                }
+            });
+
+            elements.recentMatchesSelect.addEventListener('input', (e) => {
+                let value = e.target.value.trim();
+
+                // Allow empty input temporarily (user might be typing)
+                if (value === '') {
+                    // Don't update state or UI yet, let user continue typing
+                    return;
+                } else if (value.toLowerCase() === 'all') {
+                    state.recentMatchesCount = 'All';
+                } else {
+                    // Validate numeric input
+                    const numValue = parseInt(value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                        state.recentMatchesCount = numValue.toString();
+                    } else {
+                        // Invalid input, don't update anything but don't revert either
+                        return;
+                    }
+                }
+
+                if (state.selectedTeam1 && !state.selectedTeam2) {
+                    // Update match history display
+                    const matchHistoryResult = calculateMatchHistory();
+                    updateMatchHistoryDisplay(matchHistoryResult);
+
+                    // Also update the main table to reflect filters
+                    const tableResult = calculateTable();
+                    updateTableDisplay(tableResult);
+                    updateTableInfo(tableResult);
+                }
+            });
+
+            // Add blur event to handle when user leaves the field empty
+            elements.recentMatchesSelect.addEventListener('blur', (e) => {
+                let value = e.target.value.trim();
+                if (value === '') {
+                    // If field is empty when user leaves, set to "All"
+                    state.recentMatchesCount = 'All';
+                    e.target.value = 'All';
+
+                    if (state.selectedTeam1 && !state.selectedTeam2) {
+                        const matchHistoryResult = calculateMatchHistory();
+                        updateMatchHistoryDisplay(matchHistoryResult);
+                        const tableResult = calculateTable();
+                        updateTableDisplay(tableResult);
+                        updateTableInfo(tableResult);
+                    }
+                }
             });
 
             // Buttons
@@ -4220,9 +4453,38 @@
             });
 
             // H2H controls
-            elements.recentH2HSelect.addEventListener('change', (e) => {
-                state.recentH2HCount = e.target.value;
+            elements.recentH2HSelect.addEventListener('input', (e) => {
+                let value = e.target.value.trim();
+
+                // Allow empty input temporarily (user might be typing)
+                if (value === '') {
+                    // Don't update state or UI yet, let user continue typing
+                    return;
+                } else if (value.toLowerCase() === 'all') {
+                    state.recentH2HCount = 'All';
+                } else {
+                    // Validate numeric input
+                    const numValue = parseInt(value);
+                    if (!isNaN(numValue) && numValue > 0) {
+                        state.recentH2HCount = numValue.toString();
+                    } else {
+                        // Invalid input, don't update anything but don't revert either
+                        return;
+                    }
+                }
+
                 updateTable();
+            });
+
+            // Add blur event to handle when user leaves the field empty
+            elements.recentH2HSelect.addEventListener('blur', (e) => {
+                let value = e.target.value.trim();
+                if (value === '') {
+                    // If field is empty when user leaves, set to "All"
+                    state.recentH2HCount = 'All';
+                    e.target.value = 'All';
+                    updateTable();
+                }
             });
             
             // Team Seasons controls
@@ -4488,7 +4750,7 @@
             if (homeScore > awayScore) {
                 // Home team wins
                 winnerTeam = match.HomeTeam;
-                homeScoreClass = 'font-bold';
+                homeScoreClass = 'font-bold win-score';
                 awayScoreClass = 'text-red-600 font-bold';
                 resultStyle = homeTeamColor ? 
                     `color: ${homeTeamColor} !important; font-weight: bold;` : 
@@ -4497,15 +4759,15 @@
                 // Away team wins
                 winnerTeam = match.AwayTeam;
                 homeScoreClass = 'text-red-600 font-bold';
-                awayScoreClass = 'font-bold';
+                awayScoreClass = 'font-bold win-score';
                 resultStyle = awayTeamColor ? 
                     `color: ${awayTeamColor} !important; font-weight: bold;` : 
                     'color: #059669 !important; font-weight: bold;';
             } else {
                 // Draw
                 winnerTeam = 'Draw';
-                homeScoreClass = 'text-gray-400 font-bold';
-                awayScoreClass = 'text-gray-400 font-bold';
+                homeScoreClass = 'text-gray-400 font-bold draw-score';
+                awayScoreClass = 'text-gray-400 font-bold draw-score';
                 resultStyle = 'color: #9ca3af !important; font-weight: bold;';
             }
 
@@ -4543,21 +4805,21 @@
             
             return `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString()}</td>
+                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString('en-US')}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                             <span class="${homeTeamClass}" style="${homeTeamStyle}">${match.HomeTeam}</span>
                         </div>
                     </td>
-                    <td class="text-center text-lg ${homeScoreClass}" ${homeScoreClass === 'font-bold' ? 'style="color: #047857;"' : ''}>${homeScore}</td>
+                    <td class="text-center text-lg ${homeScoreClass}" >${homeScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                             <span class="${awayTeamClass}" style="${awayTeamStyle}">${match.AwayTeam}</span>
                         </div>
                     </td>
-                    <td class="text-center text-lg ${awayScoreClass}" ${awayScoreClass === 'font-bold' ? 'style="color: #047857;"' : ''}>${awayScore}</td>
+                    <td class="text-center text-lg ${awayScoreClass}" >${awayScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -5048,7 +5310,26 @@
                         .slice(0, parseInt(state.recentH2HCount));
                 }
             } else if (state.selectedTeam1) {
+                // Single team selected - apply match history filters
                 filtered = filtered.filter(row => row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1);
+
+                // Apply match history home/away filtering
+                if (!state.matchHistoryHomeFilter) {
+                    // Filter out matches where selected team is home
+                    filtered = filtered.filter(row => row.HomeTeam !== state.selectedTeam1);
+                }
+                if (!state.matchHistoryAwayFilter) {
+                    // Filter out matches where selected team is away
+                    filtered = filtered.filter(row => row.AwayTeam !== state.selectedTeam1);
+                }
+
+                // Apply recent matches count filter if specified
+                if (state.recentMatchesCount !== 'All') {
+                    // Sort by date (most recent first) and take the specified number
+                    filtered = filtered
+                        .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
+                        .slice(0, parseInt(state.recentMatchesCount));
+                }
             }
             
             // Determine teams to show
@@ -5359,9 +5640,11 @@
             
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
-            
+            const matchHistoryResult = calculateMatchHistory();
+
             updateTableDisplay(tableResult);
             updateHeadToHeadDisplay(h2hResult);
+            updateMatchHistoryDisplay(matchHistoryResult);
             updateTableInfo(tableResult);
             
             // Handle position colors for dark mode
@@ -5397,10 +5680,10 @@
                     const isHighlighted = (state.selectedTeam1 === team.team || state.selectedTeam2 === team.team);
                     
                     // Alternating row colors: only if 3+ teams, otherwise all white
-                    const rowBackgroundClass = tableResult.tableData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                    const rowBackgroundClass = tableResult.tableData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
                     
                     return `
-                        <tr class="border-b hover:bg-gray-50 ${isHighlighted ? 'highlight' : ''} ${rowBackgroundClass}">
+                        <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                             <td class="px-3 py-4 text-center font-bold text-gray-600">${team.sharedPosition || team.originalPosition}</td>
                             <td class="px-4 py-4 font-semibold ${isHighlighted ? 'text-black' : 'text-gray-900'}">
                                 <div class="flex items-center cursor-pointer hover:bg-gray-100 rounded p-2 -m-2 team-clickable" data-team="${team.team}" title="Click to view ${team.team} history">
@@ -5408,7 +5691,7 @@
                                         const logoUrl = getTeamLogoUrl(team.team, state.selectedLeague);
                                         return logoUrl ? `<img src="${logoUrl}" alt="${team.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : '';
                                     })()}
-                                    <span class="hover:underline team-name-text">${team.team}</span>
+                                    <span class="hover:underline team-name-text ${state.selectedTeam1 === team.team ? 'team1-highlight' : state.selectedTeam2 === team.team ? 'team2-highlight' : ''}" ${(state.selectedTeam1 || state.selectedTeam2) ? `style="color: ${getTeamColor(team.team, state.selectedLeague)} !important; font-weight: bold;"` : ''}>${team.team}</span>
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-center">${team.played}</td>
@@ -5448,6 +5731,569 @@
             } else {
                 elements.tableContainer.classList.add('hidden');
             }
+        }
+
+        // Calculate match history data for single team
+        function calculateMatchHistory() {
+            if (!state.selectedTeam1 || state.selectedTeam2) return null;
+
+            // Apply all existing filters first
+            let filtered = [...state.data];
+
+            // Apply league filter
+            if (state.selectedLeague) {
+                const leagueMapping = {
+                    'premier-league': 'E0',
+                    'la-liga': 'SP1',
+                    'serie-a': 'I1',
+                    'bundesliga': 'D1',
+                    'ligue-1': 'F1'
+                };
+
+                const divFilter = leagueMapping[state.selectedLeague];
+                if (divFilter) {
+                    filtered = filtered.filter(row => row.Div === divFilter);
+                }
+            }
+
+            // Apply date filters
+            if (state.dateFrom) {
+                const fromDate = new Date(state.dateFrom);
+                filtered = filtered.filter(row => row.dateObj >= fromDate);
+            }
+
+            if (state.dateTo) {
+                const toDate = new Date(state.dateTo);
+                filtered = filtered.filter(row => row.dateObj <= toDate);
+            }
+
+            // Apply season filter
+            if (state.selectedSeason) {
+                filtered = filtered.filter(row => row.Season === state.selectedSeason);
+            }
+
+            // Apply day of week filter
+            if (state.selectedDayOfWeek) {
+                filtered = filtered.filter(row => {
+                    const dayIndex = row.dateObj.getDay();
+                    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    return dayNames[dayIndex] === state.selectedDayOfWeek;
+                });
+            }
+
+            // Filter for selected team matches
+            let teamMatches = filtered.filter(row =>
+                row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1
+            );
+
+            // Apply home/away filter for match history
+            if (state.matchHistoryHomeFilter && !state.matchHistoryAwayFilter) {
+                teamMatches = teamMatches.filter(row => row.HomeTeam === state.selectedTeam1);
+            } else if (!state.matchHistoryHomeFilter && state.matchHistoryAwayFilter) {
+                teamMatches = teamMatches.filter(row => row.AwayTeam === state.selectedTeam1);
+            }
+
+            // Sort by date (most recent first)
+            teamMatches.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+
+            return {
+                matches: teamMatches
+            };
+        }
+
+        // Update match history display
+        function updateMatchHistoryDisplay(matchHistoryResult) {
+            if (matchHistoryResult && state.selectedTeam1 && !state.selectedTeam2) {
+                elements.matchHistorySection.classList.remove('hidden');
+
+                // Hide the team stats table since main league table is shown above by updateUI
+                elements.matchHistoryStatsTable.classList.add('hidden');
+
+                // Set the recent matches input value
+                setRecentMatchesValue();
+
+                // Update the match history table and get filtered count
+                const filteredCount = updateMatchHistoryTable(matchHistoryResult);
+
+                // Get filtered matches for visualizations (same logic as in updateMatchHistoryTable)
+                let filteredMatches = matchHistoryResult.matches.filter(match => {
+                    const isHome = match.HomeTeam === state.selectedTeam1;
+                    const isAway = match.AwayTeam === state.selectedTeam1;
+
+                    // Apply home/away filter logic
+                    if (!state.matchHistoryHomeFilter && isHome) return false;
+                    if (!state.matchHistoryAwayFilter && isAway) return false;
+                    return true;
+                });
+
+                // Apply recent matches count filter
+                if (state.recentMatchesCount !== 'All') {
+                    const count = parseInt(state.recentMatchesCount);
+                    filteredMatches = filteredMatches.slice(0, count);
+                }
+
+                // Update Team Record visualizations with filtered matches
+                updateMatchHistoryVisualizations(filteredMatches, state.selectedTeam1);
+
+                // Update table subtitle with team name and match count
+                const subtitleText = `${state.selectedTeam1} (${filteredCount} matches)`;
+                elements.matchHistoryTableTitle.textContent = subtitleText;
+                elements.matchHistoryMatchCount.textContent = `${filteredCount} matches`;
+            } else {
+                elements.matchHistorySection.classList.add('hidden');
+                // Also hide stats table when section is hidden
+                if (elements.matchHistoryStatsTable) {
+                    elements.matchHistoryStatsTable.classList.add('hidden');
+                }
+            }
+        }
+
+        // Update match history table
+        function updateMatchHistoryTable(matchHistoryResult) {
+            if (!matchHistoryResult || !matchHistoryResult.matches || matchHistoryResult.matches.length === 0) {
+                elements.matchHistoryTable.classList.add('hidden');
+                return;
+            }
+
+            elements.matchHistoryTable.classList.remove('hidden');
+
+            // Apply filters - first home/away filter, then recent matches count
+            let filteredMatches = matchHistoryResult.matches.filter(match => {
+                const isHome = match.HomeTeam === state.selectedTeam1;
+                const isAway = match.AwayTeam === state.selectedTeam1;
+
+                // Apply home/away filter logic
+                if (!state.matchHistoryHomeFilter && isHome) return false;
+                if (!state.matchHistoryAwayFilter && isAway) return false;
+                return true;
+            });
+
+            // Apply recent matches count filter
+            if (state.recentMatchesCount !== 'All') {
+                const count = parseInt(state.recentMatchesCount);
+                filteredMatches = filteredMatches.slice(0, count);
+            }
+
+            // Create table headers with sorting functionality
+            elements.matchHistoryTableHeader.innerHTML = `
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('date')">Date${getMatchHistorySortIndicator('date')}</th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('homeTeam')">Home Team${getMatchHistorySortIndicator('homeTeam')}</th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('homeScore')">Home Score${getMatchHistorySortIndicator('homeScore')}</th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('awayTeam')">Away Team${getMatchHistorySortIndicator('awayTeam')}</th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('awayScore')">Away Score${getMatchHistorySortIndicator('awayScore')}</th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('result')">Result${getMatchHistorySortIndicator('result')}</th>
+            `;
+
+            // Create sorted matches data with H2H-style processing
+            let matchesData = filteredMatches.map(match => {
+                const homeScore = parseInt(match.FTHG) || 0;
+                const awayScore = parseInt(match.FTAG) || 0;
+
+                // Get team colors first
+                const homeTeamColor = getTeamColor(match.HomeTeam, state.selectedLeague);
+                const awayTeamColor = getTeamColor(match.AwayTeam, state.selectedLeague);
+
+                // Determine winner and score colors (same logic as H2H)
+                let winnerTeam = '';
+                let homeScoreClass = '';
+                let awayScoreClass = '';
+                let resultStyle = '';
+
+                if (homeScore > awayScore) {
+                    // Home team wins
+                    winnerTeam = match.HomeTeam;
+                    homeScoreClass = 'font-bold win-score';
+                    awayScoreClass = 'text-red-600 font-bold';
+                    resultStyle = homeTeamColor ?
+                        `color: ${homeTeamColor} !important; font-weight: bold;` :
+                        'color: #059669 !important; font-weight: bold;'; // Default green
+                } else if (awayScore > homeScore) {
+                    // Away team wins
+                    winnerTeam = match.AwayTeam;
+                    homeScoreClass = 'text-red-600 font-bold';
+                    awayScoreClass = 'font-bold win-score';
+                    resultStyle = awayTeamColor ?
+                        `color: ${awayTeamColor} !important; font-weight: bold;` :
+                        'color: #059669 !important; font-weight: bold;'; // Default green
+                } else {
+                    // Draw
+                    winnerTeam = 'Draw';
+                    homeScoreClass = 'text-gray-400 font-bold draw-score';
+                    awayScoreClass = 'text-gray-400 font-bold draw-score';
+                    resultStyle = 'color: #9ca3af !important; font-weight: bold;'; // Lighter gray for draws
+                }
+
+                // Add team highlights - highlight selected team
+                const isHomeSelected = match.HomeTeam === state.selectedTeam1;
+                const isAwaySelected = match.AwayTeam === state.selectedTeam1;
+
+                // Create subtle highlight classes similar to H2H
+                const homeTeamClass = isHomeSelected ? 'team1-highlight' : '';
+                const awayTeamClass = isAwaySelected ? 'team1-highlight' : '';
+
+                // Combine team color with highlight classes for inline styles
+                const homeTeamFinalStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
+                const awayTeamFinalStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
+
+                // Result shows winning team name or "Draw"
+                let resultText = '';
+                let resultClass = '';
+                if (winnerTeam === 'Draw') {
+                    resultText = 'Draw';
+                    resultStyle = 'color: #9ca3af !important; font-weight: bold;';
+                } else {
+                    resultText = winnerTeam;
+                    // Add highlighting if the winning team is the selected team
+                    if (winnerTeam === state.selectedTeam1) {
+                        resultClass = 'team1-highlight';
+                    }
+                    // Keep the winner's team color style already set above
+                }
+
+                return {
+                    date: match.dateObj.toLocaleDateString('en-US'),
+                    dateSort: match.dateObj,
+                    homeTeam: match.HomeTeam,
+                    homeTeamColor: homeTeamColor,
+                    homeTeamStyle: homeTeamFinalStyle,
+                    homeTeamClass: homeTeamClass,
+                    homeScore: homeScore,
+                    homeScoreClass: homeScoreClass,
+                    awayTeam: match.AwayTeam,
+                    awayTeamColor: awayTeamColor,
+                    awayTeamStyle: awayTeamFinalStyle,
+                    awayTeamClass: awayTeamClass,
+                    awayScore: awayScore,
+                    awayScoreClass: awayScoreClass,
+                    result: resultText,
+                    resultStyle: resultStyle,
+                    resultClass: resultClass
+                };
+            });
+
+            // Apply sorting if configured
+            if (state.matchHistorySortConfig.key && state.matchHistorySortConfig.direction) {
+                const sortKey = state.matchHistorySortConfig.key;
+                const sortDirection = state.matchHistorySortConfig.direction;
+
+                matchesData.sort((a, b) => {
+                    let aVal, bVal;
+
+                    switch (sortKey) {
+                        case 'date':
+                            aVal = a.dateSort;
+                            bVal = b.dateSort;
+                            break;
+                        case 'homeTeam':
+                            aVal = a.homeTeam;
+                            bVal = b.homeTeam;
+                            break;
+                        case 'awayTeam':
+                            aVal = a.awayTeam;
+                            bVal = b.awayTeam;
+                            break;
+                        case 'homeScore':
+                            aVal = a.homeScore;
+                            bVal = b.homeScore;
+                            break;
+                        case 'awayScore':
+                            aVal = a.awayScore;
+                            bVal = b.awayScore;
+                            break;
+                        case 'result':
+                            aVal = a.result;
+                            bVal = b.result;
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    // Handle different data types
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                        aVal = aVal.toLowerCase();
+                        bVal = bVal.toLowerCase();
+                    }
+
+                    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            // Generate table rows with H2H-style formatting
+            elements.matchHistoryTableBody.innerHTML = matchesData.map((match, index) => {
+                const isSelectedTeamHome = match.homeTeam === state.selectedTeam1;
+                const isSelectedTeamAway = match.awayTeam === state.selectedTeam1;
+
+                // Get team logos
+                const homeLogoUrl = getTeamLogoUrl(match.homeTeam, state.selectedLeague);
+                const awayLogoUrl = getTeamLogoUrl(match.awayTeam, state.selectedLeague);
+
+                // Get result logo for result column (shows winning team logo, no logo for Draw)
+                const resultLogoUrl = match.result !== 'Draw' ?
+                    getTeamLogoUrl(match.result, state.selectedLeague) : null;
+
+                return `
+                    <tr>
+                        <td class="text-center text-sm">${match.date}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.homeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span class="${match.homeTeamClass}" style="${match.homeTeamStyle}">${match.homeTeam}</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-lg ${match.homeScoreClass}" >${match.homeScore}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span class="${match.awayTeamClass}" style="${match.awayTeamStyle}">${match.awayTeam}</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-lg ${match.awayScoreClass}" >${match.awayScore}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${resultLogoUrl ? `<img src="${resultLogoUrl}" alt="${state.selectedTeam1} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span class="${match.resultClass}" style="${match.resultStyle}">${match.result}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Return the filtered count for display updates
+            return filteredMatches.length;
+        }
+
+        // Set recent matches input value
+        function setRecentMatchesValue() {
+            elements.recentMatchesSelect.value = state.recentMatchesCount === 'All' ? 'All' : state.recentMatchesCount;
+        }
+
+        // Update match history visualizations (Team Record)
+        function updateMatchHistoryVisualizations(matches, teamName) {
+            if (!matches || matches.length === 0) {
+                elements.matchHistoryVisualizations.innerHTML = '';
+                return;
+            }
+
+            // Use the pre-filtered matches passed in (no additional filtering needed)
+            const recentMatches = matches;
+
+            // Calculate team record statistics
+            let wins = 0, draws = 0, losses = 0;
+            let homeWins = 0, homeDraws = 0, homeLosses = 0;
+            let awayWins = 0, awayDraws = 0, awayLosses = 0;
+
+            recentMatches.forEach(match => {
+                const homeScore = parseInt(match.FTHG) || 0;
+                const awayScore = parseInt(match.FTAG) || 0;
+                const isHome = match.HomeTeam === teamName;
+
+                if (homeScore > awayScore) {
+                    if (isHome) {
+                        wins++;
+                        homeWins++;
+                    } else {
+                        losses++;
+                        awayLosses++;
+                    }
+                } else if (homeScore < awayScore) {
+                    if (isHome) {
+                        losses++;
+                        homeLosses++;
+                    } else {
+                        wins++;
+                        awayWins++;
+                    }
+                } else {
+                    draws++;
+                    if (isHome) {
+                        homeDraws++;
+                    } else {
+                        awayDraws++;
+                    }
+                }
+            });
+
+            const total = recentMatches.length;
+            const teamColor = getTeamColor(teamName, state.selectedLeague);
+            const teamBgStyle = teamColor ? `background: ${teamColor} !important; color: ${getContrastColor(teamColor)} !important;` : 'background: #059669 !important; color: white !important;';
+
+            let visualizationHTML = '';
+
+            // Show overall stats only if both home and away are selected
+            if (state.matchHistoryHomeFilter && state.matchHistoryAwayFilter && total > 0) {
+                visualizationHTML += `
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-semibold">${teamName} - Overall Record</span>
+                            <span class="text-sm text-gray-600">${wins}W - ${draws}D - ${losses}L</span>
+                        </div>
+                        <div class="h2h-viz-bar">
+                            <div class="h2h-segment h2h-wins" style="width: ${(wins / total) * 100}%; ${teamBgStyle}">
+                                ${wins > 0 ? wins : ''}
+                            </div>
+                            <div class="h2h-segment h2h-draws" style="width: ${(draws / total) * 100}%;">
+                                ${draws > 0 ? draws : ''}
+                            </div>
+                            <div class="h2h-segment h2h-losses" style="width: ${(losses / total) * 100}%;">
+                                ${losses > 0 ? losses : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Home Record (show if home filter is enabled)
+            if (state.matchHistoryHomeFilter && (homeWins + homeDraws + homeLosses) > 0) {
+                const homeTotal = homeWins + homeDraws + homeLosses;
+                visualizationHTML += `
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-semibold">${teamName} (Home)</span>
+                            <span class="text-sm text-gray-600">${homeWins}W - ${homeDraws}D - ${homeLosses}L</span>
+                        </div>
+                        <div class="h2h-viz-bar">
+                            <div class="h2h-segment h2h-wins" style="width: ${(homeWins / homeTotal) * 100}%; ${teamBgStyle}">
+                                ${homeWins > 0 ? homeWins : ''}
+                            </div>
+                            <div class="h2h-segment h2h-draws" style="width: ${(homeDraws / homeTotal) * 100}%;">
+                                ${homeDraws > 0 ? homeDraws : ''}
+                            </div>
+                            <div class="h2h-segment h2h-losses" style="width: ${(homeLosses / homeTotal) * 100}%;">
+                                ${homeLosses > 0 ? homeLosses : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Away Record (show if away filter is enabled)
+            if (state.matchHistoryAwayFilter && (awayWins + awayDraws + awayLosses) > 0) {
+                const awayTotal = awayWins + awayDraws + awayLosses;
+                visualizationHTML += `
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-semibold">${teamName} (Away)</span>
+                            <span class="text-sm text-gray-600">${awayWins}W - ${awayDraws}D - ${awayLosses}L</span>
+                        </div>
+                        <div class="h2h-viz-bar">
+                            <div class="h2h-segment h2h-wins" style="width: ${(awayWins / awayTotal) * 100}%; ${teamBgStyle}">
+                                ${awayWins > 0 ? awayWins : ''}
+                            </div>
+                            <div class="h2h-segment h2h-draws" style="width: ${(awayDraws / awayTotal) * 100}%;">
+                                ${awayDraws > 0 ? awayDraws : ''}
+                            </div>
+                            <div class="h2h-segment h2h-losses" style="width: ${(awayLosses / awayTotal) * 100}%;">
+                                ${awayLosses > 0 ? awayLosses : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            elements.matchHistoryVisualizations.innerHTML = visualizationHTML;
+        }
+
+        // Calculate team statistics for match history
+        function calculateTeamStats(matches, teamName) {
+            let stats = {
+                played: 0,
+                won: 0,
+                drawn: 0,
+                lost: 0,
+                goalsFor: 0,
+                goalsAgainst: 0,
+                goalDifference: 0,
+                points: 0
+            };
+
+            matches.forEach(match => {
+                const homeScore = parseInt(match.FTHG) || 0;
+                const awayScore = parseInt(match.FTAG) || 0;
+                const isHome = match.HomeTeam === teamName;
+
+                stats.played++;
+
+                if (isHome) {
+                    stats.goalsFor += homeScore;
+                    stats.goalsAgainst += awayScore;
+
+                    if (homeScore > awayScore) {
+                        stats.won++;
+                        stats.points += state.useThreePoints ? 3 : 2;
+                    } else if (homeScore === awayScore) {
+                        stats.drawn++;
+                        stats.points += 1;
+                    } else {
+                        stats.lost++;
+                    }
+                } else {
+                    stats.goalsFor += awayScore;
+                    stats.goalsAgainst += homeScore;
+
+                    if (awayScore > homeScore) {
+                        stats.won++;
+                        stats.points += state.useThreePoints ? 3 : 2;
+                    } else if (awayScore === homeScore) {
+                        stats.drawn++;
+                        stats.points += 1;
+                    } else {
+                        stats.lost++;
+                    }
+                }
+            });
+
+            stats.goalDifference = stats.goalsFor - stats.goalsAgainst;
+            return stats;
+        }
+
+        // Update match history stats table
+        function updateMatchHistoryStatsTable(stats, teamName) {
+            // Create stats table headers
+            elements.matchHistoryStatsHeader.innerHTML = `
+                <th class="text-center">Team</th>
+                <th class="text-center">P</th>
+                <th class="text-center">W</th>
+                <th class="text-center">D</th>
+                <th class="text-center">L</th>
+                <th class="text-center">GF</th>
+                <th class="text-center">GA</th>
+                <th class="text-center">GD</th>
+                <th class="text-center">Pts</th>
+            `;
+
+            // Get team color and logo
+            const teamColor = getTeamColor(teamName, state.selectedLeague);
+            const logoUrl = getTeamLogoUrl(teamName, state.selectedLeague);
+
+            // Create stats table row
+            elements.matchHistoryStatsBody.innerHTML = `
+                <tr>
+                    <td class="px-3 py-4 text-center">
+                        <div class="flex items-center justify-center">
+                            ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                            <span class="hover:underline team-name-text" style="color: ${teamColor} !important; font-weight: bold;">${teamName}</span>
+                        </div>
+                    </td>
+                    <td class="px-3 py-4 text-center">${stats.played}</td>
+                    <td class="px-3 py-4 text-center">${stats.won}</td>
+                    <td class="px-3 py-4 text-center">${stats.drawn}</td>
+                    <td class="px-3 py-4 text-center">${stats.lost}</td>
+                    <td class="px-3 py-4 text-center">${stats.goalsFor}</td>
+                    <td class="px-3 py-4 text-center">${stats.goalsAgainst}</td>
+                    <td class="px-3 py-4 text-center">
+                        <span class="font-bold ${stats.goalDifference > 0 ? 'text-green-700' : stats.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
+                            ${stats.goalDifference > 0 ? '+' : ''}${stats.goalDifference}
+                        </span>
+                    </td>
+                    <td class="px-3 py-4 text-center">
+                        <span class="points-badge">
+                            ${stats.points}
+                        </span>
+                    </td>
+                </tr>
+            `;
         }
 
         // Update head-to-head display with custom team colors
@@ -5580,7 +6426,7 @@
                 if (homeScore > awayScore) {
                     // Home team wins
                     winnerTeam = match.HomeTeam;
-                    homeScoreClass = 'font-bold';
+                    homeScoreClass = 'font-bold win-score';
                     awayScoreClass = 'text-red-600 font-bold';
                     resultStyle = homeTeamColor ? 
                         `color: ${homeTeamColor} !important; font-weight: bold;` : 
@@ -5589,15 +6435,15 @@
                     // Away team wins
                     winnerTeam = match.AwayTeam;
                     homeScoreClass = 'text-red-600 font-bold';
-                    awayScoreClass = 'font-bold';
+                    awayScoreClass = 'font-bold win-score';
                     resultStyle = awayTeamColor ? 
                         `color: ${awayTeamColor} !important; font-weight: bold;` : 
                         'color: #059669 !important; font-weight: bold;'; // Default green
                 } else {
                     // Draw
                     winnerTeam = 'Draw';
-                    homeScoreClass = 'text-gray-400 font-bold';
-                    awayScoreClass = 'text-gray-400 font-bold';
+                    homeScoreClass = 'text-gray-400 font-bold draw-score';
+                    awayScoreClass = 'text-gray-400 font-bold draw-score';
                     resultStyle = 'color: #9ca3af !important; font-weight: bold;'; // Lighter gray for draws
                 }
 
@@ -5629,7 +6475,7 @@
                 }
 
                 return {
-                    date: match.dateObj.toLocaleDateString(),
+                    date: match.dateObj.toLocaleDateString('en-US'),
                     dateSort: match.dateObj,
                     homeTeam: match.HomeTeam,
                     homeTeamColor: homeTeamColor,
@@ -5705,7 +6551,7 @@
                 const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
                 
                 return `
-                    <tr class="${(isTeam1Home || isTeam1Away) ? 'highlight' : ''}">
+                    <tr>
                         <td class="text-center text-sm">${match.date}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
@@ -5713,14 +6559,14 @@
                                 <span class="${match.homeTeamClass}" style="${match.homeTeamStyle}">${match.homeTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg ${match.homeScoreClass}" ${match.homeScoreClass === 'font-bold' ? 'style="color: #047857;"' : ''}>${match.homeScore}</td>
+                        <td class="text-center text-lg ${match.homeScoreClass}" >${match.homeScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                                 <span class="${match.awayTeamClass}" style="${match.awayTeamStyle}">${match.awayTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg ${match.awayScoreClass}" ${match.awayScoreClass === 'font-bold' ? 'style="color: #047857;"' : ''}>${match.awayScore}</td>
+                        <td class="text-center text-lg ${match.awayScoreClass}" >${match.awayScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${match.result} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -6359,7 +7205,7 @@
             `).join('');
             
             elements.teamHistoryBody.innerHTML = sortedData.map((season, index) => {
-                const rowBackgroundClass = sortedData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = sortedData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
                 const logoUrl = getTeamLogoUrl(teamName, leagueToUse);
                 
                 return `
@@ -6548,6 +7394,58 @@
             return state.sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
         }
 
+        // Match history sorting functions
+        function handleMatchHistorySort(key) {
+            // Determine if this is a numerical column
+            const numericalColumns = ['homeScore', 'awayScore'];
+            const isNumerical = numericalColumns.includes(key);
+
+            // Set initial direction based on column type
+            let direction = (key === 'homeTeam' || key === 'awayTeam' || key === 'result') ? 'asc' : 'desc';
+
+            if (state.matchHistorySortConfig.key === key) {
+                if (isNumerical || key === 'date') {
+                    // Numerical columns and date: desc -> asc -> clear
+                    if (state.matchHistorySortConfig.direction === 'desc') {
+                        direction = 'asc';
+                    } else if (state.matchHistorySortConfig.direction === 'asc') {
+                        state.matchHistorySortConfig = { key: null, direction: null };
+                        // Re-update match history display to clear sort
+                        if (state.selectedTeam1 && !state.selectedTeam2) {
+                            const matchHistoryResult = calculateMatchHistory();
+                            updateMatchHistoryDisplay(matchHistoryResult);
+                        }
+                        return;
+                    }
+                } else {
+                    // Text columns: asc -> desc -> clear
+                    if (state.matchHistorySortConfig.direction === 'asc') {
+                        direction = 'desc';
+                    } else if (state.matchHistorySortConfig.direction === 'desc') {
+                        state.matchHistorySortConfig = { key: null, direction: null };
+                        // Re-update match history display to clear sort
+                        if (state.selectedTeam1 && !state.selectedTeam2) {
+                            const matchHistoryResult = calculateMatchHistory();
+                            updateMatchHistoryDisplay(matchHistoryResult);
+                        }
+                        return;
+                    }
+                }
+            }
+
+            state.matchHistorySortConfig = { key, direction };
+            // Re-update match history display with new sort
+            if (state.selectedTeam1 && !state.selectedTeam2) {
+                const matchHistoryResult = calculateMatchHistory();
+                updateMatchHistoryDisplay(matchHistoryResult);
+            }
+        }
+
+        function getMatchHistorySortIndicator(key) {
+            if (state.matchHistorySortConfig.key !== key) return ' ↕️';
+            return state.matchHistorySortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+        }
+
         // Clear filters
         function clearFilters() {
             if (state.data.length > 0) {
@@ -6599,6 +7497,8 @@
             if (state.error) {
                 elements.controlsSection.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
+                elements.matchHistoryStatsTable.classList.add('hidden');
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableContainer.classList.add('hidden');
@@ -6618,16 +7518,29 @@
                 if (isLeagueFiltersActive) {
                     elements.tableContainer.classList.remove('hidden');
                     
-                    // Only show H2H section when both teams are selected
+                    // Show appropriate section based on team selection
                     if (state.selectedTeam1 && state.selectedTeam2) {
+                        // Two teams selected: show H2H, hide match history
                         elements.h2hSection.classList.remove('hidden');
-                    } else {
+                        elements.matchHistorySection.classList.add('hidden');
+                    } else if (state.selectedTeam1 && !state.selectedTeam2) {
+                        // One team selected: show main table above match history, hide H2H
+                        elements.tableContainer.classList.remove('hidden');  // Show main table above
                         elements.h2hSection.classList.add('hidden');
+                        elements.matchHistorySection.classList.remove('hidden');
+                        // Note: matchHistoryStatsTable visibility is managed in updateMatchHistoryDisplay
+                    } else {
+                        // No teams or invalid selection: hide both
+                        elements.h2hSection.classList.add('hidden');
+                        elements.matchHistorySection.classList.add('hidden');
+                        elements.matchHistoryStatsTable.classList.add('hidden');
                     }
                 } else {
-                    // Keep table hidden on Last Time When tab
+                    // Keep table hidden on other tabs
                     elements.tableContainer.classList.add('hidden');
                     elements.h2hSection.classList.add('hidden');
+                    elements.matchHistorySection.classList.add('hidden');
+                    elements.matchHistoryStatsTable.classList.add('hidden');
                     elements.tableInfo.classList.add('hidden');
                 }
             } else {
