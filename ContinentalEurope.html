@@ -4798,7 +4798,9 @@
 
             // H2H controls
             elements.h2hStageSelect.addEventListener('change', (e) => {
+                console.log('H2H Stage dropdown changed to:', e.target.value);
                 state.h2hStage = e.target.value;
+                console.log('state.h2hStage set to:', state.h2hStage);
                 // Reset H2H table sort when stage filter changes
                 state.h2hSortConfig = { key: 'date', direction: 'desc' };
                 updateTable();
@@ -4838,6 +4840,7 @@
             // Most Recent Matches input handler
             elements.recentMatchesSelect.addEventListener('input', (e) => {
                 let value = e.target.value.trim();
+                console.log('Most Recent Matches input changed to:', value);
                 if (value === '') {
                     return; // Allow empty, don't update yet
                 }
@@ -4845,11 +4848,13 @@
                 if (value.toLowerCase() === 'all') {
                     state.recentMatchesCount = 'All';
                     e.target.value = 'All';
+                    console.log('Set recentMatchesCount to: All');
                 } else {
                     const num = parseInt(value);
                     if (!isNaN(num) && num > 0) {
                         state.recentMatchesCount = num;
                         e.target.value = num.toString();
+                        console.log('Set recentMatchesCount to:', num);
                     } else {
                         e.target.value = state.recentMatchesCount === 'All' ? 'All' : state.recentMatchesCount.toString();
                         return;
@@ -4916,7 +4921,9 @@
             });
             
             elements.matchHistoryStageSelect.addEventListener('change', (e) => {
+                console.log('Match History Stage dropdown changed to:', e.target.value);
                 state.matchHistoryStage = e.target.value;
+                console.log('state.matchHistoryStage set to:', state.matchHistoryStage);
                 updateTable();
             });
             
@@ -5945,16 +5952,44 @@
                         .slice(0, parseInt(state.recentH2HCount));
                 }
             } else if (state.selectedTeam1) {
+                // For single team selection: filter to show only matches involving the selected team
                 filtered = filtered.filter(row => row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1);
+
+                // Apply stage filter if selected (H2H stage or Match History stage)
+                const stageFilter = state.h2hStage || state.matchHistoryStage;
+                if (stageFilter && stageFilter !== '') {
+                    const beforeFilter = filtered.length;
+                    filtered = filtered.filter(row => {
+                        return matchesStageCategory(row.CompetitionPhase, stageFilter);
+                    });
+                    const afterFilter = filtered.length;
+                    // Debug: This should show the filtering is working
+                    console.log(`Stage Filter (${state.h2hStage ? 'H2H' : 'Match History'}): ${stageFilter}, Before: ${beforeFilter}, After: ${afterFilter}`);
+                }
+
+                // Apply recent matches count limit (same as match history)
+                if (state.recentMatchesCount !== 'All') {
+                    const limit = parseInt(state.recentMatchesCount) || 0;
+                    if (limit > 0) {
+                        const beforeLimit = filtered.length;
+                        // Sort by date (most recent first) before applying limit
+                        filtered = filtered.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+                        filtered = filtered.slice(0, limit);
+                        console.log(`Table Recent Matches Filter: Limit ${limit}, Before: ${beforeLimit}, After: ${filtered.length}`);
+                    }
+                }
             }
             
             // Determine teams to show
             let teamsToShow;
             if (state.selectedTeam1 && state.selectedTeam2) {
+                // H2H mode: only show the two selected teams
                 teamsToShow = [state.selectedTeam1, state.selectedTeam2];
             } else if (state.selectedTeam1) {
+                // Single team mode: only show the selected team
                 teamsToShow = [state.selectedTeam1];
             } else {
+                // No team selected: show all teams from filtered dataset
                 teamsToShow = [...new Set([
                     ...filtered.map(row => row.HomeTeam),
                     ...filtered.map(row => row.AwayTeam)
@@ -6494,7 +6529,17 @@
                 }
             }
             // If both home/away are checked, show all matches (no additional home/away filtering needed)
-            
+
+            // Apply recent matches count limit
+            if (state.recentMatchesCount !== 'All') {
+                const limit = parseInt(state.recentMatchesCount) || 0;
+                if (limit > 0) {
+                    const beforeLimit = teamMatches.length;
+                    teamMatches = teamMatches.slice(0, limit);
+                    console.log(`Recent Matches Filter: Limit ${limit}, Before: ${beforeLimit}, After: ${teamMatches.length}`);
+                }
+            }
+
             return {
                 matches: teamMatches,
                 totalMatches: teamMatches.length
