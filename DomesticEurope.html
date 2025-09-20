@@ -793,6 +793,7 @@
             selectedDayOfWeek: '',
             selectedTeam1: '',
             selectedTeam2: '',
+            big6Opponents: null,
             selectedSeason: '',
             homeFilter: true,
             awayFilter: true,
@@ -2178,8 +2179,7 @@
                 .join('');
             
             elements.teamStreaksTeam1Select.innerHTML = teamOptions;
-            elements.teamStreaksTeam2Select.innerHTML = '<option value="">Select Team 2 (Optional)</option>' + 
-                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+            updateTeamStreaksTeam2Options();
         }
 
         // Handle Team Streaks league change
@@ -2214,12 +2214,51 @@
 
         // Handle Team Streaks Team 1 selection
         function handleTeamStreaksTeam1Change(team) {
+            // If Team 2 is currently Big 6, update the Big 6 opponents for the new Team 1
+            // but DON'T reset Team 2 selection
+            if (elements.teamStreaksTeam2Select.value === 'BIG_6') {
+                state.teamStreaksBig6Opponents = getBig6Opponents(team);
+                updateTeamStreaksTeam2Options(); // Refresh options but keep Big 6 selected
+            } else {
+                // Reset Team 2 selection and refresh its options (to show/hide Big 6)
+                elements.teamStreaksTeam2Select.value = '';
+                updateTeamStreaksTeam2Options();
+            }
+
             calculateTeamStreaks();
         }
 
-        // Handle Team Streaks Team 2 selection  
+        // Handle Team Streaks Team 2 selection
         function handleTeamStreaksTeam2Change(team) {
+            // Handle Big 6 selection
+            if (team === 'BIG_6') {
+                state.teamStreaksBig6Opponents = getBig6Opponents(elements.teamStreaksTeam1Select.value);
+            } else {
+                state.teamStreaksBig6Opponents = null;
+            }
             calculateTeamStreaks();
+        }
+
+        // Update Team Streaks Team 2 options to include Big 6 if applicable
+        function updateTeamStreaksTeam2Options() {
+            const leagueTeams = getLeagueTeams(state.selectedLeague);
+            const currentTeam2 = elements.teamStreaksTeam2Select.value; // Save current value before clearing
+            let team2Options = ['<option value="">Select Team 2</option>'];
+
+            // Add Big 6 option if Team 1 is selected and we're in Premier League
+            if (elements.teamStreaksTeam1Select.value && state.selectedLeague === 'premier-league') {
+                team2Options.push('<option value="BIG_6">Big 6</option>');
+            }
+
+            // Add all other teams
+            team2Options = team2Options.concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`));
+
+            elements.teamStreaksTeam2Select.innerHTML = team2Options.join('');
+
+            // Restore the current selection if it's still valid
+            if (currentTeam2) {
+                elements.teamStreaksTeam2Select.value = currentTeam2;
+            }
         }
 
         // Calculate and display team streaks
@@ -2257,14 +2296,22 @@
 
             // Filter matches by league
             let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-            
+
             // Filter by teams
             if (team2) {
-                // Two teams selected - head-to-head matches only
-                matches = matches.filter(row => 
-                    (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                    (row.HomeTeam === team2 && row.AwayTeam === team1)
-                );
+                if (team2 === 'BIG_6' && state.teamStreaksBig6Opponents) {
+                    // Big 6 mode: filter for matches where Team 1 played against any Big 6 opponent
+                    matches = matches.filter(row =>
+                        (row.HomeTeam === team1 && state.teamStreaksBig6Opponents.includes(row.AwayTeam)) ||
+                        (row.AwayTeam === team1 && state.teamStreaksBig6Opponents.includes(row.HomeTeam))
+                    );
+                } else {
+                    // Regular head-to-head matches only
+                    matches = matches.filter(row =>
+                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
+                        (row.HomeTeam === team2 && row.AwayTeam === team1)
+                    );
+                }
             } else {
                 // One team selected - matches against all opponents
                 matches = matches.filter(row => 
@@ -2324,11 +2371,19 @@
             
             // Filter by teams
             if (team2) {
-                // Two teams selected - head-to-head matches only
-                matches = matches.filter(row => 
-                    (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                    (row.HomeTeam === team2 && row.AwayTeam === team1)
-                );
+                if (team2 === 'BIG_6' && state.teamStreaksBig6Opponents) {
+                    // Big 6 mode: filter for matches where Team 1 played against any Big 6 opponent
+                    matches = matches.filter(row =>
+                        (row.HomeTeam === team1 && state.teamStreaksBig6Opponents.includes(row.AwayTeam)) ||
+                        (row.AwayTeam === team1 && state.teamStreaksBig6Opponents.includes(row.HomeTeam))
+                    );
+                } else {
+                    // Regular head-to-head matches only
+                    matches = matches.filter(row =>
+                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
+                        (row.HomeTeam === team2 && row.AwayTeam === team1)
+                    );
+                }
             } else {
                 // One team selected - matches against all opponents
                 matches = matches.filter(row => 
@@ -2508,11 +2563,12 @@
             const streakName = getStreakDisplayName(streakType);
             const locationText = location === 'both' ? '' : ` (${location.charAt(0).toUpperCase() + location.slice(1)})`;
             const team1Color = getTeamColor(team1, state.selectedLeague);
-            const team2Color = team2 ? getTeamColor(team2, state.selectedLeague) : null;
-            
+            const team2Color = team2 === 'BIG_6' ? '#1e3a8a' : (team2 ? getTeamColor(team2, state.selectedLeague) : null);
+
             let title;
             if (team2) {
-                title = `Historic ${streakName}s${locationText}: <span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>`;
+                const team2DisplayName = getTeamDisplayName(team2);
+                title = `Historic ${streakName}s${locationText}: <span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2DisplayName}</span>`;
             } else {
                 title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName}s${locationText}`;
             }
@@ -2557,8 +2613,9 @@
                 if (team2) {
                     // Head-to-head mode
                     const team1Logo = getTeamLogoUrl(team1, state.selectedLeague);
-                    const team2Logo = getTeamLogoUrl(team2, state.selectedLeague);
-                    
+                    const team2Logo = team2 === 'BIG_6' ? null : getTeamLogoUrl(team2, state.selectedLeague);
+                    const team2DisplayName = getTeamDisplayName(team2);
+
                     return `
                         <tr>
                             <td class="text-center">
@@ -2569,8 +2626,8 @@
                             </td>
                             <td class="text-center">
                                 <div class="flex items-center justify-center">
-                                    ${team2Logo ? `<img src="${team2Logo}" alt="${team2}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                    <span class="team2-highlight" style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>
+                                    ${team2Logo ? `<img src="${team2Logo}" alt="${team2DisplayName}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                    <span class="team2-highlight" style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2DisplayName}</span>
                                 </div>
                             </td>
                             <td class="text-center">${startDateStr}</td>
@@ -2705,12 +2762,13 @@
             
             // Get team colors
             const team1Color = getTeamColor(team1, state.selectedLeague);
-            const team2Color = team2 ? getTeamColor(team2, state.selectedLeague) : null;
-            
+            const team2Color = team2 === 'BIG_6' ? '#1e3a8a' : (team2 ? getTeamColor(team2, state.selectedLeague) : null);
+
             let title;
             if (team2) {
                 // Two-team mode: Both teams with their colors
-                title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Current ${streakName}${locationText} vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>: ${streakLength} ${streakLength === 1 ? 'match' : 'matches'}`;
+                const team2DisplayName = getTeamDisplayName(team2);
+                title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Current ${streakName}${locationText} vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2DisplayName}</span>: ${streakLength} ${streakLength === 1 ? 'match' : 'matches'}`;
             } else {
                 // Single-team mode: Just Team 1 with color
                 title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Current ${streakName}${locationText}: ${streakLength} ${streakLength === 1 ? 'match' : 'matches'}`;
@@ -2754,7 +2812,7 @@
                 let oppositeTitle;
                 if (team2) {
                     // Two-team mode: Both teams with their colors
-                    oppositeTitle = `Last ${oppositeResultName} Result${locationText} (<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>)`;
+                    oppositeTitle = `Last ${oppositeResultName} Result${locationText} (<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span> vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${getTeamDisplayName(team2)}</span>)`;
                 } else {
                     // Single-team mode: Just Team 1 with color
                     oppositeTitle = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Last ${oppositeResultName} Result${locationText}`;
@@ -2811,12 +2869,24 @@
             
             // Filter by teams
             if (team2) {
-                matches = matches.filter(row => 
-                    (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                    (row.HomeTeam === team2 && row.AwayTeam === team1)
-                );
+                if (team2 === 'BIG_6') {
+                    // Big 6 filtering logic
+                    const big6Opponents = state.teamStreaksBig6Opponents || [];
+                    matches = matches.filter(row => {
+                        const homeTeam = row.HomeTeam;
+                        const awayTeam = row.AwayTeam;
+
+                        return (homeTeam === team1 && big6Opponents.includes(awayTeam)) ||
+                               (awayTeam === team1 && big6Opponents.includes(homeTeam));
+                    });
+                } else {
+                    matches = matches.filter(row =>
+                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
+                        (row.HomeTeam === team2 && row.AwayTeam === team1)
+                    );
+                }
             } else {
-                matches = matches.filter(row => 
+                matches = matches.filter(row =>
                     row.HomeTeam === team1 || row.AwayTeam === team1
                 );
             }
@@ -3689,7 +3759,6 @@
                 // Show/hide checkbox AFTER showTeamHistory runs (to avoid being overridden)
                 setTimeout(() => {
                     if (selectedPosition) {
-                        console.log('Showing checkbox - team and position selected (after showTeamHistory)');
                         if (elements.includeBetterResultsContainer) {
                             // Clear all conflicting styles and classes
                             elements.includeBetterResultsContainer.className = 'mt-3 flex items-center gap-2';
@@ -3697,7 +3766,6 @@
                             elements.includeBetterResultsContainer.style.display = 'flex';
                         }
                     } else {
-                        console.log('Hiding checkbox - no position selected (after showTeamHistory)');
                         if (elements.includeBetterResultsContainer) {
                             elements.includeBetterResultsContainer.classList.add('hidden');
                         }
@@ -4254,7 +4322,6 @@
                     containerByIdLocal.classList.add('hidden');
                     containerByIdLocal.style.display = 'none';
                 }
-                console.log('Hiding checkbox when switching tabs');
 
                 // Update league buttons and team selects for Last Time When
                 createLeagueButtons(); // This will update the league buttons with correct selection
@@ -4312,7 +4379,6 @@
                     containerByIdLocal.classList.add('hidden');
                     containerByIdLocal.style.display = 'none';
                 }
-                console.log('Hiding checkbox when switching tabs');
 
                 // Clear Team Streaks visual elements to match cleared state
                 elements.teamStreaksResults.classList.add('hidden');
@@ -4547,11 +4613,31 @@
             // Last Time When controls
             elements.lastTimeTeam1Select.addEventListener('change', (e) => {
                 state.lastTimeTeam1 = e.target.value;
+
+                // If Team 2 is currently Big 6, update the Big 6 opponents for the new Team 1
+                // but DON'T reset Team 2 selection
+                if (state.lastTimeTeam2 === 'BIG_6') {
+                    state.lastTimeBig6Opponents = getBig6Opponents(state.lastTimeTeam1);
+                    updateLastTimeTeam2Options(); // Refresh options but keep Big 6 selected
+                } else {
+                    // Reset Team 2 selection and refresh its options (to show/hide Big 6)
+                    state.lastTimeTeam2 = '';
+                    elements.lastTimeTeam2Select.value = '';
+                    updateLastTimeTeam2Options();
+                }
+
                 calculateLastTimeWhen();
             });
             
             elements.lastTimeTeam2Select.addEventListener('change', (e) => {
-                state.lastTimeTeam2 = e.target.value;
+                // Handle Big 6 selection
+                if (e.target.value === 'BIG_6') {
+                    state.lastTimeTeam2 = 'BIG_6';
+                    state.lastTimeBig6Opponents = getBig6Opponents(state.lastTimeTeam1);
+                } else {
+                    state.lastTimeTeam2 = e.target.value;
+                    state.lastTimeBig6Opponents = null;
+                }
                 calculateLastTimeWhen();
             });
             
@@ -4637,7 +4723,6 @@
                     // Re-show checkbox after showTeamHistory runs (same as position change logic)
                     setTimeout(() => {
                         if (state.teamSeasonsSelectedPosition) {
-                            console.log('Re-showing checkbox after click');
                             if (elements.includeBetterResultsContainer) {
                                 elements.includeBetterResultsContainer.className = 'mt-3 flex items-center gap-2';
                                 elements.includeBetterResultsContainer.removeAttribute('style');
@@ -5000,7 +5085,14 @@
                     (value, text) => {
                         state.selectedTeam1 = value;
                         elements.team1Select.value = value;
-                        console.log('Team 1 selected:', value);
+
+                        // Reset Team 2 selection and refresh its options (to show/hide Big 6)
+                        state.selectedTeam2 = '';
+                        state.big6Opponents = null;
+                        elements.team2Select.value = '';
+                        team2Combobox.input.value = 'No Team';
+                        updateTeamSelects(); // This will refresh Team 2 options with/without Big 6
+
                         // Trigger same logic as original dropdown
                         updateTable();
                     }
@@ -5014,9 +5106,15 @@
                     'team2ComboboxDropdown',
                     'No Team',
                     (value, text) => {
-                        state.selectedTeam2 = value;
+                        // Handle Big 6 selection
+                        if (value === 'BIG_6') {
+                            state.selectedTeam2 = 'BIG_6';
+                            state.big6Opponents = getBig6Opponents(state.selectedTeam1);
+                        } else {
+                            state.selectedTeam2 = value;
+                            state.big6Opponents = null;
+                        }
                         elements.team2Select.value = value;
-                        console.log('Team 2 selected:', value);
                         // Trigger same logic as original dropdown
                         updateTable();
                     }
@@ -5028,10 +5126,17 @@
                 { value: '', text: 'All Teams' },
                 ...leagueTeams.map(team => ({ value: team, text: team }))
             ];
-            const team2ComboOptions = [
-                { value: '', text: 'No Team' },
-                ...leagueTeams.map(team => ({ value: team, text: team }))
-            ];
+
+            // Build Team 2 options with conditional Big 6 option
+            let team2ComboOptions = [{ value: '', text: 'No Team' }];
+
+            // Add Big 6 option if Team 1 is selected and we're in Premier League
+            if (state.selectedTeam1 && state.selectedLeague === 'premier-league') {
+                team2ComboOptions.push({ value: 'BIG_6', text: 'Big 6' });
+            }
+
+            // Add all regular teams
+            team2ComboOptions.push(...leagueTeams.map(team => ({ value: team, text: team })));
 
             team1Combobox.setOptions(team1ComboOptions);
             team2Combobox.setOptions(team2ComboOptions);
@@ -5044,7 +5149,6 @@
                     'teamSeasonsComboboxDropdown',
                     'Choose a team...',
                     (value, text) => {
-                        console.log('Team Seasons team selected:', value);
                         handleTeamSeasonsTeamChange(value);
                     }
                 );
@@ -5058,9 +5162,33 @@
                     'lastTimeTeam1ComboboxDropdown',
                     'Select Team 1',
                     (value, text) => {
-                        console.log('Last Time Team 1 selected:', value);
+                        // If Team 2 is currently Big 6, update the Big 6 opponents for the new Team 1
+                        // but DON'T reset the combobox selection
+                        if (state.lastTimeTeam2 === 'BIG_6') {
+                            state.lastTimeBig6Opponents = getBig6Opponents(value);
+                        }
+
                         elements.lastTimeTeam1Select.value = value;
                         elements.lastTimeTeam1Select.dispatchEvent(new Event('change'));
+
+                        // Update Team 2 combobox options to show/hide Big 6
+                        let updatedTeam2Options = [
+                            { value: '', text: 'Select Team 2' }
+                        ];
+
+                        // Add Big 6 option if Team 1 is selected and we're in Premier League
+                        if (value && state.selectedLeague === 'premier-league') {
+                            updatedTeam2Options.push({ value: 'BIG_6', text: 'Big 6' });
+                        }
+
+                        // Add all other teams
+                        updatedTeam2Options = updatedTeam2Options.concat(leagueTeams.map(team => ({ value: team, text: team })));
+                        lastTimeTeam2Combobox.setOptions(updatedTeam2Options);
+
+                        // If Team 2 was Big 6, restore the selection in the combobox
+                        if (state.lastTimeTeam2 === 'BIG_6') {
+                            lastTimeTeam2Combobox.setValue('BIG_6', 'Big 6');
+                        }
                     }
                 );
             }
@@ -5072,7 +5200,6 @@
                     'lastTimeTeam2ComboboxDropdown',
                     'Select Team 2',
                     (value, text) => {
-                        console.log('Last Time Team 2 selected:', value);
                         elements.lastTimeTeam2Select.value = value;
                         elements.lastTimeTeam2Select.dispatchEvent(new Event('change'));
                     }
@@ -5087,9 +5214,36 @@
                     'teamStreaksTeam1ComboboxDropdown',
                     'Select Team 1',
                     (value, text) => {
-                        console.log('Team Streaks Team 1 selected:', value);
+                        // If Team 2 is currently Big 6, update the Big 6 opponents for the new Team 1
+                        // but DON'T reset the combobox selection
+                        if (elements.teamStreaksTeam2Select.value === 'BIG_6') {
+                            state.teamStreaksBig6Opponents = getBig6Opponents(value);
+                        }
+
                         elements.teamStreaksTeam1Select.value = value;
                         elements.teamStreaksTeam1Select.dispatchEvent(new Event('change'));
+
+                        // Update Team 2 regular dropdown options too
+                        updateTeamStreaksTeam2Options();
+
+                        // Update Team 2 combobox options to show/hide Big 6
+                        let updatedTeam2Options = [
+                            { value: '', text: 'Select Team 2' }
+                        ];
+
+                        // Add Big 6 option if Team 1 is selected and we're in Premier League
+                        if (value && state.selectedLeague === 'premier-league') {
+                            updatedTeam2Options.push({ value: 'BIG_6', text: 'Big 6' });
+                        }
+
+                        // Add all other teams
+                        updatedTeam2Options = updatedTeam2Options.concat(leagueTeams.map(team => ({ value: team, text: team })));
+                        teamStreaksTeam2Combobox.setOptions(updatedTeam2Options);
+
+                        // If Team 2 was Big 6, restore the selection in the combobox
+                        if (elements.teamStreaksTeam2Select.value === 'BIG_6') {
+                            teamStreaksTeam2Combobox.setValue('BIG_6', 'Big 6');
+                        }
                     }
                 );
             }
@@ -5101,7 +5255,6 @@
                     'teamStreaksTeam2ComboboxDropdown',
                     'Select Team 2',
                     (value, text) => {
-                        console.log('Team Streaks Team 2 selected:', value);
                         elements.teamStreaksTeam2Select.value = value;
                         elements.teamStreaksTeam2Select.dispatchEvent(new Event('change'));
                     }
@@ -5117,18 +5270,32 @@
                 { value: '', text: 'Select Team 1' },
                 ...leagueTeams.map(team => ({ value: team, text: team }))
             ];
-            const lastTimeTeam2ComboOptions = [
-                { value: '', text: 'Select Team 2' },
-                ...leagueTeams.map(team => ({ value: team, text: team }))
+            let lastTimeTeam2ComboOptions = [
+                { value: '', text: 'Select Team 2' }
             ];
+
+            // Add Big 6 option if Team 1 is selected and we're in Premier League
+            if (state.lastTimeTeam1 && state.selectedLeague === 'premier-league') {
+                lastTimeTeam2ComboOptions.push({ value: 'BIG_6', text: 'Big 6' });
+            }
+
+            // Add all other teams
+            lastTimeTeam2ComboOptions = lastTimeTeam2ComboOptions.concat(leagueTeams.map(team => ({ value: team, text: team })));
             const teamStreaksTeam1ComboOptions = [
                 { value: '', text: 'Select Team 1' },
                 ...leagueTeams.map(team => ({ value: team, text: team }))
             ];
-            const teamStreaksTeam2ComboOptions = [
-                { value: '', text: 'Select Team 2' },
-                ...leagueTeams.map(team => ({ value: team, text: team }))
+            let teamStreaksTeam2ComboOptions = [
+                { value: '', text: 'Select Team 2' }
             ];
+
+            // Add Big 6 option if Team 1 is selected and we're in Premier League
+            if (elements.teamStreaksTeam1Select.value && state.selectedLeague === 'premier-league') {
+                teamStreaksTeam2ComboOptions.push({ value: 'BIG_6', text: 'Big 6' });
+            }
+
+            // Add all other teams
+            teamStreaksTeam2ComboOptions = teamStreaksTeam2ComboOptions.concat(leagueTeams.map(team => ({ value: team, text: team })));
 
             teamSeasonsCombobox.setOptions(teamComboOptions);
             lastTimeTeam1Combobox.setOptions(lastTimeTeam1ComboOptions);
@@ -5139,11 +5306,9 @@
             // Also populate Last Time When team selects (for backward compatibility)
             const lastTimeTeam1Options = '<option value="">Select Team 1</option>' +
                 leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            const lastTimeTeam2Options = '<option value="">Select Team 2</option>' +
-                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
 
             elements.lastTimeTeam1Select.innerHTML = lastTimeTeam1Options;
-            elements.lastTimeTeam2Select.innerHTML = lastTimeTeam2Options;
+            updateLastTimeTeam2Options();
 
             elements.team1Select.value = state.selectedTeam1;
             elements.team2Select.value = state.selectedTeam2;
@@ -5287,18 +5452,40 @@
                 
                 // Get team colors
                 const team1Color = getTeamColor(team1Name, state.selectedLeague);
-                const team2Color = team2Name ? getTeamColor(team2Name, state.selectedLeague) : null;
+                const team2Color = team2Name === 'BIG_6' ? '#1e3a8a' : (team2Name ? getTeamColor(team2Name, state.selectedLeague) : null);
                 
                 // Use different title format for single-team vs two-team mode
                 if (team2Name && team2Name !== team1Name) {
                     // Two-team mode: Last [Result] [Location] vs [Team2]
                     const resultWord = resultType === 'Won' ? 'Win' : resultType === 'Drew' ? 'Draw' : 'Loss';
-                    titleElement.innerHTML = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1Name}</span> Last ${resultWord} ${location} vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2Name}</span>`;
+                    const team2DisplayName = getTeamDisplayName(team2Name);
+                    titleElement.innerHTML = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1Name}</span> Last ${resultWord} ${location} vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2DisplayName}</span>`;
                 } else {
                     // Single-team mode: simple format
                     const resultWord = resultType === 'Won' ? 'Win' : resultType === 'Drew' ? 'Draw' : 'Loss';
                     titleElement.innerHTML = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1Name}</span> Last ${resultWord} ${location}`;
                 }
+            }
+        }
+
+        // Update Last Time When Team 2 options to include Big 6 if applicable
+        function updateLastTimeTeam2Options() {
+            const leagueTeams = getLeagueTeams(state.selectedLeague);
+            let team2Options = ['<option value="">Select Team 2</option>'];
+
+            // Add Big 6 option if Team 1 is selected and we're in Premier League
+            if (state.lastTimeTeam1 && state.selectedLeague === 'premier-league') {
+                team2Options.push('<option value="BIG_6">Big 6</option>');
+            }
+
+            // Add all other teams
+            team2Options = team2Options.concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`));
+
+            elements.lastTimeTeam2Select.innerHTML = team2Options.join('');
+
+            // Restore the current selection if it's still valid
+            if (state.lastTimeTeam2) {
+                elements.lastTimeTeam2Select.value = state.lastTimeTeam2;
             }
         }
 
@@ -5331,11 +5518,22 @@
                 'ligue-1': 'F1'
             };
             
-            let matches = state.data.filter(row => 
-                row.Div === leagueMapping[state.selectedLeague] &&
-                ((row.HomeTeam === state.lastTimeTeam1 && row.AwayTeam === state.lastTimeTeam2) ||
-                 (row.HomeTeam === state.lastTimeTeam2 && row.AwayTeam === state.lastTimeTeam1))
-            );
+            let matches;
+            if (state.lastTimeTeam2 === 'BIG_6' && state.lastTimeBig6Opponents) {
+                // Filter for matches where Team 1 played against any Big 6 opponent
+                matches = state.data.filter(row =>
+                    row.Div === leagueMapping[state.selectedLeague] &&
+                    ((row.HomeTeam === state.lastTimeTeam1 && state.lastTimeBig6Opponents.includes(row.AwayTeam)) ||
+                     (row.AwayTeam === state.lastTimeTeam1 && state.lastTimeBig6Opponents.includes(row.HomeTeam)))
+                );
+            } else {
+                // Regular head-to-head matches
+                matches = state.data.filter(row =>
+                    row.Div === leagueMapping[state.selectedLeague] &&
+                    ((row.HomeTeam === state.lastTimeTeam1 && row.AwayTeam === state.lastTimeTeam2) ||
+                     (row.HomeTeam === state.lastTimeTeam2 && row.AwayTeam === state.lastTimeTeam1))
+                );
+            }
             
             // Apply day of week filter if selected
             if (state.lastTimeDayOfWeek !== '') {
@@ -5381,9 +5579,23 @@
             matches.forEach(match => {
                 const homeScore = parseInt(match.FTHG) || 0;
                 const awayScore = parseInt(match.FTAG) || 0;
-                
-                if (match.HomeTeam === state.lastTimeTeam1 && match.AwayTeam === state.lastTimeTeam2) {
-                    // Team 1 is home, Team 2 is away
+
+                // Determine if this match involves Team 1 and the opponent(s)
+                let isTeam1Home = false;
+                let isTeam1Away = false;
+
+                if (state.lastTimeTeam2 === 'BIG_6' && state.lastTimeBig6Opponents) {
+                    // Big 6 mode: check if Team 1 played against any Big 6 opponent
+                    isTeam1Home = match.HomeTeam === state.lastTimeTeam1 && state.lastTimeBig6Opponents.includes(match.AwayTeam);
+                    isTeam1Away = match.AwayTeam === state.lastTimeTeam1 && state.lastTimeBig6Opponents.includes(match.HomeTeam);
+                } else {
+                    // Regular mode: exact team match
+                    isTeam1Home = match.HomeTeam === state.lastTimeTeam1 && match.AwayTeam === state.lastTimeTeam2;
+                    isTeam1Away = match.HomeTeam === state.lastTimeTeam2 && match.AwayTeam === state.lastTimeTeam1;
+                }
+
+                if (isTeam1Home) {
+                    // Team 1 is home
                     if (homeScore > awayScore && !results.team1HomeWin) {
                         results.team1HomeWin = match;
                     } else if (homeScore === awayScore && !results.team1HomeDraw) {
@@ -5391,8 +5603,8 @@
                     } else if (homeScore < awayScore && !results.team1HomeLoss) {
                         results.team1HomeLoss = match;
                     }
-                } else if (match.HomeTeam === state.lastTimeTeam2 && match.AwayTeam === state.lastTimeTeam1) {
-                    // Team 1 is away, Team 2 is home
+                } else if (isTeam1Away) {
+                    // Team 1 is away
                     if (awayScore > homeScore && !results.team1AwayWin) {
                         results.team1AwayWin = match;
                     } else if (homeScore === awayScore && !results.team1AwayDraw) {
@@ -5728,11 +5940,20 @@
             }
             
             if (state.selectedTeam1 && state.selectedTeam2) {
-                // First filter for H2H matches
-                filtered = filtered.filter(row => 
-                    (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
-                    (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
-                );
+                // Handle Big 6 selection
+                if (state.selectedTeam2 === 'BIG_6' && state.big6Opponents) {
+                    // Filter for matches where Team 1 played against any Big 6 opponent
+                    filtered = filtered.filter(row =>
+                        (row.HomeTeam === state.selectedTeam1 && state.big6Opponents.includes(row.AwayTeam)) ||
+                        (row.AwayTeam === state.selectedTeam1 && state.big6Opponents.includes(row.HomeTeam))
+                    );
+                } else {
+                    // Regular H2H matches
+                    filtered = filtered.filter(row =>
+                        (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
+                        (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
+                    );
+                }
                 
                 // Apply home/away filtering based on state (same logic as calculateHeadToHead)
                 if (state.homeFilter && !state.awayFilter) {
@@ -6018,10 +6239,20 @@
             }
             
             // Filter for head-to-head matches
-            let h2hMatches = filtered.filter(row => 
-                (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
-                (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
-            ).sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+            let h2hMatches;
+            if (state.selectedTeam2 === 'BIG_6' && state.big6Opponents) {
+                // Filter for matches where Team 1 played against any Big 6 opponent
+                h2hMatches = filtered.filter(row =>
+                    (row.HomeTeam === state.selectedTeam1 && state.big6Opponents.includes(row.AwayTeam)) ||
+                    (row.AwayTeam === state.selectedTeam1 && state.big6Opponents.includes(row.HomeTeam))
+                ).sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+            } else {
+                // Regular H2H matches
+                h2hMatches = filtered.filter(row =>
+                    (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
+                    (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
+                ).sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+            }
             
             // Apply home/away filtering first (same logic as in updateH2HMatchesTable)
             if (state.homeFilter && !state.awayFilter) {
@@ -6051,9 +6282,19 @@
                 else team1HomeStats.draws++;
             });
             
-            const team2Home = h2hMatches.filter(match => match.HomeTeam === state.selectedTeam2);
+            let team2Home;
+            if (state.selectedTeam2 === 'BIG_6' && state.big6Opponents) {
+                // For Big 6, find matches where any Big 6 team is home vs Team 1 away
+                team2Home = h2hMatches.filter(match =>
+                    state.big6Opponents.includes(match.HomeTeam) && match.AwayTeam === state.selectedTeam1
+                );
+            } else {
+                // Regular case: Team 2 playing at home
+                team2Home = h2hMatches.filter(match => match.HomeTeam === state.selectedTeam2);
+            }
+
             const team2HomeStats = { wins: 0, draws: 0, losses: 0, total: team2Home.length };
-            
+
             team2Home.forEach(match => {
                 const homeGoals = parseInt(match.FTHG) || 0;
                 const awayGoals = parseInt(match.FTAG) || 0;
@@ -6074,6 +6315,37 @@
                     total: h2hMatches.length
                 }
             };
+        }
+
+        // Big 6 teams definition
+        const BIG_6_TEAMS = [
+            'Liverpool FC',
+            'Arsenal FC',
+            'Manchester United',
+            'Manchester City',
+            'Chelsea FC',
+            'Tottenham Hotspur'
+        ];
+
+        // Get Big 6 opponents for a given team
+        function getBig6Opponents(selectedTeam) {
+            if (!selectedTeam) return [];
+
+            // If selected team is one of Big 6, return the other 5
+            if (BIG_6_TEAMS.includes(selectedTeam)) {
+                return BIG_6_TEAMS.filter(team => team !== selectedTeam);
+            } else {
+                // If selected team is not Big 6, return all 6
+                return [...BIG_6_TEAMS];
+            }
+        }
+
+        // Get display name for team (handles Big 6 special case)
+        function getTeamDisplayName(teamValue) {
+            if (teamValue === 'BIG_6') {
+                return 'Big 6';
+            }
+            return teamValue;
         }
 
         // Update table and all related UI
@@ -6118,9 +6390,34 @@
             
             // Update table body
             if (tableResult.tableData.length > 0) {
+                // Add/remove class to enable transparent highlighting when Team 1 is selected
+                if (state.selectedTeam1) {
+                    elements.tableBody.classList.add('team1-selected');
+                } else {
+                    elements.tableBody.classList.remove('team1-selected');
+                }
+
                 elements.tableBody.innerHTML = tableResult.tableData.map((team, index) => {
                     // Only highlight when Team 1 is selected, or when both teams are selected
-                    const isHighlighted = state.selectedTeam1 && (state.selectedTeam1 === team.team || state.selectedTeam2 === team.team);
+                    const isHighlighted = state.selectedTeam1 && (
+                        state.selectedTeam1 === team.team ||
+                        state.selectedTeam2 === team.team
+                    );
+                    // Note: For Big 6 scenarios, we don't treat Big 6 teams as "highlighted" for styling purposes
+
+                    // Determine highlighting class - only assign explicit classes for selected teams
+                    // CSS will automatically handle transparent highlighting for teams without classes
+                    let highlightClass = '';
+                    if (state.selectedTeam1) {
+                        if (state.selectedTeam1 === team.team) {
+                            highlightClass = 'team1-highlight';
+                        } else if (state.selectedTeam2 && state.selectedTeam2 !== 'BIG_6' && state.selectedTeam2 === team.team) {
+                            highlightClass = 'team2-highlight';
+                        }
+                        // Note: When Team 2 is Big 6, we DON'T give Big 6 teams explicit highlighting
+                        // This allows the CSS transparent highlighting to apply to all non-Team1 teams
+                        // Don't assign any class for other teams - CSS selector will handle transparent highlighting
+                    }
                     
                     // Alternating row colors: only if 3+ teams, otherwise all white
                     const rowBackgroundClass = tableResult.tableData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
@@ -6134,7 +6431,7 @@
                                         const logoUrl = getTeamLogoUrl(team.team, state.selectedLeague);
                                         return logoUrl ? `<img src="${logoUrl}" alt="${team.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : '';
                                     })()}
-                                    <span class="hover:underline team-name-text ${isHighlighted && state.selectedTeam1 === team.team ? 'team1-highlight' : isHighlighted && state.selectedTeam2 === team.team ? 'team2-highlight' : ''}" ${isHighlighted ? `style="color: ${getTeamColor(team.team, state.selectedLeague)} !important; font-weight: bold;"` : ''}>${team.team}</span>
+                                    <span class="hover:underline team-name-text ${highlightClass}" ${isHighlighted ? `style="color: ${getTeamColor(team.team, state.selectedLeague)} !important; font-weight: bold;"` : ''}>${team.team}</span>
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-center">${team.played}</td>
@@ -6178,7 +6475,7 @@
 
         // Calculate match history data for single team
         function calculateMatchHistory() {
-            if (!state.selectedTeam1 || state.selectedTeam2) return null;
+            if (!state.selectedTeam1 || (state.selectedTeam2 && state.selectedTeam2 !== '')) return null;
 
             // Apply all existing filters first
             let filtered = [...state.data];
@@ -6459,6 +6756,13 @@
                     if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
                     return 0;
                 });
+            }
+
+            // Add/remove class to enable transparent highlighting when Team 1 is selected
+            if (state.selectedTeam1) {
+                elements.matchHistoryTableBody.classList.add('team1-selected');
+            } else {
+                elements.matchHistoryTableBody.classList.remove('team1-selected');
             }
 
             // Generate table rows with H2H-style formatting
@@ -6744,11 +7048,19 @@
                 
                 // Get team colors
                 const team1Color = getTeamColor(state.selectedTeam1, state.selectedLeague);
-                const team2Color = getTeamColor(state.selectedTeam2, state.selectedLeague);
-                
+                const team2Color = state.selectedTeam2 === 'BIG_6' ? null : getTeamColor(state.selectedTeam2, state.selectedLeague);
+
+                // Define Big 6 consistent color (dark blue/navy)
+                const big6Color = '#1e3a8a'; // Dark blue
+                const big6Style = `background: ${big6Color} !important; color: ${getContrastColor(big6Color)} !important;`;
+
                 // Default colors if no custom color found
                 const team1Style = team1Color ? `background: ${team1Color} !important; color: ${getContrastColor(team1Color)} !important;` : '';
                 const team2Style = team2Color ? `background: ${team2Color} !important; color: ${getContrastColor(team2Color)} !important;` : '';
+
+                // Determine which style to use for each team position
+                const actualTeam1Style = team1Style;
+                const actualTeam2Style = state.selectedTeam2 === 'BIG_6' ? big6Style : team2Style;
                 
                 // Create H2H visualizations based on home/away filter selection
                 let visualizationHTML = '';
@@ -6758,17 +7070,17 @@
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold">${state.selectedTeam1} vs ${state.selectedTeam2} (Overall)</span>
+                                <span class="text-sm font-semibold">${getTeamDisplayName(state.selectedTeam1)} vs ${getTeamDisplayName(state.selectedTeam2)} (Overall)</span>
                                 <span class="text-sm text-gray-600">${h2hResult.overallStats.team1Wins}W - ${h2hResult.overallStats.draws}D - ${h2hResult.overallStats.team2Wins}W</span>
                             </div>
                             <div class="h2h-viz-bar">
-                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.overallStats.team1Wins / h2hResult.overallStats.total) * 100}%; ${team1Style}">
+                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.overallStats.team1Wins / h2hResult.overallStats.total) * 100}%; ${actualTeam1Style}">
                                     ${h2hResult.overallStats.team1Wins > 0 ? h2hResult.overallStats.team1Wins : ''}
                                 </div>
                                 <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.overallStats.draws / h2hResult.overallStats.total) * 100}%">
                                     ${h2hResult.overallStats.draws > 0 ? h2hResult.overallStats.draws : ''}
                                 </div>
-                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.overallStats.team2Wins / h2hResult.overallStats.total) * 100}%; ${team2Style}">
+                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.overallStats.team2Wins / h2hResult.overallStats.total) * 100}%; ${actualTeam2Style}">
                                     ${h2hResult.overallStats.team2Wins > 0 ? h2hResult.overallStats.team2Wins : ''}
                                 </div>
                             </div>
@@ -6780,18 +7092,18 @@
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold">${state.selectedTeam1} (Home) vs ${state.selectedTeam2} (Away)</span>
+                                <span class="text-sm font-semibold">${getTeamDisplayName(state.selectedTeam1)} (Home) vs ${getTeamDisplayName(state.selectedTeam2)} (Away)</span>
                                 <span class="text-sm text-gray-600">${h2hResult.team1HomeStats.wins}W - ${h2hResult.team1HomeStats.draws}D - ${h2hResult.team1HomeStats.losses}W</span>
                             </div>
                             ${h2hResult.team1HomeStats.total > 0 ? `
                             <div class="h2h-viz-bar">
-                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team1HomeStats.wins / h2hResult.team1HomeStats.total) * 100}%; ${team1Style}">
+                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team1HomeStats.wins / h2hResult.team1HomeStats.total) * 100}%; ${actualTeam1Style}">
                                     ${h2hResult.team1HomeStats.wins > 0 ? h2hResult.team1HomeStats.wins : ''}
                                 </div>
                                 <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team1HomeStats.draws / h2hResult.team1HomeStats.total) * 100}%">
                                     ${h2hResult.team1HomeStats.draws > 0 ? h2hResult.team1HomeStats.draws : ''}
                                 </div>
-                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team1HomeStats.losses / h2hResult.team1HomeStats.total) * 100}%; ${team2Style}">
+                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team1HomeStats.losses / h2hResult.team1HomeStats.total) * 100}%; ${actualTeam2Style}">
                                     ${h2hResult.team1HomeStats.losses > 0 ? h2hResult.team1HomeStats.losses : ''}
                                 </div>
                             </div>
@@ -6804,18 +7116,18 @@
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold">${state.selectedTeam2} (Home) vs ${state.selectedTeam1} (Away)</span>
+                                <span class="text-sm font-semibold">${getTeamDisplayName(state.selectedTeam2)} (Home) vs ${getTeamDisplayName(state.selectedTeam1)} (Away)</span>
                                 <span class="text-sm text-gray-600">${h2hResult.team2HomeStats.wins}W - ${h2hResult.team2HomeStats.draws}D - ${h2hResult.team2HomeStats.losses}W</span>
                             </div>
                             ${h2hResult.team2HomeStats.total > 0 ? `
                             <div class="h2h-viz-bar">
-                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team2HomeStats.wins / h2hResult.team2HomeStats.total) * 100}%; ${team2Style}">
+                                <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team2HomeStats.wins / h2hResult.team2HomeStats.total) * 100}%; ${actualTeam2Style}">
                                     ${h2hResult.team2HomeStats.wins > 0 ? h2hResult.team2HomeStats.wins : ''}
                                 </div>
                                 <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team2HomeStats.draws / h2hResult.team2HomeStats.total) * 100}%">
                                     ${h2hResult.team2HomeStats.draws > 0 ? h2hResult.team2HomeStats.draws : ''}
                                 </div>
-                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team2HomeStats.losses / h2hResult.team2HomeStats.total) * 100}%; ${team1Style}">
+                                <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team2HomeStats.losses / h2hResult.team2HomeStats.total) * 100}%; ${actualTeam1Style}">
                                     ${h2hResult.team2HomeStats.losses > 0 ? h2hResult.team2HomeStats.losses : ''}
                                 </div>
                             </div>
@@ -6847,7 +7159,7 @@
             }
 
             elements.h2hMatchesTable.classList.remove('hidden');
-            elements.h2hTableTitle.textContent = `${state.selectedTeam1} vs ${state.selectedTeam2}`;
+            elements.h2hTableTitle.textContent = `${getTeamDisplayName(state.selectedTeam1)} vs ${getTeamDisplayName(state.selectedTeam2)}`;
 
             // Create sorted matches data
             let matchesData = h2hResult.matches.map(match => {
@@ -6978,6 +7290,13 @@
                     ${header.label}${getH2hSortIndicator(header.key)}
                 </th>
             `).join('');
+
+            // Add/remove class to enable transparent highlighting when Team 1 is selected
+            if (state.selectedTeam1) {
+                elements.h2hTableBody.classList.add('team1-selected');
+            } else {
+                elements.h2hTableBody.classList.remove('team1-selected');
+            }
 
             // Update table body
             elements.h2hTableBody.innerHTML = matchesData.map((match, index) => {
