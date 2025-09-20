@@ -3687,6 +3687,8 @@
         // Handle team seasons league change
         async function handleTeamSeasonsLeagueChange(newLeague) {
             state.teamSeasonsSelectedLeague = newLeague;
+            // Also update the global league state so other tabs use the new league
+            state.selectedLeague = newLeague;
             state.teamSeasonsSelectedTeam = '';
             // Set default season for leagues that support season filtering
             if (newLeague === 'premier-league') {
@@ -4208,8 +4210,8 @@
                 document.getElementById('teamSeasonsTab').classList.add('active');
                 document.getElementById('teamSeasonsContent').classList.add('active');
 
-                // Preserve current Team Seasons league selection - don't overwrite
-                // state.teamSeasonsSelectedLeague should maintain its current value
+                // Always sync Team Seasons league with the current league when switching tabs
+                state.teamSeasonsSelectedLeague = preservedLeague;
 
                 // Reset both other tab states
                 state.selectedTeam1 = '';
