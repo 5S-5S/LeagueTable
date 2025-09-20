@@ -3634,12 +3634,26 @@
         // Update team seasons team dropdown
         function updateTeamSeasonsTeamSelect() {
             const leagueTeams = getLeagueTeams(state.teamSeasonsSelectedLeague);
-            
-            const teamOptions = '<option value="">Choose a team...</option>' + 
+
+            const teamOptions = '<option value="">Choose a team...</option>' +
                 leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            
+
             elements.teamSeasonsTeamSelect.innerHTML = teamOptions;
             elements.teamSeasonsTeamSelect.value = state.teamSeasonsSelectedTeam;
+
+            // Update the combobox options as well
+            if (teamSeasonsCombobox) {
+                const teamComboOptions = [
+                    { value: '', text: 'Choose a team...' },
+                    ...leagueTeams.map(team => ({ value: team, text: team }))
+                ];
+                teamSeasonsCombobox.setOptions(teamComboOptions);
+
+                // Set the current selection if any
+                if (state.teamSeasonsSelectedTeam) {
+                    teamSeasonsCombobox.setValue(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedTeam);
+                }
+            }
         }
 
         // Update team seasons season select
@@ -4905,6 +4919,7 @@
         // Combobox functionality
         class Combobox {
             constructor(containerId, inputId, dropdownId, placeholder, onSelect) {
+                this.containerId = containerId;
                 this.container = document.getElementById(containerId);
                 this.input = document.getElementById(inputId);
                 this.dropdown = document.getElementById(dropdownId);
@@ -4982,7 +4997,17 @@
                 this.dropdown.innerHTML = this.filteredOptions.map((option, index) => {
                     // Get team logo if this is a team option (not empty option)
                     const logoHtml = option.value && option.value !== '' ? (() => {
-                        const logoUrl = getTeamLogoUrl(option.value, state.selectedLeague);
+                        // Determine which league to use based on the combobox container
+                        let leagueToUse = state.selectedLeague;
+                        if (this.containerId === 'teamSeasonsComboboxContainer') {
+                            leagueToUse = state.teamSeasonsSelectedLeague || state.selectedLeague;
+                        } else if (this.containerId === 'lastTimeTeam1ComboboxContainer' || this.containerId === 'lastTimeTeam2ComboboxContainer') {
+                            leagueToUse = state.selectedLeague;
+                        } else if (this.containerId === 'teamStreaksTeam1ComboboxContainer' || this.containerId === 'teamStreaksTeam2ComboboxContainer') {
+                            leagueToUse = state.selectedLeague;
+                        }
+
+                        const logoUrl = getTeamLogoUrl(option.value, leagueToUse);
                         return logoUrl ? `<img src="${logoUrl}" alt="${option.value} logo" class="combobox-team-logo" onerror="this.style.display='none'">` : '';
                     })() : '';
 
@@ -5265,9 +5290,10 @@
 
             // Populate all combobox options
             const currentLeagueTeams = getLeagueTeams(state.selectedLeague);
+            const teamSeasonsLeagueTeams = getLeagueTeams(state.teamSeasonsSelectedLeague || state.selectedLeague);
             const teamComboOptions = [
                 { value: '', text: 'Choose a team...' },
-                ...currentLeagueTeams.map(team => ({ value: team, text: team }))
+                ...teamSeasonsLeagueTeams.map(team => ({ value: team, text: team }))
             ];
             const lastTimeTeam1ComboOptions = [
                 { value: '', text: 'Select Team 1' },
