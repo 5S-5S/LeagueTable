@@ -6538,8 +6538,11 @@
                 filtered = filtered.filter(row => row.dateObj <= toDate);
             }
 
-            // Apply season filter
-            if (state.selectedSeason) {
+            // Apply season filter (but skip for era seasons as they use date range filtering)
+            if (state.selectedSeason &&
+                !state.selectedSeason.includes('-era-') &&
+                !state.selectedSeason.includes('all-') &&
+                !state.selectedSeason.includes('french-division-1')) {
                 filtered = filtered.filter(row => row.Season === state.selectedSeason);
             }
 
