@@ -2447,7 +2447,7 @@
                     // Current streak ends, save it if it exists
                     if (currentStreak.length > 0) {
                         const startDate = currentStreak[0].dateObj;
-                        const endDate = currentStreak[currentStreak.length - 1].dateObj;
+                        const endDate = match.dateObj; // Use the match that broke the streak as the end date
                         const lengthInDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                         
                         allStreaks.push({
@@ -2851,6 +2851,97 @@
 
             elements.teamStreaksResults.innerHTML = tableHTML;
             elements.teamStreaksResults.classList.remove('hidden');
+        }
+
+        // Find the specific match that ended the current streak
+        function findStreakEndingMatch(streak, team1, team2, streakType, location) {
+            if (streak.length === 0) return null;
+
+            // We need to re-run the same filtering logic that was used to build the streak
+            // to find the match that would have broken the streak
+
+            // Get league mapping
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+
+            // Filter matches by league
+            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
+
+            // Filter by teams (same logic as in calculateActiveStreaks)
+            if (team2) {
+                if (team2 === 'BIG_6') {
+                    // Big 6 filtering logic
+                    const big6Opponents = state.teamStreaksBig6Opponents || [];
+                    matches = matches.filter(row => {
+                        const homeTeam = row.HomeTeam;
+                        const awayTeam = row.AwayTeam;
+
+                        return (homeTeam === team1 && big6Opponents.includes(awayTeam)) ||
+                               (awayTeam === team1 && big6Opponents.includes(homeTeam));
+                    });
+                } else {
+                    matches = matches.filter(row =>
+                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
+                        (row.HomeTeam === team2 && row.AwayTeam === team1)
+                    );
+                }
+            } else {
+                matches = matches.filter(row =>
+                    row.HomeTeam === team1 || row.AwayTeam === team1
+                );
+            }
+
+            // Filter by location (same logic as in calculateActiveStreaks)
+            if (location === 'home') {
+                matches = matches.filter(row => row.HomeTeam === team1);
+            } else if (location === 'away') {
+                matches = matches.filter(row => row.AwayTeam === team1);
+            }
+
+            // Sort by date (most recent first) - same as in calculateActiveStreaks
+            matches.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+
+            // Now iterate through matches just like calculateStreak does
+            // to find the match that would break the streak
+            let streakMatchCount = 0;
+
+            for (const match of matches) {
+                const isHome = match.HomeTeam === team1;
+                const teamScore = isHome ? parseInt(match.FTHG) || 0 : parseInt(match.FTAG) || 0;
+                const opponentScore = isHome ? parseInt(match.FTAG) || 0 : parseInt(match.FTHG) || 0;
+
+                let result;
+                if (teamScore > opponentScore) {
+                    result = 'win';
+                } else if (teamScore === opponentScore) {
+                    result = 'draw';
+                } else {
+                    result = 'loss';
+                }
+
+                // Check if this match continues the streak
+                const continuesStreak = checkStreakContinuation(result, streakType);
+
+                if (continuesStreak) {
+                    streakMatchCount++;
+                } else {
+                    // This is the match that breaks/broke the streak
+                    // But only if we've seen the same number of streak matches as in our current streak
+                    if (streakMatchCount === streak.length) {
+                        return match;
+                    } else {
+                        // Reset and continue looking for the current streak
+                        streakMatchCount = 0;
+                    }
+                }
+            }
+
+            return null;
         }
 
         // Find the match where the opposite result occurred

@@ -2453,7 +2453,7 @@
                     // Current streak ends, save it if it exists
                     if (currentStreak.length > 0) {
                         const startDate = currentStreak[0].dateObj;
-                        const endDate = currentStreak[currentStreak.length - 1].dateObj;
+                        const endDate = match.dateObj; // Use the match that broke the streak as the end date
                         const lengthInDays = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                         
                         allStreaks.push({
