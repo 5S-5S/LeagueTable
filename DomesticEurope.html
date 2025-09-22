@@ -2185,7 +2185,17 @@
         // Handle Team Streaks league change
         async function handleTeamStreaksLeagueChange(newLeague) {
             state.selectedLeague = newLeague;
-            
+
+            // Reset Team Streaks state when changing leagues
+            elements.teamStreaksTeam1Select.value = '';
+            elements.teamStreaksTeam2Select.value = '';
+            elements.teamStreaksStatusSelect.value = 'active';
+            elements.teamStreaksLocationSelect.value = 'both';
+            elements.teamStreaksTypeSelect.value = 'winning';
+            elements.teamStreaksResults.classList.add('hidden');
+            state.teamStreaksBig6Opponents = null;
+            state.historicStreaksSortConfig = { key: null, direction: null };
+
             // Load league data if not already loaded
             if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
                 await loadLeagueDataForDevice(newLeague);
@@ -2193,7 +2203,7 @@
                 // If already loaded, just filter/update UI
                 filterDataForCurrentLeague(newLeague);
             }
-            
+
             createTeamStreaksLeagueButtons();
             updateTeamStreaksSelects();
         }
@@ -3790,7 +3800,8 @@
                 state.teamSeasonsSelectedSeason = '';
             }
             state.teamSeasonsSelectedPosition = '';
-            
+            state.includeBetterResults = false;
+
             // Load league data if not already loaded
             if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
                 await loadLeagueDataForDevice(newLeague);
@@ -3807,11 +3818,20 @@
             // Clear the table and reset UI
             elements.teamHistoryTable.classList.add('hidden');
             elements.teamSeasonsPositionInfo.textContent = '';
-            
+
             // Reset dropdown values
             elements.teamSeasonsTeamSelect.value = '';
             elements.teamSeasonsSeasonSelect.value = '';
             elements.teamSeasonsPositionSelect.value = '';
+
+            // Reset Include Better Results checkbox and hide it
+            if (elements.includeBetterResultsCheckbox) {
+                elements.includeBetterResultsCheckbox.className = 'checkbox';
+            }
+            if (elements.includeBetterResultsContainer) {
+                elements.includeBetterResultsContainer.classList.add('hidden');
+                elements.includeBetterResultsContainer.style.display = 'none';
+            }
             
             // Clear stored team history data and name
             window.currentTeamHistoryData = null;

@@ -2228,7 +2228,18 @@
         // Handle Team Streaks league change
         async function handleTeamStreaksLeagueChange(newLeague) {
             state.selectedLeague = newLeague;
-            
+
+            // Reset Team Streaks state when changing leagues
+            elements.teamStreaksTeam1Select.value = '';
+            elements.teamStreaksTeam2Select.value = '';
+            elements.teamStreaksStageSelect.value = '';
+            elements.teamStreaksStatusSelect.value = 'active';
+            elements.teamStreaksLocationSelect.value = 'both';
+            elements.teamStreaksTypeSelect.value = 'winning';
+            elements.teamStreaksResults.classList.add('hidden');
+            state.teamStreaksStage = '';
+            state.historicStreaksSortConfig = { key: null, direction: null };
+
             // Load league data if not already loaded
             if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
                 await loadLeagueDataForDevice(newLeague);
@@ -2236,7 +2247,7 @@
                 // If already loaded, just filter/update UI
                 filterDataForCurrentLeague(newLeague);
             }
-            
+
             createTeamStreaksLeagueButtons();
             updateTeamStreaksSelects();
         }
@@ -3728,6 +3739,7 @@
             elements.teamSeasonsPositionSelect.value = '';
             elements.includeBetterResultsCheckbox.className = 'checkbox';
             elements.includeBetterResultsContainer.classList.add('hidden');
+            elements.includeBetterResultsContainer.style.display = 'none';
             
             // Clear stored team history data and name
             window.currentTeamHistoryData = null;
