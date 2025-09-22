@@ -253,7 +253,7 @@
                     <span class="text-sm font-semibold text-gray-700">Exclude:</span>
 
                     <label class="flex items-center cursor-pointer">
-                        <div id="excludeQualifiersCheckbox" class="checkbox checked"></div>
+                        <div id="excludeQualifiersCheckbox" class="checkbox"></div>
                         <span class="text-sm font-medium">Exclude Qualifiers</span>
                     </label>
 
@@ -903,7 +903,7 @@
             awayFilter: true,
             pointDeductionsEnabled: true,
             threePointSystem: true,
-            excludeQualifiers: true,
+            excludeQualifiers: false,
             excludeMainStage: false,
             selectedLeague: 'champions-league',
             selectedSeason: 'all-european-cup-seasons-1955-2025',
@@ -9335,7 +9335,7 @@
             state.awayFilter = true;
             state.threePointSystem = true;
             state.pointDeductionsEnabled = true;
-            state.excludeQualifiers = true;
+            state.excludeQualifiers = false;
             state.excludeMainStage = false;
             state.selectedLeague = 'champions-league';
             state.sortConfig = { key: null, direction: null };
@@ -9360,7 +9360,7 @@
             elements.awayCheckbox.className = 'checkbox checked';
             elements.deductionsCheckbox.className = 'checkbox checked';
             elements.threePointCheckbox.className = 'checkbox checked';
-            elements.excludeQualifiersCheckbox.className = 'checkbox checked';
+            elements.excludeQualifiersCheckbox.className = 'checkbox';
             elements.excludeMainStageCheckbox.className = 'checkbox';
             
             createLeagueButtons();
