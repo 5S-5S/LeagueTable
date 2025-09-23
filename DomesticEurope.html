@@ -216,7 +216,7 @@
                         </label>
                         
                         <label class="flex items-center cursor-pointer">
-                            <div id="threePointCheckbox" class="checkbox"></div>
+                            <div id="threePointCheckbox" class="checkbox checked"></div>
                             <span class="text-sm font-medium">3 Points for all Wins</span>
                         </label>
                     </div>
@@ -798,7 +798,7 @@
             homeFilter: true,
             awayFilter: true,
             pointDeductionsEnabled: true,
-            threePointSystem: false,
+            threePointSystem: true,
             selectedLeague: 'premier-league',
             sortConfig: { key: null, direction: null },
             teamHistorySortConfig: { key: null, direction: null },
@@ -4550,8 +4550,32 @@
 
             // Filter controls
             elements.seasonSelect.addEventListener('change', (e) => handleSeasonChange(e.target.value));
-            elements.dateFrom.addEventListener('change', (e) => { state.dateFrom = e.target.value; updateTable(); });
-            elements.dateTo.addEventListener('change', (e) => { state.dateTo = e.target.value; updateTable(); });
+            elements.dateFrom.addEventListener('change', (e) => {
+                state.dateFrom = e.target.value;
+                // Reset season selection when custom date range is applied
+                state.selectedSeason = '';
+                elements.seasonSelect.value = '';
+                // Set 3-point system to ON for custom date ranges
+                state.threePointSystem = true;
+                elements.threePointCheckbox.className = 'checkbox checked';
+                // Disable point deductions for custom date ranges
+                state.pointDeductionsEnabled = false;
+                elements.deductionsCheckbox.className = 'checkbox';
+                updateTable();
+            });
+            elements.dateTo.addEventListener('change', (e) => {
+                state.dateTo = e.target.value;
+                // Reset season selection when custom date range is applied
+                state.selectedSeason = '';
+                elements.seasonSelect.value = '';
+                // Set 3-point system to ON for custom date ranges
+                state.threePointSystem = true;
+                elements.threePointCheckbox.className = 'checkbox checked';
+                // Disable point deductions for custom date ranges
+                state.pointDeductionsEnabled = false;
+                elements.deductionsCheckbox.className = 'checkbox';
+                updateTable();
+            });
             elements.dayOfWeekSelect.addEventListener('change', (e) => { state.selectedDayOfWeek = e.target.value; updateTable(); });
             elements.team1Select.addEventListener('change', (e) => { 
                 state.selectedTeam1 = e.target.value; 
@@ -4902,12 +4926,16 @@
             });
         }
 
-        // Check if both teams are selected and auto-disable point deductions
+        // Intelligent point deductions logic based on team selection
         function checkAndDisablePointDeductions() {
-            if (state.selectedTeam1 && state.selectedTeam2) {
-                // Both teams selected - disable point deductions
+            if (state.selectedTeam1 || state.selectedTeam2) {
+                // 1 or 2 teams selected - disable point deductions
                 state.pointDeductionsEnabled = false;
                 elements.deductionsCheckbox.className = 'checkbox';
+            } else {
+                // No teams selected - enable point deductions by default
+                state.pointDeductionsEnabled = true;
+                elements.deductionsCheckbox.className = 'checkbox checked';
             }
         }
 
@@ -4983,6 +5011,33 @@
         // Handle season change
         function handleSeasonChange(seasonKey) {
             state.selectedSeason = seasonKey;
+
+            // Automatically set 3-point system based on season type
+            if (seasonKey === '' || !seasonKey) {
+                // No season selected (custom date range) - keep 3-point system ON
+                state.threePointSystem = true;
+            } else if (seasonKey.includes('-era-') || seasonKey.includes('all-') || seasonKey.includes('french-division-1')) {
+                // Era filters - keep 3-point system ON
+                state.threePointSystem = true;
+            } else {
+                // Individual season - turn 3-point system OFF (use historical)
+                state.threePointSystem = false;
+            }
+
+            // Update checkbox UI
+            elements.threePointCheckbox.className = `checkbox ${state.threePointSystem ? 'checked' : ''}`;
+
+            // Set point deductions based on season type
+            if (seasonKey === '' || !seasonKey) {
+                // No season selected (custom date range) - disable point deductions
+                state.pointDeductionsEnabled = false;
+                elements.deductionsCheckbox.className = 'checkbox';
+            } else {
+                // Season or era filter selected - enable point deductions by default
+                state.pointDeductionsEnabled = true;
+                elements.deductionsCheckbox.className = 'checkbox checked';
+            }
+
             const seasonData = getSeasonDateRange(seasonKey);
             if (seasonData) {
                 state.dateFrom = seasonData.start;
@@ -8423,7 +8478,7 @@
             state.selectedDayOfWeek = '';
             state.homeFilter = true;
             state.awayFilter = true;
-            state.threePointSystem = false;
+            state.threePointSystem = true;
             state.pointDeductionsEnabled = true;
             // Preserve current league when clearing filters
             // state.selectedLeague should not be reset here
@@ -8438,7 +8493,7 @@
             elements.homeCheckbox.className = 'checkbox checked';
             elements.awayCheckbox.className = 'checkbox checked';
             elements.deductionsCheckbox.className = 'checkbox checked';
-            elements.threePointCheckbox.className = 'checkbox';
+            elements.threePointCheckbox.className = 'checkbox checked';
             
             createLeagueButtons();
             updateTeamSelects();
