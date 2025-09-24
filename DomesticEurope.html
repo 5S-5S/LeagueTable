@@ -286,6 +286,16 @@
                         </div>
 
                         <div id="teamSeasonsPositionInfo" class="mt-2 text-sm text-gray-600"></div>
+
+                        <!-- Historic Seasons Toggle Button -->
+                        <div id="historicSeasonsContainer" class="mt-4 hidden">
+                            <button id="historicSeasonsToggle" class="btn btn-secondary text-sm px-4 py-2">
+                                <span class="icon-history mr-2">📜</span>Include Historic Seasons
+                            </button>
+                            <div class="mt-2 text-xs text-gray-500">
+                                Adds pre-modern era seasons to the results
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Team History Table -->
@@ -766,7 +776,7 @@
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iZWFhMWNhYzhmYjM3MDlkYzdjMmY0YmIzZDc5OWI0MS9yYXcvMjk1YmM1ZGI5ZWFjNzcxY2Q3MTdlZmRjZjdmM2JlNWMzNzI0YTE3Yy9zZXJpZWEuY3N2',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9jODk1ZGM3Zjg4MTdiZjM3Y2ZmN2FlOTBjZGEzMWZlMS9yYXcvOTA3OWJkYjZhYWMwNTgzYTM4MGUyYzVhZWNkZDlkNmY5Yjk5OGUzNC9wcmVtLmNzdg==',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9mYTM1M2RmYTExZTE4Mzk1ZmY2NTdmMjE5NmE0NTEyOS9yYXcvODlhZmExMGNlZGZkYWI5N2Y5ZmEzZmZiNDY3ZWIzZDUxOWYyNDQ0NS8yNTI2cHJlbS5jc3Y=',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8wMzkyOGU0YThlYTE4OTk4MjZmYTg1MDdkZTdhNzc1My9yYXcvOGI3NDI3NGIyOTJkZDczMWVmYmEyMDQzYjQzZGQzOWZlZDgyZjZlOC8yNTI2bGFsaWdhLmNzdg==',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8wMzkyOGU0YThlYTE4OTk4MjZmYTg1MDdkZTdhNzc1My9yYXcvM2RhZDBlZGViMjE4Y2UxZDQxZmU3NGY2OWMwMTQ2NWJkZTlhZDU5Ni8yNTI2bGFsaWdhLmNzdg==',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iY2Y2NmE4NzMzMThmODI4NzM2MjE5NGJmNTRlMWM5Yi9yYXcvODkzOWU3NmFhNGVjYmE1ZTQyZmE1NzQyYzFiZjhmNmU3Y2FiY2U3YS8yNTI2c2VyaWVhLmNzdg==',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy84MTc4MDM4ODc0YzgzMjgwNDI1MjdkNDYwYjA2NzdlZC9yYXcvMjkzMGQ3ODExNjRhNmU0NjlhZWI1YjIyOWI5MzYxMTQ4MTYyODEyYi8yNTI2YnVuZGVzbGlnYS5jc3Y=',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8xZjMyODJmNmYwMjQyMjYyMmM0N2I3YTdhNzUxMmM5MS9yYXcvZjFhOGYyMjI2OTEzYjI5Yjc2OTUyOTZjM2NhZjQwNDNhMWI5NGU5Yi8yNTI2bGlndWUuY3N2'
@@ -819,6 +829,7 @@
             teamSeasonsSelectedSeason: 'all-english-seasons-1888-2025',
             teamSeasonsSelectedPosition: '',
             includeBetterResults: false,
+            includeHistoricSeasons: false,
 
             // Previous League Tables state (for back navigation)
             previousLeagueTablesState: null,
@@ -1560,7 +1571,8 @@
                     ['AC Carpi', '#DE1616', 4820],
                     ['AC Ancona', '#FB090B', 2262],
                     ['US Pistoiese', '#BD6615', 2828],
-                    ['ACD Treviso', '#D4EFFC', 5225]
+                    ['ACD Treviso', '#D4EFFC', 5225],
+                    ['Novese', '#000000', 8086]
                 ],
                 
                 // La Liga
@@ -1687,7 +1699,13 @@
                     ['Holstein Kiel', '#0F5787', 385],
                     ['Blau-Weiß 90 Berlin', '#1709DB', 239],
                     ['1. FC Lok Leipzig', '#1F357F', 244],
-                    ['SV Tasmania Berlin', '#0000FF', 688]
+                    ['SV Tasmania Berlin', '#0000FF', 688],
+                    ['Dresdner SC', '#000000', 431],
+                    ['Rapid Wien', '#000000', 583],
+                    ['Viktoria Berlin', '#000000', 727],
+                    ['Freiburger FC', '#000000', 362],
+                    ['Karlsruher FV', '#000000', 730]
+
                 ],
                 
                 // Ligue 1
@@ -2138,6 +2156,8 @@
             includeBetterResultsContainer: document.getElementById('includeBetterResultsContainer'),
             includeBetterResultsCheckbox: document.getElementById('includeBetterResultsCheckbox'),
             teamSeasonsPositionInfo: document.getElementById('teamSeasonsPositionInfo'),
+            historicSeasonsContainer: document.getElementById('historicSeasonsContainer'),
+            historicSeasonsToggle: document.getElementById('historicSeasonsToggle'),
             // Team Streaks elements
             teamStreaksLeagueButtons: document.getElementById('teamStreaksLeagueButtons'),
             teamStreaksStatusSelect: document.getElementById('teamStreaksStatusSelect'),
@@ -2147,6 +2167,97 @@
             teamStreaksTeam2Select: document.getElementById('teamStreaksTeam2Select'),
             teamStreaksResults: document.getElementById('teamStreaksResults')
         };
+
+        // Historic Seasons Data Structure
+        // Format: [season, leagueId, position, teamName, gamesPlayed, wins, draws, losses, goalsFor, goalsAgainst, goalDifference, points]
+        const historicSeasonsData = [
+            // Example entries - replace with actual historic data
+            ["1928-29", "I1", 1, "Bologna FC", 30, 22, 5, 3, 84, 32, 52, 49],
+            ["1927-28", "I1", 1, "Torino FC", 34, 22, 5, 7, 111, 37, 74, 49],
+            ["1925-26", "I1", 1, "Juventus", 24, 19, 3, 2, 80, 15, 65, 41],
+            ["1924-25", "I1", 1, "Bologna FC", 24, 15, 4, 5, 53, 22, 31, 34],
+            ["1923-24", "I1", 1, "Genoa CFC", 22, 14, 5, 3, 50, 13, 37, 33],
+            ["1922-23", "I1", 1, "Genoa CFC", 22, 17, 5, 0, 61, 18, 43, 39],
+            ["1921-22", "I1", 1, "Pro Vercelli", 22, 17, 2, 3, 61, 14, 47, 36],
+            ["1921-22", "I1", 1, "Novese", 8, 6, 2, 0, 18, 1, 17, 14],
+            ["1920-21", "I1", 1, "Pro Vercelli", 16, 11, 1, 4, 37, 14, 23, 23],
+            ["1919-20", "I1", 1, "Inter", 22, 16, 5, 1, 81, 26, 55, 37],
+            ["1914-15", "I1", 1, "Genoa CFC", 21, 17, 1, 3, 99, 21, 78, 35],
+            ["1913-14", "I1", 1, "Casale", 28, 23, 1, 4, 80, 17, 63, 47],
+            ["1912-13", "I1", 1, "Pro Vercelli", 20, 17, 3, 0, 60, 3, 57, 37],
+            ["1911-12", "I1", 1, "Pro Vercelli", 18, 15, 2, 1, 50, 12, 38, 32],
+            ["1910-11", "I1", 1, "Pro Vercelli", 16, 12, 3, 1, 44, 8, 36, 27],
+            ["1909-10", "I1", 1, "Inter", 16, 12, 1, 3, 55, 26, 29, 25],
+            ["1909", "I1", 1, "Pro Vercelli", 6, 4, 2, 0, 11, 6, 5, 10],
+            ["1908", "I1", 1, "Pro Vercelli", 4, 2, 2, 0, 4, 2, 2, 6],
+            ["1907", "I1", 1, "AC Milan", 4, 2, 2, 0, 10, 3, 7, 6],
+            ["1906", "I1", 1, "AC Milan", 4, 2, 1, 1, 7, 4, 3, 5],
+            ["1905", "I1", 1, "Juventus", 4, 2, 2, 0, 9, 3, 6, 6],
+            ["1904", "I1", 1, "Genoa CFC", 1, 1, 0, 0, 1, 0, 1, 2],
+            ["1903", "I1", 1, "Genoa CFC", 1, 1, 0, 0, 3, 0, 3, 2],
+            ["1902", "I1", 1, "Genoa CFC", 4, 4, 0, 0, 11, 4, 7, 8],
+            ["1901", "I1", 1, "AC Milan", 3, 3, 0, 0, 8, 2, 6, 6],
+            ["1900", "I1", 1, "Genoa CFC", 2, 2, 0, 0, 10, 1, 9, 4],
+            ["1899", "I1", 1, "Genoa CFC", 1, 1, 0, 0, 3, 1, 2, 2],
+            ["1898", "I1", 1, "Genoa CFC", 2, 1, 0, 0, 4, 1, 3, 4],
+
+            ["1963", "D1", 1, "Borussia Dortmund", 4, 2, 1, 1, 15, 7, 8, 3],
+            ["1962", "D1", 1, "1. FC Köln", 3, 3, 0, 0, 14, 1, 13, 6],
+            ["1961", "D1", 1, "1. FC Nürnberg", 6, 4, 2, 0, 18, 9, 9, 10],
+            ["1960", "D1", 1, "Hamburger SV", 6, 4, 1, 1, 22, 11, 11, 9],
+            ["1959", "D1", 1, "Eintracht Frankfurt", 6, 6, 0, 0, 26, 11, 15, 12],
+            ["1958", "D1", 1, "FC Schalke 04", 3, 3, 0, 0, 16, 1, 15, 6],
+            ["1957", "D1", 1, "Borussia Dortmund", 3, 3, 0, 0, 7, 4, 3, 6],
+            ["1956", "D1", 1, "Borussia Dortmund", 6, 4, 1, 1, 19, 4, 15, 9],
+            ["1955", "D1", 1, "Rot-Weiss Essen", 6, 4, 2, 0, 16, 5, 11, 10],
+            ["1954", "D1", 1, "Hannover 96", 2, 2, 0, 0, 5, 2, 3, 4],
+            ["1953", "D1", 1, "1. FC Kaiserslautern", 6, 5, 1, 0, 16, 7, 9, 11],
+            ["1952", "D1", 1, "VfB Stuttgart", 6, 3, 2, 1, 14, 8, 6, 8],
+            ["1951", "D1", 1, "1. FC Kaiserslautern", 6, 4, 1, 1, 14, 8, 6, 9],
+            ["1950", "D1", 1, "VfB Stuttgart", 4, 4, 0, 0, 13, 5, 8, 8],
+            ["1949", "D1", 1, "Waldhof Mannheim", 3, 3, 0, 0, 10, 3, 7, 6],
+            ["1948", "D1", 1, "1. FC Nürnberg", 2, 2, 0, 0, 5, 3, 2, 4],
+            ["1944", "D1", 1, "Dresdner SC", 5, 5, 0, 0, 28, 7, 21, 10],
+            ["1943", "D1", 1, "Dresdner SC", 5, 5, 0, 0, 16, 2, 14, 10],
+            ["1942", "D1", 1, "FC Schalke 04", 5, 5, 0, 0, 25, 3, 22, 10],
+            ["1941", "D1", 1, "Rapid Wien", 8, 6, 1, 1, 30, 7, 23, 13],
+            ["1940", "D1", 1, "FC Schalke 04", 8, 6, 2, 0, 39, 6, 33, 14],
+            ["1939", "D1", 1, "FC Schalke 04", 8, 7, 0, 1, 31, 8, 3, 14],
+            ["1938", "D1", 1, "Hannover 96", 8, 8, 0, 0, 26, 13, 13, 16],
+            ["1937", "D1", 1, "FC Schalke 04", 8, 7, 1, 0, 37, 7, 30, 15],
+            ["1936", "D1", 1, "1. FC Nürnberg", 8, 7, 1, 0, 23, 5, 18, 15],
+            ["1935", "D1", 1, "FC Schalke 04", 8, 7, 0, 1, 36, 12, 24, 14],
+            ["1934", "D1", 1, "FC Schalke 04", 8, 6, 0, 2, 23, 10, 13, 12],
+            ["1933", "D1", 1, "Fortuna Düsseldorf", 4, 4, 0, 0, 19, 0, 19, 8],
+
+            ["1932", "D1", 1, "Bayern München", 4, 4, 0, 0, 11, 4, 7, 8],
+            ["1931", "D1", 1, "Hertha BSC", 4, 4, 0, 0, 14, 7, 7, 8],
+            ["1930", "D1", 1, "Hertha BSC", 4, 4, 0, 0, 23, 11, 12, 8],
+            ["1929", "D1", 1, "SpVgg Greuther Fürth", 4, 4, 0, 0, 16, 4, 12, 8],
+            ["1928", "D1", 1, "Hamburger SV", 4, 4, 0, 0, 21, 6, 15, 8],
+            ["1927", "D1", 1, "1. FC Nürnberg", 4, 4, 0, 0, 15, 3, 12, 8],
+            ["1926", "D1", 1, "SpVgg Greuther Fürth", 4, 4, 0, 0, 16, 2, 14, 8],
+            ["1925", "D1", 1, "1. FC Nürnberg", 4, 4, 0, 0, 10, 1, 9, 8],
+            ["1924", "D1", 1, "1. FC Nürnberg", 3, 3, 0, 0, 11, 2, 9, 6],
+            ["1923", "D1", 1, "Hamburger SV", 3, 3, 0, 0, 8, 2, 6, 6],
+            ["1921", "D1", 1, "1. FC Nürnberg", 2, 2, 0, 0, 10, 1, 9, 4],
+            ["1920", "D1", 1, "1. FC Nürnberg", 3, 3, 0, 0, 7, 0, 7, 6],
+            ["1914", "D1", 1, "SpVgg Greuther Fürth", 3, 3, 0, 0, 8, 6, 2, 6],
+            ["1913", "D1", 1, "1. FC Lok Leipzig", 3, 3, 0, 0, 11, 2, 9, 6],
+            ["1912", "D1", 1, "Holstein Kiel", 3, 3, 0, 0, 5, 1, 4, 6],
+            ["1911", "D1", 1, "Viktoria Berlin", 2, 2, 0, 0, 7, 1, 6, 4],
+            ["1910", "D1", 1, "Karlsruher FV", 3, 3, 0, 0, 4, 1, 3, 6],
+            ["1909", "D1", 1, "Karlsruher SC", 3, 3, 0, 0, 18, 3, 15, 6],
+            ["1908", "D1", 1, "Viktoria Berlin", 3, 3, 0, 0, 14, 1, 13, 6],
+            ["1907", "D1", 1, "Freiburger FC", 2, 2, 0, 0, 6, 3, 3, 4],
+            ["1906", "D1", 1, "1. FC Lok Leipzig", 3, 3, 0, 0, 14, 4, 10, 6],
+            ["1905", "D1", 1, "Blau-Weiß 90 Berlin", 3, 3, 0, 0, 11, 3, 8, 6],
+            ["1903", "D1", 1, "1. FC Lok Leipzig", 3, 3, 0, 0, 16, 6, 10, 6],
+
+
+
+            // Add more historic seasons here...
+        ];
 
         // Create Team Streaks league buttons
         function createTeamStreaksLeagueButtons() {
@@ -3801,6 +3912,7 @@
             }
             state.teamSeasonsSelectedPosition = '';
             state.includeBetterResults = false;
+            state.includeHistoricSeasons = false;
 
             // Load league data if not already loaded
             if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
@@ -3832,6 +3944,13 @@
                 elements.includeBetterResultsContainer.classList.add('hidden');
                 elements.includeBetterResultsContainer.style.display = 'none';
             }
+
+            // Reset Historic Seasons toggle and hide it
+            state.includeHistoricSeasons = false;
+            updateHistoricSeasonsToggleButton();
+            if (elements.historicSeasonsContainer) {
+                elements.historicSeasonsContainer.classList.add('hidden');
+            }
             
             // Clear stored team history data and name
             window.currentTeamHistoryData = null;
@@ -3853,6 +3972,108 @@
             const suffixes = ["th", "st", "nd", "rd"];
             const v = num % 100;
             return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+        }
+
+        // Update Historic Seasons toggle visibility
+        function updateHistoricSeasonsVisibility() {
+            const shouldShow = state.teamSeasonsSelectedTeam ||
+                              (state.teamSeasonsSelectedPosition && !state.teamSeasonsSelectedTeam);
+
+            if (shouldShow) {
+                elements.historicSeasonsContainer.classList.remove('hidden');
+            } else {
+                elements.historicSeasonsContainer.classList.add('hidden');
+                // Reset toggle state when hiding
+                state.includeHistoricSeasons = false;
+                updateHistoricSeasonsToggleButton();
+            }
+        }
+
+        // Update Historic Seasons toggle button appearance
+        function updateHistoricSeasonsToggleButton() {
+            if (state.includeHistoricSeasons) {
+                elements.historicSeasonsToggle.textContent = '📜 Hide Historic Seasons';
+                elements.historicSeasonsToggle.classList.remove('btn-secondary');
+                elements.historicSeasonsToggle.classList.add('btn-primary');
+            } else {
+                elements.historicSeasonsToggle.textContent = '📜 Include Historic Seasons';
+                elements.historicSeasonsToggle.classList.remove('btn-primary');
+                elements.historicSeasonsToggle.classList.add('btn-secondary');
+            }
+        }
+
+        // Handle Historic Seasons toggle
+        function handleHistoricSeasonsToggle() {
+            state.includeHistoricSeasons = !state.includeHistoricSeasons;
+            updateHistoricSeasonsToggleButton();
+
+            // Refresh the current view with or without historic seasons
+            if (state.teamSeasonsSelectedTeam) {
+                showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+
+                // Preserve Include Better Results checkbox if it should be visible
+                // (when team is selected AND position is selected)
+                if (state.teamSeasonsSelectedPosition) {
+                    setTimeout(() => {
+                        if (elements.includeBetterResultsContainer) {
+                            elements.includeBetterResultsContainer.className = 'mt-3 flex items-center gap-2';
+                            elements.includeBetterResultsContainer.removeAttribute('style');
+                            elements.includeBetterResultsContainer.style.display = 'flex';
+                        }
+                    }, 100);
+                }
+            } else if (state.teamSeasonsSelectedPosition) {
+                showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
+            }
+        }
+
+        // Get historic seasons data for a specific team or position
+        function getHistoricSeasonsData(teamName = null, position = null, league = null) {
+            if (!state.includeHistoricSeasons) return [];
+
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+
+            const targetLeagueId = leagueMapping[league];
+            if (!targetLeagueId) return [];
+
+            return historicSeasonsData
+                .filter(entry => {
+                    const [season, leagueId, pos, team] = entry;
+
+                    // Filter by league
+                    if (leagueId !== targetLeagueId) return false;
+
+                    // Filter by team if specified
+                    if (teamName && team !== teamName) return false;
+
+                    // Filter by position if specified
+                    if (position && pos !== parseInt(position)) return false;
+
+                    return true;
+                })
+                .map(entry => {
+                    const [season, leagueId, pos, team, gp, w, d, l, gf, ga, gd, pts] = entry;
+                    return {
+                        season: season,
+                        team: team,
+                        position: pos,
+                        played: gp,
+                        won: w,
+                        drawn: d,
+                        lost: l,
+                        goalsFor: gf,
+                        goalsAgainst: ga,
+                        goalDifference: gd,
+                        points: pts,
+                        isHistoric: true // Flag to identify historic data
+                    };
+                });
         }
 
         // Update team seasons position select
@@ -3879,6 +4100,10 @@
         function handleTeamSeasonsPositionChange(selectedPosition) {
             state.teamSeasonsSelectedPosition = selectedPosition;
 
+            // Reset Historic Seasons toggle state when changing position
+            state.includeHistoricSeasons = false;
+            updateHistoricSeasonsToggleButton();
+
             if (state.teamSeasonsSelectedTeam) {
                 // If a team is selected, refresh the team history with the new position filter
                 showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
@@ -3903,11 +4128,18 @@
                 // Reset team selection to ensure clean position-only view
                 state.teamSeasonsSelectedTeam = '';
                 elements.teamSeasonsTeamSelect.value = '';
+
+                // Show Historic Seasons toggle when any position is selected
+                updateHistoricSeasonsVisibility();
+
                 showAllTeamsAtPosition(selectedPosition, state.teamSeasonsSelectedLeague);
             } else {
                 // Clear the table if no filters are selected
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
+
+                // Hide Historic Seasons toggle when no position selected
+                updateHistoricSeasonsVisibility();
             }
         }
 
@@ -4124,7 +4356,13 @@
                     });
                 }
             });
-            
+
+            // Add historic seasons data if enabled
+            if (state.includeHistoricSeasons) {
+                const historicData = getHistoricSeasonsData(null, selectedPos, league);
+                allPositionData.push(...historicData);
+            }
+
             // Sort by season (most recent first), then by team name
             allPositionData.sort((a, b) => {
                 const yearA = parseInt(a.season.split('-')[0]);
@@ -4208,7 +4446,10 @@
                 
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
-                        <td class="px-3 py-4 font-semibold text-left">${season.season}</td>
+                        <td class="px-3 py-4 font-semibold text-left">
+                            ${season.season}
+                            ${season.isHistoric ? '<span class="ml-2 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">Historic</span>' : ''}
+                        </td>
                         <td class="px-3 py-4 text-center font-semibold">${season.count}</td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
@@ -4253,6 +4494,8 @@
             state.teamSeasonsSelectedTeam = selectedTeam;
             state.teamSeasonsSelectedPosition = ''; // Reset position filter
             state.includeBetterResults = false;
+            state.includeHistoricSeasons = false;
+            updateHistoricSeasonsToggleButton();
 
             if (selectedTeam) {
                 // Reset position dropdown UI when team is selected
@@ -4261,6 +4504,9 @@
                 // Team selected but no position = hide checkbox
                 elements.includeBetterResultsContainer.classList.add('hidden');
 
+                // Show Historic Seasons toggle when team is selected
+                updateHistoricSeasonsVisibility();
+
                 showTeamHistory(selectedTeam, state.teamSeasonsSelectedLeague);
             } else {
                 // Team unselected - clear everything
@@ -4268,6 +4514,9 @@
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamHistoryTitle.textContent = '';
                 elements.includeBetterResultsContainer.classList.add('hidden');
+
+                // Hide Historic Seasons toggle when no team selected
+                updateHistoricSeasonsVisibility();
 
                 // Clear stored team history data and name to prevent contamination
                 window.currentTeamHistoryData = null;
@@ -4297,6 +4546,13 @@
                 state.teamSeasonsSelectedSeason = '';
                 state.teamSeasonsSelectedPosition = '';
                 state.includeBetterResults = false;
+                state.includeHistoricSeasons = false;
+
+                // Reset Historic Seasons toggle button and hide it
+                updateHistoricSeasonsToggleButton();
+                if (elements.historicSeasonsContainer) {
+                    elements.historicSeasonsContainer.classList.add('hidden');
+                }
 
                 // Reset Last Time When state
                 state.lastTimeTeam1 = '';
@@ -4896,6 +5152,9 @@
                     }, 100);
                 }
             });
+
+            // Historic Seasons toggle event listener
+            elements.historicSeasonsToggle.addEventListener('click', handleHistoricSeasonsToggle);
 
             // Team Streaks controls
             elements.teamStreaksLeagueButtons.addEventListener('click', (e) => {
@@ -8053,6 +8312,12 @@
                 });
             });
 
+            // Add historic seasons data if enabled
+            if (state.includeHistoricSeasons) {
+                const historicData = getHistoricSeasonsData(teamName, null, leagueToUse);
+                teamHistoryData.push(...historicData);
+            }
+
             // Sort by season (most recent first)
             teamHistoryData.sort((a, b) => {
                 // Extract year from season string (e.g., "2023-24" -> 2023)
@@ -8224,7 +8489,10 @@
                 
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
-                        <td class="px-3 py-4 font-semibold text-left">${season.season}</td>
+                        <td class="px-3 py-4 font-semibold text-left">
+                            ${season.season}
+                            ${season.isHistoric ? '<span class="ml-2 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">Historic</span>' : ''}
+                        </td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -8730,6 +8998,9 @@
         initHamburgerMenu();
         initDarkMode();
         updateTabText();
+
+        // Initialize Historic Seasons toggle button
+        updateHistoricSeasonsToggleButton();
         
         // Handle window resize for responsive tabs
         window.addEventListener('resize', updateTabText);
