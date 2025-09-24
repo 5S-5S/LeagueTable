@@ -3773,10 +3773,10 @@
         function updateControlsVisibility() {
             // Update button appearance
             if (state.controlsCollapsed) {
-                elements.collapseControlsBtn.innerHTML = '▲';
+                elements.collapseControlsBtn.querySelector('span').innerHTML = '▲';
                 elements.collapseControlsBtn.title = 'Show Controls';
             } else {
-                elements.collapseControlsBtn.innerHTML = '▼';
+                elements.collapseControlsBtn.querySelector('span').innerHTML = '▼';
                 elements.collapseControlsBtn.title = 'Hide Controls';
             }
 
