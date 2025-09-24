@@ -8,10 +8,15 @@
     <link rel="stylesheet" href="DomesticEurope.css">
 <body>
     <!-- Hamburger Menu Button -->
-    <button id="hamburgerBtn" class="hamburger-btn">
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
-        <span class="hamburger-line"></span>
+    <button id="hamburgerBtn" class="hamburger-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: white; border: 1px solid #ccc; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;">
+        <span class="hamburger-line" style="width: 1.5rem; height: 0.125rem; background: #374151; border-radius: 0.125rem;"></span>
+        <span class="hamburger-line" style="width: 1.5rem; height: 0.125rem; background: #374151; border-radius: 0.125rem;"></span>
+        <span class="hamburger-line" style="width: 1.5rem; height: 0.125rem; background: #374151; border-radius: 0.125rem;"></span>
+    </button>
+
+    <!-- Collapse Controls Arrow Button -->
+    <button id="collapseControlsBtn" class="collapse-controls-btn" style="position: fixed; top: 1rem; right: 1rem; z-index: 1001; background: white; border: 1px solid #ccc; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;" title="Hide/Show Controls">
+        <span style="width: 1.5rem; height: 0.875rem; display: flex; align-items: center; justify-content: center; font-size: 1rem;">▼</span>
     </button>
 
     <!-- Sidebar Overlay -->
@@ -108,14 +113,14 @@
                 <!-- League Filters Tab Content -->
                 <div id="leagueFiltersContent" class="tab-content active">
                     <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg">
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control">
                         <p class="text-gray-700 text-sm leading-relaxed">
-                            Filter and analyze league tables from the major 5 European leagues. Select prior seasons, custom date ranges, and specific teams to find and filter league standings and head-to-head records between teams.
+                            Filter and analyze league tables from the major 5 European leagues. Select prior seasons, custom date ranges, and specific teams to find and filter league standings and head-to-head records.
                         </p>
                     </div>
 
                     <!-- League Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-4">Select League:</label>
                         <div class="league-buttons" id="leagueButtons">
                             <!-- League buttons will be populated here -->
@@ -123,7 +128,7 @@
                     </div>
                 
                 <!-- Filters -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 collapsible-control">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-search mr-2"></span>Season
@@ -193,7 +198,7 @@
                 </div>
                 
                 <!-- Match Type and Action Buttons -->
-                <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center justify-between gap-4 collapsible-control">
                     <div class="flex items-center gap-6">
                         <span class="text-sm font-semibold text-gray-700">Match Results:</span>
                         
@@ -233,14 +238,14 @@
                 <!-- Team Seasons Tab Content -->
                 <div id="teamSeasonsContent" class="tab-content">
                     <!-- Description -->
-                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control">
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Select a league and team below to view a list of their top-flight seasons. You can find out how many times a team finished in a particular place or even find something like a list of every 2nd place team. 
                         </p>
                     </div>
 
                     <!-- League Selection for Team Seasons -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-4">Select League:</label>
                         <div class="league-buttons" id="teamSeasonsLeagueButtons">
                             <!-- League buttons will be populated here -->
@@ -248,7 +253,7 @@
                     </div>
 
                     <!-- Team Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Select Team:</label>
                         <div class="combobox-container" id="teamSeasonsComboboxContainer">
                             <input type="text" id="teamSeasonsComboboxInput" class="combobox-input" placeholder="Choose a team..." autocomplete="off">
@@ -261,7 +266,7 @@
                     </div>
 
                     <!-- Season Selection (only for Ligue 1 and Premier League) -->
-                    <div id="teamSeasonsSeasonContainer" class="mb-8 hidden">
+                    <div id="teamSeasonsSeasonContainer" class="mb-8 hidden collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-search mr-2"></span>Season
                         </label>
@@ -271,7 +276,7 @@
                     </div>
 
                     <!-- Position Filter -->
-                    <div id="teamSeasonsPositionContainer" class="mb-8">
+                    <div id="teamSeasonsPositionContainer" class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Filter by Position:</label>
                         <select id="teamSeasonsPositionSelect" class="form-input w-full">
                             <option value="">All Positions</option>
@@ -331,22 +336,22 @@
                 <!-- Last Time When Tab Content -->
                 <div id="lastTimeWhenContent" class="tab-content">
                     <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg">
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control">
                         <p class="text-gray-700 text-sm leading-relaxed">
                             This tool allows you to find out the last time a team won, drew, or lost against an opponent. At home or away. On the day of the week too, if you so choose.
                         </p>
                     </div>
                     
                     <!-- League Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-4">Select League:</label>
                         <div class="league-buttons" id="lastTimeLeagueButtons">
                             <!-- League buttons will be populated here -->
                         </div>
                     </div>
-                    
+
                     <!-- Controls -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 collapsible-control">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Day of Week</label>
                             <select id="lastTimeDayOfWeekSelect" class="form-input">
@@ -530,14 +535,14 @@
                 <!-- Team Streaks Tab Content -->
                 <div id="teamStreaksContent" class="tab-content">
                     <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg">
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control">
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Discover active streaks between clubs and find out the last time your club defeated their rival. Filter between league, location, and streak type.
                         </p>
                     </div>
 
                     <!-- League Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-4">Select League:</label>
                         <div class="league-buttons" id="teamStreaksLeagueButtons">
                             <!-- League buttons will be populated here -->
@@ -545,7 +550,7 @@
                     </div>
 
                     <!-- Status Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Status:</label>
                         <select id="teamStreaksStatusSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
                             <option value="active">Active Streak</option>
@@ -553,7 +558,7 @@
                         </select>
                     </div>
                     <!-- Location Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Location:</label>
                         <select id="teamStreaksLocationSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
                             <option value="both">Both Home and Away</option>
@@ -563,7 +568,7 @@
                     </div>
 
                     <!-- Streak Type Selection -->
-                    <div class="mb-8">
+                    <div class="mb-8 collapsible-control">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Streak Type:</label>
                         <select id="teamStreaksTypeSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
                             <option value="winning">Winning Streak (Wins Only)</option>
@@ -575,7 +580,7 @@
                     </div>
 
                     <!-- Team Selection -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 collapsible-control">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1:</label>
                             <div class="combobox-container" id="teamStreaksTeam1ComboboxContainer">
@@ -830,6 +835,7 @@
             teamSeasonsSelectedPosition: '',
             includeBetterResults: false,
             includeHistoricSeasons: false,
+            controlsCollapsed: false,
 
             // Previous League Tables state (for back navigation)
             previousLeagueTablesState: null,
@@ -2158,6 +2164,7 @@
             teamSeasonsPositionInfo: document.getElementById('teamSeasonsPositionInfo'),
             historicSeasonsContainer: document.getElementById('historicSeasonsContainer'),
             historicSeasonsToggle: document.getElementById('historicSeasonsToggle'),
+            collapseControlsBtn: document.getElementById('collapseControlsBtn'),
             // Team Streaks elements
             teamStreaksLeagueButtons: document.getElementById('teamStreaksLeagueButtons'),
             teamStreaksStatusSelect: document.getElementById('teamStreaksStatusSelect'),
@@ -4027,6 +4034,31 @@
             }
         }
 
+        // Toggle controls collapse
+        function toggleControlsCollapse() {
+            state.controlsCollapsed = !state.controlsCollapsed;
+            updateControlsVisibility();
+        }
+
+        // Update controls visibility based on collapsed state
+        function updateControlsVisibility() {
+            // Update button appearance
+            if (state.controlsCollapsed) {
+                elements.collapseControlsBtn.innerHTML = '▲';
+                elements.collapseControlsBtn.title = 'Show Controls';
+            } else {
+                elements.collapseControlsBtn.innerHTML = '▼';
+                elements.collapseControlsBtn.title = 'Hide Controls';
+            }
+
+            // Use CSS approach - add/remove a body class that controls visibility via CSS
+            if (state.controlsCollapsed) {
+                document.body.classList.add('controls-collapsed');
+            } else {
+                document.body.classList.remove('controls-collapsed');
+            }
+        }
+
         // Get historic seasons data for a specific team or position
         function getHistoricSeasonsData(teamName = null, position = null, league = null) {
             if (!state.includeHistoricSeasons) return [];
@@ -5155,6 +5187,9 @@
 
             // Historic Seasons toggle event listener
             elements.historicSeasonsToggle.addEventListener('click', handleHistoricSeasonsToggle);
+
+            // Collapse controls toggle event listener
+            elements.collapseControlsBtn.addEventListener('click', toggleControlsCollapse);
 
             // Team Streaks controls
             elements.teamStreaksLeagueButtons.addEventListener('click', (e) => {

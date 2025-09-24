@@ -1361,3 +1361,8 @@ body {
 [data-theme="dark"] #teamStreaksResults .text-center.text-lg.win-score {
     color: #059669 !important;
 }
+
+/* Controls Collapse Functionality - Simple Approach */
+.controls-collapsed .collapsible-control {
+    display: none !important;
+}
