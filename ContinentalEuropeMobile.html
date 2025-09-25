@@ -5,54 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Continental Football - League Table Statistics</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-    <link rel="stylesheet" href="ContinentalEurope.css">
-    <script>
-        // Device detection and redirect logic
-        (function() {
-            // Check if user manually requested desktop version
-            const urlParams = new URLSearchParams(window.location.search);
-            const forceDesktop = urlParams.get('desktop') === 'true';
-
-            if (forceDesktop) {
-                return; // Stay on desktop version
-            }
-
-            // Mobile detection
-            function isMobileDevice() {
-                // Screen width detection
-                const isSmallScreen = window.innerWidth <= 640;
-
-                // Touch device detection
-                const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-
-                // User agent detection (mobile-specific patterns)
-                const mobileUserAgents = [
-                    /Android/i,
-                    /webOS/i,
-                    /iPhone/i,
-                    /iPad/i,
-                    /iPod/i,
-                    /BlackBerry/i,
-                    /Windows Phone/i,
-                    /Opera Mini/i,
-                    /IEMobile/i,
-                    /Mobile/i
-                ];
-
-                const isMobileUA = mobileUserAgents.some(pattern =>
-                    pattern.test(navigator.userAgent)
-                );
-
-                // Return true if any mobile criteria are met
-                return isSmallScreen || (hasTouchScreen && isMobileUA);
-            }
-
-            // Redirect to mobile version if mobile device detected
-            if (isMobileDevice()) {
-                window.location.href = 'ContinentalEuropeMobile.html';
-            }
-        })();
-    </script>
+    <link rel="stylesheet" href="ContinentalEuropeMobile.css">
 <body>
     <!-- Hamburger Menu Button -->
     <button id="hamburgerBtn" class="hamburger-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: white; border: 1px solid #ccc; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;">
@@ -87,7 +40,7 @@
             <!-- Football Section -->
             <div class="menu-section">
                 <h3 class="menu-section-title">Football</h3>
-                <a href="DomesticEurope.html" class="menu-item" data-page="domestic">
+                <a href="DomesticEuropeMobile.html" class="menu-item" data-page="domestic">
                     <span class="menu-icon">⚽</span>
                     <span>Domestic Football - Top 5 Leagues</span>
                 </a>
@@ -2690,13 +2643,13 @@
                             <td class="text-center">
                                 <div class="flex items-center justify-center">
                                     ${team1Logo ? `<img src="${team1Logo}" alt="${team1}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                    <span class="team1-highlight" style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>
+                                    <span  style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>
                                 </div>
                             </td>
                             <td class="text-center">
                                 <div class="flex items-center justify-center">
                                     ${team2Logo ? `<img src="${team2Logo}" alt="${team2}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                    <span class="team2-highlight" style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>
+                                    <span  style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>
                                 </div>
                             </td>
                             <td class="text-center">${startDateStr}</td>
@@ -2716,7 +2669,7 @@
                             <td class="text-center">
                                 <div class="flex items-center justify-center">
                                     ${teamLogo ? `<img src="${teamLogo}" alt="${teamName}" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                    <span class="team1-highlight" style="color: ${teamColor || '#374151'}; font-weight: bold;">${teamName}</span>
+                                    <span  style="color: ${teamColor || '#374151'}; font-weight: bold;">${teamName}</span>
                                 </div>
                             </td>
                             <td class="text-center">${startDateStr}</td>
@@ -3058,39 +3011,14 @@
                     `color: ${awayTeamColor} !important; font-weight: bold;` :
                     'color: #059669 !important; font-weight: bold;';
             } else {
-                winnerTeam = 'Draw';
+                winnerTeam = 'D';
                 homeScoreClass = 'text-gray-400 font-bold draw-score';
                 awayScoreClass = 'text-gray-400 font-bold draw-score';
                 resultStyle = 'color: #9ca3af !important; font-weight: bold;';
             }
 
-            // Get selected teams for highlighting
-            const team1 = elements.teamStreaksTeam1Select.value;
-            const team2 = elements.teamStreaksTeam2Select.value;
-
-            // Team highlighting based on selected teams (same as Head-to-Head)
-            const isHomeTeam1 = match.HomeTeam === team1;
-            const isHomeTeam2 = team2 && match.HomeTeam === team2;
-            const isAwayTeam1 = match.AwayTeam === team1;
-            const isAwayTeam2 = team2 && match.AwayTeam === team2;
-            
-            const homeTeamClass = isHomeTeam1 ? 'team1-highlight' : 
-                                isHomeTeam2 ? 'team2-highlight' : '';
-            const awayTeamClass = isAwayTeam1 ? 'team1-highlight' : 
-                                isAwayTeam2 ? 'team2-highlight' : '';
-            
             // Winner logo for result column
-            const winnerLogoUrl = winnerTeam !== 'Draw' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
-            
-            // Result highlighting for winner (if it's one of the selected teams)
-            let resultClass = '';
-            if (winnerTeam !== 'Draw') {
-                if (winnerTeam === team1) {
-                    resultClass = 'team1-highlight';
-                } else if (team2 && winnerTeam === team2) {
-                    resultClass = 'team2-highlight';
-                }
-            }
+            const winnerLogoUrl = winnerTeam !== 'D' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
             
             // Team styling
             const homeTeamStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
@@ -3102,21 +3030,21 @@
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span class="${homeTeamClass}" style="${homeTeamStyle}">${match.HomeTeam}</span>
+                            <span style="${homeTeamStyle}; display: none;">${match.HomeTeam}</span>
                         </div>
                     </td>
                     <td class="text-center text-lg ${homeScoreClass}" >${homeScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span class="${awayTeamClass}" style="${awayTeamStyle}">${match.AwayTeam}</span>
+                            <span style="${awayTeamStyle}; display: none;">${match.AwayTeam}</span>
                         </div>
                     </td>
                     <td class="text-center text-lg ${awayScoreClass}" >${awayScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span class="${resultClass}" style="${resultStyle}">${winnerTeam}</span>
+                            <span style="${resultStyle}${winnerTeam === 'D' ? '' : '; display: none;'}">${winnerTeam}</span>
                         </div>
                     </td>
                 </tr>
@@ -4287,7 +4215,7 @@
             // Generate table headers using the same format as team history
             const headers = [
                 { key: 'season', label: 'Season' },
-                { key: 'count', label: 'Count' },
+                { key: 'count', label: '#' },
                 { key: 'team', label: 'Team' },
                 { key: 'played', label: 'P' },
                 { key: 'won', label: 'W' },
@@ -4297,7 +4225,7 @@
                 { key: 'goalsAgainst', label: 'GA' },
                 { key: 'goalDifference', label: 'GD' },
                 { key: 'points', label: 'Pts' },
-                { key: 'tournamentProgression', label: 'Progression' }
+                { key: 'tournamentProgression', label: 'Prog.' }
             ];
             
             // Generate headers with same styling as team history
@@ -4305,7 +4233,7 @@
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
                     onclick="handleTeamHistorySort('${header.key}')"
                     style="text-align: ${(header.key === 'season' || header.key === 'team') ? 'left' : 'center'}">
-                    ${header.label}${getTeamHistorySortIndicator(header.key)}
+                    ${header.label}${(header.key === 'count' || header.key === 'lost') ? '<br>' : ''}${getTeamHistorySortIndicator(header.key)}
                 </th>
             `).join('');
             
@@ -4347,7 +4275,7 @@
                             season.tournamentProgression === 'Quarter-Finals' ? 'color: #059669; background-color: #d1fae5;' :
                             season.tournamentProgression === 'Round Of 16' ? 'color: #2563eb; background-color: #dbeafe;' :
                             'color: #6b7280; background-color: #f9fafb;'
-                        }">${season.tournamentProgression}</td>
+                        }">${abbreviateProgression(season.tournamentProgression)}</td>
                     </tr>
                 `;
             }).join('');
@@ -4387,7 +4315,7 @@
             // Generate table headers
             const headers = [
                 { key: 'season', label: 'Season' },
-                { key: 'count', label: 'Count' },
+                { key: 'count', label: '#' },
                 { key: 'team', label: 'Team' },
                 { key: 'played', label: 'P' },
                 { key: 'won', label: 'W' },
@@ -4397,7 +4325,7 @@
                 { key: 'goalsAgainst', label: 'GA' },
                 { key: 'goalDifference', label: 'GD' },
                 { key: 'points', label: 'Pts' },
-                { key: 'tournamentProgression', label: 'Progression' }
+                { key: 'tournamentProgression', label: 'Prog.' }
             ];
             
             // Generate headers
@@ -4405,7 +4333,7 @@
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
                     onclick="handleTeamHistorySort('${header.key}')"
                     style="text-align: ${(header.key === 'season' || header.key === 'team') ? 'left' : 'center'}">
-                    ${header.label}${getTeamHistorySortIndicator(header.key)}
+                    ${header.label}${(header.key === 'count' || header.key === 'lost') ? '<br>' : ''}${getTeamHistorySortIndicator(header.key)}
                 </th>
             `).join('');
             
@@ -4447,7 +4375,7 @@
                             season.tournamentProgression === 'Quarter-Finals' ? 'color: #059669; background-color: #d1fae5;' :
                             season.tournamentProgression === 'Round Of 16' ? 'color: #2563eb; background-color: #dbeafe;' :
                             'color: #6b7280; background-color: #f9fafb;'
-                        }">${season.tournamentProgression}</td>
+                        }">${abbreviateProgression(season.tournamentProgression)}</td>
                     </tr>
                 `;
             }).join('');
@@ -4471,7 +4399,7 @@
             // Update headers for multi-team view
             const headers = [
                 { key: 'season', label: 'Season' },
-                { key: 'count', label: 'Count' },
+                { key: 'count', label: '#' },
                 { key: 'team', label: 'Team' },
                 { key: 'played', label: 'P' },
                 { key: 'won', label: 'W' },
@@ -4488,7 +4416,7 @@
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
                     onclick="handleTeamHistorySort('${header.key}')"
                     style="text-align: ${(header.key === 'season' || header.key === 'team') ? 'left' : 'center'}">
-                    ${header.label}${getTeamHistorySortIndicator(header.key)}
+                    ${header.label}${(header.key === 'count' || header.key === 'lost') ? '<br>' : ''}${getTeamHistorySortIndicator(header.key)}
                 </th>
             `).join('');
             
@@ -4504,7 +4432,7 @@
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${season.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="cursor-pointer hover:text-blue-600" onclick="handleTeamClick('${season.team}')">${season.team}</span>
+                                <span class="cursor-pointer hover:text-blue-600" onclick="handleTeamClick('${season.team}')" style="font-size: 0.5rem !important;">${season.team}</span>
                             </div>
                         </td>
                         <td class="px-3 py-4 text-center">${season.played}</td>
@@ -5779,43 +5707,22 @@
                     'color: #059669 !important; font-weight: bold;';
             } else {
                 // Draw
-                winnerTeam = 'Draw';
+                winnerTeam = 'D';
                 homeScoreClass = 'text-gray-400 font-bold draw-score';
                 awayScoreClass = 'text-gray-400 font-bold draw-score';
                 resultStyle = 'color: #9ca3af !important; font-weight: bold;';
             }
 
-            // Add team highlights - Team 1 green, Team 2 blue (like Head-to-Head)
-            const isHomeTeam1 = match.HomeTeam === state.lastTimeTeam1;
-            const isHomeTeam2 = match.HomeTeam === state.lastTimeTeam2;
-            const isAwayTeam1 = match.AwayTeam === state.lastTimeTeam1;
-            const isAwayTeam2 = match.AwayTeam === state.lastTimeTeam2;
-            
-            const homeTeamClass = isHomeTeam1 ? 'team1-highlight' : 
-                                isHomeTeam2 ? 'team2-highlight' : '';
-            const awayTeamClass = isAwayTeam1 ? 'team1-highlight' : 
-                                isAwayTeam2 ? 'team2-highlight' : '';
-
-            // Team styling (matching Head-to-Head format)
+            // Team styling
             const homeTeamStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
             const awayTeamStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
-            
-            // Result highlighting for winner
-            let resultClass = '';
-            if (winnerTeam !== 'Draw') {
-                if (winnerTeam === state.lastTimeTeam1) {
-                    resultClass = 'team1-highlight';
-                } else if (winnerTeam === state.lastTimeTeam2) {
-                    resultClass = 'team2-highlight';
-                }
-            }
             
             // Get team logos
             const homeLogoUrl = getTeamLogoUrl(match.HomeTeam, state.selectedLeague);
             const awayLogoUrl = getTeamLogoUrl(match.AwayTeam, state.selectedLeague);
             
             // Get winner logo for result column (if not a draw)
-            const winnerLogoUrl = winnerTeam !== 'Draw' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
+            const winnerLogoUrl = winnerTeam !== 'D' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
             
             return `
                 <tr class="border-b hover:bg-gray-50">
@@ -5823,21 +5730,21 @@
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span class="${homeTeamClass}" style="${homeTeamStyle}">${match.HomeTeam}</span>
+                            <span style="${homeTeamStyle}; display: none;">${match.HomeTeam}</span>
                         </div>
                     </td>
                     <td class="text-center text-lg ${homeScoreClass}" >${homeScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span class="${awayTeamClass}" style="${awayTeamStyle}">${match.AwayTeam}</span>
+                            <span style="${awayTeamStyle}; display: none;">${match.AwayTeam}</span>
                         </div>
                     </td>
                     <td class="text-center text-lg ${awayScoreClass}" >${awayScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span class="${resultClass}" style="${resultStyle}">${winnerTeam}</span>
+                            <span style="${resultStyle}${winnerTeam === 'D' ? '' : '; display: none;'}">${winnerTeam}</span>
                         </div>
                     </td>
                 </tr>
@@ -7277,7 +7184,7 @@
                         `color: ${awayTeamColor} !important; font-weight: bold;` :
                         'color: #059669 !important; font-weight: bold;';
                 } else {
-                    winnerTeam = 'Draw';
+                    winnerTeam = 'D';
                     homeScoreClass = 'text-gray-400 font-bold draw-score';
                     awayScoreClass = 'text-gray-400 font-bold draw-score';
                     resultStyle = 'color: #9ca3af !important; font-weight: bold;';
@@ -7296,11 +7203,6 @@
                     }
                 }
                 
-                // Result highlighting for winner (if it's the selected team)
-                let resultClass = '';
-                if (winnerTeam !== 'Draw' && winnerTeam === state.selectedTeam1) {
-                    resultClass = 'team1-highlight';
-                }
                 
                 return {
                     date: match.dateObj.toLocaleDateString(),
@@ -7314,7 +7216,6 @@
                     awayScore: awayScore,
                     awayScoreClass: awayScoreClass,
                     result: winnerTeam,
-                    resultClass: resultClass,
                     resultStyle: resultStyle,
                     opponent: opponent,
                     stage: match.CompetitionPhase || '',
@@ -7379,7 +7280,7 @@
                 const awayLogoUrl = getTeamLogoUrl(match.awayTeam, state.selectedLeague);
                 
                 // Get winner logo for result column (if not a draw) - same as H2H table
-                const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
+                const winnerLogoUrl = match.result !== 'D' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
                 
                 // Highlight selected team with green, non-selected team with transparent
                 const homeTeamClass = match.homeTeam === state.selectedTeam1 ? 'team1-highlight' : 'team-transparent-highlight';
@@ -7398,25 +7299,25 @@
                 let rowHTML = `
                     <tr class="">
                         <td class="text-center text-sm">${match.date}</td>
-                        <td class="text-center text-sm">${match.stage}</td>
+                        <td class="text-center text-sm">${abbreviateProgression(match.stage)}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.homeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="${match.homeTeamClass}" style="${match.homeTeamStyle}">${match.homeTeam}</span>
+                                <span style="${match.homeTeamStyle}; display: none;">${match.homeTeam}</span>
                             </div>
                         </td>
                         <td class="text-center text-lg ${match.homeScoreClass}">${match.homeScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="${match.awayTeamClass}" style="${match.awayTeamStyle}">${match.awayTeam}</span>
+                                <span style="${match.awayTeamStyle}; display: none;">${match.awayTeam}</span>
                             </div>
                         </td>
                         <td class="text-center text-lg ${match.awayScoreClass}">${match.awayScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${match.result} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="${match.resultClass}" style="${match.resultStyle}">${match.result}</span>
+                                <span style="${match.resultStyle}${match.result === 'D' ? '' : '; display: none;'}">${match.result}</span>
                             </div>
                         </td>
                     </tr>
@@ -7752,6 +7653,42 @@
             }
         }
         
+        // Function to abbreviate progression stages
+        function abbreviateProgression(progression) {
+            if (!progression) return '';
+
+            const abbreviations = {
+                'Champions': 'C',
+                'Final': 'F',
+                'Semi-Finals': 'SF',
+                'Quarter-Finals': 'QF',
+                'Round Of 16': 'R16',
+                'Play-Offs': 'P',
+                'Group Stage': 'GS',
+                '2. Round': 'R2',
+                '1. Round': 'R1'
+            };
+
+            // Handle exact matches first
+            if (abbreviations[progression]) {
+                return abbreviations[progression];
+            }
+
+            // Handle partial matches for group stages and league stages
+            if (progression.toLowerCase().includes('group')) {
+                return 'GS';
+            }
+            if (progression.toLowerCase().includes('league')) {
+                return 'GS';
+            }
+            if (progression.toLowerCase().includes('qualif')) {
+                return 'Qual';
+            }
+
+            // Return original if no match found
+            return progression;
+        }
+
         function calculateTournamentProgression(teamName, teamMatches) {
             try {
                 if (!teamMatches || teamMatches.length === 0) return 'Group Stage';
@@ -7954,7 +7891,7 @@
                     'color: #059669 !important; font-weight: bold;';
             } else {
                 // Draw
-                winnerTeam = 'Draw';
+                winnerTeam = 'D';
                 homeScoreClass = 'text-gray-400 font-bold draw-score';
                 awayScoreClass = 'text-gray-400 font-bold draw-score';
                 resultStyle = 'color: #9ca3af !important; font-weight: bold;';
@@ -7969,7 +7906,7 @@
             const awayLogoUrl = getTeamLogoUrl(match.AwayTeam, state.selectedLeague);
             
             // Get winner logo for result column (if not a draw)
-            const winnerLogoUrl = winnerTeam !== 'Draw' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
+            const winnerLogoUrl = winnerTeam !== 'D' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
             
             return `
                 <tr class="border-b hover:bg-gray-50">
@@ -7977,20 +7914,20 @@
                     <td class="px-3 py-4 text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span style="${homeTeamStyle}">${match.HomeTeam}</span>
+                            <span style="${homeTeamStyle}; display: none;">${match.HomeTeam}</span>
                         </div>
                     </td>
-                    <td class="px-3 py-4 text-center text-lg ${homeScoreClass}" >${homeScore} - ${awayScore}</td>
+                    <td class="px-3 py-4 text-center text-lg" ><span class="${homeScoreClass}">${homeScore}</span> - <span class="${awayScoreClass}">${awayScore}</span></td>
                     <td class="px-3 py-4 text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span style="${awayTeamStyle}">${match.AwayTeam}</span>
+                            <span style="${awayTeamStyle}; display: none;">${match.AwayTeam}</span>
                         </div>
                     </td>
                     <td class="px-3 py-4 text-center">
                         <div class="flex items-center justify-center">
                             ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span style="${resultStyle}">${winnerTeam}</span>
+                            <span style="${resultStyle}${winnerTeam === 'D' ? '' : '; display: none;'}">${winnerTeam}</span>
                         </div>
                     </td>
                 </tr>
@@ -8031,10 +7968,10 @@
             ];
             
             elements.tableHeader.innerHTML = headers.map(header => `
-                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
-                    onclick="handleSort('${header.key}')" 
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600"
+                    onclick="handleSort('${header.key}')"
                     style="text-align: ${header.key === 'team' ? 'left' : 'center'}">
-                    ${header.label}${getSortIndicator(header.key)}
+                    ${header.key === 'position' ? `${header.label}<br>${getSortIndicator(header.key)}` : `${header.label}${getSortIndicator(header.key)}`}
                 </th>
             `).join('');
             
@@ -8327,38 +8264,17 @@
                         'color: #059669 !important; font-weight: bold;'; // Default green
                 } else {
                     // Draw
-                    winnerTeam = 'Draw';
+                    winnerTeam = 'D';
                     homeScoreClass = 'text-gray-400 font-bold draw-score';
                     awayScoreClass = 'text-gray-400 font-bold draw-score';
                     resultStyle = 'color: #9ca3af !important; font-weight: bold;'; // Lighter gray for draws
                 }
 
-                // Add team highlights - blue for Team 1, green for Team 2 (subtle like points badge)
-                const isHomeTeam1 = match.HomeTeam === state.selectedTeam1;
-                const isHomeTeam2 = match.HomeTeam === state.selectedTeam2;
-                const isAwayTeam1 = match.AwayTeam === state.selectedTeam1;
-                const isAwayTeam2 = match.AwayTeam === state.selectedTeam2;
-                
-                // Create subtle highlight classes similar to points-badge
-                const homeTeamClass = isHomeTeam1 ? 'team1-highlight' : 
-                                    isHomeTeam2 ? 'team2-highlight' : '';
-                const awayTeamClass = isAwayTeam1 ? 'team1-highlight' : 
-                                    isAwayTeam2 ? 'team2-highlight' : '';
-                
-                // Combine team color with highlight classes for inline styles  
+                // Team styling
                 const homeTeamFinalStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
                 const awayTeamFinalStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
-                
-                // Update result style to include subtle highlight for winner (but not for draws)
+
                 let finalResultStyle = resultStyle;
-                let resultClass = '';
-                if (winnerTeam !== 'Draw') {
-                    if (winnerTeam === state.selectedTeam1) {
-                        resultClass = 'team1-highlight';
-                    } else if (winnerTeam === state.selectedTeam2) {
-                        resultClass = 'team2-highlight';
-                    }
-                }
 
                 return {
                     date: match.dateObj.toLocaleDateString(),
@@ -8367,18 +8283,15 @@
                     homeTeam: match.HomeTeam,
                     homeTeamColor: homeTeamColor,
                     homeTeamStyle: homeTeamFinalStyle,
-                    homeTeamClass: homeTeamClass,
                     homeScore: homeScore,
                     homeScoreClass: homeScoreClass,
                     awayTeam: match.AwayTeam,
                     awayTeamColor: awayTeamColor,
                     awayTeamStyle: awayTeamFinalStyle,
-                    awayTeamClass: awayTeamClass,
                     awayScore: awayScore,
                     awayScoreClass: awayScoreClass,
                     result: winnerTeam,
-                    resultStyle: finalResultStyle,
-                    resultClass: resultClass
+                    resultStyle: finalResultStyle
                 };
             });
 
@@ -8439,30 +8352,30 @@
                 const awayLogoUrl = getTeamLogoUrl(match.awayTeam, state.selectedLeague);
                 
                 // Get winner logo for result column (if not a draw)
-                const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
+                const winnerLogoUrl = match.result !== 'D' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
                 
                 return `
                     <tr class="">
                         <td class="text-center text-sm">${match.date}</td>
-                        <td class="text-center text-sm">${match.stage || ''}</td>
+                        <td class="text-center text-sm">${abbreviateProgression(match.stage || '')}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.homeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="${match.homeTeamClass}" style="${match.homeTeamStyle}">${match.homeTeam}</span>
+                                <span style="${match.homeTeamStyle}; display: none;">${match.homeTeam}</span>
                             </div>
                         </td>
                         <td class="text-center text-lg ${match.homeScoreClass}" >${match.homeScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="${match.awayTeamClass}" style="${match.awayTeamStyle}">${match.awayTeam}</span>
+                                <span style="${match.awayTeamStyle}; display: none;">${match.awayTeam}</span>
                             </div>
                         </td>
                         <td class="text-center text-lg ${match.awayScoreClass}" >${match.awayScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${match.result} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="${match.resultClass}" style="${match.resultStyle}">${match.result}</span>
+                                <span style="${match.resultStyle}${match.result === 'D' ? '' : '; display: none;'}">${match.result}</span>
                             </div>
                         </td>
                     </tr>
@@ -9183,14 +9096,14 @@
                 { key: 'goalDifference', label: 'GD' },
                 { key: 'points', label: 'Pts' },
                 { key: 'position', label: 'Pos' },
-                { key: 'tournamentProgression', label: 'Progression' }
+                { key: 'tournamentProgression', label: 'Prog.' }
             ];
             
             elements.teamHistoryHeader.innerHTML = headers.map(header => `
                 <th class="px-3 py-4 text-center font-bold text-sm ${header.key !== 'team' ? 'cursor-pointer hover:bg-gray-600' : ''}" 
                     ${header.key !== 'team' ? `onclick="handleTeamHistorySort('${header.key}')"` : ''}
                     style="text-align: ${(header.key === 'season' || header.key === 'team') ? 'left' : 'center'}">
-                    ${header.label}${header.key !== 'team' ? getTeamHistorySortIndicator(header.key) : ''}
+                    ${header.label}${header.key !== 'team' ? ((header.key === 'count' || header.key === 'lost') ? '<br>' : '') + getTeamHistorySortIndicator(header.key) : ''}
                 </th>
             `).join('');
             
@@ -9204,7 +9117,7 @@
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span style="color: #000000">${teamName}</span>
+                                <span style="color: #000000; font-size: 0.5rem !important;">${teamName}</span>
                             </div>
                         </td>
                         <td class="px-3 py-4 text-center">${season.played}</td>
@@ -9236,7 +9149,7 @@
                             (season.tournamentProgression || 'Group Stage') === 'Quarter-Finals' ? 'color: #059669; background-color: #d1fae5;' :
                             (season.tournamentProgression || 'Group Stage') === 'Round Of 16' ? 'color: #2563eb; background-color: #dbeafe;' :
                             'color: #6b7280; background-color: #f9fafb;'
-                        }">${season.tournamentProgression || 'Group Stage'}</td>
+                        }">${abbreviateProgression(season.tournamentProgression || 'Group Stage')}</td>
                     </tr>
                 `;
             }).join('');

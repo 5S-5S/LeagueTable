@@ -6,6 +6,53 @@
     <title>Domestic League Filters - League Table Statistics</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="DomesticEurope.css">
+    <script>
+        // Device detection and redirect logic
+        (function() {
+            // Check if user manually requested desktop version
+            const urlParams = new URLSearchParams(window.location.search);
+            const forceDesktop = urlParams.get('desktop') === 'true';
+
+            if (forceDesktop) {
+                return; // Stay on desktop version
+            }
+
+            // Mobile detection
+            function isMobileDevice() {
+                // Screen width detection
+                const isSmallScreen = window.innerWidth <= 640;
+
+                // Touch device detection
+                const hasTouchScreen = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+                // User agent detection (mobile-specific patterns)
+                const mobileUserAgents = [
+                    /Android/i,
+                    /webOS/i,
+                    /iPhone/i,
+                    /iPad/i,
+                    /iPod/i,
+                    /BlackBerry/i,
+                    /Windows Phone/i,
+                    /Opera Mini/i,
+                    /IEMobile/i,
+                    /Mobile/i
+                ];
+
+                const isMobileUA = mobileUserAgents.some(pattern =>
+                    pattern.test(navigator.userAgent)
+                );
+
+                // Return true if any mobile criteria are met
+                return isSmallScreen || (hasTouchScreen && isMobileUA);
+            }
+
+            // Redirect to mobile version if mobile device detected
+            if (isMobileDevice()) {
+                window.location.href = 'DomesticEuropeMobile.html';
+            }
+        })();
+    </script>
 <body>
     <!-- Hamburger Menu Button -->
     <button id="hamburgerBtn" class="hamburger-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: white; border: 1px solid #ccc; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;">
@@ -781,7 +828,7 @@
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iZWFhMWNhYzhmYjM3MDlkYzdjMmY0YmIzZDc5OWI0MS9yYXcvMjk1YmM1ZGI5ZWFjNzcxY2Q3MTdlZmRjZjdmM2JlNWMzNzI0YTE3Yy9zZXJpZWEuY3N2',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9jODk1ZGM3Zjg4MTdiZjM3Y2ZmN2FlOTBjZGEzMWZlMS9yYXcvOTA3OWJkYjZhYWMwNTgzYTM4MGUyYzVhZWNkZDlkNmY5Yjk5OGUzNC9wcmVtLmNzdg==',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9mYTM1M2RmYTExZTE4Mzk1ZmY2NTdmMjE5NmE0NTEyOS9yYXcvODlhZmExMGNlZGZkYWI5N2Y5ZmEzZmZiNDY3ZWIzZDUxOWYyNDQ0NS8yNTI2cHJlbS5jc3Y=',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8wMzkyOGU0YThlYTE4OTk4MjZmYTg1MDdkZTdhNzc1My9yYXcvZTg1YzVlZTc2NDdmMGU4NmRjMmRmNmM5MTkzZDExZjhhZTE3ZjRmMi8yNTI2bGFsaWdhLmNzdg==',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8wMzkyOGU0YThlYTE4OTk4MjZmYTg1MDdkZTdhNzc1My9yYXcvM2RhZDBlZGViMjE4Y2UxZDQxZmU3NGY2OWMwMTQ2NWJkZTlhZDU5Ni8yNTI2bGFsaWdhLmNzdg==',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iY2Y2NmE4NzMzMThmODI4NzM2MjE5NGJmNTRlMWM5Yi9yYXcvODkzOWU3NmFhNGVjYmE1ZTQyZmE1NzQyYzFiZjhmNmU3Y2FiY2U3YS8yNTI2c2VyaWVhLmNzdg==',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy84MTc4MDM4ODc0YzgzMjgwNDI1MjdkNDYwYjA2NzdlZC9yYXcvMjkzMGQ3ODExNjRhNmU0NjlhZWI1YjIyOWI5MzYxMTQ4MTYyODEyYi8yNTI2YnVuZGVzbGlnYS5jc3Y=',
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8xZjMyODJmNmYwMjQyMjYyMmM0N2I3YTdhNzUxMmM5MS9yYXcvZjFhOGYyMjI2OTEzYjI5Yjc2OTUyOTZjM2NhZjQwNDNhMWI5NGU5Yi8yNTI2bGlndWUuY3N2'
