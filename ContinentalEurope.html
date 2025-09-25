@@ -5094,7 +5094,16 @@
             elements.h2hPenaltyCheckbox.addEventListener('click', () => {
                 state.h2hPenaltyFilter = !state.h2hPenaltyFilter;
                 elements.h2hPenaltyCheckbox.className = `checkbox ${state.h2hPenaltyFilter ? 'checked' : ''}`;
+
+                // Update both the table and head-to-head stats
                 updateTable();
+
+                // If both teams are selected, recalculate H2H stats with penalty filter
+                if (state.selectedTeam1 && state.selectedTeam2) {
+                    const h2hResult = calculateHeadToHead();
+                    updateHeadToHeadDisplay(h2hResult);
+                    updateH2HMatchesTable(h2hResult);
+                }
             });
             
             elements.matchHistoryStageSelect.addEventListener('change', (e) => {
@@ -6473,7 +6482,15 @@
                         return matchesStageCategory(row.CompetitionPhase, state.h2hStage);
                     });
                 }
-                
+
+                // Apply H2H penalty shootouts filter if selected
+                if (state.h2hPenaltyFilter) {
+                    filtered = filtered.filter(row =>
+                        row.AdditionalInfo &&
+                        row.AdditionalInfo.toLowerCase().includes('pso')
+                    );
+                }
+
                 // Apply recent H2H filter if specified
                 if (state.recentH2HCount !== 'All') {
                     // Sort by date (most recent first) and take the specified number
@@ -6924,7 +6941,15 @@
                     return matchesStageCategory(row.CompetitionPhase, state.h2hStage);
                 });
             }
-            
+
+            // Apply penalty shootouts filter if selected
+            if (state.h2hPenaltyFilter) {
+                filtered = filtered.filter(row =>
+                    row.AdditionalInfo &&
+                    row.AdditionalInfo.toLowerCase().includes('pso')
+                );
+            }
+
             // Filter for head-to-head matches
             let h2hMatches = filtered.filter(row => 
                 (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
