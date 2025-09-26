@@ -5030,7 +5030,15 @@
             elements.matchHistoryPenaltyCheckbox.addEventListener('click', () => {
                 state.matchHistoryPenaltyFilter = !state.matchHistoryPenaltyFilter;
                 elements.matchHistoryPenaltyCheckbox.className = `checkbox ${state.matchHistoryPenaltyFilter ? 'checked' : ''}`;
+
+                // Update both the table and match history stats
                 updateTable();
+
+                // If single team is selected, recalculate match history stats with penalty filter
+                if (state.selectedTeam1 && !state.selectedTeam2) {
+                    const matchHistoryResult = calculateMatchHistory();
+                    updateMatchHistoryDisplay(matchHistoryResult);
+                }
             });
 
             elements.h2hPenaltyCheckbox.addEventListener('click', () => {
@@ -6435,6 +6443,14 @@
                     console.log(`Stage Filter (${state.h2hStage ? 'H2H' : 'Match History'}): ${stageFilter}, Before: ${beforeFilter}, After: ${afterFilter}`);
                 }
 
+                // Apply Match History penalty shootouts filter if active (for single team)
+                if (state.matchHistoryPenaltyFilter) {
+                    filtered = filtered.filter(row =>
+                        row.AdditionalInfo &&
+                        row.AdditionalInfo.toLowerCase().includes('pso')
+                    );
+                }
+
                 // Apply recent matches count limit (same as match history)
                 if (state.recentMatchesCount !== 'All') {
                     const limit = parseInt(state.recentMatchesCount) || 0;
@@ -7023,6 +7039,57 @@
         }
 
         // Update match history display
+        // Calculate penalty shootout stats for single team
+        function calculateSingleTeamPenaltyStats(matches, teamName) {
+            let teamWins = 0, teamLosses = 0;
+            let homeWins = 0, homeLosses = 0;
+            let awayWins = 0, awayLosses = 0;
+
+            matches.forEach(match => {
+                if (match.AdditionalInfo && match.AdditionalInfo.toLowerCase().includes('pso')) {
+                    // Parse penalty score from AdditionalInfo like "pso 1:4" or "PSO 1:4"
+                    const penaltyMatch = match.AdditionalInfo.match(/pso\s+(\d+):(\d+)/i);
+                    if (penaltyMatch) {
+                        const homePenalties = parseInt(penaltyMatch[1]);
+                        const awayPenalties = parseInt(penaltyMatch[2]);
+                        const isHome = match.HomeTeam === teamName;
+
+                        // Determine if this team won or lost the penalty shootout
+                        if (homePenalties > awayPenalties) {
+                            // Home team won penalty shootout
+                            if (isHome) {
+                                teamWins++;
+                                homeWins++;
+                            } else {
+                                teamLosses++;
+                                awayLosses++;
+                            }
+                        } else if (awayPenalties > homePenalties) {
+                            // Away team won penalty shootout
+                            if (isHome) {
+                                teamLosses++;
+                                homeLosses++;
+                            } else {
+                                teamWins++;
+                                awayWins++;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const total = teamWins + teamLosses;
+            return {
+                teamWins,
+                teamLosses,
+                homeWins,
+                homeLosses,
+                awayWins,
+                awayLosses,
+                total
+            };
+        }
+
         // Update match history visualizations (Team Record)
         function updateMatchHistoryVisualizations(matches, teamName) {
             if (!matches || matches.length === 0) {
@@ -7077,8 +7144,78 @@
             const teamBgStyle = teamColor ? `background: ${teamColor} !important; color: ${getContrastColor(teamColor)} !important;` : 'background: #059669 !important; color: white !important;';
             let visualizationHTML = '';
 
-            // Show overall stats only if both home and away are selected
-            if (state.matchHistoryHomeFilter && state.matchHistoryAwayFilter && total > 0) {
+            // Check if penalty shootouts filter is active
+            if (state.matchHistoryPenaltyFilter) {
+                // Special penalty shootout visualization - only wins/losses, no draws
+                const penaltyStats = calculateSingleTeamPenaltyStats(recentMatches, teamName);
+
+                if (penaltyStats.total > 0) {
+                    // Overall penalty record (show if both home and away are selected)
+                    if (state.matchHistoryHomeFilter && state.matchHistoryAwayFilter) {
+                        visualizationHTML += `
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">${teamName} - Penalty Shootouts Record</span>
+                                    <span class="text-sm text-gray-600">${penaltyStats.teamWins}W - ${penaltyStats.teamLosses}L</span>
+                                </div>
+                                <div class="h2h-viz-bar">
+                                    <div class="h2h-segment h2h-wins" style="width: ${(penaltyStats.teamWins / penaltyStats.total) * 100}%; ${teamBgStyle}">
+                                        ${penaltyStats.teamWins > 0 ? penaltyStats.teamWins : ''}
+                                    </div>
+                                    <div class="h2h-segment h2h-losses" style="width: ${(penaltyStats.teamLosses / penaltyStats.total) * 100}%;">
+                                        ${penaltyStats.teamLosses > 0 ? penaltyStats.teamLosses : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+
+                    // Home penalty record (show if home filter is enabled)
+                    if (state.matchHistoryHomeFilter && (penaltyStats.homeWins + penaltyStats.homeLosses) > 0) {
+                        const homeTotal = penaltyStats.homeWins + penaltyStats.homeLosses;
+                        visualizationHTML += `
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">${teamName} - Penalty Shootouts (Home)</span>
+                                    <span class="text-sm text-gray-600">${penaltyStats.homeWins}W - ${penaltyStats.homeLosses}L</span>
+                                </div>
+                                <div class="h2h-viz-bar">
+                                    <div class="h2h-segment h2h-wins" style="width: ${(penaltyStats.homeWins / homeTotal) * 100}%; ${teamBgStyle}">
+                                        ${penaltyStats.homeWins > 0 ? penaltyStats.homeWins : ''}
+                                    </div>
+                                    <div class="h2h-segment h2h-losses" style="width: ${(penaltyStats.homeLosses / homeTotal) * 100}%;">
+                                        ${penaltyStats.homeLosses > 0 ? penaltyStats.homeLosses : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+
+                    // Away penalty record (show if away filter is enabled)
+                    if (state.matchHistoryAwayFilter && (penaltyStats.awayWins + penaltyStats.awayLosses) > 0) {
+                        const awayTotal = penaltyStats.awayWins + penaltyStats.awayLosses;
+                        visualizationHTML += `
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">${teamName} - Penalty Shootouts (Away)</span>
+                                    <span class="text-sm text-gray-600">${penaltyStats.awayWins}W - ${penaltyStats.awayLosses}L</span>
+                                </div>
+                                <div class="h2h-viz-bar">
+                                    <div class="h2h-segment h2h-wins" style="width: ${(penaltyStats.awayWins / awayTotal) * 100}%; ${teamBgStyle}">
+                                        ${penaltyStats.awayWins > 0 ? penaltyStats.awayWins : ''}
+                                    </div>
+                                    <div class="h2h-segment h2h-losses" style="width: ${(penaltyStats.awayLosses / awayTotal) * 100}%;">
+                                        ${penaltyStats.awayLosses > 0 ? penaltyStats.awayLosses : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+                } else {
+                    visualizationHTML += '<div class="text-sm text-gray-500 italic mb-4">No penalty shootout matches found</div>';
+                }
+            } else {
+                // Regular visualization with wins/draws/losses
+
+                // Show overall stats only if both home and away are selected
+                if (state.matchHistoryHomeFilter && state.matchHistoryAwayFilter && total > 0) {
                 visualizationHTML += `
                     <div class="mb-4">
                         <div class="flex items-center justify-between mb-2">
@@ -7145,6 +7282,7 @@
                     </div>
                 `;
             }
+            } // End of else block for regular visualization
 
             elements.matchHistoryVisualizations.innerHTML = visualizationHTML;
         }
@@ -8164,6 +8302,46 @@
             });
         }
 
+        // Calculate penalty shootout stats from matches
+        function calculatePenaltyShootoutStats(matches, team1Name, team2Name) {
+            let team1Wins = 0, team2Wins = 0;
+
+            matches.forEach(match => {
+                if (match.AdditionalInfo && match.AdditionalInfo.toLowerCase().includes('pso')) {
+                    // Parse penalty score from AdditionalInfo like "pso 1:4" or "PSO 1:4"
+                    const penaltyMatch = match.AdditionalInfo.match(/pso\s+(\d+):(\d+)/i);
+                    if (penaltyMatch) {
+                        const homePenalties = parseInt(penaltyMatch[1]);
+                        const awayPenalties = parseInt(penaltyMatch[2]);
+
+                        // Determine winner based on penalty score (not match score)
+                        if (homePenalties > awayPenalties) {
+                            // Home team won penalty shootout
+                            if (match.HomeTeam === team1Name) {
+                                team1Wins++;
+                            } else {
+                                team2Wins++;
+                            }
+                        } else if (awayPenalties > homePenalties) {
+                            // Away team won penalty shootout
+                            if (match.AwayTeam === team1Name) {
+                                team1Wins++;
+                            } else {
+                                team2Wins++;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const total = team1Wins + team2Wins;
+            return {
+                team1Wins,
+                team2Wins,
+                total
+            };
+        }
+
         // Update head-to-head display with custom team colors
         function updateHeadToHeadDisplay(h2hResult) {
             if (h2hResult && state.selectedTeam1 && state.selectedTeam2) {
@@ -8177,11 +8355,38 @@
                 const team1Style = team1Color ? `background: ${team1Color} !important; color: ${getContrastColor(team1Color)} !important;` : '';
                 const team2Style = team2Color ? `background: ${team2Color} !important; color: ${getContrastColor(team2Color)} !important;` : '';
                 
-                // Create H2H visualizations based on home/away filter selection
+                // Create H2H visualizations based on penalty filter or home/away filter selection
                 let visualizationHTML = '';
-                
-                // Show overall stats only if both home and away are selected
-                if (state.homeFilter && state.awayFilter) {
+
+                // Check if penalty shootouts filter is active
+                if (state.h2hPenaltyFilter) {
+                    // Special penalty shootout visualization - only wins/losses, no draws
+                    const penaltyStats = calculatePenaltyShootoutStats(h2hResult.matches, state.selectedTeam1, state.selectedTeam2);
+
+                    if (penaltyStats.total > 0) {
+                        visualizationHTML += `
+                            <div class="mb-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-semibold">${state.selectedTeam1} vs ${state.selectedTeam2} (Penalty Shootouts)</span>
+                                    <span class="text-sm text-gray-600">${penaltyStats.team1Wins}W - ${penaltyStats.team2Wins}W</span>
+                                </div>
+                                <div class="h2h-viz-bar">
+                                    <div class="h2h-segment h2h-wins" style="width: ${(penaltyStats.team1Wins / penaltyStats.total) * 100}%; ${team1Style}">
+                                        ${penaltyStats.team1Wins > 0 ? penaltyStats.team1Wins : ''}
+                                    </div>
+                                    <div class="h2h-segment h2h-losses" style="width: ${(penaltyStats.team2Wins / penaltyStats.total) * 100}%; ${team2Style}">
+                                        ${penaltyStats.team2Wins > 0 ? penaltyStats.team2Wins : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+                    } else {
+                        visualizationHTML += '<div class="text-sm text-gray-500 italic mb-4">No penalty shootout matches found</div>';
+                    }
+                } else {
+                    // Regular visualization with wins/draws/losses
+
+                    // Show overall stats only if both home and away are selected
+                    if (state.homeFilter && state.awayFilter) {
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
@@ -8249,7 +8454,8 @@
                             ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
                         </div>`;
                 }
-                
+                } // End of else block for regular visualization
+
                 elements.h2hVisualizations.innerHTML = visualizationHTML;
                 
                 // Update H2H matches table based on filter state
