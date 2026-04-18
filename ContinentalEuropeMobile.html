@@ -3233,7 +3233,7 @@
                         const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
                         const response = await fetch(cacheBustUrl, {
                             signal: controller.signal,
-                            headers: { 'Accept': 'text/csv,text/plain,*/*', 'Cache-Control': 'no-cache' }
+                            headers: { 'Accept': 'text/csv,text/plain,*/*' }
                         });
                         clearTimeout(timeoutId);
                         
