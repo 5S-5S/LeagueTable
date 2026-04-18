@@ -3164,18 +3164,27 @@
                     return null;
                 }
                 
+                // Strip commit hash from gist URL so we always fetch the latest version
+                // Converts: /raw/HASH/filename.csv -> /raw/filename.csv
+                function stripGistCommitHash(url) {
+                    return url.replace(
+                        /(https:\/\/gist\.githubusercontent\.com\/[^/]+\/[^/]+\/raw\/)([0-9a-f]{40}\/)(.+)/i,
+                        '$1$3'
+                    );
+                }
+
                 // Check if the result is a valid URL (single encoding)
                 if (decoded && decoded.startsWith('https://gist.githubusercontent.com')) {
                     // Successfully decoded single base64 URL
-                    return decoded;
+                    return stripGistCommitHash(decoded);
                 }
-                
+
                 // If not a valid URL, try double decode (backward compatibility)
                 try {
                     const doubleDecoded = atob(decoded);
                     if (doubleDecoded && doubleDecoded.startsWith('https://gist.githubusercontent.com')) {
                         // Successfully decoded double base64 URL
-                        return doubleDecoded;
+                        return stripGistCommitHash(doubleDecoded);
                     }
                 } catch (error) {
                     // Ignore double decode errors
@@ -3279,9 +3288,10 @@
                         const controller = new AbortController();
                         const timeoutId = setTimeout(() => controller.abort(), 15000);
                         
-                        const response = await fetch(url, { 
+                        const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
+                        const response = await fetch(cacheBustUrl, {
                             signal: controller.signal,
-                            headers: { 'Accept': 'text/csv,text/plain,*/*' }
+                            headers: { 'Accept': 'text/csv,text/plain,*/*', 'Cache-Control': 'no-cache' }
                         });
                         clearTimeout(timeoutId);
                         
