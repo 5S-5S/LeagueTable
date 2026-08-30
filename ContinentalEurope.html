@@ -907,7 +907,7 @@
         // Main Champions League data URLs
         const MAIN_GIST_URLS = [
             'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy82MWI1NzlmYTljMzM5MzNmYjRiNzg3YzZhOWQzODhlYy9yYXcvNGJkNTM0ZjA2OWFjNGZlNmEwMzljM2MzZTE2OGQyMjliYTRiMmY2MS9jaGFtcGlvbnNsZWFndWUuY3N2',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iMWU1NTcwZTk4NWQ3ZmNhNGRlYWJjYzhhMDA0ZTllMC9yYXcvZTBjZGZjODg0YzA2ZmE3OGI5MmE0NDM3ZTE0YmRhNWMwMDAxNzE5MC9jaGFtcGlvbnNsZWFndWUyNTI2LmNzdg=='
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iMWU1NTcwZTk4NWQ3ZmNhNGRlYWJjYzhhMDA0ZTllMC9yYXcvOWNlMzhiYzZiYWUxOTg3Y2VhZDM3ODJlOTIwMTAxZjI0NWMyYjkxOS9jaGFtcGlvbnNsZWFndWUyNTI2LmNzdg=='
         ];
         
         // Qualifier data URLs
@@ -7919,14 +7919,31 @@
                                 <p class="text-lg font-bold text-gray-700">
                                     <span style="color: ${aggregateInfo.winnerColor}; font-weight: bold;">
                                         ${aggregateInfo.winner}
-                                    </span> 
+                                    </span>
                                     def. ${aggregateInfo.loser} ${aggregateInfo.totalScore}
                                 </p>
                             `;
                             pairingContainer.appendChild(aggregateDiv);
                         }
+                    } else if (matches.length === 1) {
+                        // Single-leg ties (typically Finals) decided after extra time or penalties
+                        // still need a summary, since the regulation-time score alone can look like a draw.
+                        const singleMatchInfo = calculateSingleMatchResult(matches[0]);
+                        if (singleMatchInfo) {
+                            const resultDiv = document.createElement('div');
+                            resultDiv.className = 'text-center mt-3 mb-2';
+                            resultDiv.innerHTML = `
+                                <p class="text-lg font-bold text-gray-700">
+                                    <span style="color: ${singleMatchInfo.winnerColor}; font-weight: bold;">
+                                        ${singleMatchInfo.winner}
+                                    </span>
+                                    def. ${singleMatchInfo.loser} ${singleMatchInfo.totalScore}
+                                </p>
+                            `;
+                            pairingContainer.appendChild(resultDiv);
+                        }
                     }
-                    
+
                     roundContainer.appendChild(pairingContainer);
                 });
                 
@@ -8112,7 +8129,62 @@
                 winnerColor: winnerColor
             };
         }
-        
+
+        // Determine the true winner of a single-leg knockout match (e.g. a Final)
+        // when it was decided after extra time or on penalties, since the
+        // regulation-time score alone (used for the Result column) can show a draw.
+        function calculateSingleMatchResult(match) {
+            if (!match.AdditionalInfo) return null;
+
+            const info = match.AdditionalInfo.toLowerCase();
+            const hasAet = info.includes('aet');
+            const hasPso = info.includes('pso');
+
+            if (!hasAet && !hasPso) return null;
+
+            const homeScore = parseInt(match.FTHG) || 0;
+            const awayScore = parseInt(match.FTAG) || 0;
+            let winner, loser, finalScore;
+
+            if (hasPso) {
+                const psoMatch = match.AdditionalInfo.match(/pso\s+(\d+):(\d+)/i);
+                if (!psoMatch) return null;
+
+                const homePenalties = parseInt(psoMatch[1]);
+                const awayPenalties = parseInt(psoMatch[2]);
+
+                if (homePenalties > awayPenalties) {
+                    winner = match.HomeTeam;
+                    loser = match.AwayTeam;
+                } else {
+                    winner = match.AwayTeam;
+                    loser = match.HomeTeam;
+                }
+
+                finalScore = `${homeScore}-${awayScore}${hasAet ? ' aet' : ''}, (Penalty Shootout ${homePenalties}-${awayPenalties})`;
+            } else {
+                // Won outright in extra time (no shootout needed)
+                if (homeScore > awayScore) {
+                    winner = match.HomeTeam;
+                    loser = match.AwayTeam;
+                } else if (awayScore > homeScore) {
+                    winner = match.AwayTeam;
+                    loser = match.HomeTeam;
+                } else {
+                    return null;
+                }
+
+                finalScore = `${homeScore}-${awayScore} aet`;
+            }
+
+            return {
+                winner: winner,
+                loser: loser,
+                totalScore: finalScore,
+                winnerColor: getTeamColor(winner, state.selectedLeague) || '#059669'
+            };
+        }
+
         function createKnockoutMatchRow(match) {
             const homeTeamColor = getTeamColor(match.HomeTeam, state.selectedLeague);
             const awayTeamColor = getTeamColor(match.AwayTeam, state.selectedLeague);
