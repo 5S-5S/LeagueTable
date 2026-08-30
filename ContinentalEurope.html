@@ -6766,14 +6766,17 @@
             
             // Group by CompetitionPhase if season is selected (excluding the three specific era filters)
             if (shouldGroupByPhase) {
-                return groupTablesByCompetitionPhase(filtered, tableArray);
+                return groupTablesByCompetitionPhase(filtered, teamsToShow);
             }
-            
+
             return { tableData: tableArray, matchCount: filtered.length };
         }
 
-        // Group tables by CompetitionPhase for season filtering
-        function groupTablesByCompetitionPhase(filteredMatches, allTeamsTable) {
+        // Group tables by CompetitionPhase for season filtering.
+        // teamsToShow restricts each phase's table to just the selected team(s) (if any) —
+        // without this, a phase table would include every opponent those matches touch,
+        // each with a lopsided partial record (e.g. 1 played) instead of just the team(s) asked for.
+        function groupTablesByCompetitionPhase(filteredMatches, teamsToShow) {
             // Get unique competition phases from filtered matches
             let competitionPhases = [...new Set(filteredMatches.map(match => match.CompetitionPhase || 'Unknown'))]
                 .filter(phase => phase && phase.trim() !== '');
@@ -6897,8 +6900,14 @@
                     }
                 });
                 
+                // Restrict to the selected team(s), if any, before sorting/displaying
+                let phaseTeamsForDisplay = Object.values(phaseTable);
+                if (teamsToShow) {
+                    phaseTeamsForDisplay = phaseTeamsForDisplay.filter(team => teamsToShow.includes(team.team));
+                }
+
                 // Convert to array and sort
-                const phaseTableArray = sortPhaseTableData(Object.values(phaseTable), phase);
+                const phaseTableArray = sortPhaseTableData(phaseTeamsForDisplay, phase);
                 
                 // Add positions
                 phaseTableArray.forEach((team, index) => {
