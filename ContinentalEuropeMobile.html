@@ -873,13 +873,13 @@
         // Updated GIST URLs with single base64 encoding (encoded with new user-provided URLs)
         // Main Champions League data URLs
         const MAIN_GIST_URLS = [
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy82MWI1NzlmYTljMzM5MzNmYjRiNzg3YzZhOWQzODhlYy9yYXcvNGJkNTM0ZjA2OWFjNGZlNmEwMzljM2MzZTE2OGQyMjliYTRiMmY2MS9jaGFtcGlvbnNsZWFndWUuY3N2',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iMWU1NTcwZTk4NWQ3ZmNhNGRlYWJjYzhhMDA0ZTllMC9yYXcvOWNlMzhiYzZiYWUxOTg3Y2VhZDM3ODJlOTIwMTAxZjI0NWMyYjkxOS9jaGFtcGlvbnNsZWFndWUyNTI2LmNzdg=='
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy82MWI1NzlmYTljMzM5MzNmYjRiNzg3YzZhOWQzODhlYy9yYXcvYjA4YTBiZWU4MGNiYWI0MDNkMTdkMzY1MmI0MzRhOTdkNDJkNDQxNy9jaGFtcGlvbnNsZWFndWUuY3N2',
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iMWU1NTcwZTk4NWQ3ZmNhNGRlYWJjYzhhMDA0ZTllMC9yYXcvY2VhNGJmNDJkZjYyZmIxZGZmNzE5YTQ5N2MwZmQ4ZWZkMmQyODhmOS9jaGFtcGlvbnNsZWFndWUyNTI2LmNzdg=='
         ];
         
         // Qualifier data URLs
         const QUALIFIER_GIST_URLS = [
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iYmMyMGMzMmQyNWNjZGMwZmVkZjI1YmM4N2Q0NDY2ZS9yYXcvOWE2ZWNjYTdjOGRiY2UyMTA4MGYzOGFhMTM2MDI2MTU0OTZhZGFmNy9jbHF1YWxpZmllcnMuY3N2'
+            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iYmMyMGMzMmQyNWNjZGMwZmVkZjI1YmM4N2Q0NDY2ZS9yYXcvZjZhNTQ5NDg1YzZlNDNiZWJmNmUzYjZmNmU3NDMyNGFiNDY1YWZjMi9jbHF1YWxpZmllcnMuY3N2'
         ];
         
         // Combined URLs for loading
@@ -931,7 +931,7 @@
             excludeQualifiers: false,
             excludeMainStage: false,
             selectedLeague: 'champions-league',
-            selectedSeason: 'all-european-cup-seasons-1955-2025',
+            selectedSeason: 'all-european-cup-seasons-1955-2026',
             sortConfig: { key: null, direction: null },
             teamHistorySortConfig: { key: null, direction: null },
             recentH2HCount: 'All',
@@ -1431,7 +1431,7 @@
                     ['Celtic FC', '#018749', 1287],
                     ['RSC Anderlecht', '#E0AA00', 1229],
                     ['Galatasaray', '#A90432', 795],
-                    ['Olympiakos Piraeus', '#D0061F', 1400],
+                    ['Olympiacos FC', '#D0061F', 1400],
                     ['Crvena Zvezda', '#EB1926', 989],
                     ['Rangers FC', '#1B458F', 1285],
                     ['Shakhtar Donetsk', '#F0612C', 1364],
@@ -1464,7 +1464,7 @@
                     ['Spartak Trnava', '#F70505', 1314],
                     ['Partizan', '#000000', 991],
                     ['AEK Athen', '#FFFF00', 1401],
-                    ['FC København', '#375197', 1347],
+                    ['FC København', '#375197', 651],
                     ['Dinamo Zagreb', '#1D3A8D', 1199],
                     ['Budapesti Vasas', '##000CC', 1208],
                     ['RB Salzburg', '#E41349', 788],
@@ -1510,7 +1510,7 @@
                     ['FC Carl Zeiss Jena', '#0F59FA', 372],
                     ['Glentoran FC', '#37C200', 879],
                     ['Viktoria Plzeň', '#0000FF', 3093],
-                    ['FC Universitatea Craiova', '#000000', 1140],
+                    ['CS Universitatea Craiova', '#000000', 1140],
                     ['Lillestrøm SK', '#FFFF00', 1270],
                     ['DWS Amsterdam', '#0033A1', 1452],
                     ['Vejle BK', '#FA0808', 1344],
@@ -1727,7 +1727,7 @@
                     ['IF Elfsborg', '#000000', 1336],
                     ['FK Rabotnički', '#FF0000', 3127],
                     ['FK RFS', '#034694', 1088],
-                    ['Drita Gjilan', '#034694', 8403],
+                    ['KF Drita', '#034694', 8403],
                     ['FC Alashkert', '#333333', 18924],
                     ['HB Tórshavn', '#FF0000', 982],
                     ['Shakter Karaganda', '#000000', 3507],
@@ -1896,7 +1896,13 @@
                     ['SS Virtus', '#099902', 4094],
                     ['Bangor City', '#FF0000', 2428],
                     ['Rhyl FC', '#0033FF', 3557],
-                    ['Avenir Beggen', '#005999', 823]
+                    ['Avenir Beggen', '#005999', 823],
+                    ['Sabah FK', '#E055A0', 136820],
+                    ['Kauno Žalgiris', '#000000', 73159],
+                    ['FC Atert Bissen', '#FFFF00', 22697],
+                    ['FC Maxline Vitebsk', '#013220', 174183],
+                    ['Mjällby AIF', '#FFFF00', 1296],
+                    ['N.E.C.', '#E63027', 1347]
                 ]
             };
         }
@@ -2001,6 +2007,7 @@
         // Season mappings
         const seasons = {
             'champions-league': {
+                '2026-27': { start: '2026-07-01', end: '2027-06-30' },
                 '2025-26': { start: '2025-07-01', end: '2026-06-30' },
                 '2024-25': { start: '2024-07-01', end: '2025-06-30' },
                 '2023-24': { start: '2023-07-01', end: '2024-06-30' },
@@ -3712,9 +3719,9 @@
             if (state.teamSeasonsSelectedLeague === 'champions-league') {
                 // Only show Champions League eras
                 seasonOptions += `
-                    <option value="champions-league-era-1992-2025">Champions League Era (1992-2025)</option>
+                    <option value="champions-league-era-1992-2026">Champions League Era (1992-2026)</option>
                     <option value="european-cup-era-1955-1992">European Cup Era (1955-1992)</option>
-                    <option value="all-european-cup-seasons-1955-2025">All European Cup Seasons (1955-2025)</option>
+                    <option value="all-european-cup-seasons-1955-2026">All European Cup Seasons (1955-2026)</option>
                 `;
             }
             
@@ -5245,9 +5252,9 @@
 
         // Update competition stage dropdown options based on current context
         function updateCompetitionStageOptions() {
-            const isEraFilter = state.selectedSeason === 'all-european-cup-seasons-1955-2025' || 
+            const isEraFilter = state.selectedSeason === 'all-european-cup-seasons-1955-2026' || 
                                state.selectedSeason === 'european-cup-era-1955-1992' || 
-                               state.selectedSeason === 'champions-league-era-1992-2025';
+                               state.selectedSeason === 'champions-league-era-1992-2026';
             const isCustomDateRange = !state.selectedSeason || state.selectedSeason === '';
             
             // Show "All" option only for era filters or custom date ranges
@@ -5344,14 +5351,14 @@
 
         // Get season date range
         function getSeasonDateRange(seasonKey) {
-            if (seasonKey === 'champions-league-era-1992-2025') {
-                return { start: '1992-09-01', end: '2026-06-30' };
+            if (seasonKey === 'champions-league-era-1992-2026') {
+                return { start: '1992-09-01', end: '2027-06-30' };
             }
             if (seasonKey === 'european-cup-era-1955-1992') {
                 return { start: '1955-09-01', end: '1992-06-30' };
             }
-            if (seasonKey === 'all-european-cup-seasons-1955-2025') {
-                return { start: '1955-09-01', end: '2026-06-30' };
+            if (seasonKey === 'all-european-cup-seasons-1955-2026') {
+                return { start: '1955-09-01', end: '2027-06-30' };
             }
             if (seasonKey === 'english-first-division-era-1888-1992') {
                 return { start: '1888-09-08', end: '1992-05-25' };
@@ -6211,9 +6218,9 @@
             const options = '<option value="">Select Season</option>' + 
                 availableSeasons.map(season => {
                     let label = season;
-                    if (season === 'champions-league-era-1992-2025') label = 'Champions League Era (1992-2025)';
+                    if (season === 'champions-league-era-1992-2026') label = 'Champions League Era (1992-2026)';
                     if (season === 'european-cup-era-1955-1992') label = 'European Cup Era (1955-1992)';
-                    if (season === 'all-european-cup-seasons-1955-2025') label = 'All European Cup Seasons (1955-2025)';
+                    if (season === 'all-european-cup-seasons-1955-2026') label = 'All European Cup Seasons (1955-2026)';
                     return `<option value="${season}">${label}</option>`;
                 }).join('');
             
@@ -6259,14 +6266,13 @@
                     match.dateObj <= seasonEnd
                 );
 
-                // Check if season has any non-qualifier matches
-                const hasNonQualifierMatches = seasonMatches.some(match => !match.isQualifier);
-
-                return hasNonQualifierMatches;
+                // Show the season if it has any matches at all (main draw or qualifiers-in-progress,
+                // e.g. a new season whose qualifiers have started but League Phase hasn't yet)
+                return seasonMatches.length > 0;
             });
 
             if (leagueToUse === 'champions-league') {
-                return ['champions-league-era-1992-2025', 'european-cup-era-1955-1992', 'all-european-cup-seasons-1955-2025', ...filteredSeasons];
+                return ['champions-league-era-1992-2026', 'european-cup-era-1955-1992', 'all-european-cup-seasons-1955-2026', ...filteredSeasons];
             }
 
             // For Europa League and Conference League, just return filtered seasons
@@ -6313,16 +6319,28 @@
             let filtered = [...state.data];
 
             // Check if we should group by CompetitionPhase (exclude when no season selected OR one of the three specific era filters)
-            const isEraFilter = state.selectedSeason === 'all-european-cup-seasons-1955-2025' ||
+            const isEraFilter = state.selectedSeason === 'all-european-cup-seasons-1955-2026' ||
                                state.selectedSeason === 'european-cup-era-1955-1992' ||
-                               state.selectedSeason === 'champions-league-era-1992-2025';
+                               state.selectedSeason === 'champions-league-era-1992-2026';
             const isSpecificSeason = state.selectedSeason && state.selectedSeason !== '' && !isEraFilter;
             const shouldGroupByPhase = isSpecificSeason;
 
-            // Auto-exclude qualifiers for specific season filters (not era filters)
-            if (isSpecificSeason) {
-                filtered = filtered.filter(row => !row.isQualifier);
-            } else {
+            // Auto-exclude qualifiers for specific season filters (not era filters), unless the
+            // user explicitly wants to see only qualifiers via the Exclude Main Stage checkbox,
+            // or the season has nothing but qualifier matches so far (e.g. a season whose
+            // qualifying rounds are underway but League Phase hasn't started yet) — in that
+            // case hiding qualifiers by default would leave nothing to show at all.
+            if (isSpecificSeason && !state.excludeMainStage) {
+                const seasonRange = getSeasonDateRange(state.selectedSeason);
+                const hasNonQualifierDataForSeason = !seasonRange || filtered.some(row =>
+                    !row.isQualifier &&
+                    row.dateObj >= new Date(seasonRange.start) &&
+                    row.dateObj <= new Date(seasonRange.end)
+                );
+                if (hasNonQualifierDataForSeason) {
+                    filtered = filtered.filter(row => !row.isQualifier);
+                }
+            } else if (!isSpecificSeason) {
                 // Apply manual qualifier exclusion filter for era filters and no season
                 if (state.excludeQualifiers) {
                     filtered = filtered.filter(row => !row.isQualifier);
