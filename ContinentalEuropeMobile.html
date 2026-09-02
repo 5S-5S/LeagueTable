@@ -129,48 +129,52 @@
                 
                 <!-- Filters -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 collapsible-control">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-search mr-2"></span>Season
-                        </label>
-                        <select id="seasonSelect" class="form-input">
-                            <option value="">Select Season</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-search mr-2"></span>Season
+                            </label>
+                            <select id="seasonSelect" class="form-input">
+                                <option value="">Select Season</option>
+                            </select>
+                        </div>
+
+                        <!-- Competition Stage Filter (only visible when season is selected) -->
+                        <div id="competitionStageContainer">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-trophy mr-2">🏆</span>Stage
+                            </label>
+                            <select id="competitionStageSelect" class="form-input">
+                                <option value="">All</option>
+                                <option value="group-stage">League/Group Stage</option>
+                                <option value="knockout-stage">Knock-Out Stage</option>
+                                <option value="Final">Final</option>
+                                <option value="Semi-Finals">Semi-Finals</option>
+                                <option value="Quarter-Finals">Quarter-Finals</option>
+                                <option value="Round Of 16">Round Of 16</option>
+                                <option value="Play-Offs">Play-Offs</option>
+                                <option value="2. Round">2. Round</option>
+                                <option value="1. Round">1. Round</option>
+                            </select>
+                        </div>
                     </div>
-                    
-                    <!-- Competition Stage Filter (only visible when season is selected) -->
-                    <div id="competitionStageContainer">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-trophy mr-2">🏆</span>Stage
-                        </label>
-                        <select id="competitionStageSelect" class="form-input">
-                            <option value="">All</option>
-                            <option value="group-stage">League/Group Stage</option>
-                            <option value="knockout-stage">Knock-Out Stage</option>
-                            <option value="Final">Final</option>
-                            <option value="Semi-Finals">Semi-Finals</option>
-                            <option value="Quarter-Finals">Quarter-Finals</option>
-                            <option value="Round Of 16">Round Of 16</option>
-                            <option value="Play-Offs">Play-Offs</option>
-                            <option value="2. Round">2. Round</option>
-                            <option value="1. Round">1. Round</option>
-                        </select>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
+                            </label>
+                            <input type="date" id="dateFrom" class="form-input">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
+                            </label>
+                            <input type="date" id="dateTo" class="form-input">
+                        </div>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
-                        </label>
-                        <input type="date" id="dateFrom" class="form-input">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
-                        </label>
-                        <input type="date" id="dateTo" class="form-input">
-                    </div>
-                    
+
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-calendar mr-2"></span>Day of Week
@@ -186,33 +190,35 @@
                             <option value="6">Saturday</option>
                         </select>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-search mr-2"></span>Team 1
-                        </label>
-                        <div class="combobox-container" id="team1ComboboxContainer">
-                            <input type="text" id="team1ComboboxInput" class="combobox-input" placeholder="All Teams" autocomplete="off">
-                            <span class="combobox-arrow">▼</span>
-                            <div class="combobox-dropdown" id="team1ComboboxDropdown"></div>
-                        </div>
-                        <select id="team1Select" class="form-input" style="display: none;">
-                            <option value="">All Teams</option>
-                        </select>
-                    </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-search mr-2"></span>Team 2
-                        </label>
-                        <div class="combobox-container" id="team2ComboboxContainer">
-                            <input type="text" id="team2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
-                            <span class="combobox-arrow">▼</span>
-                            <div class="combobox-dropdown" id="team2ComboboxDropdown"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-search mr-2"></span>Team 1
+                            </label>
+                            <div class="combobox-container" id="team1ComboboxContainer">
+                                <input type="text" id="team1ComboboxInput" class="combobox-input" placeholder="All Teams" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="team1ComboboxDropdown"></div>
+                            </div>
+                            <select id="team1Select" class="form-input" style="display: none;">
+                                <option value="">All Teams</option>
+                            </select>
                         </div>
-                        <select id="team2Select" class="form-input" style="display: none;">
-                            <option value="">No Team</option>
-                        </select>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-search mr-2"></span>Team 2
+                            </label>
+                            <div class="combobox-container" id="team2ComboboxContainer">
+                                <input type="text" id="team2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="team2ComboboxDropdown"></div>
+                            </div>
+                            <select id="team2Select" class="form-input" style="display: none;">
+                                <option value="">No Team</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 

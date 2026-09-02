@@ -129,71 +129,77 @@
                 
                 <!-- Filters -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 collapsible-control">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-search mr-2"></span>Season
-                        </label>
-                        <select id="seasonSelect" class="form-input">
-                            <option value="">Select Season</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
-                        </label>
-                        <input type="date" id="dateFrom" class="form-input">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
-                        </label>
-                        <input type="date" id="dateTo" class="form-input">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-calendar mr-2"></span>Day of Week
-                        </label>
-                        <select id="dayOfWeekSelect" class="form-input">
-                            <option value="">All Days</option>
-                            <option value="0">Sunday</option>
-                            <option value="1">Monday</option>
-                            <option value="2">Tuesday</option>
-                            <option value="3">Wednesday</option>
-                            <option value="4">Thursday</option>
-                            <option value="5">Friday</option>
-                            <option value="6">Saturday</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-search mr-2"></span>Team 1
-                        </label>
-                        <div class="combobox-container" id="team1ComboboxContainer">
-                            <input type="text" id="team1ComboboxInput" class="combobox-input" placeholder="All Teams" autocomplete="off">
-                            <span class="combobox-arrow">▼</span>
-                            <div class="combobox-dropdown" id="team1ComboboxDropdown"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-search mr-2"></span>Season
+                            </label>
+                            <select id="seasonSelect" class="form-input">
+                                <option value="">Select Season</option>
+                            </select>
                         </div>
-                        <select id="team1Select" class="form-input" style="display: none;">
-                            <option value="">All Teams</option>
-                        </select>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-calendar mr-2"></span>Day of Week
+                            </label>
+                            <select id="dayOfWeekSelect" class="form-input">
+                                <option value="">All Days</option>
+                                <option value="0">Sunday</option>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            <span class="icon-search mr-2"></span>Team 2
-                        </label>
-                        <div class="combobox-container" id="team2ComboboxContainer">
-                            <input type="text" id="team2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
-                            <span class="combobox-arrow">▼</span>
-                            <div class="combobox-dropdown" id="team2ComboboxDropdown"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
+                            </label>
+                            <input type="date" id="dateFrom" class="form-input">
                         </div>
-                        <select id="team2Select" class="form-input" style="display: none;">
-                            <option value="">No Team</option>
-                        </select>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
+                            </label>
+                            <input type="date" id="dateTo" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-search mr-2"></span>Team 1
+                            </label>
+                            <div class="combobox-container" id="team1ComboboxContainer">
+                                <input type="text" id="team1ComboboxInput" class="combobox-input" placeholder="All Teams" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="team1ComboboxDropdown"></div>
+                            </div>
+                            <select id="team1Select" class="form-input" style="display: none;">
+                                <option value="">All Teams</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-search mr-2"></span>Team 2
+                            </label>
+                            <div class="combobox-container" id="team2ComboboxContainer">
+                                <input type="text" id="team2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="team2ComboboxDropdown"></div>
+                            </div>
+                            <select id="team2Select" class="form-input" style="display: none;">
+                                <option value="">No Team</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
