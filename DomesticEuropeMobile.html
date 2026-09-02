@@ -1679,6 +1679,7 @@
                     ['Hansa Rostock', '#0033CC', 243],
                     ['FC St. Pauli', '#8B4513', 234],
                     ['1. FC Union Berlin', '#E40019', 330],
+                    ['SV Elversberg', '#000000', 13214],
                     ['Waldhof Mannheim', '#004292', 338],
                     ['Kickers Offenbach', '#FF0000', 226],
                     ['Rot-Weiss Essen', '#FF0000', 224],
@@ -1921,6 +1922,7 @@
         // Season mappings
         const seasons = {
             'serie-a': {
+                '2026-27': { start: '2026-08-01', end: '2027-06-30' },
                 '2025-26': { start: '2025-08-01', end: '2026-06-30' },
                 '2024-25': { start: '2024-08-01', end: '2025-06-30' },
                 '2023-24': { start: '2023-08-01', end: '2024-06-30' },
@@ -1974,7 +1976,7 @@
             }
 
             // Premier League and English First Division seasons
-            for (let year = 1888; year <= 2025; year++) {
+            for (let year = 1888; year <= 2026; year++) {
                 if (year === 2019 || year === 2020) continue; // Skip COVID seasons
                 
                 // Skip WWI seasons: 1915-16, 1916-17, 1917-18, 1918-19
@@ -2014,7 +2016,7 @@
             ['bundesliga', 'la-liga', 'ligue-1'].forEach(league => {
                 seasons[league] = seasons[league] || {};
                 const startYear = league === 'bundesliga' ? 1963 : league === 'la-liga' ? 1928 : 1932;
-                for (let year = startYear; year <= 2025; year++) {
+                for (let year = startYear; year <= 2026; year++) {
                     if (league === 'la-liga' && year >= 1936 && year <= 1938) continue;
                     if (league === 'la-liga' && (year === 2019 || year === 2020)) continue; // Skip COVID seasons
                     if (league === 'ligue-1' && year >= 1939 && year <= 1944) continue;
@@ -4351,7 +4353,7 @@
                     // Process each team at this position
                     teamsAtPosition.forEach(teamAtPosition => {
                         // Check if this season should be included (34+ games or historical incomplete season)
-                        const shouldInclude = teamAtPosition.played >= 34 || seasonFilter !== '2025-26';
+                        const shouldInclude = teamAtPosition.played >= 34 || seasonFilter !== '2026-27';
                         
                         // Check for stripped champions (position-only filtering, no team filter)
                         const isStripped = isStrippedChampion(teamAtPosition.team, divCode, seasonFilter, selectedPos, false, true);
@@ -5266,10 +5268,10 @@
             // Set default date ranges for specific leagues
             if (newLeague === 'premier-league') {
                 state.dateFrom = '1992-08-01';
-                state.dateTo = '2026-06-30';
+                state.dateTo = '2027-06-30';
             } else if (newLeague === 'ligue-1') {
                 state.dateFrom = '2002-07-01';
-                state.dateTo = '2026-06-30';
+                state.dateTo = '2027-06-30';
             } else {
                 // For other leagues, use the full data range
                 const leagueData = state.data.filter(row => row.Div === leagueMapping[newLeague]);
@@ -5331,31 +5333,31 @@
         // Get season date range
         function getSeasonDateRange(seasonKey) {
             if (seasonKey === 'ligue-1-era-2002-2025') {
-                return { start: '2002-07-01', end: '2026-06-30' };
+                return { start: '2002-07-01', end: '2027-06-30' };
             }
             if (seasonKey === 'french-division-1-1932-2002') {
                 return { start: '1932-07-01', end: '2002-06-30' };
             }
             if (seasonKey === 'all-french-seasons-1932-2025') {
-                return { start: '1932-07-01', end: '2026-06-30' };
+                return { start: '1932-07-01', end: '2027-06-30' };
             }
             if (seasonKey === 'premier-league-era-1992-2025') {
-                return { start: '1992-08-01', end: '2026-06-30' };
+                return { start: '1992-08-01', end: '2027-06-30' };
             }
             if (seasonKey === 'english-first-division-era-1888-1992') {
                 return { start: '1888-09-08', end: '1992-05-25' };
             }
             if (seasonKey === 'all-english-seasons-1888-2025') {
-                return { start: '1888-08-01', end: '2026-06-30' };
+                return { start: '1888-08-01', end: '2027-06-30' };
             }
             if (seasonKey === 'all-spanish-seasons-1928-2025') {
-                return { start: '1929-01-01', end: '2026-06-30' };
+                return { start: '1929-01-01', end: '2027-06-30' };
             }
             if (seasonKey === 'all-italian-seasons-1929-2025') {
-                return { start: '1929-07-01', end: '2026-06-30' };
+                return { start: '1929-07-01', end: '2027-06-30' };
             }
             if (seasonKey === 'all-german-seasons-1963-2025') {
-                return { start: '1963-07-01', end: '2026-06-30' };
+                return { start: '1963-07-01', end: '2027-06-30' };
             }
             
             if (seasons[state.selectedLeague] && seasons[state.selectedLeague][seasonKey]) {
@@ -8280,8 +8282,8 @@
                     // Always include seasons with 34+ games
                     if (season.played >= 34) return true;
                     
-                    // For seasons under 34 games, exclude only if it's the current season (2025-26)
-                    const isCurrentSeason = season.season === '2025-26';
+                    // For seasons under 34 games, exclude only if it's the current season (2026-27)
+                    const isCurrentSeason = season.season === '2026-27';
                     return !isCurrentSeason;
                 }).filter(season => {
                     // Apply stripped champions filtering (both team and position are selected)
