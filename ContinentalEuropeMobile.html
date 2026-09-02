@@ -685,6 +685,33 @@
                 <span class="text-lg font-semibold text-gray-700" id="tableInfoText"></span>
             </div>
 
+            <!-- Table Section -->
+            <div class="table-section">
+
+                <div id="errorState" class="text-center text-black hidden">
+                    <div class="icon-loading w-16 h-16 mx-auto mb-4" style="font-size: 4rem;"></div>
+                    <div class="text-2xl mb-4">Loading Data</div>
+                    <div class="text-lg mb-6 text-black" id="errorMessage"></div>
+                    <button id="retryBtn" class="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all">
+                        Try Again
+                    </button>
+                </div>
+
+                <div id="tableContainer" class="hidden">
+                    <div class="league-table">
+                        <table>
+                            <thead>
+                                <tr id="tableHeader">
+                                    <!-- Headers will be populated -->
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <!-- Rows will be populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            
             <!-- Head-to-Head Section -->
             <div id="h2hSection" class="mt-8 p-8 bg-white border-b rounded-xl hidden">
                 <div class="mb-4">
@@ -741,33 +768,6 @@
                     <!-- H2H visualizations will be populated here -->
                 </div>
             </div>
-            
-            <!-- Table Section -->
-            <div class="table-section">
-
-                <div id="errorState" class="text-center text-black hidden">
-                    <div class="icon-loading w-16 h-16 mx-auto mb-4" style="font-size: 4rem;"></div>
-                    <div class="text-2xl mb-4">Loading Data</div>
-                    <div class="text-lg mb-6 text-black" id="errorMessage"></div>
-                    <button id="retryBtn" class="px-6 py-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all">
-                        Try Again
-                    </button>
-                </div>
-
-                <div id="tableContainer" class="hidden">
-                    <div class="league-table">
-                        <table>
-                            <thead>
-                                <tr id="tableHeader">
-                                    <!-- Headers will be populated -->
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <!-- Rows will be populated -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
                 <!-- Head-to-Head Matches Table -->
                 <div id="h2hMatchesTable" class="mt-8 hidden">
@@ -790,7 +790,8 @@
                 </div>
 
                 <!-- Match History Section (Single Team) -->
-                <div id="matchHistorySection" class="mt-8 bg-white hidden" style="margin-left: -2rem !important; margin-right: -2rem !important;">
+                <div id="matchHistorySection" class="mt-8 hidden" style="margin-left: -2rem !important; margin-right: -2rem !important;">
+                  <div class="bg-white">
                     <div class="mb-4 px-6">
                         <h3 class="text-lg font-semibold text-gray-700 mb-3">Match History</h3>
 
@@ -841,10 +842,11 @@
                             </div>
                         </div>
                     </div>
-                    <div id="matchHistoryVisualizations" class="mb-8">
+                    <div id="matchHistoryVisualizations">
                         <!-- Team Record visualizations will be populated here -->
                     </div>
-                    <div id="matchHistoryTable" class="mt-4">
+                  </div>
+                    <div id="matchHistoryTable" class="mt-8">
                         <div class="league-table">
                             <div class="text-center py-4 bg-white border-b">
                                 <h2 class="text-xl font-semibold text-gray-700 mb-1">Match History</h2>
