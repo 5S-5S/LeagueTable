@@ -747,7 +747,7 @@ body {
 
 .team1-highlight {
     font-size: 1rem;
-    font-weight: 900;
+    font-weight: 700;
     background: #dcfce7;
     display: flex;
     align-items: center;
@@ -761,7 +761,7 @@ body {
 
 .team2-highlight {
     font-size: 1rem;
-    font-weight: 900;
+    font-weight: 700;
     background: #dbeafe;
     display: flex;
     align-items: center;
@@ -797,7 +797,7 @@ body {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
-    font-weight: 900 !important;
+    font-weight: 700 !important;
     font-style: normal !important;
     text-decoration: none !important;
     text-transform: none !important;
@@ -829,7 +829,7 @@ body {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
-    font-weight: 900 !important;
+    font-weight: 700 !important;
     font-style: normal !important;
     text-decoration: none !important;
     text-transform: none !important;
@@ -1233,7 +1233,7 @@ body {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
-    font-weight: 900 !important;
+    font-weight: 700 !important;
     font-style: normal !important;
     text-decoration: none !important;
     text-transform: none !important;
@@ -1266,7 +1266,7 @@ body {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
-    font-weight: 900 !important;
+    font-weight: 700 !important;
     font-style: normal !important;
     text-decoration: none !important;
     text-transform: none !important;
@@ -1298,7 +1298,7 @@ body {
     /* Reset any conflicting styles */
     font-family: inherit !important;
     font-size: 1rem !important;
-    font-weight: 900 !important;
+    font-weight: 700 !important;
     font-style: normal !important;
     text-decoration: none !important;
     text-transform: none !important;

@@ -3098,7 +3098,7 @@
             const winnerLogoUrl = winnerTeam !== 'Draw' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
             
             // Result highlighting for winner (if it's one of the selected teams)
-            let resultClass = '';
+            let resultClass = 'team-transparent-highlight';
             if (winnerTeam !== 'Draw') {
                 if (winnerTeam === team1) {
                     resultClass = 'team1-highlight';
@@ -5849,7 +5849,7 @@
             const awayTeamStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
             
             // Result highlighting for winner
-            let resultClass = '';
+            let resultClass = 'team-transparent-highlight';
             if (winnerTeam !== 'Draw') {
                 if (winnerTeam === state.lastTimeTeam1) {
                     resultClass = 'team1-highlight';
@@ -7514,7 +7514,7 @@
                 }
                 
                 // Result highlighting for winner (if it's the selected team)
-                let resultClass = '';
+                let resultClass = 'team-transparent-highlight';
                 if (winnerTeam !== 'Draw' && winnerTeam === state.selectedTeam1) {
                     resultClass = 'team1-highlight';
                 }
@@ -8729,7 +8729,7 @@
                 
                 // Update result style to include subtle highlight for winner (but not for draws)
                 let finalResultStyle = resultStyle;
-                let resultClass = '';
+                let resultClass = 'team-transparent-highlight';
                 if (winnerTeam !== 'Draw') {
                     if (winnerTeam === state.selectedTeam1) {
                         resultClass = 'team1-highlight';

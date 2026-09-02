@@ -349,6 +349,20 @@ body {
     color: #059669 !important;
 }
 
+/* Team Streaks - winning scores should be green */
+#teamStreaksResults .win-score,
+#teamStreaksResults td.win-score,
+#teamStreaksResults .text-center.text-lg.win-score {
+    color: #059669 !important;
+}
+
+/* Last Time When - winning scores should be green */
+#lastTimeResults .win-score,
+#lastTimeResults td.win-score,
+#lastTimeResults .text-center.text-lg.win-score {
+    color: #059669 !important;
+}
+
 /* Dark mode support for winning scores */
 [data-theme="dark"] #h2hTableBody .win-score,
 [data-theme="dark"] #matchHistoryTableBody .win-score {
