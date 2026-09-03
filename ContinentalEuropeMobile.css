@@ -1874,6 +1874,204 @@ body {
 }
 
 /* ============================================================
+   Mobile redesign: Team Streaks results (same concepts as The
+   Last Time When... above). Two very different table shapes share
+   #teamStreaksResults, distinguished by marker classes set in JS:
+   .streak-match-table   - a per-match list (Date/Home/H:A/Away/
+                            Result), same H:A merge as Last Time
+                            When/Match History.
+   .historic-streaks-table - streak metadata (Team(s)/Start->End/
+                            Count/Days), Start Date + End Date
+                            merged into one sortable "Start -> End"
+                            column, arrows removed. Column meaning
+                            shifts by index between head-to-head and
+                            single-team mode, so .historic-h2h-mode/
+                            .historic-single-mode further disambiguate
+                            (same technique as Team Seasons above).
+   The header-font-size rule matches the old shared rule's selector
+   depth (#teamStreaksResults .league-table table thead tr th) so
+   source order decides the winner instead of fighting specificity.
+   ============================================================ */
+@media (max-width: 640px) {
+    #teamStreaksResults .league-table table {
+        table-layout: fixed !important;
+        width: 100% !important;
+    }
+
+    #teamStreaksResults .league-table table thead tr th {
+        font-size: 0.55rem !important;
+        font-weight: 700 !important;
+        padding: 0.3rem 0.1rem !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        overflow-wrap: normal !important;
+        line-height: 1.1 !important;
+        vertical-align: middle !important;
+        word-break: normal !important;
+        hyphens: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        text-align: center !important;
+    }
+
+    #teamStreaksResults .league-table td {
+        font-size: 0.6rem !important;
+        padding: 0.3rem 0.15rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Reset the overflow/ellipsis that generic .league-table th/td
+       rules (written for the main League Table's Team column) would
+       otherwise leak onto these unrelated tables' headers/cells. */
+    #teamStreaksResults .league-table th,
+    #teamStreaksResults .league-table td {
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+
+    /* --- .streak-match-table: Date, Home, H:A, Away, Result --- */
+    #teamStreaksResults .streak-match-table th:nth-child(1),
+    #teamStreaksResults .streak-match-table td:nth-child(1) {
+        width: 64px !important;
+        min-width: 64px !important;
+        max-width: 64px !important;
+    }
+
+    #teamStreaksResults .streak-match-table th:nth-child(2),
+    #teamStreaksResults .streak-match-table td:nth-child(2),
+    #teamStreaksResults .streak-match-table th:nth-child(4),
+    #teamStreaksResults .streak-match-table td:nth-child(4) {
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+    }
+
+    #teamStreaksResults .streak-match-table td:nth-child(2) img,
+    #teamStreaksResults .streak-match-table td:nth-child(4) img {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    #teamStreaksResults .streak-match-table th:nth-child(3),
+    #teamStreaksResults .streak-match-table td:nth-child(3) {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        font-size: 0.75rem !important;
+    }
+
+    #teamStreaksResults .streak-match-table th:nth-child(5),
+    #teamStreaksResults .streak-match-table td:nth-child(5) {
+        width: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+    }
+
+    #teamStreaksResults .streak-match-table td:nth-child(5) img {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    /* --- .historic-streaks-table: Team(s), Start -> End, Count, Days --- */
+    #teamStreaksResults .historic-streaks-table td:nth-child(1) img {
+        width: 14px !important;
+        height: 14px !important;
+        margin-right: 0.15rem !important;
+    }
+
+    /* These team names were never inline-hidden - undo the old
+       generic nth-child(2)/(4) name-hiding rule (written for a
+       6-column layout where those indices were always Home/Away
+       Team columns) which would otherwise hide Team 2's name in
+       head-to-head mode here. Truncate instead of wrapping, since
+       these columns are narrow. Matches the old rule's nth-child
+       selector depth (#teamStreaksResults .league-table
+       td:nth-child(N) span) so specificity ties and source order
+       (later in the file) decides the winner. */
+    #teamStreaksResults .historic-h2h-mode td:nth-child(1) span,
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2) span,
+    #teamStreaksResults .historic-single-mode td:nth-child(1) span,
+    #teamStreaksResults .historic-streaks-table td span {
+        display: inline-block !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+
+    /* The merged date-range cell needs to wrap onto two lines - a
+       single nowrap line at this font size overlaps neighboring
+       cells instead of fitting. */
+    #teamStreaksResults .historic-streaks-table .date-range-cell {
+        white-space: normal !important;
+        line-height: 1.25 !important;
+    }
+
+    /* Single-team mode: Team, Start->End, Count, Days */
+    #teamStreaksResults .historic-single-mode th:nth-child(1),
+    #teamStreaksResults .historic-single-mode td:nth-child(1) {
+        width: 62px !important;
+        min-width: 62px !important;
+        max-width: 62px !important;
+    }
+
+    #teamStreaksResults .historic-single-mode th:nth-child(2),
+    #teamStreaksResults .historic-single-mode td:nth-child(2) {
+        width: auto !important;
+        min-width: 78px !important;
+    }
+
+    #teamStreaksResults .historic-single-mode th:nth-child(3),
+    #teamStreaksResults .historic-single-mode td:nth-child(3),
+    #teamStreaksResults .historic-single-mode th:nth-child(4),
+    #teamStreaksResults .historic-single-mode td:nth-child(4) {
+        width: 34px !important;
+        min-width: 34px !important;
+    }
+
+    /* Head-to-head mode: Team1, Team2, Start->End, Count, Days */
+    #teamStreaksResults .historic-h2h-mode th:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(2),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2) {
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+    }
+
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2) img {
+        width: 14px !important;
+        height: 14px !important;
+        margin-right: 0.15rem !important;
+    }
+
+    #teamStreaksResults .historic-h2h-mode th:nth-child(3),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(3) {
+        width: auto !important;
+        min-width: 78px !important;
+    }
+
+    /* Title/subtitle above each table, and gap between consecutive
+       tables (main streak table + opposite-result table) */
+    #teamStreaksResults h2 {
+        font-size: 0.95rem !important;
+    }
+
+    #teamStreaksResults .text-sm.text-gray-600 {
+        font-size: 0.7rem !important;
+    }
+
+    #teamStreaksResults .league-table.mb-4 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    #teamStreaksResults p.mb-8 {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* ============================================================
    Mobile redesign: Match History and H2H cards. Continental's
    markup differs from Domestic's here (Competition Stage dropdown,
    Penalty Shootouts checkbox, and the Home/Away/Penalty row already

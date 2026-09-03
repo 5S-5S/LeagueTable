@@ -2534,18 +2534,6 @@
         }
         
         // Get sort icon for historic streaks columns
-        function getSortIcon(columnKey) {
-            if (state.historicStreaksSortConfig.key !== columnKey) {
-                return ' ↕️'; // Up-down arrows when not sorted (sortable indicator)
-            }
-            
-            switch (state.historicStreaksSortConfig.direction) {
-                case 'desc': return ' ↓';
-                case 'asc': return ' ↑';
-                default: return ' ↕️';
-            }
-        }
-        
         // Handle historic streaks table sorting
         function handleHistoricStreaksSort(columnKey) {
             // Determine next sort direction (tri-state: desc → asc → reset)
@@ -2621,6 +2609,17 @@
                 title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName}s${locationText}`;
             }
 
+            // Sub-sortable "Start → End" merged date-range header
+            const thSort = (key, label) =>
+                `<span onclick="handleHistoricStreaksSort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
+            const dateRangeHeader = `
+                <th class="text-center" style="white-space: nowrap;">
+                    ${thSort('startDate', 'Start')} → ${thSort('endDate', 'End')}
+                </th>
+                <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count</th>
+                <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Days</th>
+            `;
+
             // Create table headers based on mode (single team vs head-to-head)
             let tableHeaders;
             if (team2) {
@@ -2628,10 +2627,7 @@
                 tableHeaders = `
                     <th class="text-center">Team 1</th>
                     <th class="text-center">Team 2</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('startDate')">Start Date ${getSortIcon('startDate')}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('endDate')">End Date ${getSortIcon('endDate')}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count ${getSortIcon('count')}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Length (Days) ${getSortIcon('lengthInDays')}</th>
+                    ${dateRangeHeader}
                 `;
             } else {
                 // Single team mode - adjust header based on location
@@ -2643,13 +2639,10 @@
                 } else {
                     teamColumnHeader = 'Team';
                 }
-                
+
                 tableHeaders = `
                     <th class="text-center">${teamColumnHeader}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('startDate')">Start Date ${getSortIcon('startDate')}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('endDate')">End Date ${getSortIcon('endDate')}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count ${getSortIcon('count')}</th>
-                    <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Length (Days) ${getSortIcon('lengthInDays')}</th>
+                    ${dateRangeHeader}
                 `;
             }
 
@@ -2657,12 +2650,12 @@
             const tableRows = streaks.map(streak => {
                 const startDateStr = streak.startDate.toLocaleDateString('en-US');
                 const endDateStr = streak.endDate.toLocaleDateString('en-US');
-                
+
                 if (team2) {
                     // Head-to-head mode
                     const team1Logo = getTeamLogoUrl(team1, state.selectedLeague);
                     const team2Logo = getTeamLogoUrl(team2, state.selectedLeague);
-                    
+
                     return `
                         <tr>
                             <td class="text-center">
@@ -2677,8 +2670,7 @@
                                     <span  style="color: ${team2Color || '#374151'}; font-weight: bold;">${team2}</span>
                                 </div>
                             </td>
-                            <td class="text-center">${startDateStr}</td>
-                            <td class="text-center">${endDateStr}</td>
+                            <td class="text-center date-range-cell">${startDateStr}<br>→ ${endDateStr}</td>
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
                         </tr>
@@ -2688,7 +2680,7 @@
                     const teamName = team1;
                     const teamLogo = getTeamLogoUrl(teamName, state.selectedLeague);
                     const teamColor = getTeamColor(teamName, state.selectedLeague);
-                    
+
                     return `
                         <tr>
                             <td class="text-center">
@@ -2697,8 +2689,7 @@
                                     <span  style="color: ${teamColor || '#374151'}; font-weight: bold;">${teamName}</span>
                                 </div>
                             </td>
-                            <td class="text-center">${startDateStr}</td>
-                            <td class="text-center">${endDateStr}</td>
+                            <td class="text-center date-range-cell">${startDateStr}<br>→ ${endDateStr}</td>
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
                         </tr>
@@ -2707,7 +2698,7 @@
             }).join('');
 
             const tableHTML = `
-                <div class="league-table">
+                <div class="league-table historic-streaks-table ${team2 ? 'historic-h2h-mode' : 'historic-single-mode'}">
                     <div class="text-center py-4 bg-white border-b">
                         <h2 class="text-xl font-semibold text-gray-700 mb-1">${title}</h2>
                         <p class="text-sm text-gray-600">${streaks.length} streak${streaks.length === 1 ? '' : 's'} of 3+ games found</p>
@@ -2826,7 +2817,7 @@
 
             // Create main streak table
             let tableHTML = `
-                <div class="league-table mb-4">
+                <div class="league-table streak-match-table mb-4">
                     <div class="text-center py-4 bg-white border-b">
                         <h2 class="text-xl font-semibold text-gray-700 mb-1">${title}</h2>
                         <p class="text-sm text-gray-600">Most recent matches first</p>
@@ -2835,10 +2826,9 @@
                         <thead>
                             <tr>
                                 <th class="text-center cursor-pointer">Date</th>
-                                <th class="text-center cursor-pointer">Home Team</th>
-                                <th class="text-center cursor-pointer">Home Score</th>
-                                <th class="text-center cursor-pointer">Away Team</th>
-                                <th class="text-center cursor-pointer">Away Score</th>
+                                <th class="text-center cursor-pointer">Home</th>
+                                <th class="text-center cursor-pointer">H:A</th>
+                                <th class="text-center cursor-pointer">Away</th>
                                 <th class="text-center cursor-pointer">Result</th>
                             </tr>
                         </thead>
@@ -2868,7 +2858,7 @@
                 const daysSinceOpposite = Math.floor((new Date() - oppositeMatch.dateObj) / (1000 * 60 * 60 * 24));
 
                 tableHTML += `
-                    <div class="league-table mb-4">
+                    <div class="league-table streak-match-table mb-4">
                         <div class="text-center py-4 bg-white border-b">
                             <h2 class="text-xl font-semibold text-gray-700 mb-1">${oppositeTitle}</h2>
                             <p class="text-sm text-gray-600">The match that ended the previous streak</p>
@@ -2877,10 +2867,9 @@
                             <thead>
                                 <tr>
                                     <th class="text-center cursor-pointer">Date</th>
-                                    <th class="text-center cursor-pointer">Home Team</th>
-                                    <th class="text-center cursor-pointer">Home Score</th>
-                                    <th class="text-center cursor-pointer">Away Team</th>
-                                    <th class="text-center cursor-pointer">Away Score</th>
+                                    <th class="text-center cursor-pointer">Home</th>
+                                    <th class="text-center cursor-pointer">H:A</th>
+                                    <th class="text-center cursor-pointer">Away</th>
                                     <th class="text-center cursor-pointer">Result</th>
                                 </tr>
                             </thead>
@@ -3058,14 +3047,13 @@
                             <span style="${homeTeamStyle}; display: none;">${match.HomeTeam}</span>
                         </div>
                     </td>
-                    <td class="text-center text-lg ${homeScoreClass}" >${homeScore}</td>
+                    <td class="text-center text-lg" style="white-space: nowrap;"><span class="${homeScoreClass}">${homeScore}</span>:<span class="${awayScoreClass}">${awayScore}</span></td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                             <span style="${awayTeamStyle}; display: none;">${match.AwayTeam}</span>
                         </div>
                     </td>
-                    <td class="text-center text-lg ${awayScoreClass}" >${awayScore}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
