@@ -696,6 +696,8 @@
                             <option value="draw">Draw Streak (Draws Only)</option>
                             <option value="winless">Winless Streak (Draws + Losses)</option>
                             <option value="losing">Losing Streak (Losses Only)</option>
+                            <option value="clean-sheet">Clean Sheet Streak (0 Goals Allowed)</option>
+                            <option value="scoring">Scoring Streak (1+ Goals Scored)</option>
                         </select>
                     </div>
 
@@ -2527,7 +2529,7 @@
                 }
 
                 // Check if this match continues the current streak
-                const continuesStreak = checkStreakContinuation(result, streakType);
+                const continuesStreak = checkStreakContinuation(result, streakType, teamScore, opponentScore);
                 
                 if (continuesStreak) {
                     currentStreak.push({
@@ -2795,7 +2797,7 @@
                 }
 
                 // Check if this match continues the streak
-                const continuesStreak = checkStreakContinuation(result, streakType);
+                const continuesStreak = checkStreakContinuation(result, streakType, teamScore, opponentScore);
                 
                 if (continuesStreak) {
                     streak.push({
@@ -2815,7 +2817,7 @@
         }
 
         // Check if a result continues the current streak type
-        function checkStreakContinuation(result, streakType) {
+        function checkStreakContinuation(result, streakType, teamScore, opponentScore) {
             switch (streakType) {
                 case 'winning':
                     return result === 'win';
@@ -2827,6 +2829,10 @@
                     return result === 'draw' || result === 'loss';
                 case 'losing':
                     return result === 'loss';
+                case 'clean-sheet':
+                    return opponentScore === 0;
+                case 'scoring':
+                    return teamScore >= 1;
                 default:
                     return false;
             }
@@ -2997,7 +3003,7 @@
                 }
 
                 // Check if this is an opposite result
-                const isOppositeResult = checkOppositeResult(result, streakType);
+                const isOppositeResult = checkOppositeResult(result, streakType, teamScore, opponentScore);
                 
                 if (isOppositeResult) {
                     return match;
@@ -3008,7 +3014,7 @@
         }
 
         // Check if a result is opposite to the current streak type
-        function checkOppositeResult(result, streakType) {
+        function checkOppositeResult(result, streakType, teamScore, opponentScore) {
             switch (streakType) {
                 case 'winning':
                     return result === 'draw' || result === 'loss'; // Non-win
@@ -3020,6 +3026,10 @@
                     return result === 'win'; // Win
                 case 'losing':
                     return result === 'draw' || result === 'win'; // Non-loss
+                case 'clean-sheet':
+                    return opponentScore >= 1; // Conceded
+                case 'scoring':
+                    return teamScore === 0; // Failed to score
                 default:
                     return false;
             }
@@ -3033,6 +3043,8 @@
                 case 'draw': return 'Non-Draw (Win/Loss)';
                 case 'winless': return 'Win';
                 case 'losing': return 'Non-Loss (Draw/Win)';
+                case 'clean-sheet': return 'Conceded a Goal';
+                case 'scoring': return 'Failed to Score';
                 default: return 'Opposite';
             }
         }
@@ -3045,6 +3057,8 @@
                 case 'draw': return 'Draw Streak';
                 case 'winless': return 'Winless Streak';
                 case 'losing': return 'Losing Streak';
+                case 'clean-sheet': return 'Clean Sheet Streak';
+                case 'scoring': return 'Scoring Streak';
                 default: return 'Streak';
             }
         }
