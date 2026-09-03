@@ -631,6 +631,7 @@
                             <option value="losing">Losing Streak (Losses Only)</option>
                             <option value="clean-sheet">Clean Sheet Streak (0 Goals Allowed)</option>
                             <option value="scoring">Scoring Streak (1+ Goals Scored)</option>
+                            <option value="no-score">Failed to Score Streak (0 Goals Scored)</option>
                         </select>
                     </div>
 
@@ -2926,6 +2927,8 @@
                     return opponentScore === 0;
                 case 'scoring':
                     return teamScore >= 1;
+                case 'no-score':
+                    return teamScore === 0;
                 default:
                     return false;
             }
@@ -3226,6 +3229,8 @@
                     return opponentScore >= 1; // Conceded
                 case 'scoring':
                     return teamScore === 0; // Failed to score
+                case 'no-score':
+                    return teamScore >= 1; // Scored
                 default:
                     return false;
             }
@@ -3241,6 +3246,7 @@
                 case 'losing': return 'Non-Loss (Draw/Win)';
                 case 'clean-sheet': return 'Conceded a Goal';
                 case 'scoring': return 'Failed to Score';
+                case 'no-score': return 'Scored a Goal';
                 default: return 'Opposite';
             }
         }
@@ -3255,6 +3261,7 @@
                 case 'losing': return 'Losing Streak';
                 case 'clean-sheet': return 'Clean Sheet Streak';
                 case 'scoring': return 'Scoring Streak';
+                case 'no-score': return 'Failed to Score Streak';
                 default: return 'Streak';
             }
         }
