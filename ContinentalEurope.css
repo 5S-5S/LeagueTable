@@ -503,6 +503,12 @@ body {
     flex: 1;
 }
 
+.team-dashboard-search-result-country {
+    font-size: 0.8rem;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
 .team-dashboard-search-empty {
     padding: 1rem 1.25rem;
     color: #6b7280;

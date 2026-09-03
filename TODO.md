@@ -9,14 +9,36 @@ Feature ideas, not yet scheduled.
 - **Shareable filter state** — encode the current league/team/date
   selections into the URL so a link reopens the exact same view.
 
-- **Country field on the team registry (Continental-specific)** — add a
-  country to each team's entry in the `getTeamColors()`-style logo matrix
-  (currently `[name, color, crestId]` per league) so a team's performance
-  can be compared against all teams from another country, not just a single
-  league/club. Continental competitions mix teams across countries, so this
-  only makes sense there.
-
 ## Done
+
+- ~~Compare a team against a whole country (Continental-specific)~~ — done
+  (2026-09-03): in League Tables & Head-to-Head, The Last Time When, and Team
+  Streaks, Team 2 can now be a country (e.g. "🇩🇪 Germany") instead of a single
+  club — the country option appears in the Team 2 dropdown once Team 1 is
+  picked, and shows Team 1's results against every team from that country
+  combined. Follows the same pattern as Domestic's "Big 6" group: a sentinel
+  Team 2 value (`COUNTRY:<name>`), a shared match filter, and highlight/label
+  helpers so match tables, H2H visualizations, and streak titles all display
+  the country name and flag correctly. Countries are listed after all club
+  teams in the Team 2 dropdown, not before. Team Seasons is unaffected (out
+  of scope, as it has no Team 2 concept). Fixed a related bug in the process:
+  Last Time When's per-match result classification was checking the exact
+  Team 2 name, which would have silently shown no results for a country
+  selection - it now classifies by whether Team 1 was home or away, which
+  works for both a specific opponent and a country group.
+
+- ~~Country field on the team registry (Continental-specific)~~ — done
+  (2026-09-04): every `getTeamColors()` entry in
+  `ContinentalEurope.html`/`ContinentalEuropeMobile.html` is now
+  `[name, color, crestId, country]`. The 5 domestic buckets get their
+  country mechanically (bucket = country); the 478 Champions-League-only
+  clubs (Benfica, Ajax, Galatasaray, down to obscure qualifiers like
+  `SS Murata`/`B68 Toftir`) were tagged by hand from football knowledge —
+  no data source carries this. Added `getTeamCountry(teamName, league)`
+  alongside `getTeamColor`/`getTeamLogoUrl`. The actual "compare vs. a
+  country" UI/feature is still unbuilt — this is just the data layer for it.
+  Four entries flagged as lower-confidence (`FC Rànger's`, `Víkingur`,
+  `FC Dinamo City`, `FK Obilić`) were web-verified afterward — all correct.
 
 - ~~Team dashboard/profile page~~ — done for Domestic (2026-09-03) and
   Continental (2026-09-03). Domestic: a search bar on `index.html` (embedded
