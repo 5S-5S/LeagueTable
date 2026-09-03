@@ -1756,6 +1756,124 @@ body {
 }
 
 /* ============================================================
+   Mobile redesign: The Last Time When... results tables. Ported
+   from DomesticEuropeMobile.css - Home Score/Away Score merged
+   into one H:A column, smaller header/title/"days ago" text, and
+   a tighter gap between consecutive result tables. These tables
+   never had sort arrows (each section shows a single most-recent
+   match), so there's nothing to remove there. The header rule
+   below matches the old shared rule's selector depth
+   (#lastTimeResults .league-table table thead tr th) so source
+   order decides the winner instead of fighting specificity -
+   #teamStreaksResults, which shares that old rule, is untouched.
+   ============================================================ */
+@media (max-width: 640px) {
+    #lastTimeResults .league-table table {
+        table-layout: fixed !important;
+        width: 100% !important;
+    }
+
+    #lastTimeResults .league-table table thead tr th {
+        font-size: 0.55rem !important;
+        font-weight: 700 !important;
+        padding: 0.3rem 0.1rem !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        overflow-wrap: normal !important;
+        line-height: 1.1 !important;
+        vertical-align: middle !important;
+        word-break: normal !important;
+        hyphens: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        text-align: center !important;
+    }
+
+    #lastTimeResults .league-table td {
+        font-size: 0.6rem !important;
+        padding: 0.3rem 0.15rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Reset the overflow/ellipsis that generic .league-table th/td
+       rules (written for the main League Table's Team column) would
+       otherwise leak onto this unrelated table's headers/cells. */
+    #lastTimeResults .league-table th,
+    #lastTimeResults .league-table td {
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+
+    /* Date column */
+    #lastTimeResults .league-table th:nth-child(1),
+    #lastTimeResults .league-table td:nth-child(1) {
+        width: 64px !important;
+        min-width: 64px !important;
+        max-width: 64px !important;
+    }
+
+    /* Home/Away columns: logo only, name already hidden inline */
+    #lastTimeResults .league-table th:nth-child(2),
+    #lastTimeResults .league-table td:nth-child(2),
+    #lastTimeResults .league-table th:nth-child(4),
+    #lastTimeResults .league-table td:nth-child(4) {
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+    }
+
+    #lastTimeResults .league-table td:nth-child(2) img,
+    #lastTimeResults .league-table td:nth-child(4) img {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    /* H:A merged score column - fixed (not auto) width so it can't
+       swallow all remaining table-layout:fixed space */
+    #lastTimeResults .league-table th:nth-child(3),
+    #lastTimeResults .league-table td:nth-child(3) {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Result column */
+    #lastTimeResults .league-table th:nth-child(5),
+    #lastTimeResults .league-table td:nth-child(5) {
+        width: 30px !important;
+        min-width: 30px !important;
+        max-width: 30px !important;
+    }
+
+    #lastTimeResults .league-table td:nth-child(5) img {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    /* "Days Since Last Match Results" - shrink to fit on one line */
+    #lastTimeResults > h3 {
+        font-size: 0.95rem !important;
+    }
+
+    /* Per-section titles ("Inter Last Win at Home") - smaller than
+       the main header above */
+    #lastTimeResults h4 {
+        font-size: 0.8rem !important;
+    }
+
+    /* "X days ago" */
+    #lastTimeResults p {
+        font-size: 0.7rem !important;
+    }
+
+    /* Tighten the gap between consecutive result tables */
+    #lastTimeResults > div {
+        margin-bottom: 0.75rem !important;
+    }
+}
+
+/* ============================================================
    Mobile redesign: Match History and H2H cards. Continental's
    markup differs from Domestic's here (Competition Stage dropdown,
    Penalty Shootouts checkbox, and the Home/Away/Penalty row already
