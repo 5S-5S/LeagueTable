@@ -461,6 +461,7 @@ body {
 .radio-dot {
     width: 1.25rem;
     height: 1.25rem;
+    flex-shrink: 0;
     border: 2px solid #d1d5db;
     border-radius: 50%;
     margin-right: 0.75rem;
@@ -1064,114 +1065,6 @@ body {
         text-align: center !important;
     }
 
-    /* Team History table mobile optimizations */
-    #teamHistoryTable .league-table {
-        font-size: 0.7rem !important;
-        overflow-x: visible !important;
-    }
-    /* Remove margins from Team History table container for mobile */
-    #teamHistoryTable {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        margin-top: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-    #teamHistoryTable table th,
-    #teamHistoryTable table td {
-        padding: 0.2rem 0.05rem !important;
-        font-size: 0.65rem !important;
-        white-space: normal !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
-        min-height: 2rem !important;
-        vertical-align: middle !important;
-    }
-    /* Team History table specific column widths */
-    #teamHistoryTable th:nth-child(1), /* Season */
-    #teamHistoryTable td:nth-child(1) {
-        min-width: 45px !important;
-        max-width: 45px !important;
-        word-break: break-all !important;
-        hyphens: none !important;
-        font-size: 0.55rem !important;
-    }
-    /* Force season text to break after dash */
-    #teamHistoryTable td:nth-child(1) {
-        line-height: 1.1 !important;
-    }
-    #teamHistoryTable th:nth-child(2), /* Count/# */
-    #teamHistoryTable td:nth-child(2) {
-        min-width: 30px !important;
-        max-width: 30px !important;
-    }
-    /* Force # column header to wrap arrow to next line */
-    #teamHistoryTable th:nth-child(2) {
-        position: relative !important;
-        line-height: 1.1 !important;
-    }
-    /* Add line break before arrow characters for # column */
-    #teamHistoryTable th:nth-child(2) {
-        white-space: pre-line !important;
-    }
-    #teamHistoryTable th:nth-child(3), /* Team */
-    #teamHistoryTable td:nth-child(3) {
-        min-width: 55px !important;
-        max-width: 55px !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-    /* More specific selector for team column font size with truncation */
-    #teamHistoryTable table tbody td:nth-child(3),
-    #teamHistoryTable .league-table td:nth-child(3) {
-        font-size: 0.5rem !important;
-    }
-    /* Force team name truncation for abbreviations */
-    #teamHistoryTable td:nth-child(3) span {
-        display: inline-block !important;
-        max-width: 45px !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-    #teamHistoryTable th:nth-child(4), /* P */
-    #teamHistoryTable td:nth-child(4),
-    #teamHistoryTable th:nth-child(5), /* W */
-    #teamHistoryTable td:nth-child(5),
-    #teamHistoryTable th:nth-child(6), /* D */
-    #teamHistoryTable td:nth-child(6),
-    #teamHistoryTable th:nth-child(7), /* L */
-    #teamHistoryTable td:nth-child(7) {
-        min-width: 22px !important;
-        max-width: 22px !important;
-    }
-    /* Force L column header to wrap arrow to next line */
-    #teamHistoryTable th:nth-child(7) {
-        position: relative !important;
-        line-height: 1.1 !important;
-    }
-    /* Add line break before arrow characters for L column */
-    #teamHistoryTable th:nth-child(7) {
-        white-space: pre-line !important;
-    }
-    #teamHistoryTable th:nth-child(8), /* GF */
-    #teamHistoryTable td:nth-child(8),
-    #teamHistoryTable th:nth-child(9), /* GA */
-    #teamHistoryTable td:nth-child(9),
-    #teamHistoryTable th:nth-child(10), /* GD */
-    #teamHistoryTable td:nth-child(10) {
-        min-width: 25px !important;
-        max-width: 25px !important;
-    }
-    #teamHistoryTable th:nth-child(11), /* Points */
-    #teamHistoryTable td:nth-child(11),
-    #teamHistoryTable th:nth-child(12), /* Pos */
-    #teamHistoryTable td:nth-child(12) {
-        min-width: 28px !important;
-        max-width: 28px !important;
-    }
-
     /* Match History and H2H table specific adjustments */
     #matchHistoryTable th:first-child,
     #matchHistoryTable td:first-child,
@@ -1385,70 +1278,6 @@ body {
         font-size: 0.55rem !important;
     }
 
-    /* Make Team History table scrollable horizontally in Team Seasons */
-    #teamHistoryTable {
-        overflow-x: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-    }
-
-    #teamHistoryTable .league-table {
-        min-width: 100% !important;
-        overflow-x: auto !important;
-    }
-
-    #teamHistoryTable table {
-        table-layout: fixed !important;
-        width: 360px !important;
-        font-size: 0.45rem !important;
-    }
-
-    /* Constrain Team History table column widths */
-    #teamHistoryTable table th,
-    #teamHistoryTable table td {
-        padding: 0.15rem !important;
-        text-align: center !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-
-    /* Specific column widths for Team History */
-    #teamHistoryTable table th:nth-child(1),
-    #teamHistoryTable table td:nth-child(1) { width: 55px !important; } /* Season */
-    #teamHistoryTable table th:nth-child(2),
-    #teamHistoryTable table td:nth-child(2) { width: 20px !important; } /* # */
-    #teamHistoryTable table th:nth-child(3),
-    #teamHistoryTable table td:nth-child(3) { width: 20px !important; } /* Team */
-    #teamHistoryTable table th:nth-child(4),
-    #teamHistoryTable table td:nth-child(4) { width: 20px !important; } /* P */
-    #teamHistoryTable table th:nth-child(5),
-    #teamHistoryTable table td:nth-child(5) { width: 20px !important; } /* W */
-    #teamHistoryTable table th:nth-child(6),
-    #teamHistoryTable table td:nth-child(6) { width: 20px !important; } /* D */
-    #teamHistoryTable table th:nth-child(7),
-    #teamHistoryTable table td:nth-child(7) { width: 20px !important; } /* L */
-    #teamHistoryTable table th:nth-child(8),
-    #teamHistoryTable table td:nth-child(8) { width: 25px !important; } /* GF */
-    #teamHistoryTable table th:nth-child(9),
-    #teamHistoryTable table td:nth-child(9) { width: 25px !important; } /* GA */
-    #teamHistoryTable table th:nth-child(10),
-    #teamHistoryTable table td:nth-child(10) { width: 35px !important; } /* GD */
-    #teamHistoryTable table th:nth-child(11),
-    #teamHistoryTable table td:nth-child(11) { width: 40px !important; } /* Pts */
-    #teamHistoryTable table th:nth-child(12),
-    #teamHistoryTable table td:nth-child(12) { width: 25px !important; } /* Pos */
-
-    /* Hide team names in Team History table, show only logos */
-    #teamHistoryTable .league-table td:nth-child(3) span {
-        display: none !important;
-    }
-
-    /* Ensure team logos are visible in Team History */
-    #teamHistoryTable .league-table td img {
-        display: inline-block !important;
-        width: 16px !important;
-        height: 16px !important;
-    }
     /* Remove margins from Team Streaks tables for mobile */
     #teamStreaksResults {
         margin-left: 0 !important;
@@ -1570,6 +1399,547 @@ body {
         overflow-x: visible !important;
     }
 }
+
+/* ============================================================
+   Mobile redesign pilot: main League Table only.
+   Replaces the shrink-everything-to-fit approach above with
+   horizontal scroll + sticky Pos/Team columns, larger touch
+   targets, and full team names. Scoped to #tableContainer so
+   Match History/H2H/Last Time/Team Streaks tables (which share
+   the .league-table class) are untouched for now.
+   ============================================================ */
+@media (max-width: 640px) {
+    /* Reclaim the outer blue frame and let the table bleed to the
+       white card's edges instead of respecting table-section's padding */
+    body {
+        margin: 0 !important;
+    }
+
+    .league-table-container {
+        padding: 0.15rem !important;
+    }
+
+    #tableContainer {
+        margin-left: -2rem !important;
+        margin-right: -2rem !important;
+        width: calc(100% + 4rem) !important;
+    }
+
+    /* Team combobox dropdown (Team1/Team2/etc.): long team names at
+       full desktop font size don't fit in a narrow half-width column,
+       and .combobox-option-text's flex default (min-width:auto) was
+       forcing the whole dropdown to overflow off-screen instead of
+       wrapping. Shrink the text and let it actually wrap/shrink. */
+    .combobox-dropdown {
+        overflow-x: hidden !important;
+    }
+
+    .combobox-option {
+        padding: 0.5rem 0.6rem !important;
+        gap: 0.35rem !important;
+    }
+
+    .combobox-option-text {
+        min-width: 0 !important;
+        font-size: 0.75rem !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .combobox-team-logo {
+        width: 1rem !important;
+        height: 1rem !important;
+    }
+
+    .combobox-input {
+        font-size: 0.8rem !important;
+        padding: 0.6rem 2rem 0.6rem 0.75rem !important;
+    }
+
+    /* Match Results: Home/Away/Point Deductions/3 Points checkboxes were
+       each forced onto their own line by a legacy div:has() rule that
+       (like the ones fixed above) over-matches this wrapper. Override
+       via its own ID instead of fighting :has() specificity again. */
+    div#matchResultsCheckboxGroup {
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 0.5rem 0.85rem !important;
+    }
+
+    #matchResultsCheckboxGroup .icon-home,
+    #matchResultsCheckboxGroup .icon-plane,
+    #matchResultsCheckboxGroup .icon-alert {
+        display: none !important;
+    }
+
+    #matchResultsCheckboxGroup span {
+        font-size: 0.72rem !important;
+    }
+
+    /* "Premier League - All Results (X matches) - Y teams" banner was
+       wrapping to two lines at the default text-lg size */
+    #tableInfoText {
+        font-size: 0.75rem !important;
+    }
+
+    #tableContainer .league-table {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        font-size: 0.5rem !important;
+        border-radius: 0 !important;
+    }
+
+    #tableContainer .league-table table {
+        table-layout: auto !important;
+        width: auto !important;
+        min-width: 100% !important;
+    }
+
+    #tableContainer .league-table th,
+    #tableContainer .league-table td {
+        font-size: 0.5rem !important;
+        padding: 0.35rem 0.22rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Pos column: sticky, pinned to the left edge */
+    #tableContainer .league-table th:first-child,
+    #tableContainer .league-table td:first-child {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 2 !important;
+        width: 16px !important;
+        min-width: 16px !important;
+        max-width: 16px !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.08rem !important;
+        text-align: center !important;
+        background: inherit !important;
+    }
+
+    /* Team column: sticky, pinned right after Pos. Kept narrow enough that
+       stat columns are visible without scrolling on a phone. */
+    #tableContainer .league-table th:nth-child(2),
+    #tableContainer .league-table td:nth-child(2) {
+        position: sticky !important;
+        left: 16px !important;
+        z-index: 2 !important;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.1rem !important;
+        white-space: nowrap !important;
+        background: inherit !important;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    /* Header cells need their own explicit background (can't inherit
+       a solid color from thead), matching the existing header gradient */
+    #tableContainer .league-table th:first-child,
+    #tableContainer .league-table th:nth-child(2) {
+        background: linear-gradient(to right, #374151, #1f2937) !important;
+    }
+
+    /* Undo the logo-only hack: show full team names again */
+    #tableContainer .league-table td:nth-child(2) span {
+        display: inline !important;
+    }
+
+    #tableContainer .league-table .team-name-text {
+        display: inline-block !important;
+        max-width: 26px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+
+    #tableContainer .league-table td:nth-child(2) img {
+        display: inline-block !important;
+        width: 10px !important;
+        height: 10px !important;
+        margin-right: 0.1rem !important;
+    }
+
+    /* Stat columns (P, W-D-L, GF:GA, GD, Pts): tight, consistent,
+       scroll into view instead of being squeezed to fit */
+    #tableContainer .league-table th:nth-child(n+3),
+    #tableContainer .league-table td:nth-child(n+3) {
+        min-width: 24px !important;
+        max-width: none !important;
+        width: auto !important;
+        text-align: center !important;
+        font-size: 0.5rem !important;
+        padding: 0.35rem 0.16rem !important;
+    }
+
+    #tableContainer .points-badge {
+        font-size: 0.55rem !important;
+        font-weight: 900 !important;
+        padding: 0.08rem 0.2rem !important;
+    }
+}
+
+/* ============================================================
+   Mobile redesign: Team Seasons table (same concepts as the
+   League Table above) - horizontal scroll + sticky identity
+   columns, W-D-L/GF:GA merged into sortable sub-columns, no
+   arrows, smaller font. Two layouts share this table/header:
+   single-team-mode (Season, Team, ..., Pos) and
+   position-only-mode (Season, #, Team, ...) - the JS toggles a
+   class on #teamHistoryTable so column position/width rules
+   can differ between them.
+   ============================================================ */
+@media (max-width: 640px) {
+    /* Bleed to the white card's edges, same as #tableContainer above */
+    #teamHistoryTable {
+        margin-left: -2rem !important;
+        margin-right: -2rem !important;
+        margin-top: 0.5rem !important;
+        width: calc(100% + 4rem) !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #teamHistoryTable .league-table {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        font-size: 0.5rem !important;
+        border-radius: 0 !important;
+    }
+
+    #teamHistoryTable .league-table table {
+        table-layout: auto !important;
+        width: auto !important;
+        min-width: 100% !important;
+    }
+
+    #teamHistoryTable .league-table th,
+    #teamHistoryTable .league-table td {
+        font-size: 0.5rem !important;
+        padding: 0.35rem 0.22rem !important;
+        white-space: nowrap !important;
+        word-wrap: normal !important;
+        overflow-wrap: normal !important;
+        min-height: 0 !important;
+    }
+
+    /* Season column: sticky, pinned to the left edge in both modes */
+    #teamHistoryTable .league-table th:nth-child(1),
+    #teamHistoryTable .league-table td:nth-child(1) {
+        position: sticky !important;
+        left: 0 !important;
+        z-index: 2 !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.2rem !important;
+        text-align: left !important;
+        background: inherit !important;
+        word-break: normal !important;
+    }
+
+    /* --- single-team-mode: Season, Team, P, W-D-L, GF:GA, GD, Pts, Pos --- */
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(1),
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(1) {
+        width: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+    }
+
+    /* Team column: sticky, pinned right after Season */
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(2),
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(2) {
+        position: sticky !important;
+        left: 40px !important;
+        z-index: 2 !important;
+        width: 46px !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.1rem !important;
+        text-align: left !important;
+        background: inherit !important;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(n+3),
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(n+3) {
+        min-width: 24px !important;
+        max-width: none !important;
+        width: auto !important;
+        text-align: center !important;
+        font-size: 0.5rem !important;
+        padding: 0.35rem 0.16rem !important;
+    }
+
+    /* --- position-only-mode: Season, #, Team, P, W-D-L, GF:GA, GD, Pts --- */
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(1),
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(1) {
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+    }
+
+    /* # column: sticky, pinned right after Season */
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(2),
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(2) {
+        position: sticky !important;
+        left: 36px !important;
+        z-index: 2 !important;
+        width: 20px !important;
+        min-width: 20px !important;
+        max-width: 20px !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.1rem !important;
+        text-align: center !important;
+        background: inherit !important;
+    }
+
+    /* Team column: sticky, pinned right after # */
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(3),
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(3) {
+        position: sticky !important;
+        left: 56px !important;
+        z-index: 2 !important;
+        width: 42px !important;
+        min-width: 42px !important;
+        max-width: 42px !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.1rem !important;
+        text-align: left !important;
+        background: inherit !important;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(n+4),
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(n+4) {
+        min-width: 24px !important;
+        max-width: none !important;
+        width: auto !important;
+        text-align: center !important;
+        font-size: 0.5rem !important;
+        padding: 0.35rem 0.16rem !important;
+    }
+
+    /* Header cells need their own explicit background (can't inherit
+       a solid color from thead), matching the League Table's header */
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(1),
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(2),
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(1),
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(2),
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(3) {
+        background: linear-gradient(to right, #374151, #1f2937) !important;
+    }
+
+    #teamHistoryTable .league-table .team-name-text {
+        display: inline-block !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        vertical-align: middle !important;
+    }
+
+    #teamHistoryTable .league-table td img {
+        display: inline-block !important;
+        width: 10px !important;
+        height: 10px !important;
+        margin-right: 0.1rem !important;
+    }
+
+    #teamHistoryTable .points-badge {
+        font-size: 0.55rem !important;
+        font-weight: 900 !important;
+        padding: 0.08rem 0.2rem !important;
+    }
+}
+
+/* ============================================================
+   Mobile redesign: Match History (bars + match list) and the
+   same header-overflow bug in H2H's equivalent header row.
+   ============================================================ */
+@media (max-width: 640px) {
+    /* Let the Match History / H2H cards bleed to the white main-card's
+       edges instead of respecting table-section's padding, same as
+       the League Table above. Only direct children of .table-section
+       need this - matchHistoryStatsTable/matchHistoryTable are nested
+       inside matchHistorySection and inherit its bled width for free. */
+    #matchHistorySection,
+    #h2hSection,
+    #h2hMatchesTable {
+        margin-left: -2rem !important;
+        margin-right: -2rem !important;
+        width: calc(100% + 4rem) !important;
+    }
+
+    /* Shrink the "Match History"/"Head-to-Head Record" title so it
+       doesn't wrap to two lines and push the checkboxes off-screen */
+    #matchHistorySection h3,
+    #h2hSection h3 {
+        font-size: 0.75rem !important;
+    }
+
+    /* The title + Home/Away checkboxes group itself also needs to wrap
+       (its parent wrapping alone wasn't enough - this inner group was
+       still wider than the screen on its own) */
+    #matchHistorySection .flex.items-center.gap-6,
+    #h2hSection .flex.items-center.gap-6 {
+        flex-wrap: wrap !important;
+        row-gap: 0.4rem !important;
+        column-gap: 0.75rem !important;
+    }
+
+    /* Drop the house/plane emoji next to Home/Away - the checkbox +
+       label text alone is enough, and this is what lets everything
+       fit on one line with the title */
+    #matchHistorySection .flex.items-center.gap-6 .icon-home,
+    #matchHistorySection .flex.items-center.gap-6 .icon-plane,
+    #h2hSection .flex.items-center.gap-6 .icon-home,
+    #h2hSection .flex.items-center.gap-6 .icon-plane {
+        display: none !important;
+    }
+
+    #matchHistorySection .flex.items-center.gap-6 label span,
+    #h2hSection .flex.items-center.gap-6 label span {
+        font-size: 0.68rem !important;
+    }
+
+    /* :has(#recentMatchesSelect) (used both here and in a legacy rule
+       earlier in this file) matches EVERY ancestor div containing that
+       input - including the whole card wrapper - which was accidentally
+       turning the entire card into a shrink-wrapped flex column and is
+       why the bars above were stuck at a fraction of the card's width.
+       Force the card back to normal block layout to undo that. */
+    #matchHistorySection > .p-8,
+    #h2hSection:not(.hidden) {
+        display: block !important;
+    }
+
+    #matchHistoryVisualizations,
+    #h2hVisualizations {
+        width: 100% !important;
+    }
+
+    /* "Most Recent Matches" label + input: put them on one row instead
+       of the stacked layout forced further up this file, and shrink both.
+       Matches the same div:has(#id) specificity pattern as the legacy
+       rule above (an ID selector inside :has() outranks plain classes),
+       so this later rule actually wins the cascade instead of being
+       silently overridden. */
+    #matchHistorySection div:has(#recentMatchesSelect),
+    #h2hSection div:has(#recentH2HSelect) {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+
+    #matchHistorySection div:has(#recentMatchesSelect) > label,
+    #h2hSection div:has(#recentH2HSelect) > label {
+        font-size: 0.68rem !important;
+        white-space: nowrap !important;
+    }
+
+    #recentMatchesSelect,
+    #recentH2HSelect {
+        width: 70px !important;
+        max-width: 70px !important;
+        font-size: 0.65rem !important;
+        padding: 0.25rem 0.4rem !important;
+    }
+
+    #matchHistoryMatchCount,
+    #h2hMatchCount {
+        display: inline !important;
+        width: auto !important;
+        font-size: 0.65rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Give the bars room to run nearly edge to edge instead of losing
+       most of their width to the card's generous default padding */
+    #matchHistorySection > .p-8,
+    #h2hSection {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    #matchHistoryVisualizations .h2h-viz-bar,
+    #h2hVisualizations .h2h-viz-bar {
+        height: 1.25rem !important;
+    }
+
+    #matchHistoryVisualizations .h2h-segment,
+    #h2hVisualizations .h2h-segment {
+        font-size: 0.65rem !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        padding: 0 0.15rem !important;
+    }
+
+    /* The "Match History"/"Head-to-Head Record" title + Home/Away
+       checkboxes were overflowing off-screen next to the "Most Recent"
+       control since the row never wrapped */
+    #matchHistorySection .flex.items-center.justify-between.mb-4,
+    #h2hSection .flex.items-center.justify-between.mb-4 {
+        flex-wrap: wrap !important;
+        row-gap: 0.75rem !important;
+    }
+
+    /* Team record label ("X - Overall Record") and its W-D-L summary
+       were fighting for the same row and wrapping mid-word. Stack them. */
+    #matchHistoryVisualizations .flex.items-center.justify-between.mb-2,
+    #h2hVisualizations .flex.items-center.justify-between.mb-2 {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.1rem !important;
+    }
+
+    #matchHistoryVisualizations .mb-2 span,
+    #h2hVisualizations .mb-2 span {
+        font-size: 0.7rem !important;
+    }
+
+    /* Match History table (list of matches): same tight styling as the
+       main League Table, scoped so it doesn't affect other tables */
+    #matchHistoryTable .league-table {
+        font-size: 0.55rem !important;
+    }
+
+    #matchHistoryTable .league-table th,
+    #matchHistoryTable .league-table td {
+        font-size: 0.55rem !important;
+        padding: 0.35rem 0.25rem !important;
+        white-space: nowrap !important;
+    }
+
+    #matchHistoryTable .league-table img {
+        width: 14px !important;
+        height: 14px !important;
+        margin-right: 0 !important;
+    }
+
+    /* H2H Match History table (list of matches): same tight styling as
+       the Match History match list, with H:A combined score column */
+    #h2hMatchesTable .league-table {
+        font-size: 0.55rem !important;
+    }
+
+    #h2hMatchesTable .league-table th,
+    #h2hMatchesTable .league-table td {
+        font-size: 0.55rem !important;
+        padding: 0.35rem 0.25rem !important;
+        white-space: nowrap !important;
+    }
+
+    #h2hMatchesTable .league-table img {
+        width: 14px !important;
+        height: 14px !important;
+        margin-right: 0 !important;
+    }
+}
+
 .h2h-viz-bar {
     display: flex;
     width: 100%;

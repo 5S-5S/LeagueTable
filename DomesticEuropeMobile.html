@@ -205,27 +205,27 @@
                 
                 <!-- Match Type and Action Buttons -->
                 <div class="flex flex-wrap items-center justify-between gap-4 collapsible-control">
-                    <div class="flex items-center gap-6">
+                    <div id="matchResultsCheckboxGroup" class="flex items-center gap-6">
                         <span class="text-sm font-semibold text-gray-700">Match Results:</span>
-                        
+
                         <label class="flex items-center cursor-pointer">
                             <div id="homeCheckbox" class="checkbox checked"></div>
                             <span class="icon-home mr-1"></span>
                             <span class="text-sm font-medium">Home</span>
                         </label>
-                        
+
                         <label class="flex items-center cursor-pointer">
                             <div id="awayCheckbox" class="checkbox checked"></div>
                             <span class="icon-plane mr-1"></span>
                             <span class="text-sm font-medium">Away</span>
                         </label>
-                        
+
                         <label class="flex items-center cursor-pointer">
                             <div id="deductionsCheckbox" class="checkbox checked"></div>
                             <span class="icon-alert mr-1" style="color: #6b7280;"></span>
                             <span class="text-sm font-medium">Point Deductions</span>
                         </label>
-                        
+
                         <label class="flex items-center cursor-pointer">
                             <div id="threePointCheckbox" class="checkbox checked"></div>
                             <span class="text-sm font-medium">3 Points for all Wins</span>
@@ -673,7 +673,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                             <label class="text-sm font-medium text-gray-700">Most Recent Head-to-Head</label>
                             <div class="flex items-center gap-2">
-                                <input type="text" id="recentH2HSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
+                                <input type="text" id="recentH2HSelect" placeholder="# or All" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
                                 <span class="text-sm text-gray-600" id="h2hMatchCount"></span>
                             </div>
                         </div>
@@ -725,7 +725,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                             <label class="text-sm font-medium text-gray-700">Most Recent Matches</label>
                             <div class="flex items-center gap-2">
-                                <input type="text" id="recentMatchesSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
+                                <input type="text" id="recentMatchesSelect" placeholder="# or All" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
                                 <span class="text-sm text-gray-600" id="matchHistoryMatchCount"></span>
                             </div>
                         </div>
@@ -4443,54 +4443,49 @@
             const medalStyle = selectedPos === 1 ? 'color: #d97706; font-weight: bold;' : selectedPos === 2 ? 'color: #374151; font-weight: bold;' : selectedPos === 3 ? 'color: #b45309; font-weight: bold;' : 'color: #374151; font-weight: bold;';
             elements.teamHistoryTitle.innerHTML = `All teams (Position <span style="${medalStyle}">${selectedPos}</span>) - ${ordinalPosition} Place Finishes`;
             
-            // Update headers for multi-team view
-            const headers = [
-                { key: 'season', label: 'Season' },
-                { key: 'count', label: '#' },
-                { key: 'team', label: 'Team' },
-                { key: 'played', label: 'P' },
-                { key: 'won', label: 'W' },
-                { key: 'drawn', label: 'D' },
-                { key: 'lost', label: 'L' },
-                { key: 'goalsFor', label: 'GF' },
-                { key: 'goalsAgainst', label: 'GA' },
-                { key: 'goalDifference', label: 'GD' },
-                { key: 'points', label: 'Pts' }
-            ];
-            
-            // In position-only mode, make ALL columns sortable (including team)
-            elements.teamHistoryHeader.innerHTML = headers.map(header => `
-                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
-                    onclick="handleTeamHistorySort('${header.key}')"
-                    style="text-align: ${(header.key === 'season' || header.key === 'team') ? 'left' : 'center'}">
-                    ${header.label}${(header.key === 'count' || header.key === 'lost') ? '<br>' : ''}${getTeamHistorySortIndicator(header.key)}
+            elements.teamHistoryTable.classList.remove('single-team-mode');
+            elements.teamHistoryTable.classList.add('position-only-mode');
+
+            const thSort = (key, label) =>
+                `<span onclick="handleTeamHistorySort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
+
+            // In position-only mode, all columns remain independently sortable
+            elements.teamHistoryHeader.innerHTML = `
+                <th class="px-3 py-4 text-left font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('season')" style="text-align: left;">Season</th>
+                <th class="px-2 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('count')" style="text-align: center;">#</th>
+                <th class="px-4 py-4 text-left font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('team')" style="text-align: left;">Team</th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('played')" style="text-align: center;">P</th>
+                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                    ${thSort('won', 'W')}-${thSort('drawn', 'D')}-${thSort('lost', 'L')}
                 </th>
-            `).join('');
-            
+                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                    ${thSort('goalsFor', 'GF')}:${thSort('goalsAgainst', 'GA')}
+                </th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('goalDifference')" style="text-align: center;">GD</th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('points')" style="text-align: center;">Pts</th>
+            `;
+
             // Create table rows
             elements.teamHistoryBody.innerHTML = allPositionData.map((season, index) => {
                 const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
                 const logoUrl = getTeamLogoUrl(season.team, league);
-                
+
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                         <td class="px-3 py-4 font-semibold text-left">
                             ${season.season}
                             ${season.isHistoric ? '<span class="ml-2 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">Historic</span>' : ''}
                         </td>
-                        <td class="px-3 py-4 text-center font-semibold">${season.count}</td>
+                        <td class="px-2 py-4 text-center font-semibold">${season.count}</td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${season.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span class="cursor-pointer hover:text-blue-600" onclick="handleTeamClick('${season.team}')" style="font-size: 0.5rem !important;">${season.team}</span>
+                                <span class="cursor-pointer hover:text-blue-600 team-name-text" onclick="handleTeamClick('${season.team}')">${season.team}</span>
                             </div>
                         </td>
                         <td class="px-3 py-4 text-center">${season.played}</td>
-                        <td class="px-3 py-4 text-center">${season.won}</td>
-                        <td class="px-3 py-4 text-center">${season.drawn}</td>
-                        <td class="px-3 py-4 text-center">${season.lost}</td>
-                        <td class="px-3 py-4 text-center">${season.goalsFor}</td>
-                        <td class="px-3 py-4 text-center">${season.goalsAgainst}</td>
+                        <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.won}-${season.drawn}-${season.lost}</td>
+                        <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.goalsFor}:${season.goalsAgainst}</td>
                         <td class="px-3 py-4 text-center ${season.goalDifference >= 0 ? 'text-green-600' : 'text-red-600'}">${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}</td>
                         <td class="px-3 py-4 text-center">
                             <span class="points-badge">
@@ -6833,26 +6828,23 @@
 
         // Update table display
         function updateTableDisplay(tableResult) {
-            const headers = [
-                { key: 'position', label: 'Pos<br>' },
-                { key: 'team', label: '' },
-                { key: 'played', label: 'P' },
-                { key: 'won', label: 'W' },
-                { key: 'drawn', label: 'D' },
-                { key: 'lost', label: 'L' },
-                { key: 'goalsFor', label: 'GF' },
-                { key: 'goalsAgainst', label: 'GA' },
-                { key: 'goalDifference', label: 'GD' },
-                { key: 'points', label: 'Pts' }
-            ];
-            
-            elements.tableHeader.innerHTML = headers.map(header => `
-                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
-                    onclick="handleSort('${header.key}')" 
-                    style="text-align: ${header.key === 'team' ? 'left' : 'center'}">
-                    ${header.label}
+            const sortMark = (key) => ''; // arrows removed to save space on mobile; still fully sortable
+            const subSort = (key, label) =>
+                `<span onclick="handleSort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}${sortMark(key)}</span>`;
+
+            elements.tableHeader.innerHTML = `
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleSort('position')" style="text-align: center;">Pos<br></th>
+                <th class="px-4 py-4 font-bold text-sm" style="text-align: left;"></th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleSort('played')" style="text-align: center;">P${sortMark('played')}</th>
+                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                    ${subSort('won', 'W')}-${subSort('drawn', 'D')}-${subSort('lost', 'L')}
                 </th>
-            `).join('');
+                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                    ${subSort('goalsFor', 'GF')}:${subSort('goalsAgainst', 'GA')}
+                </th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleSort('goalDifference')" style="text-align: center;">GD${sortMark('goalDifference')}</th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleSort('points')" style="text-align: center;">Pts${sortMark('points')}</th>
+            `;
             
             // Update table body
             if (tableResult.tableData.length > 0) {
@@ -6880,11 +6872,8 @@
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-center">${team.played}</td>
-                            <td class="px-3 py-4 text-center">${team.won}</td>
-                            <td class="px-3 py-4 text-center">${team.drawn}</td>
-                            <td class="px-3 py-4 text-center">${team.lost}</td>
-                            <td class="px-3 py-4 text-center">${team.goalsFor}</td>
-                            <td class="px-3 py-4 text-center">${team.goalsAgainst}</td>
+                            <td class="px-2 py-4 text-center" style="white-space: nowrap;">${team.won}-${team.drawn}-${team.lost}</td>
+                            <td class="px-2 py-4 text-center" style="white-space: nowrap;">${team.goalsFor}:${team.goalsAgainst}</td>
                             <td class="px-3 py-4 text-center">
                                 <span class="font-bold ${team.goalDifference > 0 ? 'text-green-700' : team.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
                                     ${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}
@@ -7058,10 +7047,11 @@
             // Create table headers with sorting functionality
             elements.matchHistoryTableHeader.innerHTML = `
                 <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('date')">Date${getMatchHistorySortIndicator('date')}</th>
-                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('homeTeam')">Home Team${getMatchHistorySortIndicator('homeTeam')}</th>
-                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('homeScore')">Home Score${getMatchHistorySortIndicator('homeScore')}</th>
-                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('awayTeam')">Away Team${getMatchHistorySortIndicator('awayTeam')}</th>
-                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('awayScore')">Away Score${getMatchHistorySortIndicator('awayScore')}</th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('homeTeam')">Home${getMatchHistorySortIndicator('homeTeam')}</th>
+                <th class="text-center" style="white-space: nowrap;">
+                    <span onclick="handleMatchHistorySort('homeScore')" style="cursor:pointer;" title="Sort by Home Score">H${getMatchHistorySortIndicator('homeScore')}</span>:<span onclick="handleMatchHistorySort('awayScore')" style="cursor:pointer;" title="Sort by Away Score">A${getMatchHistorySortIndicator('awayScore')}</span>
+                </th>
+                <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('awayTeam')">Away${getMatchHistorySortIndicator('awayTeam')}</th>
                 <th class="text-center cursor-pointer hover:bg-gray-600" onclick="handleMatchHistorySort('result')">Result${getMatchHistorySortIndicator('result')}</th>
             `;
 
@@ -7207,14 +7197,13 @@
                                 <span style="${match.homeTeamStyle}; display: none;">${match.homeTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg ${match.homeScoreClass}" >${match.homeScore}</td>
+                        <td class="text-center text-lg" style="white-space: nowrap;"><span class="${match.homeScoreClass}">${match.homeScore}</span>:<span class="${match.awayScoreClass}">${match.awayScore}</span></td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                                 <span style="${match.awayTeamStyle}; display: none;">${match.awayTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg ${match.awayScoreClass}" >${match.awayScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${resultLogoUrl ? `<img src="${resultLogoUrl}" alt="${state.selectedTeam1} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -7292,17 +7281,16 @@
                     <div class="mb-4">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-semibold">${teamName} - Overall Record</span>
-                            <span class="text-sm text-gray-600">${wins}W - ${draws}D - ${losses}L</span>
                         </div>
                         <div class="h2h-viz-bar">
                             <div class="h2h-segment h2h-wins" style="width: ${(wins / total) * 100}%; ${teamBgStyle}">
-                                ${wins > 0 ? wins : ''}
+                                ${wins > 0 ? wins + ' W' : ''}
                             </div>
                             <div class="h2h-segment h2h-draws" style="width: ${(draws / total) * 100}%;">
-                                ${draws > 0 ? draws : ''}
+                                ${draws > 0 ? draws + ' D' : ''}
                             </div>
                             <div class="h2h-segment h2h-losses" style="width: ${(losses / total) * 100}%;">
-                                ${losses > 0 ? losses : ''}
+                                ${losses > 0 ? losses + ' L' : ''}
                             </div>
                         </div>
                     </div>
@@ -7316,17 +7304,16 @@
                     <div class="mb-4">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-semibold">${teamName} (Home)</span>
-                            <span class="text-sm text-gray-600">${homeWins}W - ${homeDraws}D - ${homeLosses}L</span>
                         </div>
                         <div class="h2h-viz-bar">
                             <div class="h2h-segment h2h-wins" style="width: ${(homeWins / homeTotal) * 100}%; ${teamBgStyle}">
-                                ${homeWins > 0 ? homeWins : ''}
+                                ${homeWins > 0 ? homeWins + ' W' : ''}
                             </div>
                             <div class="h2h-segment h2h-draws" style="width: ${(homeDraws / homeTotal) * 100}%;">
-                                ${homeDraws > 0 ? homeDraws : ''}
+                                ${homeDraws > 0 ? homeDraws + ' D' : ''}
                             </div>
                             <div class="h2h-segment h2h-losses" style="width: ${(homeLosses / homeTotal) * 100}%;">
-                                ${homeLosses > 0 ? homeLosses : ''}
+                                ${homeLosses > 0 ? homeLosses + ' L' : ''}
                             </div>
                         </div>
                     </div>
@@ -7340,17 +7327,16 @@
                     <div class="mb-4">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-semibold">${teamName} (Away)</span>
-                            <span class="text-sm text-gray-600">${awayWins}W - ${awayDraws}D - ${awayLosses}L</span>
                         </div>
                         <div class="h2h-viz-bar">
                             <div class="h2h-segment h2h-wins" style="width: ${(awayWins / awayTotal) * 100}%; ${teamBgStyle}">
-                                ${awayWins > 0 ? awayWins : ''}
+                                ${awayWins > 0 ? awayWins + ' W' : ''}
                             </div>
                             <div class="h2h-segment h2h-draws" style="width: ${(awayDraws / awayTotal) * 100}%;">
-                                ${awayDraws > 0 ? awayDraws : ''}
+                                ${awayDraws > 0 ? awayDraws + ' D' : ''}
                             </div>
                             <div class="h2h-segment h2h-losses" style="width: ${(awayLosses / awayTotal) * 100}%;">
-                                ${awayLosses > 0 ? awayLosses : ''}
+                                ${awayLosses > 0 ? awayLosses + ' L' : ''}
                             </div>
                         </div>
                     </div>
@@ -7491,64 +7477,61 @@
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-semibold">${getTeamDisplayName(state.selectedTeam1)} vs ${getTeamDisplayName(state.selectedTeam2)} (Overall)</span>
-                                <span class="text-sm text-gray-600">${h2hResult.overallStats.team1Wins}W - ${h2hResult.overallStats.draws}D - ${h2hResult.overallStats.team2Wins}W</span>
                             </div>
                             <div class="h2h-viz-bar">
                                 <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.overallStats.team1Wins / h2hResult.overallStats.total) * 100}%; ${actualTeam1Style}">
-                                    ${h2hResult.overallStats.team1Wins > 0 ? h2hResult.overallStats.team1Wins : ''}
+                                    ${h2hResult.overallStats.team1Wins > 0 ? h2hResult.overallStats.team1Wins + ' W' : ''}
                                 </div>
                                 <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.overallStats.draws / h2hResult.overallStats.total) * 100}%">
-                                    ${h2hResult.overallStats.draws > 0 ? h2hResult.overallStats.draws : ''}
+                                    ${h2hResult.overallStats.draws > 0 ? h2hResult.overallStats.draws + ' D' : ''}
                                 </div>
                                 <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.overallStats.team2Wins / h2hResult.overallStats.total) * 100}%; ${actualTeam2Style}">
-                                    ${h2hResult.overallStats.team2Wins > 0 ? h2hResult.overallStats.team2Wins : ''}
+                                    ${h2hResult.overallStats.team2Wins > 0 ? h2hResult.overallStats.team2Wins + ' W' : ''}
                                 </div>
                             </div>
                         </div>`;
                 }
-                
+
                 // Show Team1 Home scenario if home is selected (when HOME button is checked, show Team1 home matches)
                 if (state.homeFilter) {
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-semibold">${getTeamDisplayName(state.selectedTeam1)} (Home) vs ${getTeamDisplayName(state.selectedTeam2)} (Away)</span>
-                                <span class="text-sm text-gray-600">${h2hResult.team1HomeStats.wins}W - ${h2hResult.team1HomeStats.draws}D - ${h2hResult.team1HomeStats.losses}W</span>
                             </div>
                             ${h2hResult.team1HomeStats.total > 0 ? `
                             <div class="h2h-viz-bar">
                                 <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team1HomeStats.wins / h2hResult.team1HomeStats.total) * 100}%; ${actualTeam1Style}">
-                                    ${h2hResult.team1HomeStats.wins > 0 ? h2hResult.team1HomeStats.wins : ''}
+                                    ${h2hResult.team1HomeStats.wins > 0 ? h2hResult.team1HomeStats.wins + ' W' : ''}
                                 </div>
                                 <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team1HomeStats.draws / h2hResult.team1HomeStats.total) * 100}%">
-                                    ${h2hResult.team1HomeStats.draws > 0 ? h2hResult.team1HomeStats.draws : ''}
+                                    ${h2hResult.team1HomeStats.draws > 0 ? h2hResult.team1HomeStats.draws + ' D' : ''}
                                 </div>
                                 <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team1HomeStats.losses / h2hResult.team1HomeStats.total) * 100}%; ${actualTeam2Style}">
-                                    ${h2hResult.team1HomeStats.losses > 0 ? h2hResult.team1HomeStats.losses : ''}
+                                    ${h2hResult.team1HomeStats.losses > 0 ? h2hResult.team1HomeStats.losses + ' W' : ''}
                                 </div>
                             </div>
                             ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
                         </div>`;
                 }
-                
+
                 // Show Team2 Home scenario if away is selected (when AWAY button is checked, show Team2 home matches)
                 if (state.awayFilter) {
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-semibold">${getTeamDisplayName(state.selectedTeam2)} (Home) vs ${getTeamDisplayName(state.selectedTeam1)} (Away)</span>
-                                <span class="text-sm text-gray-600">${h2hResult.team2HomeStats.wins}W - ${h2hResult.team2HomeStats.draws}D - ${h2hResult.team2HomeStats.losses}W</span>
                             </div>
                             ${h2hResult.team2HomeStats.total > 0 ? `
                             <div class="h2h-viz-bar">
                                 <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.team2HomeStats.wins / h2hResult.team2HomeStats.total) * 100}%; ${actualTeam2Style}">
-                                    ${h2hResult.team2HomeStats.wins > 0 ? h2hResult.team2HomeStats.wins : ''}
+                                    ${h2hResult.team2HomeStats.wins > 0 ? h2hResult.team2HomeStats.wins + ' W' : ''}
                                 </div>
                                 <div class="h2h-segment h2h-draws" style="width: ${(h2hResult.team2HomeStats.draws / h2hResult.team2HomeStats.total) * 100}%">
-                                    ${h2hResult.team2HomeStats.draws > 0 ? h2hResult.team2HomeStats.draws : ''}
+                                    ${h2hResult.team2HomeStats.draws > 0 ? h2hResult.team2HomeStats.draws + ' D' : ''}
                                 </div>
                                 <div class="h2h-segment h2h-losses" style="width: ${(h2hResult.team2HomeStats.losses / h2hResult.team2HomeStats.total) * 100}%; ${actualTeam1Style}">
-                                    ${h2hResult.team2HomeStats.losses > 0 ? h2hResult.team2HomeStats.losses : ''}
+                                    ${h2hResult.team2HomeStats.losses > 0 ? h2hResult.team2HomeStats.losses + ' W' : ''}
                                 </div>
                             </div>
                             ` : '<div class="text-sm text-gray-500 italic">No matches found</div>'}
@@ -7671,21 +7654,15 @@
             elements.h2hMatchCount.textContent = `(${matchesData.length} matches)`;
 
             // Create table headers
-            const headers = [
-                { key: 'date', label: 'Date' },
-                { key: 'homeTeam', label: 'Home Team' },
-                { key: 'homeScore', label: 'Home Score' },
-                { key: 'awayTeam', label: 'Away Team' },
-                { key: 'awayScore', label: 'Away Score' },
-                { key: 'result', label: 'Result' }
-            ];
-
-            elements.h2hTableHeader.innerHTML = headers.map(header => `
-                <th class="${header.key.includes('Team') ? 'text-center' : 'text-center'} cursor-pointer" 
-                    onclick="handleH2hSort('${header.key}')">
-                    ${header.label}${getH2hSortIndicator(header.key)}
+            elements.h2hTableHeader.innerHTML = `
+                <th class="text-center cursor-pointer" onclick="handleH2hSort('date')">Date</th>
+                <th class="text-center cursor-pointer" onclick="handleH2hSort('homeTeam')">Home</th>
+                <th class="text-center" style="white-space: nowrap;">
+                    <span onclick="handleH2hSort('homeScore')" style="cursor:pointer;" title="Sort by Home Score">H</span>:<span onclick="handleH2hSort('awayScore')" style="cursor:pointer;" title="Sort by Away Score">A</span>
                 </th>
-            `).join('');
+                <th class="text-center cursor-pointer" onclick="handleH2hSort('awayTeam')">Away</th>
+                <th class="text-center cursor-pointer" onclick="handleH2hSort('result')">Result</th>
+            `;
 
 
             // Update table body
@@ -7709,14 +7686,13 @@
                                 <span style="${match.homeTeamStyle}; display: none;">${match.homeTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg ${match.homeScoreClass}" >${match.homeScore}</td>
+                        <td class="text-center text-lg" style="white-space: nowrap;"><span class="${match.homeScoreClass}">${match.homeScore}</span>:<span class="${match.awayScoreClass}">${match.awayScore}</span></td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
                                 <span style="${match.awayTeamStyle}; display: none;">${match.awayTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg ${match.awayScoreClass}" >${match.awayScore}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
                                 ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${match.result} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -7749,12 +7725,6 @@
             }
             
             updateTable();
-        }
-
-        // Get H2H sort indicator
-        function getH2hSortIndicator(key) {
-            if (state.h2hSortConfig.key !== key) return ' ↕️';
-            return state.h2hSortConfig.direction === 'asc' ? ' ↑' : ' ↓';
         }
 
         // Update last data update based on most recent game
@@ -8392,32 +8362,31 @@
                 });
             }
             
-            const headers = [
-                { key: 'season', label: 'Season' },
-                { key: 'team', label: 'Team' },
-                { key: 'played', label: 'P' },
-                { key: 'won', label: 'W' },
-                { key: 'drawn', label: 'D' },
-                { key: 'lost', label: 'L' },
-                { key: 'goalsFor', label: 'GF' },
-                { key: 'goalsAgainst', label: 'GA' },
-                { key: 'goalDifference', label: 'GD' },
-                { key: 'points', label: 'Pts' },
-                { key: 'position', label: 'Pos<br>' }
-            ];
-            
-            elements.teamHistoryHeader.innerHTML = headers.map(header => `
-                <th class="px-3 py-4 text-center font-bold text-sm ${header.key !== 'team' ? 'cursor-pointer hover:bg-gray-600' : ''}" 
-                    ${header.key !== 'team' ? `onclick="handleTeamHistorySort('${header.key}')"` : ''}
-                    style="text-align: ${(header.key === 'season' || header.key === 'team') ? 'left' : 'center'}">
-                    ${header.label}${header.key !== 'team' ? ((header.key === 'count' || header.key === 'lost') ? '<br>' : '') + getTeamHistorySortIndicator(header.key) : ''}
+            elements.teamHistoryTable.classList.remove('position-only-mode');
+            elements.teamHistoryTable.classList.add('single-team-mode');
+
+            const thSort = (key, label) =>
+                `<span onclick="handleTeamHistorySort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
+
+            elements.teamHistoryHeader.innerHTML = `
+                <th class="px-3 py-4 text-left font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('season')" style="text-align: left;">Season</th>
+                <th class="px-4 py-4 font-bold text-sm" style="text-align: left;">Team</th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('played')" style="text-align: center;">P</th>
+                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                    ${thSort('won', 'W')}-${thSort('drawn', 'D')}-${thSort('lost', 'L')}
                 </th>
-            `).join('');
-            
+                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                    ${thSort('goalsFor', 'GF')}:${thSort('goalsAgainst', 'GA')}
+                </th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('goalDifference')" style="text-align: center;">GD</th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('points')" style="text-align: center;">Pts</th>
+                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('position')" style="text-align: center;">Pos</th>
+            `;
+
             elements.teamHistoryBody.innerHTML = sortedData.map((season, index) => {
                 const rowBackgroundClass = sortedData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
                 const logoUrl = getTeamLogoUrl(teamName, leagueToUse);
-                
+
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                         <td class="px-3 py-4 font-semibold text-left">
@@ -8427,15 +8396,12 @@
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                                <span style="font-size: 0.5rem !important;">${teamName}</span>
+                                <span class="team-name-text">${teamName}</span>
                             </div>
                         </td>
                         <td class="px-3 py-4 text-center">${season.played}</td>
-                        <td class="px-3 py-4 text-center">${season.won}</td>
-                        <td class="px-3 py-4 text-center">${season.drawn}</td>
-                        <td class="px-3 py-4 text-center">${season.lost}</td>
-                        <td class="px-3 py-4 text-center">${season.goalsFor}</td>
-                        <td class="px-3 py-4 text-center">${season.goalsAgainst}</td>
+                        <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.won}-${season.drawn}-${season.lost}</td>
+                        <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.goalsFor}:${season.goalsAgainst}</td>
                         <td class="px-3 py-4 text-center">
                             <span class="font-bold ${season.goalDifference > 0 ? 'text-green-700' : season.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
                                 ${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}
@@ -8447,9 +8413,9 @@
                             </span>
                         </td>
                         <td class="px-3 py-4 text-center font-bold" style="${
-                            season.position === 1 ? 'color: #d97706; background-color: #fef3c7;' : 
-                            season.position === 2 ? 'color: #374151; background-color: #e5e7eb;' : 
-                            season.position === 3 ? 'color: #b45309; background-color: #fef7ed;' : 
+                            season.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
+                            season.position === 2 ? 'color: #374151; background-color: #e5e7eb;' :
+                            season.position === 3 ? 'color: #b45309; background-color: #fef7ed;' :
                             'color: #6b7280;'
                         }">${season.position}</td>
                     </tr>
@@ -8589,18 +8555,6 @@
             }
         }
 
-        // Get team history sort indicator
-        function getTeamHistorySortIndicator(key) {
-            if (state.teamHistorySortConfig.key !== key) return ' ↕️';
-            
-            if (state.teamHistorySortConfig.direction === 'asc') {
-                return ' ↑';
-            } else if (state.teamHistorySortConfig.direction === 'desc') {
-                return ' ↓';
-            }
-            return ' ↕️';
-        }
-
         // Get sort indicator
         function getSortIndicator(key) {
             if (state.sortConfig.key !== key) return ' ↕️';
@@ -8655,8 +8609,7 @@
         }
 
         function getMatchHistorySortIndicator(key) {
-            if (state.matchHistorySortConfig.key !== key) return ' ↕️';
-            return state.matchHistorySortConfig.direction === 'asc' ? ' ↑' : ' ↓';
+            return ''; // arrows removed to save space on mobile; still fully sortable
         }
 
         // Clear filters
