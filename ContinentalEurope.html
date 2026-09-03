@@ -49,7 +49,7 @@
 
             // Redirect to mobile version if mobile device detected
             if (isMobileDevice()) {
-                window.location.href = 'ContinentalEuropeMobile.html';
+                window.location.href = 'ContinentalEuropeMobile.html' + window.location.search;
             }
         })();
     </script>
@@ -146,9 +146,21 @@
                 </div>
             </div>
 
+            <!-- Team Dashboard Snapshot (shown only when Team 1 is locked via URL) -->
+            <div id="teamDashboardHeader" class="team-dashboard-header hidden"></div>
+
+            <!-- Team Dashboard Search (shown when no team is locked, once data has loaded) -->
+            <div id="teamDashboardSearch" class="team-dashboard-search hidden">
+                <div class="team-dashboard-search-box">
+                    <span class="team-dashboard-search-icon">🔍</span>
+                    <input type="text" id="teamDashboardSearchInput" class="team-dashboard-search-input" placeholder="Search for a team to view its dashboard..." autocomplete="off">
+                </div>
+                <div id="teamDashboardSearchResults" class="team-dashboard-search-results hidden"></div>
+            </div>
+
             <!-- Controls Section -->
             <div id="controlsSection" class="controls-section hidden">
-                
+
                 <!-- Tab Container -->
                 <div class="tab-container">
                     <button class="tab-button active" id="leagueFiltersTab" data-mobile-text="Tables & H2H">League Tables & Head to Head Stats</button>
@@ -1014,8 +1026,28 @@
             
             // Historic Streaks sort state
             historicStreaksSortConfig: { key: null, direction: null },
-            lastHistoricStreaksParams: null
+            lastHistoricStreaksParams: null,
+
+            // Team Dashboard state (locked team via ?team= URL params, or
+            // picked from the in-page search). dashboardLockedTeam is the
+            // stable identity - it survives tab switches, unlike
+            // selectedTeam1/teamSeasonsSelectedTeam/lastTimeTeam1/etc, which
+            // each tab resets independently when switching away from it.
+            // Unlike Domestic, there's no league to track here - Continental
+            // only ever has one selectable competition (Champions League).
+            pendingTeamLock: '',
+            teamLocked: false,
+            dashboardLockedTeam: ''
         };
+
+        // Team Dashboard: read ?team= from the URL before anything else runs
+        function applyTeamDashboardUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const team = urlParams.get('team');
+            if (team) {
+                state.pendingTeamLock = team;
+            }
+        }
 
         // Ranking overrides for historic seasons
         function getRankingOverrides() {
@@ -3169,11 +3201,13 @@
 
         // Initialize the application
         function init() {
+            applyTeamDashboardUrlParams();
             setupEventListeners();
             createLeagueButtons();
             createTeamSeasonsLeagueButtons();
             populateRecentH2HOptions();
             updateCompetitionStageOptions(); // Set initial dropdown options
+            initTeamDashboardSearch();
             updateUI();
             // Auto-load data on page load
             loadGistData();
@@ -4621,11 +4655,29 @@
             }
         }
 
+        const TEAM_DASHBOARD_TAB_BUTTON_IDS = {
+            'league-filters': 'leagueFiltersTab',
+            'team-seasons': 'teamSeasonsTab',
+            'last-time-when': 'lastTimeWhenTab',
+            'team-streaks': 'teamStreaksTab'
+        };
+
         // Switch tabs
         function switchTab(tabName) {
             // Store the current league before switching
             let preservedLeague = state.selectedLeague;
-            
+
+            // Team Dashboard: was this tab already the active one before this
+            // call? showTeamHistory() calls switchTab('team-seasons') as part
+            // of its own contract even when we're already on that tab (e.g.
+            // changing the position filter while a team is selected) - in
+            // that case re-applying the dashboard lock's team selection below
+            // would re-trigger handleTeamSeasonsTeamChange and clobber the
+            // filter the user just set. Only apply the lock on a genuine
+            // tab change.
+            const dashboardLockTabButton = document.getElementById(TEAM_DASHBOARD_TAB_BUTTON_IDS[tabName]);
+            const wasAlreadyActiveTab = !!(dashboardLockTabButton && dashboardLockTabButton.classList.contains('active'));
+
             // Remove active class from all tabs and content
             document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -4812,6 +4864,13 @@
                 // Initialize Team Streaks controls with correct league selected
                 createTeamStreaksLeagueButtons();
                 updateTeamStreaksSelects();
+            }
+
+            // Team Dashboard: keep the locked team applied on whichever tab
+            // just became active (each branch above may have reset it) -
+            // but only for a genuine tab change, not a redundant self-call.
+            if (!wasAlreadyActiveTab) {
+                applyTeamDashboardLockToTab(tabName);
             }
         }
 
@@ -5819,6 +5878,18 @@
             lastTimeTeam2Combobox.setOptions(lastTimeTeam2ComboOptions);
             teamStreaksTeam1Combobox.setOptions(teamStreaksTeam1ComboOptions);
             teamStreaksTeam2Combobox.setOptions(teamStreaksTeam2ComboOptions);
+
+            // Team Dashboard: consume a pending team lock from the URL (once)
+            if (state.pendingTeamLock) {
+                const lockedTeam = state.pendingTeamLock;
+                state.pendingTeamLock = '';
+                if (leagueTeams.includes(lockedTeam)) {
+                    state.teamLocked = true;
+                    state.dashboardLockedTeam = lockedTeam;
+                    team1Combobox.selectOption(lockedTeam, lockedTeam);
+                    applyTeamLockUI();
+                }
+            }
 
             // Also populate Last Time When team selects (for backward compatibility)
             const lastTimeTeam1Options = '<option value="">Select Team 1</option>' +
@@ -7751,18 +7822,299 @@
         // Update table and all related UI
         function updateTable() {
             if (state.data.length === 0) return;
-            
+
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
             const matchHistoryResult = calculateMatchHistory();
-            
+
             updateTableDisplay(tableResult);
             updateHeadToHeadDisplay(h2hResult);
             updateMatchHistoryDisplay(matchHistoryResult);
             updateTableInfo(tableResult);
-            
+            updateTeamDashboardHeader();
+
             // Handle position colors for dark mode
             setTimeout(handlePositionColors, 50);
+        }
+
+        // --- Team Dashboard (locked team via ?team= or in-page search) ---
+
+        function lockComboboxUI(containerId, inputId) {
+            const input = document.getElementById(inputId);
+            const container = document.getElementById(containerId);
+            if (input) input.disabled = true;
+            if (container) container.classList.add('locked');
+        }
+
+        function unlockComboboxUI(containerId, inputId) {
+            const input = document.getElementById(inputId);
+            const container = document.getElementById(containerId);
+            if (input) input.disabled = false;
+            if (container) container.classList.remove('locked');
+        }
+
+        // Visually lock the Team 1 combobox once a team is applied
+        function applyTeamLockUI() {
+            lockComboboxUI('team1ComboboxContainer', 'team1ComboboxInput');
+        }
+
+        // Release the lock and return to normal, freely-editable behavior
+        // across every tab's own team selector.
+        function clearTeamLock() {
+            state.teamLocked = false;
+            state.dashboardLockedTeam = '';
+            unlockComboboxUI('team1ComboboxContainer', 'team1ComboboxInput');
+            unlockComboboxUI('teamSeasonsComboboxContainer', 'teamSeasonsComboboxInput');
+            unlockComboboxUI('lastTimeTeam1ComboboxContainer', 'lastTimeTeam1ComboboxInput');
+            unlockComboboxUI('teamStreaksTeam1ComboboxContainer', 'teamStreaksTeam1ComboboxInput');
+            history.replaceState(null, '', window.location.pathname);
+            updateTeamDashboardHeader();
+        }
+
+        // Re-apply the locked team to whichever tab just became active.
+        // Each tab keeps its own "selected team" state (selectedTeam1,
+        // teamSeasonsSelectedTeam, lastTimeTeam1, teamStreaksTeam1) and
+        // switchTab() resets the tabs being left/entered independently of
+        // each other - this keeps all four in sync with the dashboard lock
+        // instead of only the tab the lock was originally applied on.
+        //
+        // Guarded against re-entrancy: showTeamHistory() (triggered by
+        // selecting a team in the Team Seasons combobox below) itself calls
+        // switchTab('team-seasons') again as part of its own contract - without
+        // this guard that becomes infinite recursion.
+        let applyingTeamDashboardLock = false;
+        function applyTeamDashboardLockToTab(tabName) {
+            if (!state.teamLocked || !state.dashboardLockedTeam) return;
+            if (applyingTeamDashboardLock) return;
+            applyingTeamDashboardLock = true;
+            try {
+                const team = state.dashboardLockedTeam;
+
+                if (tabName === 'league-filters' && team1Combobox) {
+                    team1Combobox.selectOption(team, team);
+                    lockComboboxUI('team1ComboboxContainer', 'team1ComboboxInput');
+                } else if (tabName === 'team-seasons' && teamSeasonsCombobox) {
+                    teamSeasonsCombobox.selectOption(team, team);
+                    lockComboboxUI('teamSeasonsComboboxContainer', 'teamSeasonsComboboxInput');
+                } else if (tabName === 'last-time-when' && lastTimeTeam1Combobox) {
+                    lastTimeTeam1Combobox.selectOption(team, team);
+                    lockComboboxUI('lastTimeTeam1ComboboxContainer', 'lastTimeTeam1ComboboxInput');
+                } else if (tabName === 'team-streaks' && teamStreaksTeam1Combobox) {
+                    teamStreaksTeam1Combobox.selectOption(team, team);
+                    lockComboboxUI('teamStreaksTeam1ComboboxContainer', 'teamStreaksTeam1ComboboxInput');
+                }
+            } finally {
+                applyingTeamDashboardLock = false;
+            }
+        }
+
+        // Which dashboard tab is currently on screen (falls back to
+        // 'league-filters' if none is marked active, e.g. before the first
+        // render).
+        function getActiveDashboardTabName() {
+            for (const tabName of Object.keys(TEAM_DASHBOARD_TAB_BUTTON_IDS)) {
+                const btn = document.getElementById(TEAM_DASHBOARD_TAB_BUTTON_IDS[tabName]);
+                if (btn && btn.classList.contains('active')) return tabName;
+            }
+            return 'league-filters';
+        }
+
+        // Lock the chosen team - the same end state a ?team= URL produces,
+        // but triggered from the search box directly. This can be called
+        // from ANY tab (the search box is visible everywhere a team isn't
+        // locked yet), so it must drive whichever tab is currently on
+        // screen. Unlike Domestic, there's no league-switching branch here:
+        // Continental only ever has one selectable competition (Champions
+        // League), so the team is simply locked on the active tab.
+        function selectTeamForDashboard(teamName) {
+            const activeTab = getActiveDashboardTabName();
+            state.teamLocked = true;
+            state.dashboardLockedTeam = teamName;
+            applyTeamDashboardLockToTab(activeTab);
+            // Team Seasons/Last Time When/Team Streaks selections don't run
+            // through updateTable() (that's League Filters-specific), so the
+            // snapshot header needs an explicit refresh here.
+            updateTeamDashboardHeader();
+        }
+
+        // Team's current standing + last 5 results, reusing calculateTable()
+        // (temporarily cleared of any team filter, i.e. the full standings
+        // table under whatever season/stage filter is currently active) and
+        // the raw match data - no new calculation logic. Continental has no
+        // Div/league to filter match data by (all state.data is Champions
+        // League), unlike Domestic.
+        function getTeamDashboardSnapshot(teamName) {
+            if (!teamName || state.data.length === 0) return null;
+
+            const savedTeam1 = state.selectedTeam1;
+            const savedTeam2 = state.selectedTeam2;
+            state.selectedTeam1 = '';
+            state.selectedTeam2 = '';
+            const standings = calculateTable().tableData;
+            state.selectedTeam1 = savedTeam1;
+            state.selectedTeam2 = savedTeam2;
+
+            const standing = standings.find(row => row.team === teamName);
+            if (!standing) return null;
+
+            const lastResults = state.data
+                .filter(row => row.HomeTeam === teamName || row.AwayTeam === teamName)
+                .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
+                .slice(0, 5)
+                .map(match => {
+                    const isHome = match.HomeTeam === teamName;
+                    const teamGoals = parseInt(isHome ? match.FTHG : match.FTAG) || 0;
+                    const oppGoals = parseInt(isHome ? match.FTAG : match.FTHG) || 0;
+                    if (teamGoals > oppGoals) return 'W';
+                    if (teamGoals < oppGoals) return 'L';
+                    return 'D';
+                })
+                .reverse(); // oldest -> newest, most recent on the right
+
+            return { standing, lastResults };
+        }
+
+        // Render the Team Dashboard snapshot header (crest, position, record, form)
+        function updateTeamDashboardHeader() {
+            const headerEl = document.getElementById('teamDashboardHeader');
+            const searchEl = document.getElementById('teamDashboardSearch');
+            if (!headerEl) return;
+
+            if (!state.teamLocked || !state.dashboardLockedTeam) {
+                headerEl.classList.add('hidden');
+                headerEl.innerHTML = '';
+                // Only offer the search box once there's data for it to search
+                if (searchEl) searchEl.classList.toggle('hidden', state.data.length === 0);
+                return;
+            }
+
+            if (searchEl) searchEl.classList.add('hidden');
+
+            const snapshot = getTeamDashboardSnapshot(state.dashboardLockedTeam);
+            if (!snapshot) {
+                headerEl.classList.add('hidden');
+                headerEl.innerHTML = '';
+                if (searchEl) searchEl.classList.toggle('hidden', state.data.length === 0);
+                return;
+            }
+
+            const { standing, lastResults } = snapshot;
+            const teamColor = getTeamColor(state.dashboardLockedTeam, state.selectedLeague) || '#374151';
+            const logoUrl = getTeamLogoUrl(state.dashboardLockedTeam, state.selectedLeague);
+            const textColor = getContrastColor(teamColor);
+
+            const chipClass = (result) => result === 'W' ? 'team-dashboard-chip-win' : result === 'L' ? 'team-dashboard-chip-loss' : 'team-dashboard-chip-draw';
+            const chipsHtml = lastResults.length
+                ? lastResults.map(result => `<span class="team-dashboard-chip ${chipClass(result)}">${result}</span>`).join('')
+                : '<span class="team-dashboard-form-empty">No matches yet</span>';
+
+            headerEl.innerHTML = `
+                <div class="team-dashboard-identity">
+                    ${logoUrl ? `<img src="${logoUrl}" class="team-dashboard-crest" alt="${state.dashboardLockedTeam} crest" onerror="this.style.display='none'">` : ''}
+                    <span class="team-dashboard-name" style="background-color: ${teamColor}; color: ${textColor};">${state.dashboardLockedTeam}</span>
+                </div>
+                <div class="team-dashboard-stats">
+                    <div class="team-dashboard-stat">
+                        <span class="team-dashboard-stat-value">#${standing.originalPosition}</span>
+                        <span class="team-dashboard-stat-label">Position</span>
+                    </div>
+                    <div class="team-dashboard-stat">
+                        <span class="team-dashboard-stat-value">${standing.points}</span>
+                        <span class="team-dashboard-stat-label">Points</span>
+                    </div>
+                    <div class="team-dashboard-stat">
+                        <span class="team-dashboard-stat-value">${standing.played}</span>
+                        <span class="team-dashboard-stat-label">Played</span>
+                    </div>
+                    <div class="team-dashboard-stat">
+                        <span class="team-dashboard-stat-value">${standing.won}-${standing.drawn}-${standing.lost}</span>
+                        <span class="team-dashboard-stat-label">W-D-L</span>
+                    </div>
+                </div>
+                <div class="team-dashboard-form">
+                    <span class="team-dashboard-form-label">Last 5</span>
+                    <div class="team-dashboard-chips">${chipsHtml}</div>
+                </div>
+                <button type="button" id="changeTeamBtn" class="team-dashboard-change-btn">✕ Change Team</button>
+            `;
+            headerEl.classList.remove('hidden');
+
+            const changeTeamBtn = document.getElementById('changeTeamBtn');
+            if (changeTeamBtn) changeTeamBtn.addEventListener('click', clearTeamLock);
+        }
+
+        // Flat team directory built from the full team registry (merging all
+        // 6 getTeamColors() buckets, deduped by name) - unlike Domestic there's
+        // no per-league grouping to preserve, since every team here belongs
+        // to the same single competition (Champions League).
+        function getTeamDashboardDirectory() {
+            const teamColors = getTeamColors();
+            const directory = [];
+            const seen = new Set();
+            Object.keys(teamColors).forEach(bucket => {
+                teamColors[bucket].forEach(([name, color, crestId]) => {
+                    if (seen.has(name)) return;
+                    seen.add(name);
+                    directory.push({ name, crestId });
+                });
+            });
+            return directory;
+        }
+
+        // Team Dashboard: as-you-type search box shown in place of the
+        // snapshot header whenever no team is currently locked.
+        function initTeamDashboardSearch() {
+            const input = document.getElementById('teamDashboardSearchInput');
+            const resultsEl = document.getElementById('teamDashboardSearchResults');
+            if (!input || !resultsEl) return;
+
+            const directory = getTeamDashboardDirectory();
+
+            function renderResults(matches) {
+                if (matches.length === 0) {
+                    resultsEl.innerHTML = '<div class="team-dashboard-search-empty">No teams found</div>';
+                } else {
+                    resultsEl.innerHTML = matches.map((team, index) => `
+                        <div class="team-dashboard-search-result" data-index="${index}">
+                            ${team.crestId ? `<img src="https://s.hs-data.com/gfx/emblem/common/80x80/${team.crestId}.png" class="team-dashboard-search-result-logo" alt="" onerror="this.style.display='none'">` : '<span class="team-dashboard-search-result-logo"></span>'}
+                            <span class="team-dashboard-search-result-name">${team.name}</span>
+                        </div>
+                    `).join('');
+                    resultsEl.querySelectorAll('.team-dashboard-search-result').forEach(el => {
+                        el.addEventListener('click', () => {
+                            const team = matches[parseInt(el.dataset.index)];
+                            input.value = '';
+                            resultsEl.classList.add('hidden');
+                            resultsEl.innerHTML = '';
+                            selectTeamForDashboard(team.name);
+                        });
+                    });
+                }
+                resultsEl.classList.remove('hidden');
+            }
+
+            input.addEventListener('input', () => {
+                const query = input.value.trim().toLowerCase();
+                if (!query) {
+                    resultsEl.classList.add('hidden');
+                    resultsEl.innerHTML = '';
+                    return;
+                }
+                const matches = directory.filter(team => team.name.toLowerCase().includes(query)).slice(0, 8);
+                renderResults(matches);
+            });
+
+            input.addEventListener('focus', () => {
+                if (input.value.trim() && resultsEl.innerHTML) {
+                    resultsEl.classList.remove('hidden');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.team-dashboard-search')) {
+                    resultsEl.classList.add('hidden');
+                }
+            });
         }
 
         // Update table display
@@ -10020,6 +10372,8 @@
             // Update form values
             elements.dateFrom.value = state.dateFrom;
             elements.dateTo.value = state.dateTo;
+
+            updateTeamDashboardHeader();
         }
 
         // Hamburger Menu Functionality
