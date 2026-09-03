@@ -1372,9 +1372,14 @@ body {
        reliably recompute sticky offsets for content inserted via
        innerHTML (which is how Continental's table redraws on every
        filter change) without this hint, leaving Pos/Team looking
-       squished or invisible until the page is scrolled. */
-    #tableContainer .league-table th:first-child,
-    #tableContainer .league-table td:first-child {
+       squished or invisible until the page is scrolled.
+       Scoped to .standings-table (displaySingleTable/
+       displayGroupedPhasesTables' 7-column Pos/Team/P/W-D-L/GF:GA/GD/Pts
+       shape) - displayKnockoutMatchHistory's 5-column Date/Home/H:A/Away/
+       Result tables share the .league-table wrapper but have their own
+       column rules below, since nth-child(1) there is Date, not Pos. */
+    #tableContainer .league-table.standings-table th:first-child,
+    #tableContainer .league-table.standings-table td:first-child {
         position: sticky !important;
         left: 0 !important;
         z-index: 2 !important;
@@ -1396,8 +1401,8 @@ body {
        to the same fixed size as everything else. (Stat column widths
        below are ~10% larger than their tightest fit, which correspondingly
        trims Team's share of the leftover space.) */
-    #tableContainer .league-table th:nth-child(2),
-    #tableContainer .league-table td:nth-child(2) {
+    #tableContainer .league-table.standings-table th:nth-child(2),
+    #tableContainer .league-table.standings-table td:nth-child(2) {
         position: sticky !important;
         left: 22px !important;
         z-index: 2 !important;
@@ -1410,12 +1415,12 @@ body {
         -webkit-transform: translateZ(0) !important;
     }
 
-    #tableContainer .league-table th:first-child,
-    #tableContainer .league-table th:nth-child(2) {
+    #tableContainer .league-table.standings-table th:first-child,
+    #tableContainer .league-table.standings-table th:nth-child(2) {
         background: linear-gradient(to right, #374151, #1f2937) !important;
     }
 
-    #tableContainer .league-table td:nth-child(2) span {
+    #tableContainer .league-table.standings-table td:nth-child(2) span {
         display: inline !important;
     }
 
@@ -1440,35 +1445,35 @@ body {
     /* Stat columns: each gets its own fixed width sized to its actual
        content (not a shared min-width) so none of them can be starved
        by, or steal space from, the flexible Team column above. */
-    #tableContainer .league-table th:nth-child(n+3),
-    #tableContainer .league-table td:nth-child(n+3) {
+    #tableContainer .league-table.standings-table th:nth-child(n+3),
+    #tableContainer .league-table.standings-table td:nth-child(n+3) {
         text-align: center !important;
         font-size: 0.5rem !important;
         padding: 0.35rem 0.16rem !important;
     }
 
-    #tableContainer .league-table th:nth-child(3), /* P */
-    #tableContainer .league-table td:nth-child(3) {
+    #tableContainer .league-table.standings-table th:nth-child(3), /* P */
+    #tableContainer .league-table.standings-table td:nth-child(3) {
         width: 31px !important;
     }
 
-    #tableContainer .league-table th:nth-child(4), /* W-D-L */
-    #tableContainer .league-table td:nth-child(4) {
+    #tableContainer .league-table.standings-table th:nth-child(4), /* W-D-L */
+    #tableContainer .league-table.standings-table td:nth-child(4) {
         width: 70px !important;
     }
 
-    #tableContainer .league-table th:nth-child(5), /* GF:GA */
-    #tableContainer .league-table td:nth-child(5) {
+    #tableContainer .league-table.standings-table th:nth-child(5), /* GF:GA */
+    #tableContainer .league-table.standings-table td:nth-child(5) {
         width: 57px !important;
     }
 
-    #tableContainer .league-table th:nth-child(6), /* GD */
-    #tableContainer .league-table td:nth-child(6) {
+    #tableContainer .league-table.standings-table th:nth-child(6), /* GD */
+    #tableContainer .league-table.standings-table td:nth-child(6) {
         width: 40px !important;
     }
 
-    #tableContainer .league-table th:nth-child(7), /* Pts */
-    #tableContainer .league-table td:nth-child(7) {
+    #tableContainer .league-table.standings-table th:nth-child(7), /* Pts */
+    #tableContainer .league-table.standings-table td:nth-child(7) {
         width: 44px !important;
     }
 
@@ -1476,6 +1481,84 @@ body {
         font-size: 0.55rem !important;
         font-weight: 900 !important;
         padding: 0.08rem 0.2rem !important;
+    }
+}
+
+/* ============================================================
+   Mobile redesign: displayGroupedPhasesTables (group-stage/league
+   phase standings, e.g. Group A/Group B or a knockout competition's
+   league phase) and displayKnockoutMatchHistory (Round of 16/QF/SF/
+   Final match lists) - the two #tableContainer display paths that
+   never got the horizontal-scroll/sticky-column/merged-column
+   treatment the default league-format table (displaySingleTable)
+   got earlier. Group/phase standings share that table's exact
+   7-column shape (both carry .standings-table, see the League Table
+   block above), so no extra CSS is needed for them beyond a bit of
+   title sizing. Knockout match lists are a different, 5-column
+   Date/Home/H:A/Away/Result shape (same concepts as Last Time
+   When/Match History), so they get their own rules here.
+   ============================================================ */
+@media (max-width: 640px) {
+    /* Group/phase heading ("Group A (6 matches)") and knockout round
+       heading ("Round of 16") - shrink to match the rest of the
+       redesigned section titles. */
+    #tableContainer h3 {
+        font-size: 0.9rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    #tableContainer h2 {
+        font-size: 1rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+
+    #tableContainer .knockout-match-table table {
+        table-layout: fixed !important;
+        width: 100% !important;
+    }
+
+    #tableContainer .knockout-match-table th,
+    #tableContainer .knockout-match-table td {
+        font-size: 0.55rem !important;
+        padding: 0.3rem 0.15rem !important;
+        white-space: nowrap !important;
+    }
+
+    /* Reset the overflow/ellipsis that .standings-table's Team-column
+       rules (or the generic .league-table rules above) would
+       otherwise leak onto this differently-shaped table. */
+    #tableContainer .knockout-match-table th,
+    #tableContainer .knockout-match-table td {
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
+
+    /* Date column */
+    #tableContainer .knockout-match-table th:nth-child(1),
+    #tableContainer .knockout-match-table td:nth-child(1) {
+        width: 64px !important;
+    }
+
+    /* Home/Away columns: logo only, name already hidden inline */
+    #tableContainer .knockout-match-table th:nth-child(2),
+    #tableContainer .knockout-match-table td:nth-child(2),
+    #tableContainer .knockout-match-table th:nth-child(4),
+    #tableContainer .knockout-match-table td:nth-child(4) {
+        width: 28px !important;
+    }
+
+    /* H:A merged score column - fixed (not auto) width so it can't
+       swallow all remaining table-layout:fixed space */
+    #tableContainer .knockout-match-table th:nth-child(3),
+    #tableContainer .knockout-match-table td:nth-child(3) {
+        width: 50px !important;
+        font-size: 0.75rem !important;
+    }
+
+    /* Result column */
+    #tableContainer .knockout-match-table th:nth-child(5),
+    #tableContainer .knockout-match-table td:nth-child(5) {
+        width: 30px !important;
     }
 }
 

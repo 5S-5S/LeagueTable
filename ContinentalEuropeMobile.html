@@ -7669,32 +7669,26 @@
                 
                 // Create table for this phase with same styling as standard league table
                 const phaseTable = document.createElement('div');
-                phaseTable.className = 'league-table';
+                phaseTable.className = 'league-table standings-table';
                 
-                const headers = [
-                    { key: 'position', label: 'Pos' },
-                    { key: 'team', label: '' },
-                    { key: 'played', label: 'P' },
-                    { key: 'won', label: 'W' },
-                    { key: 'drawn', label: 'D' },
-                    { key: 'lost', label: 'L' },
-                    { key: 'goalsFor', label: 'GF' },
-                    { key: 'goalsAgainst', label: 'GA' },
-                    { key: 'goalDifference', label: 'GD' },
-                    { key: 'points', label: 'Pts' }
-                ];
-                
+                const subSort = (key, label) =>
+                    `<span onclick="handlePhaseSort('${key}', '${phaseName}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
+
                 phaseTable.innerHTML = `
                     <table>
                         <thead>
                             <tr>
-                                ${headers.map(header => `
-                                    <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
-                                        onclick="handlePhaseSort('${header.key}', '${phaseName}')" 
-                                        style="text-align: ${header.key === 'team' ? 'left' : 'center'}">
-                                        ${header.label}${getPhaseTableSortIndicator(header.key, phaseName)}
-                                    </th>
-                                `).join('')}
+                                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handlePhaseSort('position', '${phaseName}')" style="text-align: center;">Pos<br></th>
+                                <th class="px-4 py-4 font-bold text-sm" style="text-align: left;"></th>
+                                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handlePhaseSort('played', '${phaseName}')" style="text-align: center;">P</th>
+                                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                                    ${subSort('won', 'W')}-${subSort('drawn', 'D')}-${subSort('lost', 'L')}
+                                </th>
+                                <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
+                                    ${subSort('goalsFor', 'GF')}:${subSort('goalsAgainst', 'GA')}
+                                </th>
+                                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handlePhaseSort('goalDifference', '${phaseName}')" style="text-align: center;">GD</th>
+                                <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handlePhaseSort('points', '${phaseName}')" style="text-align: center;">Pts</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -7729,11 +7723,8 @@
                                             </div>
                                         </td>
                                         <td class="px-3 py-4 text-center">${team.played}</td>
-                                        <td class="px-3 py-4 text-center">${team.won}</td>
-                                        <td class="px-3 py-4 text-center">${team.drawn}</td>
-                                        <td class="px-3 py-4 text-center">${team.lost}</td>
-                                        <td class="px-3 py-4 text-center">${team.goalsFor}</td>
-                                        <td class="px-3 py-4 text-center">${team.goalsAgainst}</td>
+                                        <td class="px-2 py-4 text-center" style="white-space: nowrap;">${team.won}-${team.drawn}-${team.lost}</td>
+                                        <td class="px-2 py-4 text-center" style="white-space: nowrap;">${team.goalsFor}:${team.goalsAgainst}</td>
                                         <td class="px-3 py-4 text-center">
                                             <span class="font-bold ${team.goalDifference > 0 ? 'text-green-700' : team.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
                                                 ${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}
@@ -7833,16 +7824,16 @@
                     
                     // Create match history table
                     const matchTable = document.createElement('div');
-                    matchTable.className = 'league-table';
-                    
+                    matchTable.className = 'league-table knockout-match-table';
+
                     matchTable.innerHTML = `
                         <table>
                             <thead>
                                 <tr>
                                     <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Date</th>
-                                    <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Home Team</th>
-                                    <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Score</th>
-                                    <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Away Team</th>
+                                    <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Home</th>
+                                    <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">H:A</th>
+                                    <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Away</th>
                                     <th class="px-3 py-4 text-center font-bold text-sm" style="text-align: center">Result</th>
                                 </tr>
                             </thead>
@@ -8223,7 +8214,7 @@
                             <span style="${homeTeamStyle}; display: none;">${match.HomeTeam}</span>
                         </div>
                     </td>
-                    <td class="px-3 py-4 text-center text-lg" ><span class="${homeScoreClass}">${homeScore}</span> - <span class="${awayScoreClass}">${awayScore}</span></td>
+                    <td class="px-3 py-4 text-center text-lg" style="white-space: nowrap;"><span class="${homeScoreClass}">${homeScore}</span>:<span class="${awayScoreClass}">${awayScore}</span></td>
                     <td class="px-3 py-4 text-center">
                         <div class="flex items-center justify-center">
                             ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -8244,7 +8235,7 @@
             // Restore the standard table structure (in case it was modified by grouped display)
             const tableContainer = elements.tableContainer;
             tableContainer.innerHTML = `
-                <div class="league-table">
+                <div class="league-table standings-table">
                     <table>
                         <thead>
                             <tr id="tableHeader">
@@ -8383,14 +8374,6 @@
             
             // Re-calculate and display tables with new sorting
             updateTable();
-        }
-
-        // Get sort indicator for phase tables
-        function getPhaseTableSortIndicator(column, phaseName) {
-            if (!phaseTableSortState[phaseName] || phaseTableSortState[phaseName].column !== column) {
-                return '';
-            }
-            return phaseTableSortState[phaseName].direction === 'asc' ? ' ↑' : ' ↓';
         }
 
         // Sort phase table data
