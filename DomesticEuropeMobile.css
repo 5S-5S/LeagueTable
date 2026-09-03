@@ -922,149 +922,6 @@ body {
         padding: 0.15rem 0.25rem !important;
     }
 
-    /* Mobile-specific league table optimizations */
-    .league-table {
-        font-size: 0.7rem !important;
-        overflow-x: visible !important;
-    }
-    /* Remove margins from main league table container for mobile */
-    .league-table,
-    #tableContainer {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
-
-    /* League table column width optimizations for mobile */
-    /* Pos column - make it smaller */
-    .league-table th:first-child,
-    .league-table td:first-child {
-        min-width: 25px !important;
-        max-width: 25px !important;
-        width: 25px !important;
-        font-size: 0.5rem !important;
-        padding: 0.2rem 0.1rem !important;
-    }
-
-    /* Force main league table to use fixed layout and override all width constraints */
-    #tableContainer .league-table table {
-        table-layout: fixed !important;
-        width: 100% !important;
-    }
-
-    /* Override JavaScript-generated CSS classes for main league table headers */
-    #tableContainer .league-table th.px-3 {
-        padding-left: 0.1rem !important;
-        padding-right: 0.1rem !important;
-    }
-
-    #tableContainer .league-table th.py-4 {
-        padding-top: 0.2rem !important;
-        padding-bottom: 0.2rem !important;
-    }
-
-    /* Points column - make text smaller and prevent wrapping */
-    #tableContainer .league-table th:last-child,
-    #tableContainer .league-table td:last-child {
-        font-size: 0.45rem !important;
-        min-width: 50px !important;
-        max-width: 50px !important;
-        width: 50px !important;
-        white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: clip !important;
-        padding: 0.2rem 0.1rem !important;
-    }
-
-    /* Pos column - specific width override */
-    #tableContainer .league-table th:first-child,
-    #tableContainer .league-table td:first-child {
-        width: 25px !important;
-        min-width: 25px !important;
-        max-width: 25px !important;
-        padding: 0.2rem 0.1rem !important;
-    }
-
-    /* Team column - specific width override */
-    #tableContainer .league-table th:nth-child(2),
-    #tableContainer .league-table td:nth-child(2) {
-        width: 18px !important;
-        min-width: 18px !important;
-        max-width: 18px !important;
-        padding: 0.2rem 0.1rem !important;
-    }
-    /* Team name column - logos only, make thinner */
-    .league-table th:nth-child(2),
-    .league-table td:nth-child(2) {
-        min-width: 18px !important;
-        max-width: 18px !important;
-        font-size: 0.5rem !important;
-        padding: 0.2rem 0.1rem !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-
-    /* Hide team names in main league table, show only logos */
-    .league-table td:nth-child(2) span {
-        display: none !important;
-    }
-
-    /* Ensure team logos are visible in main league table */
-    .league-table td:nth-child(2) img {
-        display: inline-block !important;
-        width: 16px !important;
-        height: 16px !important;
-    }
-    /* Make team name text truncate intelligently */
-    .league-table .team-name-text {
-        display: inline-block !important;
-        max-width: 100% !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        white-space: nowrap !important;
-    }
-
-    /* Stats columns - make them much narrower */
-    .league-table th:nth-child(3), /* P */
-    .league-table td:nth-child(3),
-    .league-table th:nth-child(4), /* W */
-    .league-table td:nth-child(4),
-    .league-table th:nth-child(5), /* D */
-    .league-table td:nth-child(5),
-    .league-table th:nth-child(6), /* L */
-    .league-table td:nth-child(6) {
-        min-width: 25px !important;
-        max-width: 25px !important;
-        padding: 0.2rem 0.03rem !important;
-        font-size: 0.65rem !important;
-        text-align: center !important;
-    }
-
-    /* Goal stats columns */
-    .league-table th:nth-child(7), /* GF */
-    .league-table td:nth-child(7),
-    .league-table th:nth-child(8), /* GA */
-    .league-table td:nth-child(8),
-    .league-table th:nth-child(9), /* GD */
-    .league-table td:nth-child(9) {
-        min-width: 30px !important;
-        max-width: 30px !important;
-        padding: 0.2rem 0.03rem !important;
-        font-size: 0.6rem !important;
-        text-align: center !important;
-    }
-
-    /* Points column */
-    .league-table th:last-child,
-    .league-table td:last-child {
-        min-width: 35px !important;
-        max-width: 35px !important;
-        padding: 0.2rem 0.1rem !important;
-        text-align: center !important;
-    }
-
     /* Match History and H2H table specific adjustments */
     #matchHistoryTable th:first-child,
     #matchHistoryTable td:first-child,
@@ -1489,9 +1346,16 @@ body {
         border-radius: 0 !important;
     }
 
+    /* table-layout: fixed (not auto) so every column's width below is
+       an exact, enforced value rather than a hint some mobile browsers
+       (notably real-device Safari) will override by redistributing
+       "leftover" width across every column - including Pos/Team -
+       instead of only the ones actually left unconstrained. Team is
+       the one column below with no width set, so it alone receives
+       100% of whatever space isn't claimed by the fixed columns. */
     #tableContainer .league-table table {
-        table-layout: auto !important;
-        width: auto !important;
+        table-layout: fixed !important;
+        width: 100% !important;
         min-width: 100% !important;
     }
 
@@ -1508,25 +1372,25 @@ body {
         position: sticky !important;
         left: 0 !important;
         z-index: 2 !important;
-        width: 16px !important;
-        min-width: 16px !important;
-        max-width: 16px !important;
+        width: 20px !important;
+        min-width: 20px !important;
+        max-width: 20px !important;
         font-size: 0.48rem !important;
         padding: 0.35rem 0.08rem !important;
         text-align: center !important;
         background: inherit !important;
     }
 
-    /* Team column: sticky, pinned right after Pos. Kept narrow enough that
-       stat columns are visible without scrolling on a phone. */
+    /* Team column: sticky, pinned right after Pos. Deliberately has no
+       width/min-width/max-width - under table-layout:fixed that makes
+       it the sole flexible column, so it soaks up all the space the
+       fixed-width columns below don't need instead of being squeezed
+       to the same fixed size as everything else. */
     #tableContainer .league-table th:nth-child(2),
     #tableContainer .league-table td:nth-child(2) {
         position: sticky !important;
-        left: 16px !important;
+        left: 20px !important;
         z-index: 2 !important;
-        width: 46px !important;
-        min-width: 46px !important;
-        max-width: 46px !important;
         font-size: 0.48rem !important;
         padding: 0.35rem 0.1rem !important;
         white-space: nowrap !important;
@@ -1546,9 +1410,11 @@ body {
         display: inline !important;
     }
 
+    /* Only clip with an ellipsis as a last resort - now that Team owns
+       the leftover width, most names fit at full length. */
     #tableContainer .league-table .team-name-text {
         display: inline-block !important;
-        max-width: 26px !important;
+        max-width: 100% !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         white-space: nowrap !important;
@@ -1562,16 +1428,39 @@ body {
         margin-right: 0.1rem !important;
     }
 
-    /* Stat columns (P, W-D-L, GF:GA, GD, Pts): tight, consistent,
-       scroll into view instead of being squeezed to fit */
+    /* Stat columns: each gets its own fixed width sized to its actual
+       content (not a shared min-width) so none of them can be starved
+       by, or steal space from, the flexible Team column above. */
     #tableContainer .league-table th:nth-child(n+3),
     #tableContainer .league-table td:nth-child(n+3) {
-        min-width: 24px !important;
-        max-width: none !important;
-        width: auto !important;
         text-align: center !important;
         font-size: 0.5rem !important;
         padding: 0.35rem 0.16rem !important;
+    }
+
+    #tableContainer .league-table th:nth-child(3), /* P */
+    #tableContainer .league-table td:nth-child(3) {
+        width: 28px !important;
+    }
+
+    #tableContainer .league-table th:nth-child(4), /* W-D-L */
+    #tableContainer .league-table td:nth-child(4) {
+        width: 64px !important;
+    }
+
+    #tableContainer .league-table th:nth-child(5), /* GF:GA */
+    #tableContainer .league-table td:nth-child(5) {
+        width: 52px !important;
+    }
+
+    #tableContainer .league-table th:nth-child(6), /* GD */
+    #tableContainer .league-table td:nth-child(6) {
+        width: 36px !important;
+    }
+
+    #tableContainer .league-table th:nth-child(7), /* Pts */
+    #tableContainer .league-table td:nth-child(7) {
+        width: 40px !important;
     }
 
     #tableContainer .points-badge {
@@ -1609,9 +1498,13 @@ body {
         border-radius: 0 !important;
     }
 
+    /* table-layout: fixed (not auto) so column widths below are exact,
+       enforced values instead of hints - see the League Table block
+       above for why. Team is the one column left with no width in
+       each mode, so it alone receives the leftover space. */
     #teamHistoryTable .league-table table {
-        table-layout: auto !important;
-        width: auto !important;
+        table-layout: fixed !important;
+        width: 100% !important;
         min-width: 100% !important;
     }
 
@@ -1646,15 +1539,14 @@ body {
         max-width: 40px !important;
     }
 
-    /* Team column: sticky, pinned right after Season */
+    /* Team column: sticky, pinned right after Season. Deliberately no
+       width/min-width/max-width - under table-layout:fixed that makes
+       it the sole flexible column in this mode. */
     #teamHistoryTable.single-team-mode .league-table th:nth-child(2),
     #teamHistoryTable.single-team-mode .league-table td:nth-child(2) {
         position: sticky !important;
         left: 40px !important;
         z-index: 2 !important;
-        width: 46px !important;
-        min-width: 46px !important;
-        max-width: 46px !important;
         font-size: 0.48rem !important;
         padding: 0.35rem 0.1rem !important;
         text-align: left !important;
@@ -1662,14 +1554,43 @@ body {
         box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
     }
 
+    /* Stat columns: each gets its own fixed width sized to its actual
+       content so none of them can steal space from Team above. */
     #teamHistoryTable.single-team-mode .league-table th:nth-child(n+3),
     #teamHistoryTable.single-team-mode .league-table td:nth-child(n+3) {
-        min-width: 24px !important;
-        max-width: none !important;
-        width: auto !important;
         text-align: center !important;
         font-size: 0.5rem !important;
         padding: 0.35rem 0.16rem !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(3), /* P */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(3) {
+        width: 26px !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(4), /* W-D-L */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(4) {
+        width: 64px !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(5), /* GF:GA */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(5) {
+        width: 52px !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(6), /* GD */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(6) {
+        width: 36px !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(7), /* Pts */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(7) {
+        width: 40px !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(8), /* Pos */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(8) {
+        width: 30px !important;
     }
 
     /* --- position-only-mode: Season, #, Team, P, W-D-L, GF:GA, GD, Pts --- */
@@ -1695,15 +1616,14 @@ body {
         background: inherit !important;
     }
 
-    /* Team column: sticky, pinned right after # */
+    /* Team column: sticky, pinned right after #. Deliberately no
+       width/min-width/max-width - under table-layout:fixed that makes
+       it the sole flexible column in this mode. */
     #teamHistoryTable.position-only-mode .league-table th:nth-child(3),
     #teamHistoryTable.position-only-mode .league-table td:nth-child(3) {
         position: sticky !important;
         left: 56px !important;
         z-index: 2 !important;
-        width: 42px !important;
-        min-width: 42px !important;
-        max-width: 42px !important;
         font-size: 0.48rem !important;
         padding: 0.35rem 0.1rem !important;
         text-align: left !important;
@@ -1711,14 +1631,38 @@ body {
         box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
     }
 
+    /* Stat columns: each gets its own fixed width sized to its actual
+       content so none of them can steal space from Team above. */
     #teamHistoryTable.position-only-mode .league-table th:nth-child(n+4),
     #teamHistoryTable.position-only-mode .league-table td:nth-child(n+4) {
-        min-width: 24px !important;
-        max-width: none !important;
-        width: auto !important;
         text-align: center !important;
         font-size: 0.5rem !important;
         padding: 0.35rem 0.16rem !important;
+    }
+
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(4), /* P */
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(4) {
+        width: 26px !important;
+    }
+
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(5), /* W-D-L */
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(5) {
+        width: 64px !important;
+    }
+
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(6), /* GF:GA */
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(6) {
+        width: 52px !important;
+    }
+
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(7), /* GD */
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(7) {
+        width: 36px !important;
+    }
+
+    #teamHistoryTable.position-only-mode .league-table th:nth-child(8), /* Pts */
+    #teamHistoryTable.position-only-mode .league-table td:nth-child(8) {
+        width: 40px !important;
     }
 
     /* Header cells need their own explicit background (can't inherit
