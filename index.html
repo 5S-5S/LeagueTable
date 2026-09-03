@@ -90,6 +90,15 @@
             <div class="hero-section">
                 <h1 class="hero-title">League Table Statistics</h1>
                 <p class="hero-subtitle">Comprehensive statistics for Europe's top 5 leagues. And for other sports soon. Dive deep into team performances, historical data, and head to head statistics and streaks.</p>
+
+                <div class="team-search-wrapper">
+                    <div class="team-search-box">
+                        <span class="team-search-icon">🔍</span>
+                        <input type="text" id="teamSearchInput" class="team-search-input" placeholder="Search for a team..." autocomplete="off">
+                    </div>
+                    <div id="teamSearchResults" class="team-search-results hidden"></div>
+                </div>
+
                 <a href="DomesticEurope.html" class="cta-button">
                     <span>🚀</span>
                     Start Exploring
@@ -163,6 +172,402 @@
     </div>
 
     <script>
+        // Team Dashboard: flat directory of every team across the 5 domestic
+        // leagues, extracted from getTeamColors() in DomesticEurope.html.
+        const TEAM_DIRECTORY = [
+            ['Liverpool FC','premier-league',1226],
+            ['Arsenal FC','premier-league',127],
+            ['Everton FC','premier-league',573],
+            ['Manchester United','premier-league',1268],
+            ['Aston Villa','premier-league',151],
+            ['Manchester City','premier-league',1267],
+            ['Chelsea FC','premier-league',373],
+            ['Tottenham Hotspur','premier-league',1924],
+            ['Newcastle United','premier-league',1355],
+            ['Sunderland AFC','premier-league',1844],
+            ['West Bromwich Albion','premier-league',2136],
+            ['Wolverhampton Wanderers','premier-league',2151],
+            ['Blackburn Rovers','premier-league',237],
+            ['Bolton Wanderers','premier-league',250],
+            ['Sheffield Wednesday','premier-league',1692],
+            ['West Ham United','premier-league',2137],
+            ['Derby County','premier-league',476],
+            ['Sheffield United','premier-league',1691],
+            ['Leeds United','premier-league',1197],
+            ['Burnley FC','premier-league',290],
+            ['Nottingham Forest','premier-league',1391],
+            ['Middlesbrough FC','premier-league',1291],
+            ['Stoke City','premier-league',1829],
+            ['Leicester City','premier-league',1199],
+            ['Birmingham City','premier-league',227],
+            ['Preston North End','premier-league',1497],
+            ['Southampton FC','premier-league',1753],
+            ['Huddersfield Town','premier-league',1004],
+            ['Portsmouth FC','premier-league',1491],
+            ['Coventry City','premier-league',419],
+            ['Blackpool FC','premier-league',238],
+            ['Ipswich Town','premier-league',1058],
+            ['Fulham FC','premier-league',847],
+            ['Charlton Athletic','premier-league',371],
+            ['Notts County','premier-league',1392],
+            ['Norwich City','premier-league',1388],
+            ['Queens Park Rangers','premier-league',1507],
+            ['Crystal Palace','premier-league',429],
+            ['Bury FC','premier-league',293],
+            ['Cardiff City','premier-league',317],
+            ['Luton Town','premier-league',1249],
+            ['Wimbledon FC','premier-league',175380],
+            ['Watford FC','premier-league',2130],
+            ['Oldham Athletic','premier-league',1412],
+            ['Grimsby Town','premier-league',920],
+            ['Bradford City','premier-league',267],
+            ['Brighton & Hove Albion','premier-league',276],
+            ['Brentford FC','premier-league',274],
+            ['Bristol City','premier-league',277],
+            ['Swansea City','premier-league',1879],
+            ['AFC Bournemouth','premier-league',65],
+            ['Wigan Athletic','premier-league',2145],
+            ['Hull City','premier-league',1005],
+            ['Bradford Park Avenue','premier-league',19590],
+            ['Accrington FC','premier-league',153758],
+            ['Reading FC','premier-league',1542],
+            ['Oxford United','premier-league',1445],
+            ['Millwall FC','premier-league',1294],
+            ['Northampton Town','premier-league',1386],
+            ['Carlisle United','premier-league',318],
+            ['Darwen','premier-league',22562],
+            ['Barnsley FC','premier-league',200],
+            ['Swindon Town','premier-league',1881],
+            ['Leyton Orient','premier-league',1210],
+            ['Glossop North End','premier-league',22711],
+            ['Juventus','serie-a',1094],
+            ['Inter','serie-a',1052],
+            ['AC Milan','serie-a',43],
+            ['AS Roma','serie-a',138],
+            ['ACF Fiorentina','serie-a',48],
+            ['Lazio Roma','serie-a',1187],
+            ['SSC Napoli','serie-a',1794],
+            ['Torino FC','serie-a',1916],
+            ['Bologna FC','serie-a',249],
+            ['Sampdoria','serie-a',1609],
+            ['Atalanta','serie-a',155],
+            ['Udinese Calcio','serie-a',1983],
+            ['Genoa CFC','serie-a',626],
+            ['Cagliari Calcio','serie-a',312],
+            ['Parma Calcio 1913','serie-a',1458],
+            ['Hellas Verona','serie-a',17579],
+            ['Palermo FC','serie-a',2024],
+            ['L.R. Vicenza','serie-a',2092],
+            ['SSC Bari','serie-a',132],
+            ['US Triestina','serie-a',2025],
+            ['Brescia Calcio','serie-a',275],
+            ['Chievo Verona','serie-a',382],
+            ['SPAL 2013 Ferrara','serie-a',17467],
+            ['AS Livorno','serie-a',135],
+            ['Calcio Padova','serie-a',13756],
+            ['Calcio Catania','serie-a',313],
+            ['US Lecce','serie-a',2020],
+            ['Empoli FC','serie-a',543],
+            ['Ascoli Calcio','serie-a',143],
+            ['US Alessandria 1912','serie-a',17792],
+            ['Modena FC','serie-a',1305],
+            ['Sassuolo Calcio','serie-a',13744],
+            ['AC Perugia','serie-a',13749],
+            ['Como 1907','serie-a',17583],
+            ['Novara Calcio','serie-a',13765],
+            ['Aurora Pro Patria','serie-a',18311],
+            ['Venezia FC','serie-a',17626],
+            ['Foggia Calcio','serie-a',13778],
+            ['Cesena FC','serie-a',39],
+            ['ACN Siena 1904','serie-a',45],
+            ['Reggina 1914','serie-a',1556],
+            ['US Avellino','serie-a',2015],
+            ['Lucchese','serie-a',17676],
+            ['Piacenza Calcio','serie-a',1469],
+            ['Pro Vercelli','serie-a',19015],
+            ['US Cremonese','serie-a',13777],
+            ['Mantova 1911 SSD','serie-a',42],
+            ['Pisa SC','serie-a',1472],
+            ['US Catanzaro','serie-a',18392],
+            ['AS Varese 1910','serie-a',17791],
+            ['US Salernitana 1919','serie-a',13743],
+            ['AC Liguria','serie-a',21606],
+            ['ACR Messina','serie-a',672],
+            ['Delfino Pescara','serie-a',13767],
+            ['Casale','serie-a',19032],
+            ['AC Monza','serie-a',13760],
+            ['Spezia Calcio','serie-a',1768],
+            ['Sampierdarenese','serie-a',21469],
+            ['Calcio Lecco 1912','serie-a',18305],
+            ['FC Crotone','serie-a',13759],
+            ['Frosinone Calcio','serie-a',840],
+            ['AC Reggiana','serie-a',13751],
+            ['Legnano','serie-a',13763],
+            ['Benevento Calcio','serie-a',13755],
+            ['Ternana Calcio','serie-a',18096],
+            ['AC Carpi','serie-a',17647],
+            ['AC Ancona','serie-a',13742],
+            ['US Pistoiese','serie-a',17651],
+            ['ACD Treviso','serie-a',1932],
+            ['Novese','serie-a',21471],
+            ['Real Madrid','la-liga',1545],
+            ['FC Barcelona','la-liga',597],
+            ['Atlético Madrid','la-liga',162],
+            ['Athletic Club','la-liga',156],
+            ['Valencia CF','la-liga',2041],
+            ['Sevilla FC','la-liga',1681],
+            ['RCD Espanyol','la-liga',560],
+            ['Real Sociedad','la-liga',1550],
+            ['Real Betis','la-liga',1543],
+            ['Celta de Vigo','la-liga',355],
+            ['Real Zaragoza','la-liga',1553],
+            ['Deportivo La Coruña','la-liga',469],
+            ['Real Valladolid','la-liga',1552],
+            ['CA Osasuna','la-liga',306],
+            ['Sporting Gijón','la-liga',1779],
+            ['Racing Santander','la-liga',1517],
+            ['Real Oviedo','la-liga',13858],
+            ['Málaga CF','la-liga',1262],
+            ['RCD Mallorca','la-liga',1541],
+            ['Villarreal CF','la-liga',2102],
+            ['UD Las Palmas','la-liga',1975],
+            ['Granada CF','la-liga',907],
+            ['Rayo Vallecano','la-liga',1535],
+            ['Getafe CF','la-liga',880],
+            ['Elche CF','la-liga',538],
+            ['CD Alavés','la-liga',327],
+            ['Hércules CF','la-liga',972],
+            ['Levante UD','la-liga',1207],
+            ['Cádiz CF','la-liga',309],
+            ['CD Tenerife','la-liga',350],
+            ['Real Murcia','la-liga',1546],
+            ['CE Sabadell','la-liga',18002],
+            ['UD Salamanca','la-liga',1979],
+            ['CD Castellón','la-liga',330],
+            ['CD Logroñés','la-liga',17556],
+            ['Burgos CF','la-liga',289],
+            ['Córdoba CF','la-liga',411],
+            ['Albacete','la-liga',81],
+            ['UD Almería','la-liga',1973],
+            ['SD Eibar','la-liga',1666],
+            ['Girona FC','la-liga',627],
+            ['Pontevedra CF','la-liga',1485],
+            ['SD Compostela','la-liga',17860],
+            ['CD Leganés','la-liga',17575],
+            ['Recreativo Huelva','la-liga',1555],
+            ['Arenas de Getxo','la-liga',19435],
+            ['CD Numancia','la-liga',344],
+            ['Gimnàstic de Tarragona','la-liga',886],
+            ['CD Alcoyano','la-liga',328],
+            ['Real Jaén','la-liga',1544],
+            ['CF Extremadura','la-liga',17672],
+            ['Mérida AD','la-liga',17108],
+            ['Real Unión','la-liga',1551],
+            ['AD Almería','la-liga',45477],
+            ['SD Huesca','la-liga',1667],
+            ['CE Europa','la-liga',20190],
+            ['Lleida Esportiu','la-liga',17917],
+            ['Xerez CD','la-liga',2163],
+            ['CD Condal','la-liga',19467],
+            ['Atlético Tetuán','la-liga',20179],
+            ['Cultural Leonesa','la-liga',18975],
+            ['Bayern München','bundesliga',209],
+            ['Borussia Dortmund','bundesliga',258],
+            ['Werder Bremen','bundesliga',2134],
+            ['VfB Stuttgart','bundesliga',2076],
+            ['Bor. Mönchengladbach','bundesliga',253],
+            ['Hamburger SV','bundesliga',943],
+            ['Eintracht Frankfurt','bundesliga',530],
+            ['FC Schalke 04','bundesliga',694],
+            ['Bayer Leverkusen','bundesliga',205],
+            ['1. FC Köln','bundesliga',9],
+            ['1. FC Kaiserslautern','bundesliga',6],
+            ['Hertha BSC','bundesliga',977],
+            ['VfL Bochum','bundesliga',2079],
+            ['VfL Wolfsburg','bundesliga',2086],
+            ['1. FC Nürnberg','bundesliga',12],
+            ['Hannover 96','bundesliga',951],
+            ['MSV Duisburg','bundesliga',1322],
+            ['SC Freiburg','bundesliga',1639],
+            ['Fortuna Düsseldorf','bundesliga',826],
+            ['Karlsruher SC','bundesliga',1109],
+            ['Eintracht Braunschweig','bundesliga',528],
+            ['TSV 1860 München','bundesliga',1943],
+            ['1. FSV Mainz 05','bundesliga',21],
+            ['1899 Hoffenheim','bundesliga',24],
+            ['Arminia Bielefeld','bundesliga',124],
+            ['RB Leipzig','bundesliga',29680],
+            ['FC Augsburg','bundesliga',594],
+            ['KFC Uerdingen 05','bundesliga',1122],
+            ['Hansa Rostock','bundesliga',953],
+            ['FC St. Pauli','bundesliga',702],
+            ['1. FC Union Berlin','bundesliga',19],
+            ['SV Elversberg','bundesliga',13214],
+            ['Waldhof Mannheim','bundesliga',2126],
+            ['Kickers Offenbach','bundesliga',1127],
+            ['Rot-Weiss Essen','bundesliga',1583],
+            ['Energie Cottbus','bundesliga',545],
+            ['Alemannia Aachen','bundesliga',86],
+            ['SG Wattenscheid 09','bundesliga',13217],
+            ['1. FC Saarbrücken','bundesliga',15],
+            ['Dynamo Dresden','bundesliga',515],
+            ['Rot-Weiß Oberhausen','bundesliga',1586],
+            ['SV Darmstadt 98','bundesliga',1852],
+            ['Wuppertaler SV','bundesliga',2157],
+            ['Borussia Neunkirchen','bundesliga',260],
+            ['FC 08 Homburg','bundesliga',589],
+            ['SpVgg Unterhaching','bundesliga',1789],
+            ['Stuttgarter Kickers','bundesliga',1838],
+            ['FC Ingolstadt 04','bundesliga',644],
+            ['1. FC Heidenheim 1846','bundesliga',5],
+            ['SC Paderborn 07','bundesliga',1651],
+            ['TeBe Berlin','bundesliga',1895],
+            ['SpVgg Greuther Fürth','bundesliga',1787],
+            ['SSV Ulm 1846','bundesliga',1798],
+            ['Fortuna Köln','bundesliga',13215],
+            ['Preußen Münster','bundesliga',1498],
+            ['Holstein Kiel','bundesliga',995],
+            ['Blau-Weiß 90 Berlin','bundesliga',18101],
+            ['1. FC Lok Leipzig','bundesliga',13031],
+            ['SV Tasmania Berlin','bundesliga',17842],
+            ['Dresdner SC','bundesliga',17856],
+            ['Rapid Vienna','bundesliga',1531],
+            ['Viktoria Berlin','bundesliga',31115],
+            ['Freiburger FC','bundesliga',17501],
+            ['Karlsruher FV','bundesliga',18750],
+            ['Olympique Marseille','ligue-1',1421],
+            ['AS Monaco','ligue-1',136],
+            ['Girondins Bordeaux','ligue-1',888],
+            ['AS Saint-Étienne','ligue-1',139],
+            ['Olympique Lyonnais','ligue-1',1420],
+            ['Lille OSC','ligue-1',1435],
+            ['Paris Saint-Germain','ligue-1',1457],
+            ['OGC Nice','ligue-1',1408],
+            ['Stade Rennais','ligue-1',1811],
+            ['FC Nantes','ligue-1',676],
+            ['FC Sochaux','ligue-1',700],
+            ['RC Lens','ligue-1',1539],
+            ['RC Strasbourg','ligue-1',1540],
+            ['FC Metz','ligue-1',673],
+            ['Stade de Reims','ligue-1',1810],
+            ['Montpellier HSC','ligue-1',1314],
+            ['AJ Auxerre','ligue-1',75],
+            ['Toulouse FC','ligue-1',1925],
+            ['Nîmes Olympique','ligue-1',1367],
+            ['SC Bastia','ligue-1',1631],
+            ['Racing Club de France','ligue-1',17870],
+            ['Valenciennes FC','ligue-1',2042],
+            ['Angers SCO','ligue-1',104],
+            ['AS Nancy Lorraine','ligue-1',137],
+            ['CS Sedan','ligue-1',435],
+            ['Havre AC','ligue-1',1190],
+            ['AS Cannes','ligue-1',17584],
+            ['FC Rouen 1899','ligue-1',689],
+            ['Stade Brestois 29','ligue-1',1806],
+            ['SM Caen','ligue-1',1744],
+            ['FC Lorient','ligue-1',663],
+            ['Toulouse FC (old)','ligue-1',372165],
+            ['SC Sète','ligue-1',698],
+            ['FC Nancy','ligue-1',21749],
+            ['Stade Français','ligue-1',18824],
+            ['Stade Lavallois','ligue-1',1808],
+            ['ESTAC Troyes','ligue-1',562],
+            ['EA Guingamp','ligue-1',516],
+            ['Red Star FC','ligue-1',17618],
+            ['AC Ajaccio','ligue-1',36],
+            ['SC Toulon','ligue-1',17378],
+            ['CO Roubaix-Tourcoing','ligue-1',19938],
+            ['Olympique Lillois Lille','ligue-1',18827],
+            ['Excelsior Roubaix','ligue-1',18826],
+            ['SC Fives Lille','ligue-1',18828],
+            ['Le Mans FC','ligue-1',1191],
+            ['FC Antibes','ligue-1',18829],
+            ['Dijon FCO','ligue-1',482],
+            ['FC Mulhouse','ligue-1',17401],
+            ['Thonon Évian GGFC','ligue-1',423],
+            ['Tours FC','ligue-1',1926],
+            ['Olympique Alès','ligue-1',18532],
+            ['Grenoble Foot 38','ligue-1',916],
+            ['Limoges FC','ligue-1',19443],
+            ['Paris FC','ligue-1',1456],
+            ['Angoulême CFC','ligue-1',18946],
+            ['Clermont Foot 63','ligue-1',392],
+            ['FC Martigues','ligue-1',669],
+            ['Amiens SC','ligue-1',100],
+            ['RC Roubaix (old)','ligue-1',18823],
+            ['Troyes AF','ligue-1',372147],
+            ['SC Nîmes','ligue-1',374232],
+            ['Chamois Niortais','ligue-1',368],
+            ['SR Colmar','ligue-1',18938],
+            ['CA Paris (old)','ligue-1',18832],
+            ['Lyon OU','ligue-1',372012],
+            ['FC Gueugnon','ligue-1',632],
+            ['Gazélec FC Ajaccio','ligue-1',881],
+            ['AS Béziers (old)','ligue-1',374706],
+            ['FC Istres','ligue-1',647],
+            ['LB Châteauroux','ligue-1',1188],
+            ['US Boulogne','ligue-1',2017],
+            ['Avenir Club Avignonnais','ligue-1',18936],
+            ['AS Aix-en-Provence','ligue-1',17822],
+            ['AC Arles-Avignon','ligue-1',37],
+            ['Club Francais Paris','ligue-1',18833],
+            ['Hyères FC','ligue-1',17597]
+        ].map(([name, league, crestId]) => ({ name, league, crestId }));
+
+        const TEAM_SEARCH_LEAGUE_NAMES = {
+            'premier-league': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League',
+            'la-liga': '🇪🇸 La Liga',
+            'serie-a': '🇮🇹 Serie A',
+            'bundesliga': '🇩🇪 Bundesliga',
+            'ligue-1': '🇫🇷 Ligue 1'
+        };
+
+        // Team Dashboard: as-you-type search, click-through to a locked
+        // Team 1 view on DomesticEurope.html (device-appropriate redirect
+        // to Mobile happens there, so this always links to the desktop URL).
+        function initTeamSearch() {
+            const input = document.getElementById('teamSearchInput');
+            const resultsEl = document.getElementById('teamSearchResults');
+
+            function renderResults(matches) {
+                if (matches.length === 0) {
+                    resultsEl.innerHTML = '<div class="team-search-empty">No teams found</div>';
+                } else {
+                    resultsEl.innerHTML = matches.map(team => `
+                        <a class="team-search-result" href="DomesticEurope.html?league=${encodeURIComponent(team.league)}&team=${encodeURIComponent(team.name)}">
+                            ${team.crestId ? `<img src="https://s.hs-data.com/gfx/emblem/common/80x80/${team.crestId}.png" class="team-search-result-logo" alt="" onerror="this.style.display='none'">` : '<span class="team-search-result-logo"></span>'}
+                            <span class="team-search-result-name">${team.name}</span>
+                            <span class="team-search-result-league">${TEAM_SEARCH_LEAGUE_NAMES[team.league] || team.league}</span>
+                        </a>
+                    `).join('');
+                }
+                resultsEl.classList.remove('hidden');
+            }
+
+            input.addEventListener('input', () => {
+                const query = input.value.trim().toLowerCase();
+                if (!query) {
+                    resultsEl.classList.add('hidden');
+                    resultsEl.innerHTML = '';
+                    return;
+                }
+                const matches = TEAM_DIRECTORY.filter(team => team.name.toLowerCase().includes(query)).slice(0, 8);
+                renderResults(matches);
+            });
+
+            input.addEventListener('focus', () => {
+                if (input.value.trim() && resultsEl.innerHTML) {
+                    resultsEl.classList.remove('hidden');
+                }
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.team-search-wrapper')) {
+                    resultsEl.classList.add('hidden');
+                }
+            });
+        }
+
         // Hamburger Menu Functionality
         function initHamburgerMenu() {
             const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -235,6 +640,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initHamburgerMenu();
             initDarkMode();
+            initTeamSearch();
         });
     </script>
 </body>

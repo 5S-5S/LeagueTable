@@ -251,6 +251,273 @@ body {
     text-align: left;
 }
 
+/* Team Dashboard Snapshot */
+.team-dashboard-header.hidden {
+    display: none;
+}
+
+.team-dashboard-header {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem 2rem;
+    background: var(--bg-gray-50);
+    border-bottom: 2px solid #e5e7eb;
+    overflow-x: auto;
+}
+
+[data-theme="dark"] .team-dashboard-header {
+    border-bottom-color: #444;
+}
+
+.team-dashboard-identity {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.team-dashboard-crest {
+    width: 2.75rem;
+    height: 2.75rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.team-dashboard-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    padding: 0.4rem 0.9rem;
+    border-radius: 0.5rem;
+    white-space: nowrap;
+}
+
+.team-dashboard-stats {
+    display: flex;
+    gap: 1.75rem;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+}
+
+.team-dashboard-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.team-dashboard-stat-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+[data-theme="dark"] .team-dashboard-stat-value {
+    color: white;
+}
+
+.team-dashboard-stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.team-dashboard-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.team-dashboard-form-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.team-dashboard-form-empty {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.team-dashboard-chips {
+    display: flex;
+    gap: 0.375rem;
+}
+
+.team-dashboard-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+}
+
+.team-dashboard-chip-win { background: #059669; }
+.team-dashboard-chip-draw { background: #9ca3af; }
+.team-dashboard-chip-loss { background: #dc2626; }
+
+.team-dashboard-change-btn {
+    margin-left: auto;
+    flex-shrink: 0;
+    white-space: nowrap;
+    background: none;
+    border: 2px solid #d1d5db;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.team-dashboard-change-btn:hover {
+    border-color: #dc2626;
+    color: #dc2626;
+}
+
+[data-theme="dark"] .team-dashboard-change-btn {
+    border-color: #555;
+    color: #ccc;
+}
+
+/* Team Dashboard Search (shown in place of the snapshot when no team is locked) */
+.team-dashboard-search {
+    position: relative;
+    padding: 0.625rem 2rem;
+    background: var(--bg-gray-50);
+    border-bottom: 2px solid #e5e7eb;
+}
+
+[data-theme="dark"] .team-dashboard-search {
+    border-bottom-color: #444;
+}
+
+.team-dashboard-search-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: white;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1.25rem;
+    border: 2px solid #d1d5db;
+    transition: border-color 0.3s ease;
+    max-width: 32rem;
+}
+
+.team-dashboard-search-box:focus-within {
+    border-color: #10b981;
+}
+
+[data-theme="dark"] .team-dashboard-search-box {
+    background: var(--bg-white);
+    border-color: #555;
+}
+
+.team-dashboard-search-icon {
+    font-size: 1rem;
+    opacity: 0.6;
+}
+
+.team-dashboard-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    color: #374151;
+}
+
+[data-theme="dark"] .team-dashboard-search-input {
+    color: white;
+}
+
+.team-dashboard-search-results {
+    position: absolute;
+    top: 100%;
+    left: 2rem;
+    right: 2rem;
+    max-width: 32rem;
+    margin-top: 0.25rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    max-height: 20rem;
+    overflow-y: auto;
+    z-index: 20;
+}
+
+[data-theme="dark"] .team-dashboard-search-results {
+    background: var(--bg-white);
+}
+
+.team-dashboard-search-result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+}
+
+.team-dashboard-search-result:last-child {
+    border-bottom: none;
+}
+
+.team-dashboard-search-result:hover {
+    background: #f0fdfa;
+    color: #047857;
+}
+
+[data-theme="dark"] .team-dashboard-search-result {
+    color: white;
+    border-bottom-color: #444;
+}
+
+[data-theme="dark"] .team-dashboard-search-result:hover {
+    background: var(--bg-gray-50);
+    color: #10b981;
+}
+
+.team-dashboard-search-result-logo {
+    width: 1.5rem;
+    height: 1.5rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.team-dashboard-search-result-name {
+    font-weight: 600;
+    flex: 1;
+}
+
+.team-dashboard-search-result-league {
+    font-size: 0.8rem;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.team-dashboard-search-empty {
+    padding: 1rem 1.25rem;
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+}
+
 /* Dark Mode Toggle Styles */
 .dark-mode-toggle {
     position: relative;
@@ -593,6 +860,25 @@ body {
     color: #6b7280;
     font-style: italic;
     text-align: center;
+}
+
+/* Team Dashboard: locked Team 1 combobox */
+.combobox-container.locked .combobox-input {
+    background: #f0fdfa;
+    border-color: #059669;
+    color: #047857;
+    font-weight: 600;
+    cursor: default;
+}
+
+.combobox-container.locked .combobox-arrow {
+    display: none;
+}
+
+[data-theme="dark"] .combobox-container.locked .combobox-input {
+    background: var(--bg-gray-50);
+    border-color: #10b981;
+    color: #10b981;
 }
 
 /* Dark mode combobox styles */
