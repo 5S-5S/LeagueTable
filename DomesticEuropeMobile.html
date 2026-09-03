@@ -5363,16 +5363,47 @@
                 this.filteredOptions = [];
                 this.selectedIndex = -1;
                 this.isOpen = false;
+                this.currentValue = '';
+                this.currentText = this.placeholder;
 
                 this.init();
             }
 
             init() {
                 // Input events
-                this.input.addEventListener('focus', () => this.open());
+                this.input.addEventListener('focus', () => {
+                    // Clear the field on focus instead of leaving the current
+                    // selection's text in place - lets the user start typing
+                    // immediately without having to select-all/delete first.
+                    this.input.value = '';
+                    this.filteredOptions = [...this.options];
+                    this.selectedIndex = -1;
+                    this.open();
+                });
                 this.input.addEventListener('blur', () => {
                     // Delay close to allow for option click
-                    setTimeout(() => this.close(), 150);
+                    setTimeout(() => {
+                        if (this.input.value.trim() === '') {
+                            // Left empty - fall back to the default option
+                            // ("All Teams"/"No Team") instead of leaving the
+                            // field blank with no real selection.
+                            const emptyOption = this.options.find(opt => opt.value === '');
+                            const value = emptyOption ? emptyOption.value : '';
+                            const text = emptyOption ? emptyOption.text : this.placeholder;
+                            this.currentValue = value;
+                            this.currentText = text;
+                            this.input.value = text;
+                            if (this.onSelect) {
+                                this.onSelect(value, text);
+                            }
+                        } else if (this.input.value !== this.currentText) {
+                            // Typed something but clicked away without picking
+                            // an option - revert to the last confirmed selection
+                            // instead of leaving unmatched text in the field.
+                            this.input.value = this.currentText;
+                        }
+                        this.close();
+                    }, 150);
                 });
                 this.input.addEventListener('input', (e) => this.filterOptions(e.target.value));
                 this.input.addEventListener('keydown', (e) => this.handleKeyDown(e));
@@ -5495,6 +5526,8 @@
             }
 
             selectOption(value, text) {
+                this.currentValue = value;
+                this.currentText = text;
                 this.input.value = text;
                 this.close();
                 if (this.onSelect) {
@@ -5515,7 +5548,9 @@
             }
 
             setValue(value, text) {
-                this.input.value = text || this.placeholder;
+                this.currentValue = value;
+                this.currentText = text || this.placeholder;
+                this.input.value = this.currentText;
             }
         }
 
@@ -5549,7 +5584,7 @@
                         state.selectedTeam2 = '';
                         state.big6Opponents = null;
                         elements.team2Select.value = '';
-                        team2Combobox.input.value = 'No Team';
+                        team2Combobox.setValue('', 'No Team');
                         updateTeamSelects(); // This will refresh Team 2 options with/without Big 6
 
                         // Trigger same logic as original dropdown
