@@ -125,10 +125,11 @@
                 <!-- League Filters Tab Content -->
                 <div id="leagueFiltersContent" class="tab-content active">
                     <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control">
-                        <p class="text-gray-700 text-sm leading-relaxed">
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
+                        <p class="text-gray-700 text-sm leading-relaxed w-full">
                             Filter and analyze stats for the major continental competitions. Select prior seasons, custom date ranges, competition stages, and specific teams to find and filter league standings and head-to-head records to filter with. 
                         </p>
+                        <button id="copyLinkBtnLeagueFilters" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
 
                     <!-- League Selection -->
@@ -290,10 +291,11 @@
                 <!-- Team Seasons Tab Content -->
                 <div id="teamSeasonsContent" class="tab-content">
                     <!-- Description -->
-                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control">
-                        <p class="text-gray-700 text-sm leading-relaxed">
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
+                        <p class="text-gray-700 text-sm leading-relaxed w-full">
                             Select a competition and team below to view a list of their seasons. You can find out how many times a team finished in a particular place or even find something like a list of every 2nd place team. Note: only seasons where teams qualified for group or knockout stages are included.
                         </p>
+                        <button id="copyLinkBtnTeamSeasons" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
 
                     <!-- League Selection for Team Seasons -->
@@ -387,10 +389,11 @@
                 <!-- Last Time When Tab Content -->
                 <div id="lastTimeWhenContent" class="tab-content">
                     <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control">
-                        <p class="text-gray-700 text-sm leading-relaxed">
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
+                        <p class="text-gray-700 text-sm leading-relaxed w-full">
                             This tool allows you to find out the last time a team won, drew, or lost against an opponent. At home or away. Or in a particular stage. On the day of the week too, if you so choose.
                         </p>
+                        <button id="copyLinkBtnLastTimeWhen" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
                     
                     <!-- League Selection -->
@@ -597,10 +600,11 @@
                 <!-- Team Streaks Tab Content -->
                 <div id="teamStreaksContent" class="tab-content">
                     <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control">
-                        <p class="text-gray-700 text-sm leading-relaxed">
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
+                        <p class="text-gray-700 text-sm leading-relaxed w-full">
                             Discover active streaks between clubs and find out the last time your club defeated their rival. Filter between league, location, and streak type.
                         </p>
+                        <button id="copyLinkBtnTeamStreaks" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
 
                     <!-- League Selection -->
@@ -992,7 +996,12 @@
             // only ever has one selectable competition (Champions League).
             pendingTeamLock: '',
             teamLocked: false,
-            dashboardLockedTeam: ''
+            dashboardLockedTeam: '',
+
+            // Shareable filter state (separate from the Team Dashboard's
+            // ?team= lock scheme above - a shared filter link never locks
+            // anything, it just reopens the same editable view).
+            pendingShareableState: null
         };
 
         // Team Dashboard: read ?team= from the URL before anything else runs
@@ -1002,6 +1011,25 @@
             if (team) {
                 state.pendingTeamLock = team;
             }
+        }
+
+        // Shareable filter state: read ?view=&... from the URL before
+        // anything else runs. Uses its own param names (view/t1/t2/...),
+        // entirely separate from ?team= above, so the two schemes can never
+        // collide - a shared filter link only ever pre-fills a tab's
+        // filters, it never locks Team 1 or shows the dashboard header.
+        // Ignored if a dashboard lock link (?team=) is present, since that's
+        // a different mode entirely. No league param is needed here (unlike
+        // Domestic) - League Tables/Last Time/Streaks always mean Champions
+        // League; only Team Seasons has its own league concept.
+        function applyShareableFilterUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('team')) return;
+
+            const view = urlParams.get('view');
+            if (!view) return;
+
+            state.pendingShareableState = { view, params: urlParams };
         }
 
         // Ranking overrides for historic seasons
@@ -2120,6 +2148,194 @@
             }
         }
 
+        // Build a URL that reopens the current tab with its current filters.
+        // Captures each tab's core selections (team(s), season/date, stage,
+        // and that tab's own defining filters) - not every minor toggle, so
+        // this stays maintainable as those toggles change independently.
+        function buildShareableFilterUrl() {
+            const view = getActiveDashboardTabName();
+            const params = new URLSearchParams();
+            params.set('view', view);
+
+            if (view === 'league-filters') {
+                if (state.selectedSeason) {
+                    params.set('season', state.selectedSeason);
+                } else {
+                    if (state.dateFrom) params.set('from', state.dateFrom);
+                    if (state.dateTo) params.set('to', state.dateTo);
+                }
+                if (state.competitionStage) params.set('stage', state.competitionStage);
+                if (state.excludeQualifiers) params.set('exQ', '1');
+                if (state.excludeMainStage) params.set('exM', '1');
+                if (state.selectedTeam1) params.set('t1', state.selectedTeam1);
+                if (state.selectedTeam2) params.set('t2', state.selectedTeam2);
+            } else if (view === 'team-seasons') {
+                if (state.teamSeasonsSelectedLeague) params.set('league', state.teamSeasonsSelectedLeague);
+                if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
+                if (state.teamSeasonsSelectedSeason) params.set('season', state.teamSeasonsSelectedSeason);
+                if (state.teamSeasonsSelectedPosition) params.set('pos', state.teamSeasonsSelectedPosition);
+            } else if (view === 'last-time-when') {
+                if (state.lastTimeTeam1) params.set('t1', state.lastTimeTeam1);
+                if (state.lastTimeTeam2) params.set('t2', state.lastTimeTeam2);
+                if (state.lastTimeDayOfWeek) params.set('day', state.lastTimeDayOfWeek);
+                if (state.lastTimeLocation) params.set('loc', state.lastTimeLocation);
+                if (state.lastTimeStage) params.set('stage', state.lastTimeStage);
+            } else if (view === 'team-streaks') {
+                const t1 = elements.teamStreaksTeam1Select.value;
+                const t2 = elements.teamStreaksTeam2Select.value;
+                if (t1) params.set('t1', t1);
+                if (t2) params.set('t2', t2);
+                const status = elements.teamStreaksStatusSelect.value;
+                const location = elements.teamStreaksLocationSelect.value;
+                const streakType = elements.teamStreaksTypeSelect.value;
+                if (status && status !== 'active') params.set('status', status);
+                if (location && location !== 'both') params.set('loc', location);
+                if (streakType && streakType !== 'winning') params.set('type', streakType);
+                if (state.teamStreaksStage) params.set('stage', state.teamStreaksStage);
+            }
+
+            return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        }
+
+        // One handler shared by all four tabs' Copy Link buttons - each
+        // button sits wherever makes sense for its own tab (next to Reload
+        // Data/Reset on League Filters, top-right of the description box on
+        // the other three), but they all copy the same active tab's state.
+        async function copyShareableLink(event) {
+            const btn = event.currentTarget;
+            const url = buildShareableFilterUrl();
+            try {
+                await navigator.clipboard.writeText(url);
+                showCopyLinkFeedback(btn, true);
+            } catch (err) {
+                showCopyLinkFeedback(btn, false);
+            }
+        }
+
+        function showCopyLinkFeedback(btn, success) {
+            if (!btn) return;
+            const original = '🔗 Copy Link';
+            btn.textContent = success ? '✓ Copied!' : 'Copy failed';
+            clearTimeout(btn._resetTimer);
+            btn._resetTimer = setTimeout(() => {
+                btn.textContent = original;
+            }, 1500);
+        }
+
+        // Shareable filter state: apply a pending shared-link state once
+        // every tab's comboboxes exist. Mirrors the field ordering each
+        // tab's own handlers already depend on (team before season/position,
+        // etc.) by reusing those same handlers/dispatched events rather than
+        // duplicating their side effects here. Async because restoring Team
+        // Seasons' league may need to lazily load that league's data first.
+        async function consumePendingShareableState() {
+            if (!state.pendingShareableState) return;
+            const { view, params } = state.pendingShareableState;
+            state.pendingShareableState = null;
+
+            if (!TEAM_DASHBOARD_TAB_BUTTON_IDS[view]) return;
+
+            switchTab(view);
+
+            if (view === 'league-filters') {
+                const season = params.get('season');
+                if (season) {
+                    elements.seasonSelect.value = season;
+                    handleSeasonChange(season);
+                } else {
+                    const from = params.get('from');
+                    const to = params.get('to');
+                    if (from) {
+                        elements.dateFrom.value = from;
+                        elements.dateFrom.dispatchEvent(new Event('change'));
+                    }
+                    if (to) {
+                        elements.dateTo.value = to;
+                        elements.dateTo.dispatchEvent(new Event('change'));
+                    }
+                }
+                const stage = params.get('stage');
+                if (stage) {
+                    elements.competitionStageSelect.value = stage;
+                    elements.competitionStageSelect.dispatchEvent(new Event('change'));
+                }
+                if (params.get('exQ') === '1' && !state.excludeQualifiers) {
+                    elements.excludeQualifiersCheckbox.click();
+                }
+                if (params.get('exM') === '1' && !state.excludeMainStage) {
+                    elements.excludeMainStageCheckbox.click();
+                }
+                const t1 = params.get('t1');
+                const t2 = params.get('t2');
+                if (t1) team1Combobox.selectOption(t1, t1);
+                if (t2) team2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
+            } else if (view === 'team-seasons') {
+                const league = params.get('league');
+                if (league && league !== state.teamSeasonsSelectedLeague) {
+                    await handleTeamSeasonsLeagueChange(league);
+                }
+                const t1 = params.get('t1');
+                const season = params.get('season');
+                const pos = params.get('pos');
+                if (t1) teamSeasonsCombobox.selectOption(t1, t1);
+                if (season) {
+                    elements.teamSeasonsSeasonSelect.value = season;
+                    handleTeamSeasonsSeasonChange(season);
+                }
+                if (pos) {
+                    elements.teamSeasonsPositionSelect.value = pos;
+                    handleTeamSeasonsPositionChange(pos);
+                }
+            } else if (view === 'last-time-when') {
+                const t1 = params.get('t1');
+                const t2 = params.get('t2');
+                const day = params.get('day');
+                const loc = params.get('loc');
+                const stage = params.get('stage');
+                if (t1) lastTimeTeam1Combobox.selectOption(t1, t1);
+                if (t2) lastTimeTeam2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
+                if (day) {
+                    elements.lastTimeDayOfWeekSelect.value = day;
+                    elements.lastTimeDayOfWeekSelect.dispatchEvent(new Event('change'));
+                }
+                if (loc) {
+                    elements.lastTimeLocationSelect.value = loc;
+                    elements.lastTimeLocationSelect.dispatchEvent(new Event('change'));
+                }
+                if (stage) {
+                    elements.lastTimeStageSelect.value = stage;
+                    elements.lastTimeStageSelect.dispatchEvent(new Event('change'));
+                }
+            } else if (view === 'team-streaks') {
+                const t1 = params.get('t1');
+                const t2 = params.get('t2');
+                const status = params.get('status');
+                const loc = params.get('loc');
+                const type = params.get('type');
+                const stage = params.get('stage');
+                if (t1) teamStreaksTeam1Combobox.selectOption(t1, t1);
+                if (t2) teamStreaksTeam2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
+                if (status) {
+                    elements.teamStreaksStatusSelect.value = status;
+                    elements.teamStreaksStatusSelect.dispatchEvent(new Event('change'));
+                }
+                if (loc) {
+                    elements.teamStreaksLocationSelect.value = loc;
+                    elements.teamStreaksLocationSelect.dispatchEvent(new Event('change'));
+                }
+                if (type) {
+                    elements.teamStreaksTypeSelect.value = type;
+                    elements.teamStreaksTypeSelect.dispatchEvent(new Event('change'));
+                }
+                if (stage) {
+                    elements.teamStreaksStageSelect.value = stage;
+                    elements.teamStreaksStageSelect.dispatchEvent(new Event('change'));
+                }
+            }
+
+            history.replaceState(null, '', window.location.pathname);
+        }
+
         // Get contrasting text color (white or black) based on background color
         function getContrastColor(hexColor) {
             // Remove # if present
@@ -2309,6 +2525,10 @@
             excludeQualifiersCheckbox: document.getElementById('excludeQualifiersCheckbox'),
             excludeMainStageCheckbox: document.getElementById('excludeMainStageCheckbox'),
             resetBtn: document.getElementById('resetBtn'),
+            copyLinkBtnLeagueFilters: document.getElementById('copyLinkBtnLeagueFilters'),
+            copyLinkBtnTeamSeasons: document.getElementById('copyLinkBtnTeamSeasons'),
+            copyLinkBtnLastTimeWhen: document.getElementById('copyLinkBtnLastTimeWhen'),
+            copyLinkBtnTeamStreaks: document.getElementById('copyLinkBtnTeamStreaks'),
             retryBtn: document.getElementById('retryBtn'),
             matchHistorySection: document.getElementById('matchHistorySection'),
             matchHistoryHomeCheckbox: document.getElementById('matchHistoryHomeCheckbox'),
@@ -3226,6 +3446,7 @@
         // Initialize the application
         function init() {
             applyTeamDashboardUrlParams();
+            applyShareableFilterUrlParams();
             setupEventListeners();
             createLeagueButtons();
             createTeamSeasonsLeagueButtons();
@@ -5046,6 +5267,10 @@
 
             // Buttons
             elements.resetBtn.addEventListener('click', clearFilters);
+            elements.copyLinkBtnLeagueFilters.addEventListener('click', copyShareableLink);
+            elements.copyLinkBtnTeamSeasons.addEventListener('click', copyShareableLink);
+            elements.copyLinkBtnLastTimeWhen.addEventListener('click', copyShareableLink);
+            elements.copyLinkBtnTeamStreaks.addEventListener('click', copyShareableLink);
             
             // Last Time When controls
             elements.lastTimeTeam1Select.addEventListener('change', (e) => {
@@ -5931,6 +6156,10 @@
             lastTimeTeam2Combobox.setValue('', 'Select Team 2');
             teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
             teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
+
+            // Shareable filter state: consume a pending shared-link state
+            // now that every tab's comboboxes exist (once)
+            consumePendingShareableState();
         }
 
         // Helper function to hide all Last Time sections

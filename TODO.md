@@ -6,10 +6,58 @@ Feature ideas, not yet scheduled.
   biggest ever win" or "closest 1-goal games this season." Same match data,
   different sort/filter lens.
 
-- **Shareable filter state** — encode the current league/team/date
-  selections into the URL so a link reopens the exact same view.
+- **Multi-team table filter** — extend Team 2 selection beyond two teams (or
+  beyond the fixed Big 6/country group) to an arbitrary custom list, so users
+  can build their own comparison group on the fly. Reuses the existing
+  `teamsToShow` mechanism already in place for Big 6/country mode.
+
+- **Side-by-side Team Seasons** — a split view comparing two teams'
+  season-by-season history in one page, rather than the current
+  one-team-at-a-time view.
+
+- Later: **Country vs. Country (Continental-specific)** — extend the
+  country-comparison feature so Team 1 can also be a country, not just Team 2
+  (e.g. "Spain vs. Germany": every Spanish team's combined record against
+  every German team). Lower priority — scoped it out and it's uneven work:
+  League Tables & Head-to-Head is moderate (filter plumbing reuses, but would
+  need a row per club instead of one blended row), while Last Time When and
+  Team Streaks are hard and arguably a different feature — a "streak" is a
+  single-club narrative, so a country Team 1 there means a per-club list
+  view, not a straight extension of the current layout.
+
+- Maybe: **"On this day"** — a small widget (dashboard or landing page)
+  showing historical matches that happened on today's date, using existing
+  match data with a date filter.
+
+- Maybe: **Pinned/favorite team** — remember a user's team via
+  `localStorage` so the landing-page search can offer a one-click shortcut
+  back to their dashboard instead of retyping every visit.
+
+- Maybe: **Team progression chart** — a line chart (points or league
+  position per season) on the Team Dashboard for Domestic and Continental,
+  possibly with a second team overlaid for comparison. Also interesting:
+  a visual knockout bracket for Continental (Round of 16 through Final).
 
 ## Done
+
+- ~~Shareable filter state~~ — done (2026-09-03): a "🔗 Copy Link" button on
+  each of League Tables & Head-to-Head, Team Seasons, The Last Time When, and
+  Team Streaks copies a URL that reopens that exact tab with its filters
+  restored, fully editable (no lock). Added to all four pages
+  (Domestic/Continental, desktop/mobile). Uses its own param names
+  (`view`/`t1`/`t2`/`season`/...), entirely separate from the Team
+  Dashboard's `?league=&team=` locked-team scheme, so the two link types can
+  never collide - a shared filter link never locks Team 1 or shows the
+  dashboard header. Captures each tab's core selections (team(s),
+  season/date, stage where applicable, and that tab's own defining filters
+  like streak type/status) rather than every minor toggle, to stay
+  maintainable. Restoration reuses each field's own change handler/dispatched
+  event instead of duplicating their side effects, including the async
+  league-load Continental's Team Seasons tab needs when the link specifies a
+  different league than the current one. The button lives inside each tab's
+  description box - beside the text on desktop, underneath it on mobile
+  (where the longer wrapped text made a side-by-side button stretch or
+  crowd the row).
 
 - ~~Compare a team against a whole country (Continental-specific)~~ — done
   (2026-09-03): in League Tables & Head-to-Head, The Last Time When, and Team
