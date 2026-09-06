@@ -7695,15 +7695,24 @@
                 }
             }
 
-            // Apply date filters
+            // Apply date filters (compare as ISO date strings, not raw Date
+            // objects - row.dateObj carries a local-timezone-derived time
+            // component, so a Date-object <= comparison against a
+            // state.dateTo parsed as UTC midnight can wrongly exclude
+            // matches that fall exactly on the boundary date. Same pattern
+            // as calculateTable()/calculateHeadToHead().)
             if (state.dateFrom) {
-                const fromDate = new Date(state.dateFrom);
-                filtered = filtered.filter(row => row.dateObj >= fromDate);
+                filtered = filtered.filter(row => {
+                    const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
+                    return matchDateStr >= state.dateFrom;
+                });
             }
 
             if (state.dateTo) {
-                const toDate = new Date(state.dateTo);
-                filtered = filtered.filter(row => row.dateObj <= toDate);
+                filtered = filtered.filter(row => {
+                    const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
+                    return matchDateStr <= state.dateTo;
+                });
             }
 
             // Note: season filtering is fully handled by the dateFrom/dateTo range above

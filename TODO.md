@@ -6,10 +6,28 @@ Feature ideas, not yet scheduled.
   biggest ever win" or "closest 1-goal games this season." Same match data,
   different sort/filter lens.
 
-- **Multi-team table filter** — extend Team 2 selection beyond two teams (or
-  beyond the fixed Big 6/country group) to an arbitrary custom list, so users
-  can build their own comparison group on the fly. Reuses the existing
-  `teamsToShow` mechanism already in place for Big 6/country mode.
+- On hold: **Multi-team table filter / mini-league** — scoped out
+  (2026-09-04), paused while other ideas are explored. Turned out to be a
+  genuine fork, not a simple Team 2 extension:
+  - **Not** "Team 1 vs a custom group" (which would've been a third flavor
+    of the existing Big 6/Country pattern - one aggregated row, reusing
+    `filterMatchesByOpponent`/`teamsToShow`).
+  - **Is** a mini-league: pick 3+ teams, filter the match data down to only
+    games where *both* home and away teams are in the selected group, then
+    run the existing standings computation on that subset. No Team 1/Team 2
+    pairing, no aggregated row, no phantom-sentinel trick - each selected
+    team gets its own real row, computed normally, just from a smaller match
+    set. E.g. if Arsenal played 15 total matches but only 5 each vs Chelsea/
+    Spurs/West Ham (the other selected teams), Arsenal's mini-league row
+    shows 15 GP (5+5+5), not its real season total.
+  - Open questions before starting: (1) League Table only, or also extend to
+    Last Time When/Team Streaks? (a "mini-league" doesn't map onto those the
+    same way Big 6/Country did, since a streak or "last time" is inherently
+    two-team, not group-standings). (2) Minimum team count (3+, since 2 is
+    already H2H) and any practical max. (3) The multi-select UI itself is
+    genuinely new - no multi-pick control exists anywhere in the app today
+    (every team picker is single-select); likely shape is a new "add
+    team"/chip control, separate from the existing Team 1/Team 2 comboboxes.
 
 - **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
