@@ -5133,6 +5133,7 @@
                 showTeamHistory(selectedTeam, state.teamSeasonsSelectedLeague);
             } else {
                 // Team unselected - clear everything
+                elements.teamSeasonsPositionSelect.value = '';
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamHistoryTitle.textContent = '';
