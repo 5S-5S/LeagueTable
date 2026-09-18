@@ -7575,9 +7575,8 @@
             // Apply day of week filter
             if (state.selectedDayOfWeek) {
                 filtered = filtered.filter(row => {
-                    const dayIndex = row.dateObj.getDay();
-                    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                    return dayNames[dayIndex] === state.selectedDayOfWeek;
+                    const dayOfWeek = row.dateObj.getDay();
+                    return dayOfWeek.toString() === state.selectedDayOfWeek;
                 });
             }
 
