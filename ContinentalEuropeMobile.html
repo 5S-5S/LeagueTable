@@ -354,6 +354,16 @@
                         </div>
                         
                         <div id="teamSeasonsPositionInfo" class="mt-2 text-sm text-gray-600"></div>
+
+                        <!-- First Occurrence Only Toggle Button -->
+                        <div id="firstOccurrenceOnlyContainer" class="mt-4 hidden">
+                            <button id="firstOccurrenceOnlyToggle" class="btn btn-secondary text-sm px-4 py-2">
+                                First Occurrence Only
+                            </button>
+                            <div class="mt-2 text-xs text-gray-500">
+                                Shows only each team's first-ever finish at this progression
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Team History Table -->
@@ -975,6 +985,7 @@
             teamSeasonsSelectedSeason: '',
             teamSeasonsSelectedPosition: '',
             includeBetterResults: false,
+            firstOccurrenceOnly: false,
             controlsCollapsed: false,
 
             // Previous League Tables state (for back navigation)
@@ -2603,6 +2614,8 @@
             includeBetterResultsContainer: document.getElementById('includeBetterResultsContainer'),
             includeBetterResultsCheckbox: document.getElementById('includeBetterResultsCheckbox'),
             teamSeasonsPositionInfo: document.getElementById('teamSeasonsPositionInfo'),
+            firstOccurrenceOnlyContainer: document.getElementById('firstOccurrenceOnlyContainer'),
+            firstOccurrenceOnlyToggle: document.getElementById('firstOccurrenceOnlyToggle'),
             collapseControlsBtn: document.getElementById('collapseControlsBtn'),
             // Team Streaks elements
             teamStreaksLeagueButtons: document.getElementById('teamStreaksLeagueButtons'),
@@ -4102,7 +4115,8 @@
             state.teamSeasonsSelectedSeason = '';
             state.teamSeasonsSelectedPosition = '';
             state.includeBetterResults = false;
-            
+            state.firstOccurrenceOnly = false;
+
             // Load league data if not already loaded
             if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
                 await loadLeagueDataForDevice(newLeague);
@@ -4110,16 +4124,16 @@
                 // If already loaded, just filter/update UI
                 filterDataForCurrentLeague(newLeague);
             }
-            
+
             createTeamSeasonsLeagueButtons();
             updateTeamSeasonsTeamSelect();
             updateTeamSeasonsSeasonSelect();
             updateTeamSeasonsProgressionSelect();
-            
+
             // Clear the table and reset UI
             elements.teamHistoryTable.classList.add('hidden');
             elements.teamSeasonsPositionInfo.textContent = '';
-            
+
             // Reset dropdown values
             elements.teamSeasonsTeamSelect.value = '';
             elements.teamSeasonsSeasonSelect.value = '';
@@ -4127,7 +4141,13 @@
             elements.includeBetterResultsCheckbox.className = 'checkbox';
             elements.includeBetterResultsContainer.classList.add('hidden');
             elements.includeBetterResultsContainer.style.display = 'none';
-            
+
+            // Reset First Occurrence Only toggle and hide it
+            updateFirstOccurrenceOnlyToggleButton();
+            if (elements.firstOccurrenceOnlyContainer) {
+                elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+            }
+
             // Clear stored team history data and name
             window.currentTeamHistoryData = null;
             window.currentTeamHistoryName = null;
@@ -4175,6 +4195,46 @@
             return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
         }
 
+        // Update First Occurrence Only toggle visibility - only relevant for
+        // the all-teams-at-progression table (no single team selected), since
+        // that's the only view with a Count column.
+        function updateFirstOccurrenceOnlyVisibility() {
+            const shouldShow = state.teamSeasonsSelectedPosition && !state.teamSeasonsSelectedTeam;
+
+            if (shouldShow) {
+                elements.firstOccurrenceOnlyContainer.classList.remove('hidden');
+            } else {
+                elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                // Reset toggle state when hiding
+                state.firstOccurrenceOnly = false;
+                updateFirstOccurrenceOnlyToggleButton();
+            }
+        }
+
+        // Update First Occurrence Only toggle button appearance
+        function updateFirstOccurrenceOnlyToggleButton() {
+            if (state.firstOccurrenceOnly) {
+                elements.firstOccurrenceOnlyToggle.textContent = 'Show All Occurrences';
+                elements.firstOccurrenceOnlyToggle.classList.remove('btn-secondary');
+                elements.firstOccurrenceOnlyToggle.classList.add('btn-primary');
+            } else {
+                elements.firstOccurrenceOnlyToggle.textContent = 'First Occurrence Only';
+                elements.firstOccurrenceOnlyToggle.classList.remove('btn-primary');
+                elements.firstOccurrenceOnlyToggle.classList.add('btn-secondary');
+            }
+        }
+
+        // Handle First Occurrence Only toggle
+        function handleFirstOccurrenceOnlyToggle() {
+            state.firstOccurrenceOnly = !state.firstOccurrenceOnly;
+            updateFirstOccurrenceOnlyToggleButton();
+
+            // Only relevant when viewing all teams at a progression
+            if (state.teamSeasonsSelectedPosition && !state.teamSeasonsSelectedTeam) {
+                showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
+            }
+        }
+
         // Update team seasons progression select
         function updateTeamSeasonsProgressionSelect() {
             // Progression options are now static in HTML
@@ -4184,16 +4244,23 @@
         // Handle team seasons season selection
         function handleTeamSeasonsSeasonChange(selectedSeason) {
             state.teamSeasonsSelectedSeason = selectedSeason;
-            
+
             // If a team is already selected, refresh the team history with the new season filter
             if (state.teamSeasonsSelectedTeam) {
                 showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+            } else if (state.teamSeasonsSelectedPosition) {
+                // No team selected but a progression is - refresh the all-teams-at-progression view
+                showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
             }
         }
 
         // Handle team seasons position selection
         function handleTeamSeasonsPositionChange(selectedPosition) {
             state.teamSeasonsSelectedPosition = selectedPosition;
+
+            // Reset First Occurrence Only toggle state when changing progression
+            state.firstOccurrenceOnly = false;
+            updateFirstOccurrenceOnlyToggleButton();
 
             if (state.teamSeasonsSelectedTeam) {
                 // If a team is selected, refresh the team history with the new progression filter
@@ -4210,16 +4277,26 @@
                         elements.includeBetterResultsContainer.classList.add('hidden');
                     }
                 }, 100);
+
+                // Hide First Occurrence Only toggle (no Count column in single-team view)
+                updateFirstOccurrenceOnlyVisibility();
             } else if (selectedPosition) {
                 // If no team selected but progression is selected, show all teams at that progression
                 // Reset team selection to ensure clean progression-only view
                 state.teamSeasonsSelectedTeam = '';
                 elements.teamSeasonsTeamSelect.value = '';
+
+                // Show First Occurrence Only toggle when any progression is selected
+                updateFirstOccurrenceOnlyVisibility();
+
                 showAllTeamsAtProgression(selectedPosition, state.teamSeasonsSelectedLeague);
             } else {
                 // Clear the table if no filters are selected
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
+
+                // Hide First Occurrence Only toggle when no progression selected
+                updateFirstOccurrenceOnlyVisibility();
             }
         }
 
@@ -4450,17 +4527,58 @@
             
             const divCode = leagueMapping[league];
             if (!divCode) return;
-            
+
             const availableSeasons = getAvailableSeasons(league);
             const allProgressionData = [];
-            
+
+            // Filter seasons based on Team Seasons selection (if any)
+            let seasonsToProcess = availableSeasons;
+            if (state.teamSeasonsSelectedSeason) {
+                // For era seasons, filter individual seasons to only those within the era date range
+                if (state.teamSeasonsSelectedSeason.includes('all-') || state.teamSeasonsSelectedSeason.includes('-era-')) {
+                    const originalSelectedLeague = state.selectedLeague;
+                    state.selectedLeague = league;
+                    const eraSeasonDates = getSeasonDateRange(state.teamSeasonsSelectedSeason);
+                    state.selectedLeague = originalSelectedLeague;
+
+                    if (eraSeasonDates) {
+                        const eraStart = new Date(eraSeasonDates.start);
+                        const eraEnd = new Date(eraSeasonDates.end);
+
+                        // Filter individual seasons to only those that fall within the era
+                        seasonsToProcess = availableSeasons.filter(season => {
+                            // Skip era seasons themselves in this filtering
+                            if (season.includes('all-') || season.includes('-era-')) {
+                                return false;
+                            }
+
+                            const originalSelectedLeague2 = state.selectedLeague;
+                            state.selectedLeague = league;
+                            const seasonDates = getSeasonDateRange(season);
+                            state.selectedLeague = originalSelectedLeague2;
+
+                            if (!seasonDates) return false;
+
+                            const seasonStart = new Date(seasonDates.start);
+                            const seasonEnd = new Date(seasonDates.end);
+
+                            // Include season if it starts on or after era start and ends before or on era end
+                            return seasonStart >= eraStart && seasonEnd <= eraEnd;
+                        });
+                    }
+                } else {
+                    // For individual seasons (shouldn't happen in Team Seasons but keeping for safety)
+                    seasonsToProcess = [state.teamSeasonsSelectedSeason];
+                }
+            }
+
             // Process each season to find teams that reached this progression
-            availableSeasons.forEach(seasonFilter => {
+            seasonsToProcess.forEach(seasonFilter => {
                 // Skip special seasons
                 if (seasonFilter.includes('all-') || seasonFilter.includes('-era-')) {
                     return;
                 }
-                
+
                 // Get season date range
                 const originalSelectedLeague = state.selectedLeague;
                 state.selectedLeague = league;
@@ -4575,15 +4693,26 @@
             
             // Update progression info
             const totalCount = allProgressionData.length;
+            const uniqueTeamCount = Object.keys(teamCounts).length;
             if (totalCount === 0) {
                 elements.teamSeasonsPositionInfo.textContent = `No teams found that reached ${progression}`;
+            } else if (state.firstOccurrenceOnly) {
+                const teamText = uniqueTeamCount === 1 ? 'team' : 'teams';
+                const countText = totalCount === 1 ? 'time' : 'times';
+                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} unique ${teamText} reached ${progression} (${totalCount} ${countText} total)`;
             } else {
                 const countText = totalCount === 1 ? 'time' : 'times';
                 elements.teamSeasonsPositionInfo.textContent = `${totalCount} teams reached ${progression} a total of ${totalCount} ${countText}`;
             }
-            
+
+            // Apply First Occurrence Only filter if enabled - keeps only
+            // each team's first chronological finish at this progression
+            const displayData = state.firstOccurrenceOnly
+                ? allProgressionData.filter(season => season.count === 1)
+                : allProgressionData;
+
             // Display the results
-            displayAllTeamsAtProgression(allProgressionData, progression, league);
+            displayAllTeamsAtProgression(displayData, progression, league);
         }
 
         // Display progression-only table
@@ -4860,7 +4989,9 @@
             state.teamSeasonsSelectedTeam = selectedTeam;
             state.teamSeasonsSelectedPosition = ''; // Reset position filter
             state.includeBetterResults = false;
-            
+            state.firstOccurrenceOnly = false;
+            updateFirstOccurrenceOnlyToggleButton();
+
             if (selectedTeam) {
                 // Reset position dropdown UI when team is selected
                 elements.teamSeasonsPositionSelect.value = '';
@@ -4869,6 +5000,9 @@
                 // Team selected but no position = hide checkbox
                 elements.includeBetterResultsContainer.classList.add('hidden');
 
+                // Hide First Occurrence Only toggle (no Count column in single-team view)
+                updateFirstOccurrenceOnlyVisibility();
+
                 showTeamHistory(selectedTeam, state.teamSeasonsSelectedLeague);
             } else {
                 // Team unselected - clear everything
@@ -4876,7 +5010,10 @@
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamHistoryTitle.textContent = '';
                 elements.includeBetterResultsContainer.classList.add('hidden');
-                
+
+                // Hide First Occurrence Only toggle when no team selected
+                updateFirstOccurrenceOnlyVisibility();
+
                 // Clear stored team history data and name to prevent contamination
                 window.currentTeamHistoryData = null;
                 window.currentTeamHistoryName = null;
@@ -4923,6 +5060,11 @@
                 state.teamSeasonsSelectedSeason = '';
                 state.teamSeasonsSelectedPosition = '';
                 state.includeBetterResults = false;
+                state.firstOccurrenceOnly = false;
+                updateFirstOccurrenceOnlyToggleButton();
+                if (elements.firstOccurrenceOnlyContainer) {
+                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                }
 
                 // Reset Last Time When state
                 state.lastTimeTeam1 = '';
@@ -4991,6 +5133,13 @@
                     containerById.style.display = 'none';
                 }
 
+                // Ensure First Occurrence Only toggle is hidden/reset when switching TO Team Seasons tab
+                state.firstOccurrenceOnly = false;
+                updateFirstOccurrenceOnlyToggleButton();
+                if (elements.firstOccurrenceOnlyContainer) {
+                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                }
+
                 // Clear Team Seasons visual elements to match cleared state
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
@@ -5004,7 +5153,15 @@
                 createTeamSeasonsLeagueButtons();
                 updateTeamSeasonsTeamSelect();
                 updateTeamSeasonsProgressionSelect();
-                
+                updateTeamSeasonsSeasonSelect();
+
+                // Show/hide season dropdown for Champions League
+                if (state.teamSeasonsSelectedLeague === 'champions-league') {
+                    elements.teamSeasonsSeasonContainer.classList.remove('hidden');
+                } else {
+                    elements.teamSeasonsSeasonContainer.classList.add('hidden');
+                }
+
             } else if (tabName === 'last-time-when') {
                 document.getElementById('lastTimeWhenTab').classList.add('active');
                 document.getElementById('lastTimeWhenContent').classList.add('active');
@@ -5017,6 +5174,11 @@
                 state.teamSeasonsSelectedSeason = '';
                 state.teamSeasonsSelectedPosition = '';
                 state.includeBetterResults = false;
+                state.firstOccurrenceOnly = false;
+                updateFirstOccurrenceOnlyToggleButton();
+                if (elements.firstOccurrenceOnlyContainer) {
+                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                }
 
                 // Reset League Filters state
                 state.selectedTeam1 = '';
@@ -5051,6 +5213,11 @@
                 state.teamSeasonsSelectedSeason = '';
                 state.teamSeasonsSelectedPosition = '';
                 state.includeBetterResults = false;
+                state.firstOccurrenceOnly = false;
+                updateFirstOccurrenceOnlyToggleButton();
+                if (elements.firstOccurrenceOnlyContainer) {
+                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                }
 
                 // Reset other tab states
                 state.selectedTeam1 = '';
@@ -5510,6 +5677,9 @@
                 }
             });
 
+            // First Occurrence Only toggle event listener
+            elements.firstOccurrenceOnlyToggle.addEventListener('click', handleFirstOccurrenceOnlyToggle);
+
             // Collapse controls toggle event listener
             elements.collapseControlsBtn.addEventListener('click', toggleControlsCollapse);
 
@@ -5731,13 +5901,13 @@
         // Get season date range
         function getSeasonDateRange(seasonKey) {
             if (seasonKey === 'champions-league-era-1992-2026') {
-                return { start: '1992-09-01', end: '2027-06-30' };
+                return { start: '1992-07-01', end: '2027-06-30' };
             }
             if (seasonKey === 'european-cup-era-1955-1992') {
-                return { start: '1955-09-01', end: '1992-06-30' };
+                return { start: '1955-07-01', end: '1992-06-30' };
             }
             if (seasonKey === 'all-european-cup-seasons-1955-2026') {
-                return { start: '1955-09-01', end: '2027-06-30' };
+                return { start: '1955-07-01', end: '2027-06-30' };
             }
             if (seasonKey === 'english-first-division-era-1888-1992') {
                 return { start: '1888-09-08', end: '1992-05-25' };
@@ -10729,12 +10899,15 @@
         // Initialize the application
         init();
         initHamburgerMenu();
-        
+
         // Initialize dark mode with small delay to ensure DOM is ready
         setTimeout(initDarkMode, 100);
-        
+
         updateTabText();
-        
+
+        // Initialize First Occurrence Only toggle button
+        updateFirstOccurrenceOnlyToggleButton();
+
         // Handle window resize for responsive tabs
         window.addEventListener('resize', updateTabText);
     </script>
