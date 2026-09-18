@@ -4383,6 +4383,7 @@
                     } else {
                         // Team but no position = hide checkbox
                         elements.includeBetterResultsContainer.classList.add('hidden');
+                        elements.includeBetterResultsContainer.style.display = 'none';
                     }
                 }, 100);
 
@@ -5124,6 +5125,7 @@
 
                 // Team selected but no position = hide checkbox
                 elements.includeBetterResultsContainer.classList.add('hidden');
+                elements.includeBetterResultsContainer.style.display = 'none';
 
                 // Hide First Occurrence Only toggle (no Count column in single-team view)
                 updateFirstOccurrenceOnlyVisibility();
@@ -5135,6 +5137,7 @@
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamHistoryTitle.textContent = '';
                 elements.includeBetterResultsContainer.classList.add('hidden');
+                elements.includeBetterResultsContainer.style.display = 'none';
 
                 // Hide First Occurrence Only toggle when no team selected
                 updateFirstOccurrenceOnlyVisibility();

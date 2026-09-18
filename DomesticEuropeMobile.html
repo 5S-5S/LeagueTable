@@ -4318,6 +4318,7 @@
                     } else {
                         if (elements.includeBetterResultsContainer) {
                             elements.includeBetterResultsContainer.classList.add('hidden');
+                            elements.includeBetterResultsContainer.style.display = 'none';
                         }
                     }
                 }, 100);
@@ -4717,6 +4718,7 @@
 
                 // Team selected but no position = hide checkbox
                 elements.includeBetterResultsContainer.classList.add('hidden');
+                elements.includeBetterResultsContainer.style.display = 'none';
 
                 // Show Historic Seasons toggle when team is selected
                 updateHistoricSeasonsVisibility();
@@ -4731,6 +4733,7 @@
                 elements.teamSeasonsPositionInfo.textContent = '';
                 elements.teamHistoryTitle.textContent = '';
                 elements.includeBetterResultsContainer.classList.add('hidden');
+                elements.includeBetterResultsContainer.style.display = 'none';
 
                 // Hide Historic Seasons toggle when no team selected
                 updateHistoricSeasonsVisibility();
