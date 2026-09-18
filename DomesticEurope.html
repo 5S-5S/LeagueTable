@@ -4060,17 +4060,19 @@
             
             if (state.teamSeasonsSelectedLeague === 'premier-league') {
                 // Only show era seasons for Premier League
+                const endYear = getSeasonEraEndYear('E0', 2025);
                 seasonOptions += `
-                    <option value="premier-league-era-1992-2025">Premier League Era (1992-2025)</option>
+                    <option value="premier-league-era-1992-2025">Premier League Era (1992-${endYear})</option>
                     <option value="english-first-division-era-1888-1992">English First Division Era (1888-1992)</option>
-                    <option value="all-english-seasons-1888-2025">All English Seasons (1888-2025)</option>
+                    <option value="all-english-seasons-1888-2025">All English Seasons (1888-${endYear})</option>
                 `;
             } else if (state.teamSeasonsSelectedLeague === 'ligue-1') {
                 // Only show era seasons for Ligue 1
+                const endYear = getSeasonEraEndYear('F1', 2025);
                 seasonOptions += `
-                    <option value="ligue-1-era-2002-2025">Ligue 1 Era (2002-2025)</option>
+                    <option value="ligue-1-era-2002-2025">Ligue 1 Era (2002-${endYear})</option>
                     <option value="french-division-1-1932-2002">French Division 1 (1932-2002)</option>
-                    <option value="all-french-seasons-1932-2025">All French Seasons (1932-2025)</option>
+                    <option value="all-french-seasons-1932-2025">All French Seasons (1932-${endYear})</option>
                 `;
             }
             
@@ -4162,6 +4164,31 @@
             const suffixes = ["th", "st", "nd", "rd"];
             const v = num % 100;
             return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+        }
+
+        // Compute the season-ending year (e.g. 2027 for the 2026-27 season)
+        // that the most recent match in a division actually falls in, so era
+        // filter labels ("Premier League Era (1992-2027)") stay correct as
+        // new data comes in instead of being hardcoded to a fixed year.
+        function getSeasonEraEndYear(divCode, fallbackYear) {
+            const leagueData = state.data.filter(row => row.Div === divCode);
+            if (leagueData.length === 0) return fallbackYear;
+
+            let mostRecentDate = null;
+            leagueData.forEach(row => {
+                if (row.dateObj instanceof Date && !isNaN(row.dateObj)) {
+                    if (!mostRecentDate || row.dateObj > mostRecentDate) {
+                        mostRecentDate = row.dateObj;
+                    }
+                }
+            });
+            if (!mostRecentDate) return fallbackYear;
+
+            const year = mostRecentDate.getFullYear();
+            const month = mostRecentDate.getMonth() + 1; // 1-12
+            // Seasons run July-June, so a match from July onward belongs to
+            // the season ending the following year.
+            return month >= 7 ? year + 1 : year;
         }
 
         // Update Historic Seasons toggle visibility
@@ -6656,15 +6683,15 @@
             const options = '<option value="">Select Season</option>' + 
                 availableSeasons.map(season => {
                     let label = season;
-                    if (season === 'ligue-1-era-2002-2025') label = 'Ligue 1 Era (2002-2025)';
+                    if (season === 'ligue-1-era-2002-2025') label = `Ligue 1 Era (2002-${getSeasonEraEndYear('F1', 2025)})`;
                     if (season === 'french-division-1-1932-2002') label = 'French Division 1 (1932-2002)';
-                    if (season === 'all-french-seasons-1932-2025') label = 'All French Seasons (1932-2025)';
-                    if (season === 'premier-league-era-1992-2025') label = 'Premier League Era (1992-2025)';
+                    if (season === 'all-french-seasons-1932-2025') label = `All French Seasons (1932-${getSeasonEraEndYear('F1', 2025)})`;
+                    if (season === 'premier-league-era-1992-2025') label = `Premier League Era (1992-${getSeasonEraEndYear('E0', 2025)})`;
                     if (season === 'english-first-division-era-1888-1992') label = 'English First Division Era (1888-1992)';
-                    if (season === 'all-english-seasons-1888-2025') label = 'All English Seasons (1888-2025)';
-                    if (season === 'all-spanish-seasons-1928-2025') label = 'All Spanish Seasons (1928-2025)';
-                    if (season === 'all-italian-seasons-1929-2025') label = 'All Italian Seasons (1929-2025)';
-                    if (season === 'all-german-seasons-1963-2025') label = 'All German Seasons (1963-2025)';
+                    if (season === 'all-english-seasons-1888-2025') label = `All English Seasons (1888-${getSeasonEraEndYear('E0', 2025)})`;
+                    if (season === 'all-spanish-seasons-1928-2025') label = `All Spanish Seasons (1928-${getSeasonEraEndYear('SP1', 2025)})`;
+                    if (season === 'all-italian-seasons-1929-2025') label = `All Italian Seasons (1929-${getSeasonEraEndYear('I1', 2025)})`;
+                    if (season === 'all-german-seasons-1963-2025') label = `All German Seasons (1963-${getSeasonEraEndYear('D1', 2025)})`;
                     return `<option value="${season}">${label}</option>`;
                 }).join('');
             

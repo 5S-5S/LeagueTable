@@ -4097,10 +4097,11 @@
             
             if (state.teamSeasonsSelectedLeague === 'champions-league') {
                 // Only show Champions League eras
+                const endYear = getSeasonEraEndYear('C1', 2026);
                 seasonOptions += `
-                    <option value="champions-league-era-1992-2026">Champions League Era (1992-2026)</option>
+                    <option value="champions-league-era-1992-2026">Champions League Era (1992-${endYear})</option>
                     <option value="european-cup-era-1955-1992">European Cup Era (1955-1992)</option>
-                    <option value="all-european-cup-seasons-1955-2026">All European Cup Seasons (1955-2026)</option>
+                    <option value="all-european-cup-seasons-1955-2026">All European Cup Seasons (1955-${endYear})</option>
                 `;
             }
             
@@ -4193,6 +4194,31 @@
             const suffixes = ["th", "st", "nd", "rd"];
             const v = num % 100;
             return num + (suffixes[(v - 20) % 10] || suffixes[v] || suffixes[0]);
+        }
+
+        // Compute the season-ending year (e.g. 2027 for the 2026-27 season)
+        // that the most recent match in a division actually falls in, so era
+        // filter labels ("Champions League Era (1992-2027)") stay correct as
+        // new data comes in instead of being hardcoded to a fixed year.
+        function getSeasonEraEndYear(divCode, fallbackYear) {
+            const leagueData = state.data.filter(row => row.Div === divCode);
+            if (leagueData.length === 0) return fallbackYear;
+
+            let mostRecentDate = null;
+            leagueData.forEach(row => {
+                if (row.dateObj instanceof Date && !isNaN(row.dateObj)) {
+                    if (!mostRecentDate || row.dateObj > mostRecentDate) {
+                        mostRecentDate = row.dateObj;
+                    }
+                }
+            });
+            if (!mostRecentDate) return fallbackYear;
+
+            const year = mostRecentDate.getFullYear();
+            const month = mostRecentDate.getMonth() + 1; // 1-12
+            // Seasons run July-June, so a match from July onward belongs to
+            // the season ending the following year.
+            return month >= 7 ? year + 1 : year;
         }
 
         // Update First Occurrence Only toggle visibility - only relevant for
@@ -6819,9 +6845,9 @@
             const options = '<option value="">Select Season</option>' + 
                 availableSeasons.map(season => {
                     let label = season;
-                    if (season === 'champions-league-era-1992-2026') label = 'Champions League Era (1992-2026)';
+                    if (season === 'champions-league-era-1992-2026') label = `Champions League Era (1992-${getSeasonEraEndYear('C1', 2026)})`;
                     if (season === 'european-cup-era-1955-1992') label = 'European Cup Era (1955-1992)';
-                    if (season === 'all-european-cup-seasons-1955-2026') label = 'All European Cup Seasons (1955-2026)';
+                    if (season === 'all-european-cup-seasons-1955-2026') label = `All European Cup Seasons (1955-${getSeasonEraEndYear('C1', 2026)})`;
                     return `<option value="${season}">${label}</option>`;
                 }).join('');
             
