@@ -18,16 +18,22 @@ actually ready to cut over.
 - [x] `migration/migrate.mjs` — one-time backfill script: fetches the
       same gist CSVs the live frontend uses today, normalizes them the
       same way `processRawData()` does, outputs `seed.sql`
-- [ ] Cloudflare account authenticated locally (`wrangler login`) — **you**
-      need to do this interactively, see below
-- [ ] D1 database created (`npm run db:create` in `worker/`)
-- [ ] Schema + seed data loaded into D1
-- [ ] First endpoint: `GET /api/team-history?div=&team=` (single-team
-      match history — the simplest query, chosen as the first cut)
+- [x] Cloudflare account authenticated locally (`wrangler login`)
+- [x] D1 database created — `leaguetable`
+      (`7069d435-b2d1-4b49-9510-8be2cf8119d9`, region WNAM)
+- [x] Schema + seed data loaded into D1 (local and remote) — 166,519 rows
+- [x] First endpoint live: `GET /api/team-history?div=&team=`
+      https://leaguetable-api.league-table-api.workers.dev/api/team-history
+      (single-team match history — the simplest query, chosen as the
+      first cut). Verified against both apps' data (Arsenal FC / E0 and
+      Real Madrid / C1) and against 404/missing-param/CORS-preflight cases.
 - [ ] Frontend's single-team Match History view switched to call the
       Worker instead of computing from the full gist-loaded dataset
 - [ ] Everything else (head-to-head, standings, Team Seasons filters) —
       one endpoint at a time, same pattern
+- [ ] Keeping D1 in sync going forward — the daily GitHub Actions pipeline
+      (`scripts/update_*_scores.py`) still only writes to the gists; D1 is
+      a point-in-time backfill until that's addressed
 
 ## Layout
 
@@ -41,18 +47,27 @@ backend/
     migrate.mjs
 ```
 
-## Next steps (needs you)
+## Live endpoint
 
-1. If you don't have one, create a free Cloudflare account:
-   https://dash.cloudflare.com/sign-up
-2. Authenticate wrangler locally — this opens a browser OAuth flow, has
-   to be done by you interactively:
-   ```
-   cd backend/worker
-   npx wrangler login
-   ```
-3. Once authenticated, tell me and I'll create the D1 database, load the
-   schema, run the backfill, and start on the first endpoint.
+```
+GET https://leaguetable-api.league-table-api.workers.dev/api/team-history?div=E0&team=Arsenal%20FC
+```
+
+`div` is the same competition code the frontend already uses internally
+(E0/SP1/I1/D1/F1 for Domestic, C1/E1/C2 for Continental).
+
+## Next steps
+
+1. Wire up the frontend: the single-team Match History view in
+   `DomesticEurope.html`/`ContinentalEurope.html` (and their Mobile
+   counterparts) should call this endpoint instead of filtering the full
+   in-memory gist dataset. Once that's live and confirmed working, do the
+   same for the mobile files.
+2. Build the next endpoint (head-to-head is the next simplest: two teams,
+   optionally two divs).
+3. Eventually: point `scripts/update_*_scores.py` at D1 too (or replace
+   the gist writes entirely), so new results don't need a manual re-run
+   of the backfill script.
 
 ## Regenerating the seed data
 
