@@ -1,0 +1,11 @@
+{
+  "name": "leaguetable-migration",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate": "node migrate.mjs"
+  },
+  "dependencies": {
+    "papaparse": "^5.4.1"
+  }
+}
