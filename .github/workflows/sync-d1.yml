@@ -1,0 +1,31 @@
+name: Sync D1 database
+
+on:
+  schedule:
+    # 06:30 UTC daily — after both score-update workflows (06:00/06:15 UTC)
+    # have already refreshed the gists, so this picks up same-day results
+    # instead of trailing a day behind.
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync-d1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: backend/migration
+        run: npm install
+
+      - name: Sync new matches into D1
+        working-directory: backend/migration
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_DATABASE_ID: ${{ secrets.CLOUDFLARE_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node sync.mjs

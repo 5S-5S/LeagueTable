@@ -25,3 +25,8 @@ CREATE INDEX IF NOT EXISTS idx_matches_home_team ON matches(home_team);
 CREATE INDEX IF NOT EXISTS idx_matches_away_team ON matches(away_team);
 CREATE INDEX IF NOT EXISTS idx_matches_div ON matches(div);
 CREATE INDEX IF NOT EXISTS idx_matches_date ON matches(date);
+
+-- Lets the daily sync use INSERT OR IGNORE to add only genuinely new
+-- matches without re-writing the whole table (D1's free tier caps writes
+-- at 100,000 rows/day - well under our 166k+ total row count).
+CREATE UNIQUE INDEX IF NOT EXISTS idx_matches_unique ON matches(div, date, home_team, away_team);
