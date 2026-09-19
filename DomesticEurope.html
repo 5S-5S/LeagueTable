@@ -935,6 +935,14 @@
             recentMatchesCount: 'All',
             matchHistorySortConfig: { key: null, direction: null },
 
+            // Match History's data now comes from the team-history API
+            // instead of the full in-memory gist dataset (see
+            // backend/README.md). Cache keyed by "div::team" so re-renders
+            // triggered by filter changes don't re-fetch.
+            teamHistoryApiCache: null,
+            teamHistoryApiCacheKey: null,
+            teamHistoryApiLoading: false,
+
             // Team Dashboard state (locked team via ?league=&team= URL params,
             // or picked from the in-page search). dashboardLockedTeam is the
             // stable identity - it survives tab switches, unlike
@@ -7805,28 +7813,89 @@
             }
         }
 
+        // Team History API - first slice of the site cut over from public
+        // gist URLs (anyone could curl the whole dataset, forever, from
+        // the Network tab) to a small backend that only ever answers one
+        // specific question per request. See backend/README.md.
+        const TEAM_HISTORY_API_BASE = 'https://leaguetable-api.league-table-api.workers.dev';
+
+        // Parses an ISO 'YYYY-MM-DD' string the same way processRawData()
+        // builds dateObj from the gist CSVs - local-timezone midnight, not
+        // UTC midnight - so day-of-week filtering and sorting behave
+        // identically regardless of where this data came from.
+        function isoDateToLocalDateObj(isoDateStr) {
+            const [year, month, day] = isoDateStr.split('-').map(Number);
+            const dateObj = new Date(year, month - 1, day);
+            dateObj.setHours(0, 0, 0, 0);
+            return dateObj;
+        }
+
+        // Fetches (or reuses a cached) match history for one team from the
+        // API. Fire-and-forget from calculateMatchHistory(): if the cache
+        // is missing/stale this kicks off a fetch and calls updateTable()
+        // again once it resolves, rather than making the whole render path
+        // async.
+        async function ensureTeamHistoryLoaded(team, div) {
+            const cacheKey = `${div}::${team}`;
+            if (state.teamHistoryApiCacheKey === cacheKey) return;
+            if (state.teamHistoryApiLoading) return;
+
+            state.teamHistoryApiLoading = true;
+            try {
+                const url = `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Team history request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.teamHistoryApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.teamHistoryApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load team history from API:', err);
+                // Leave the cache as-is rather than throwing - Match
+                // History just shows no matches instead of breaking the
+                // rest of the page.
+            } finally {
+                state.teamHistoryApiLoading = false;
+            }
+
+            // Only re-render if the user hasn't since moved on to a
+            // different team while this fetch was in flight.
+            if (state.selectedTeam1 === team) {
+                updateTable();
+            }
+        }
+
         // Calculate match history data for single team
         function calculateMatchHistory() {
             if (!state.selectedTeam1 || (state.selectedTeam2 && state.selectedTeam2 !== '')) return null;
 
-            // Apply all existing filters first
-            let filtered = [...state.data];
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+            const div = leagueMapping[state.selectedLeague];
 
-            // Apply league filter
-            if (state.selectedLeague) {
-                const leagueMapping = {
-                    'premier-league': 'E0',
-                    'la-liga': 'SP1',
-                    'serie-a': 'I1',
-                    'bundesliga': 'D1',
-                    'ligue-1': 'F1'
-                };
-
-                const divFilter = leagueMapping[state.selectedLeague];
-                if (divFilter) {
-                    filtered = filtered.filter(row => row.Div === divFilter);
-                }
+            // Served from the team-history API instead of the full
+            // in-memory gist dataset - kicks off a fetch if this team
+            // isn't already cached; updateTable() re-runs once it lands.
+            if (div) {
+                ensureTeamHistoryLoaded(state.selectedTeam1, div);
             }
+
+            // Already scoped to this team and division by the API, so no
+            // league or team filter needed here - just the user's other
+            // active filters.
+            let filtered = [...(state.teamHistoryApiCache || [])];
 
             // Apply date filters (compare as ISO date strings, not raw Date
             // objects - row.dateObj carries a local-timezone-derived time
@@ -7859,10 +7928,7 @@
                 });
             }
 
-            // Filter for selected team matches
-            let teamMatches = filtered.filter(row =>
-                row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1
-            );
+            let teamMatches = filtered;
 
             // Apply home/away filter for match history
             if (state.matchHistoryHomeFilter && !state.matchHistoryAwayFilter) {
