@@ -1036,6 +1036,13 @@
             teamStreaksApiCacheKey: null,
             teamStreaksApiLoading: false,
 
+            // The Last Time When... also has its own team selection,
+            // independent of League Filters and Team Streaks - same
+            // reasoning, own cache slot.
+            lastTimeApiCache: null,
+            lastTimeApiCacheKey: null,
+            lastTimeApiLoading: false,
+
             h2hPenaltyFilter: false,
             
             // H2H sort config
@@ -6671,29 +6678,90 @@
         }
 
         // Calculate last time when results
+        // Fetches (or reuses a cached) match list for The Last Time
+        // When... - team1 alone (all opponents, via team-history) or
+        // team1 vs a specific opponent/country grouping (via
+        // head-to-head, opponents already resolved to concrete team
+        // names by the caller). Own cache slot, separate from League
+        // Filters' and Team Streaks' - this tab can have a different team
+        // selected at the same time. Same fire-and-forget pattern as
+        // ensureTeamHistoryLoaded()/ensureHeadToHeadLoaded(), except it
+        // re-renders via calculateLastTimeWhen() (which re-reads current
+        // state itself) rather than updateTable().
+        async function ensureLastTimeDataLoaded(team1, opponents, div) {
+            const cacheKey = opponents
+                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
+                : `${div}::${team1}::__all__`;
+            if (state.lastTimeApiCacheKey === cacheKey) return;
+            if (state.lastTimeApiLoading) return;
+
+            state.lastTimeApiLoading = true;
+            try {
+                const url = opponents
+                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
+                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Last Time When data request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.lastTimeApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals,
+                    CompetitionPhase: m.competitionPhase,
+                    isQualifier: m.isQualifier,
+                    AdditionalInfo: m.additionalInfo
+                }));
+                state.lastTimeApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load Last Time When data from API:', err);
+            } finally {
+                state.lastTimeApiLoading = false;
+            }
+
+            calculateLastTimeWhen();
+        }
+
         function calculateLastTimeWhen() {
             if (!state.lastTimeTeam1) {
                 elements.lastTimeResults.classList.add('hidden');
                 return;
             }
-            
+
             // Handle single team scenario (Team 1 only selected)
             if (!state.lastTimeTeam2) {
                 calculateSingleTeamResults();
                 return;
             }
-            
+
             if (state.lastTimeTeam1 === state.lastTimeTeam2) {
                 elements.lastTimeResults.classList.add('hidden');
                 return;
             }
-            
+
             // Hide all sections initially
             hideAllLastTimeSections();
-            
-            // Filter matches for the two selected teams (no domestic league filtering for Champions League data)
-            let matches = filterMatchesByOpponent(state.data, state.lastTimeTeam1, state.lastTimeTeam2);
-            
+
+            const leagueMapping = {
+                'champions-league': 'C1',
+                'europa-league': 'E1',
+                'conference-league': 'C2'
+            };
+            const div = leagueMapping[state.selectedLeague];
+
+            const opponents = isCountryOpponentValue(state.lastTimeTeam2)
+                ? getCountryOpponents(countryFromOpponentValue(state.lastTimeTeam2), state.lastTimeTeam1)
+                : [state.lastTimeTeam2];
+
+            if (div && opponents.length > 0) {
+                ensureLastTimeDataLoaded(state.lastTimeTeam1, opponents, div);
+            }
+
+            let matches = [...(state.lastTimeApiCache || [])];
+
             // Apply qualifier exclusion filter if enabled
             if (state.excludeQualifiers) {
                 matches = matches.filter(row => !row.isQualifier);
@@ -6816,11 +6884,20 @@
         function calculateSingleTeamResults() {
             // Hide all sections initially
             hideAllLastTimeSections();
-            // Filter matches for the selected team (no domestic league filtering for Champions League data)
-            let matches = state.data.filter(row => 
-                (row.HomeTeam === state.lastTimeTeam1 || row.AwayTeam === state.lastTimeTeam1)
-            );
-            
+
+            const leagueMapping = {
+                'champions-league': 'C1',
+                'europa-league': 'E1',
+                'conference-league': 'C2'
+            };
+            const div = leagueMapping[state.selectedLeague];
+
+            if (div) {
+                ensureLastTimeDataLoaded(state.lastTimeTeam1, null, div);
+            }
+
+            let matches = [...(state.lastTimeApiCache || [])];
+
             // Apply qualifier exclusion filter if enabled
             if (state.excludeQualifiers) {
                 matches = matches.filter(row => !row.isQualifier);
