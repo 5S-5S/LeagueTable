@@ -30,11 +30,17 @@ actually ready to cut over.
       (single-team match history — the simplest query, chosen as the
       first cut). Verified against both apps' data (Arsenal FC / E0 and
       Real Madrid / C1) and against 404/missing-param/CORS-preflight cases.
-- [x] Daily sync workflow written (`.github/workflows/sync-d1.yml`, 06:30
-      UTC) — **not active yet**, needs a Cloudflare API token added as a
-      repo secret first, see below
-- [ ] Frontend's single-team Match History view switched to call the
-      Worker instead of computing from the full gist-loaded dataset
+- [x] Daily sync workflow active (`.github/workflows/sync-d1.yml`, 06:30
+      UTC), authenticated via a `CLOUDFLARE_API_TOKEN` repo secret
+- [x] `additional_info` column added (Continental penalty-shootout data,
+      e.g. `pso 4:3`) — nullable, always `NULL` for Domestic
+- [x] Frontend's single-team Match History view switched to call the
+      Worker instead of computing from the full gist-loaded dataset, on
+      all four pages: `DomesticEurope.html`, `DomesticEuropeMobile.html`,
+      `ContinentalEurope.html`, `ContinentalEuropeMobile.html`
+- [x] `migration/verify-parity.mjs` — full parity check (every team,
+      every division) between the live gists and the API; run after any
+      backend change that touches match data
 - [ ] Everything else (head-to-head, standings, Team Seasons filters) —
       one endpoint at a time, same pattern
 
@@ -98,9 +104,11 @@ backend/
     wrangler.toml
     src/index.js
   migration/
-    lib.mjs        Shared gist-fetch/normalize logic
-    migrate.mjs    One-off full backfill (gists -> seed.sql)
-    sync.mjs       Daily incremental sync (gists -> D1, new rows only)
+    lib.mjs                       Shared gist-fetch/normalize logic
+    migrate.mjs                   One-off full backfill (gists -> seed.sql)
+    sync.mjs                      Daily incremental sync (gists -> D1, new rows only)
+    backfill-additional-info.mjs  One-off: backfill additional_info for rows inserted before that column existed
+    verify-parity.mjs             Full gist-vs-API parity check, every team/division
 ```
 
 ## Live endpoint
@@ -112,17 +120,28 @@ GET https://leaguetable-api.league-table-api.workers.dev/api/team-history?div=E0
 `div` is the same competition code the frontend already uses internally
 (E0/SP1/I1/D1/F1 for Domestic, C1/E1/C2 for Continental).
 
+## Data integrity
+
+The initial `migrate.mjs` backfill ran before the commit-hash-stripping fix
+existed (see git history for `decodeGistUrl`), so it read a frozen gist
+snapshot rather than current data. This surfaced as 9 teams (2 in SP1, 7 in
+C1 - e.g. `AC Sparta Praha` vs the gists' current `Sparta Prague`) whose
+names had since been standardized upstream; `sync.mjs`'s watermark-based
+design only catches new matches, never retroactive corrections to old
+rows, so these stayed stale in D1 indefinitely. Fixed with one-off
+`UPDATE` statements renaming the 9 teams in D1 to match the gists.
+
+Run `verify-parity.mjs` after any change that touches match data (schema
+changes, bulk updates, a new endpoint reading raw D1 rows) - it'll catch
+exactly this kind of drift by diffing every team's full match list against
+the live gists.
+
 ## Next steps
 
-1. Add the `CLOUDFLARE_API_TOKEN` secret (see above) so the daily sync
-   actually runs.
-2. Wire up the frontend: the single-team Match History view in
-   `DomesticEurope.html`/`ContinentalEurope.html` (and their Mobile
-   counterparts) should call this endpoint instead of filtering the full
-   in-memory gist dataset. Once that's live and confirmed working, do the
-   same for the mobile files.
-3. Build the next endpoint (head-to-head is the next simplest: two teams,
+1. Build the next endpoint (head-to-head is the next simplest: two teams,
    optionally two divs).
+2. Keep working through the rest of the site's features the same way -
+   standings, Team Seasons filters, etc.
 
 ## Regenerating the seed data (manual full rebuild only)
 
