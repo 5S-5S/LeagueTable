@@ -27,8 +27,21 @@ export const CONTINENTAL_QUALIFIER_GIST_URLS = [
     'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iYmMyMGMzMmQyNWNjZGMwZmVkZjI1YmM4N2Q0NDY2ZS9yYXcvZjZhNTQ5NDg1YzZlNDNiZWJmNmUzYjZmNmU3NDMyNGFiNDY1YWZjMi9jbHF1YWxpZmllcnMuY3N2',
 ];
 
+// Strips the commit hash from a gist raw URL so we always fetch the latest
+// revision instead of the one pinned at extraction time. Mirrors
+// stripGistCommitHash() in the frontend (decodeSingleBase64Url) exactly -
+// without this, /raw/<hash>/filename.csv permanently serves whatever
+// content existed at that hash, even though the gist keeps getting updated.
+function stripGistCommitHash(url) {
+    return url.replace(
+        /(https:\/\/gist\.githubusercontent\.com\/[^/]+\/[^/]+\/raw\/)([0-9a-f]{40}\/)(.+)/i,
+        '$1$3'
+    );
+}
+
 export function decodeGistUrl(encoded) {
-    return Buffer.from(encoded, 'base64').toString('utf-8');
+    const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
+    return stripGistCommitHash(decoded);
 }
 
 // Same day/month/year parsing as processRawData() in the frontend.
