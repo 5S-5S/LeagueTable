@@ -14,13 +14,17 @@
 //   client-side (unchanged) and just sends the resolved names here.
 //   -> { team1, team2: [...], div, matches: [...] }
 //
-// GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=
+// GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=&excludeQualifiers=&excludeMainStage=&competitionStage=
 //   -> { div, matchCount, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
-//   Domestic only for now - Continental's table has season-specific
-//   competition-phase grouping the frontend still computes itself. Points
-//   are raw/undeducted - point deductions stay a client-side correction
-//   (the table is hardcoded in the frontend, not duplicated here; see
-//   backend/README.md's Data integrity section).
+//   excludeQualifiers/excludeMainStage/competitionStage are Continental-
+//   only and only cover the FLAT (non-grouped) table - the branch
+//   calculateTable() in ContinentalEurope.html takes when no specific
+//   season is selected (no season, or an era filter). A specific season
+//   selected groups into per-competition-phase mini-tables, which the
+//   frontend still computes client-side (see backend/README.md's Data
+//   integrity / Next steps). Points are raw/undeducted - point
+//   deductions stay a client-side correction (the table is hardcoded in
+//   the frontend, not duplicated here).
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -106,9 +110,11 @@ async function handleHeadToHead(url, env) {
 // Historical point-system rule: 3 points for a win unless threePointSystem
 // is false AND the match falls in one of these leagues' pre-3-point eras.
 // Ligue 1's 1988-89 season used 3 points even though the surrounding years
-// used 2 - that's the one carve-out. Mirrors winPointsFor() in
-// backend/migration/standings-aggregate.mjs and calculateTable() in
-// DomesticEurope.html exactly - keep all three in sync if this changes.
+// used 2 - that's the one carve-out. C1 (Champions League) is much
+// simpler: 2 points through the 1994-95 season, 3 from 1995-96 on.
+// Mirrors winPointsFor() in backend/migration/standings-aggregate.mjs and
+// calculateTable()/getHistoricalPointSystem() in DomesticEurope.html/
+// ContinentalEurope.html exactly - keep all copies in sync if this changes.
 function winPointsFor(div, isoDate, threePointSystem) {
     if (threePointSystem) return 3;
     if (div === 'I1' && isoDate <= '1994-06-30') return 2;
@@ -119,7 +125,63 @@ function winPointsFor(div, isoDate, threePointSystem) {
         return 2;
     }
     if (div === 'E0' && isoDate <= '1981-06-30') return 2;
+    if (div === 'C1' && isoDate < '1995-07-01') return 2;
     return 3;
+}
+
+// Continental-only pre-filtering: qualifier exclusion, main-stage-only,
+// and competition-stage (group/knockout/specific phase). Mirrors the flat
+// branch of calculateTable() in ContinentalEurope.html. Mirrors
+// filterContinentalMatches()/matchesStageCategory() in
+// backend/migration/standings-aggregate.mjs exactly.
+const KNOCKOUT_PHASES = [
+    'Round Of 16', 'Round of 16', 'Quarter-Finals', 'Semi-Finals', 'Final',
+    'Play-Offs', '1. Round', '2. Round',
+];
+
+function matchesStageCategory(competitionPhase, stageCategory) {
+    if (!competitionPhase || !stageCategory) return false;
+    const phase = competitionPhase.toLowerCase();
+    switch (stageCategory) {
+        case 'League/Group Stage':
+            return phase.includes('league phase') || phase.includes('group') ||
+                phase.includes('preliminary') || phase.includes('intermediate') ||
+                /group [a-z]/i.test(competitionPhase) ||
+                /preliminary gr\. [a-z]/i.test(competitionPhase) ||
+                /intermediate gr\. [a-z]/i.test(competitionPhase);
+        case 'Knock-Out Stage':
+            return phase.includes('final') || phase.includes('semi-final') ||
+                phase.includes('quarter-final') || phase.includes('round of 16') ||
+                phase.includes('play-off') || phase.includes('2. round') || phase.includes('1. round');
+        case 'Final': return phase === 'final';
+        case 'Semi-Finals': return phase === 'semi-finals';
+        case 'Quarter-Finals': return phase === 'quarter-finals';
+        case 'Round Of 16':
+        case 'Round of 16': return phase === 'round of 16';
+        case 'Play-Offs': return phase === 'play-offs';
+        case '2. Round': return phase === '2. round';
+        case '1. Round': return phase === '1. round';
+        default: return false;
+    }
+}
+
+function filterContinentalMatches(matches, { excludeQualifiers, excludeMainStage, competitionStage }) {
+    let filtered = matches;
+
+    if (excludeQualifiers) filtered = filtered.filter(m => !m.isQualifier);
+    if (excludeMainStage) filtered = filtered.filter(m => m.isQualifier);
+
+    if (competitionStage) {
+        if (competitionStage === 'group-stage') {
+            filtered = filtered.filter(m => !KNOCKOUT_PHASES.includes(m.competitionPhase || ''));
+        } else if (competitionStage === 'knockout-stage') {
+            filtered = filtered.filter(m => KNOCKOUT_PHASES.includes(m.competitionPhase || ''));
+        } else {
+            filtered = filtered.filter(m => matchesStageCategory(m.competitionPhase, competitionStage));
+        }
+    }
+
+    return filtered;
 }
 
 // Mirrors aggregateStandings() in backend/migration/standings-aggregate.mjs
@@ -192,8 +254,11 @@ async function handleStandings(url, env) {
     const threePointSystem = parseBoolParam(url, 'threePointSystem', true);
     const homeFilter = parseBoolParam(url, 'homeFilter', true);
     const awayFilter = parseBoolParam(url, 'awayFilter', true);
+    const excludeQualifiers = parseBoolParam(url, 'excludeQualifiers', false);
+    const excludeMainStage = parseBoolParam(url, 'excludeMainStage', false);
+    const competitionStage = url.searchParams.get('competitionStage') || '';
 
-    let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals FROM matches WHERE div = ?1`;
+    let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier FROM matches WHERE div = ?1`;
     const params = [div];
     if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
     if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
@@ -201,10 +266,15 @@ async function handleStandings(url, env) {
 
     const { results } = await env.DB.prepare(sql).bind(...params).all();
 
-    const matches = results.map(row => ({
+    let matches = results.map(row => ({
         div: row.div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
         homeGoals: row.home_goals, awayGoals: row.away_goals,
+        competitionPhase: row.competition_phase, isQualifier: !!row.is_qualifier,
     }));
+
+    if (excludeQualifiers || excludeMainStage || competitionStage) {
+        matches = filterContinentalMatches(matches, { excludeQualifiers, excludeMainStage, competitionStage });
+    }
 
     const { matchDateRange, standings } = aggregateStandings(matches, { threePointSystem, homeFilter, awayFilter });
 

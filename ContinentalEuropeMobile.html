@@ -998,6 +998,15 @@
             lastTimeApiCacheKey: null,
             lastTimeApiLoading: false,
 
+            // League Table (no team selected, no specific season) comes
+            // from the standings API - the one view that legitimately
+            // needs many teams' data at once. A specific season selected
+            // still uses the full in-memory gist dataset for its grouped
+            // per-competition-phase mini-tables (see calculateTable()).
+            standingsApiCache: null,
+            standingsApiCacheKey: null,
+            standingsApiLoading: false,
+
             h2hPenaltyFilter: false,
             
             // H2H sort config
@@ -7062,15 +7071,20 @@
         }
 
         // Apply point deductions
-        function applyPointDeductions(tableArray, filteredMatches, selectedLeagueDiv) {
+        // dateRange is {start, end} (Date objects or ISO strings both work,
+        // both sides just need to be comparable via `new Date(...)`) -
+        // either derived from a raw matches array (grouped/team-scoped
+        // table modes, still computed client-side) or straight from the
+        // standings API's matchDateRange (flat full-table mode, where no
+        // raw matches are available client-side by design).
+        function applyPointDeductions(tableArray, dateRange, selectedLeagueDiv) {
             if (pointDeductions.length === 0 || !state.pointDeductionsEnabled) return tableArray;
-            
-            if (filteredMatches.length === 0) return tableArray;
-            
-            const matchDates = filteredMatches.map(match => match.dateObj);
-            const filterStartDate = new Date(Math.min(...matchDates));
-            const filterEndDate = new Date(Math.max(...matchDates));
-            
+
+            if (!dateRange) return tableArray;
+
+            const filterStartDate = new Date(dateRange.start);
+            const filterEndDate = new Date(dateRange.end);
+
             return tableArray.map(team => {
                 let adjustedPoints = team.points;
                 
@@ -7096,7 +7110,352 @@
         }
 
         // Calculate table (abbreviated - same logic as original)
+        // A specific season selected groups into per-competition-phase
+        // mini-tables (calculateGroupedTable(), unchanged, still sourced
+        // from the full in-memory gist dataset - deferred cutover, see
+        // backend/README.md's Next steps). Everything else (no season, or
+        // an era filter) is served from the standings API (no team
+        // selected) or the existing team-history/head-to-head caches (one
+        // or two teams selected) instead.
         function calculateTable() {
+            const isEraFilter = state.selectedSeason === 'all-european-cup-seasons-1955-2026' ||
+                               state.selectedSeason === 'european-cup-era-1955-1992' ||
+                               state.selectedSeason === 'champions-league-era-1992-2026';
+            const isSpecificSeason = state.selectedSeason && state.selectedSeason !== '' && !isEraFilter;
+            const shouldGroupByPhase = isSpecificSeason;
+
+            if (shouldGroupByPhase) {
+                return calculateGroupedTable();
+            }
+
+            const leagueMapping = {
+                'champions-league': 'C1',
+                'europa-league': 'E1',
+                'conference-league': 'C2'
+            };
+            const selectedDiv = leagueMapping[state.selectedLeague];
+
+            if (!state.selectedTeam1) {
+                // No team selected: the one League Table mode that needs
+                // every team's data at once, served from the standings API.
+                if (selectedDiv) {
+                    ensureStandingsLoaded(selectedDiv, {
+                        dateFrom: state.dateFrom,
+                        dateTo: state.dateTo,
+                        dayOfWeek: state.selectedDayOfWeek,
+                        threePointSystem: state.threePointSystem,
+                        homeFilter: state.homeFilter,
+                        awayFilter: state.awayFilter,
+                        excludeQualifiers: state.excludeQualifiers,
+                        excludeMainStage: state.excludeMainStage,
+                        competitionStage: state.competitionStage
+                    });
+                }
+
+                const cached = state.standingsApiCache;
+                const tableArray = (cached?.standings || []).map(team => ({
+                    ...team,
+                    goalDifference: team.goalsFor - team.goalsAgainst
+                }));
+                return finalizeTable(tableArray, cached?.matchDateRange || null, selectedDiv, cached?.matchCount || 0);
+            }
+
+            // One or two teams selected: naturally narrow, so reuse
+            // whichever of teamHistoryApiCache/h2hApiCache the sibling
+            // calculateMatchHistory()/calculateHeadToHead() calls are
+            // already keeping current for this exact selection (every
+            // call site that reaches this branch also calls one of those
+            // in the same tick, same as the Domestic cutover).
+            let filtered = state.selectedTeam2
+                ? [...(state.h2hApiCache || [])]
+                : [...(state.teamHistoryApiCache || [])];
+
+            const knockoutPhases = [
+                'Round Of 16', 'Round of 16', 'Quarter-Finals', 'Semi-Finals', 'Final',
+                'Play-Offs', '1. Round', '2. Round'
+            ];
+
+            // Apply the same global filters the flat standings API applies
+            // server-side for the no-team case, just client-side here
+            // since this data is already narrowly scoped to one team.
+            if (state.excludeQualifiers) {
+                filtered = filtered.filter(row => !row.isQualifier);
+            }
+            if (state.excludeMainStage) {
+                filtered = filtered.filter(row => row.isQualifier);
+            }
+            if (state.competitionStage && state.competitionStage !== '') {
+                if (state.competitionStage === 'group-stage') {
+                    filtered = filtered.filter(row => !knockoutPhases.includes(row.CompetitionPhase || ''));
+                } else if (state.competitionStage === 'knockout-stage') {
+                    filtered = filtered.filter(row => knockoutPhases.includes(row.CompetitionPhase || ''));
+                } else {
+                    filtered = filtered.filter(row => matchesStageCategory(row.CompetitionPhase, state.competitionStage));
+                }
+            }
+
+            if (state.dateFrom) {
+                filtered = filtered.filter(row => {
+                    const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
+                    return matchDateStr >= state.dateFrom;
+                });
+            }
+            if (state.dateTo) {
+                filtered = filtered.filter(row => {
+                    const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
+                    return matchDateStr <= state.dateTo;
+                });
+            }
+            if (state.selectedDayOfWeek !== '') {
+                filtered = filtered.filter(row => {
+                    const dayOfWeek = row.dateObj.getDay();
+                    return dayOfWeek.toString() === state.selectedDayOfWeek;
+                });
+            }
+
+            if (state.selectedTeam2) {
+                if (state.homeFilter && !state.awayFilter) {
+                    filtered = filtered.filter(row => row.HomeTeam === state.selectedTeam1);
+                } else if (state.awayFilter && !state.homeFilter) {
+                    filtered = filtered.filter(row => row.AwayTeam === state.selectedTeam1);
+                }
+                if (state.h2hStage !== '') {
+                    filtered = filtered.filter(row => matchesStageCategory(row.CompetitionPhase, state.h2hStage));
+                }
+                if (state.h2hPenaltyFilter) {
+                    filtered = filtered.filter(row =>
+                        row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('pso')
+                    );
+                }
+                if (state.recentH2HCount !== 'All') {
+                    filtered = filtered
+                        .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
+                        .slice(0, parseInt(state.recentH2HCount));
+                }
+            } else {
+                const stageFilter = state.h2hStage || state.matchHistoryStage;
+                if (stageFilter && stageFilter !== '') {
+                    filtered = filtered.filter(row => matchesStageCategory(row.CompetitionPhase, stageFilter));
+                }
+                if (state.matchHistoryPenaltyFilter) {
+                    filtered = filtered.filter(row =>
+                        row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('pso')
+                    );
+                }
+                if (state.recentMatchesCount !== 'All') {
+                    filtered = filtered
+                        .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
+                        .slice(0, parseInt(state.recentMatchesCount));
+                }
+            }
+
+            const teamsToShow = state.selectedTeam2
+                ? [state.selectedTeam1, state.selectedTeam2]
+                : [state.selectedTeam1];
+
+            const table = {};
+            teamsToShow.forEach(team => {
+                table[team] = {
+                    team: team,
+                    played: 0,
+                    won: 0,
+                    drawn: 0,
+                    lost: 0,
+                    goalsFor: 0,
+                    goalsAgainst: 0,
+                    goalDifference: 0,
+                    points: 0
+                };
+            });
+
+            filtered.forEach(match => {
+                const homeTeam = table[match.HomeTeam];
+                const awayTeam = table[match.AwayTeam];
+
+                const homeGoals = parseInt(match.FTHG) || 0;
+                const awayGoals = parseInt(match.FTAG) || 0;
+
+                let winPoints = 3;
+                if (!state.threePointSystem) {
+                    if (match.dateObj < new Date('1995-07-01')) {
+                        winPoints = 2;
+                    }
+                }
+
+                if (homeTeam && (state.homeFilter || (state.selectedTeam1 && state.selectedTeam2))) {
+                    homeTeam.played++;
+                    homeTeam.goalsFor += homeGoals;
+                    homeTeam.goalsAgainst += awayGoals;
+                    if (homeGoals > awayGoals) {
+                        homeTeam.won++;
+                        homeTeam.points += winPoints;
+                    } else if (homeGoals < awayGoals) {
+                        homeTeam.lost++;
+                    } else {
+                        homeTeam.drawn++;
+                        homeTeam.points += 1;
+                    }
+                }
+
+                if (awayTeam && (state.awayFilter || (state.selectedTeam1 && state.selectedTeam2))) {
+                    awayTeam.played++;
+                    awayTeam.goalsFor += awayGoals;
+                    awayTeam.goalsAgainst += homeGoals;
+                    if (awayGoals > homeGoals) {
+                        awayTeam.won++;
+                        awayTeam.points += winPoints;
+                    } else if (awayGoals < homeGoals) {
+                        awayTeam.lost++;
+                    } else {
+                        awayTeam.drawn++;
+                        awayTeam.points += 1;
+                    }
+                }
+            });
+
+            const tableArray = Object.values(table)
+                .filter(team => team.played > 0)
+                .map(team => ({
+                    ...team,
+                    goalDifference: team.goalsFor - team.goalsAgainst
+                }));
+
+            let dateRangeForDeductions = null;
+            if (filtered.length > 0) {
+                const matchDates = filtered.map(m => m.dateObj);
+                dateRangeForDeductions = { start: new Date(Math.min(...matchDates)), end: new Date(Math.max(...matchDates)) };
+            }
+
+            return finalizeTable(tableArray, dateRangeForDeductions, 'C1', filtered.length);
+        }
+
+        // Fetches (or reuses a cached) full-division standings from the
+        // standings API - the one League Table mode that legitimately
+        // needs every team's data at once. Same fire-and-forget pattern
+        // as the other ensure*Loaded() functions.
+        async function ensureStandingsLoaded(div, params) {
+            const cacheKey = [
+                div, params.dateFrom || '', params.dateTo || '', params.dayOfWeek || '',
+                params.threePointSystem, params.homeFilter, params.awayFilter,
+                params.excludeQualifiers, params.excludeMainStage, params.competitionStage || '',
+            ].join('::');
+            if (state.standingsApiCacheKey === cacheKey) return;
+            if (state.standingsApiLoading) return;
+
+            state.standingsApiLoading = true;
+            try {
+                const qs = new URLSearchParams({
+                    div,
+                    threePointSystem: String(params.threePointSystem),
+                    homeFilter: String(params.homeFilter),
+                    awayFilter: String(params.awayFilter),
+                    excludeQualifiers: String(params.excludeQualifiers),
+                    excludeMainStage: String(params.excludeMainStage),
+                });
+                if (params.dateFrom) qs.set('dateFrom', params.dateFrom);
+                if (params.dateTo) qs.set('dateTo', params.dateTo);
+                if (params.dayOfWeek) qs.set('dayOfWeek', params.dayOfWeek);
+                if (params.competitionStage) qs.set('competitionStage', params.competitionStage);
+
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/standings?${qs.toString()}`);
+                if (!res.ok) throw new Error(`Standings request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.standingsApiCache = data;
+                state.standingsApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load standings from API:', err);
+                state.standingsApiCacheKey = cacheKey;
+            } finally {
+                state.standingsApiLoading = false;
+            }
+
+            updateTable();
+        }
+
+        // Shared tail of calculateTable(): point deductions, sorting,
+        // historic-season ranking overrides, and position assignment.
+        function finalizeTable(tableArray, dateRangeForDeductions, selectedDiv, matchCount) {
+            tableArray = applyPointDeductions(tableArray, dateRangeForDeductions, selectedDiv);
+
+            let pointsSortedArray = [...tableArray].sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+                return b.goalsFor - a.goalsFor;
+            });
+
+            if (!state.sortConfig.key) {
+                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+            } else {
+                pointsSortedArray.sort((a, b) => {
+                    let aVal = a[state.sortConfig.key];
+                    let bVal = b[state.sortConfig.key];
+                    if (typeof aVal === 'string') {
+                        return state.sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    }
+                    return state.sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+            }
+
+            if (!state.sortConfig.key) {
+                const overridePositions = [];
+                const blockedPositions = new Set();
+
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        overridePositions.push(team.sharedPosition);
+                    }
+                });
+
+                const positionCounts = {};
+                overridePositions.forEach(pos => {
+                    positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+                });
+
+                Object.keys(positionCounts).forEach(pos => {
+                    const position = parseInt(pos);
+                    const count = positionCounts[pos];
+                    for (let i = 0; i < count; i++) {
+                        blockedPositions.add(position + i);
+                    }
+                });
+
+                let currentPosition = 1;
+                const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
+
+                regularTeams.forEach(team => {
+                    while (blockedPositions.has(currentPosition)) {
+                        currentPosition++;
+                    }
+                    team.originalPosition = currentPosition;
+                    currentPosition++;
+                });
+
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        team.originalPosition = team.sharedPosition;
+                    }
+                });
+
+                pointsSortedArray.sort((a, b) => {
+                    if (a.originalPosition !== b.originalPosition) {
+                        return a.originalPosition - b.originalPosition;
+                    }
+                    return 0;
+                });
+            } else {
+                pointsSortedArray.forEach((team, index) => {
+                    team.originalPosition = index + 1;
+                });
+            }
+
+            return { tableData: pointsSortedArray, matchCount };
+        }
+
+        // Specific season selected: groups into per-competition-phase
+        // mini-tables. Unchanged from before the API cutover - still
+        // sources from the full in-memory gist dataset (state.data).
+        function calculateGroupedTable() {
             // Use all Champions League data (no division filtering needed)
             let filtered = [...state.data];
 
@@ -7385,7 +7744,12 @@
             
             // For Champions League data, use 'C1' as the division identifier
             const selectedDiv = 'C1';
-            tableArray = applyPointDeductions(tableArray, filtered, selectedDiv);
+            let groupedDateRange = null;
+            if (filtered.length > 0) {
+                const matchDates = filtered.map(m => m.dateObj);
+                groupedDateRange = { start: new Date(Math.min(...matchDates)), end: new Date(Math.max(...matchDates)) };
+            }
+            tableArray = applyPointDeductions(tableArray, groupedDateRange, selectedDiv);
             
             // First, sort by points to establish the base ranking
             let pointsSortedArray = [...tableArray].sort((a, b) => {
