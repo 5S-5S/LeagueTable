@@ -2856,6 +2856,7 @@
                 state.teamStreaksApiCacheKey = cacheKey;
             } catch (err) {
                 console.error('Failed to load Team Streaks data from API:', err);
+                state.teamStreaksApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.teamStreaksApiLoading = false;
             }
@@ -6718,6 +6719,7 @@
                 state.lastTimeApiCacheKey = cacheKey;
             } catch (err) {
                 console.error('Failed to load Last Time When data from API:', err);
+                state.lastTimeApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.lastTimeApiLoading = false;
             }
@@ -7800,6 +7802,7 @@
                 state.h2hApiCacheKey = cacheKey;
             } catch (err) {
                 console.error('Failed to load head-to-head from API:', err);
+                state.h2hApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.h2hApiLoading = false;
             }
@@ -7993,6 +7996,7 @@
                 // Leave the cache as-is rather than throwing - Match
                 // History just shows no matches instead of breaking the
                 // rest of the page.
+                state.teamHistoryApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.teamHistoryApiLoading = false;
             }
