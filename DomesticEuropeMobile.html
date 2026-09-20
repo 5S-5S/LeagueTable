@@ -896,6 +896,15 @@
             h2hApiCacheKey: null,
             h2hApiLoading: false,
 
+            // Team Streaks and The Last Time When... each have their own
+            // team selection independent of League Filters, so they get
+            // their own cache slots - sharing h2hApiCache/teamHistoryApiCache
+            // would thrash (and briefly show the wrong team's data) whenever
+            // a different team is selected on a different tab.
+            teamStreaksApiCache: null,
+            teamStreaksApiCacheKey: null,
+            teamStreaksApiLoading: false,
+
             // Team Dashboard state (locked team via ?league=&team= URL params,
             // or picked from the in-page search). dashboardLockedTeam is the
             // stable identity - it survives tab switches, unlike
@@ -2515,9 +2524,54 @@
         }
         
         // Calculate active streaks (original logic)
-        function calculateActiveStreaks(team1, team2, location, streakType) {
+        // Fetches (or reuses a cached) match list for Team Streaks - team1
+        // alone (all opponents, via team-history) or team1 vs a specific
+        // opponent/group (via head-to-head). Own cache slot, separate from
+        // League Filters' - this tab can have a different team selected at
+        // the same time. Same fire-and-forget pattern as
+        // ensureTeamHistoryLoaded()/ensureHeadToHeadLoaded(), except it
+        // re-renders via calculateTeamStreaks() (which re-reads the
+        // current dropdown values itself) rather than updateTable().
+        async function ensureTeamStreaksDataLoaded(team1, opponents, div) {
+            const cacheKey = opponents
+                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
+                : `${div}::${team1}::__all__`;
+            if (state.teamStreaksApiCacheKey === cacheKey) return;
+            if (state.teamStreaksApiLoading) return;
 
-            // Get league mapping
+            state.teamStreaksApiLoading = true;
+            try {
+                const url = opponents
+                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
+                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Team Streaks data request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.teamStreaksApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.teamStreaksApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load Team Streaks data from API:', err);
+            } finally {
+                state.teamStreaksApiLoading = false;
+            }
+
+            calculateTeamStreaks();
+        }
+
+        // Resolves Team Streaks' team2 dropdown value (a real team, or
+        // 'BIG_6') into the div + concrete opponent list the API needs,
+        // and kicks off ensureTeamStreaksDataLoaded() if needed. Shared by
+        // calculateActiveStreaks() and calculateHistoricStreaks() since
+        // both want the exact same underlying match set.
+        function loadTeamStreaksData(team1, team2) {
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1',
@@ -2525,31 +2579,19 @@
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
+            const div = leagueMapping[state.selectedLeague];
+            const opponents = team2
+                ? ((team2 === 'BIG_6' && state.teamStreaksBig6Opponents) ? state.teamStreaksBig6Opponents : [team2])
+                : null;
 
-            // Filter matches by league
-            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-
-            // Filter by teams
-            if (team2) {
-                if (team2 === 'BIG_6' && state.teamStreaksBig6Opponents) {
-                    // Big 6 mode: filter for matches where Team 1 played against any Big 6 opponent
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && state.teamStreaksBig6Opponents.includes(row.AwayTeam)) ||
-                        (row.AwayTeam === team1 && state.teamStreaksBig6Opponents.includes(row.HomeTeam))
-                    );
-                } else {
-                    // Regular head-to-head matches only
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                        (row.HomeTeam === team2 && row.AwayTeam === team1)
-                    );
-                }
-            } else {
-                // One team selected - matches against all opponents
-                matches = matches.filter(row => 
-                    row.HomeTeam === team1 || row.AwayTeam === team1
-                );
+            if (div) {
+                ensureTeamStreaksDataLoaded(team1, opponents, div);
             }
+            return [...(state.teamStreaksApiCache || [])];
+        }
+
+        function calculateActiveStreaks(team1, team2, location, streakType) {
+            let matches = loadTeamStreaksData(team1, team2);
 
             // Filter by location
             if (location === 'home') {
@@ -2564,64 +2606,21 @@
 
             // Calculate streak based on type
             const streak = calculateStreak(matches, team1, streakType);
-            
+
             // Display results
             displayStreakResults(streak, team1, team2, streakType, location);
         }
-        
+
         // Calculate historic streaks - find all streaks of 3+ games throughout history
         function calculateHistoricStreaks(team1, team2, location, streakType) {
-            // Check if data is loaded
-            if (!state.data || state.data.length === 0) {
-                elements.teamStreaksResults.innerHTML = `
-                    <div class="text-center py-8">
-                        <p class="text-gray-600">Loading data...</p>
-                    </div>
-                `;
-                elements.teamStreaksResults.classList.remove('hidden');
-                return;
-            }
-            
             // Reset sort config when parameters change (except when called from sort handler)
             const currentParams = `${team1}-${team2}-${location}-${streakType}`;
             if (!state.lastHistoricStreaksParams || state.lastHistoricStreaksParams !== currentParams) {
                 state.historicStreaksSortConfig = { key: null, direction: null };
                 state.lastHistoricStreaksParams = currentParams;
             }
-            
-            // Get league mapping
-            const leagueMapping = {
-                'premier-league': 'E0',
-                'la-liga': 'SP1',
-                'serie-a': 'I1',
-                'bundesliga': 'D1',
-                'ligue-1': 'F1'
-            };
 
-            // Filter matches by league
-            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-            
-            // Filter by teams
-            if (team2) {
-                if (team2 === 'BIG_6' && state.teamStreaksBig6Opponents) {
-                    // Big 6 mode: filter for matches where Team 1 played against any Big 6 opponent
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && state.teamStreaksBig6Opponents.includes(row.AwayTeam)) ||
-                        (row.AwayTeam === team1 && state.teamStreaksBig6Opponents.includes(row.HomeTeam))
-                    );
-                } else {
-                    // Regular head-to-head matches only
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                        (row.HomeTeam === team2 && row.AwayTeam === team1)
-                    );
-                }
-            } else {
-                // One team selected - matches against all opponents
-                matches = matches.filter(row => 
-                    row.HomeTeam === team1 || row.AwayTeam === team1
-                );
-            }
+            let matches = loadTeamStreaksData(team1, team2);
 
             // Filter by location
             if (location === 'home') {
@@ -2635,10 +2634,10 @@
 
             // Find all historic streaks
             const allStreaks = findAllHistoricStreaks(matches, team1, streakType);
-            
+
             // Filter streaks to only include those with 3+ games
             const significantStreaks = allStreaks.filter(streak => streak.count >= 3);
-            
+
             // Display results
             displayHistoricStreaksResults(significantStreaks, team1, team2, streakType, location);
         }
