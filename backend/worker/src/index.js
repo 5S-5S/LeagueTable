@@ -15,7 +15,7 @@
 //   -> { team1, team2: [...], div, matches: [...] }
 //
 // GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=
-//   -> { div, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
+//   -> { div, matchCount, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
 //   Domestic only for now - Continental's table has season-specific
 //   competition-phase grouping the frontend still computes itself. Points
 //   are raw/undeducted - point deductions stay a client-side correction
@@ -208,7 +208,7 @@ async function handleStandings(url, env) {
 
     const { matchDateRange, standings } = aggregateStandings(matches, { threePointSystem, homeFilter, awayFilter });
 
-    return jsonResponse({ div, matchDateRange, standings });
+    return jsonResponse({ div, matchCount: matches.length, matchDateRange, standings });
 }
 
 export default {

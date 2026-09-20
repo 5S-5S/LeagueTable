@@ -962,6 +962,15 @@
             lastTimeApiCacheKey: null,
             lastTimeApiLoading: false,
 
+            // League Table (no team selected) comes from the standings API
+            // - it's the one view that legitimately needs many teams' data
+            // at once, so unlike Match History/Head-to-Head/etc. this
+            // can't just be "one team's data, narrowly scoped". Cache
+            // keyed by every param that changes the aggregation.
+            standingsApiCache: null,
+            standingsApiCacheKey: null,
+            standingsApiLoading: false,
+
             // Team Dashboard state (locked team via ?league=&team= URL params,
             // or picked from the in-page search). dashboardLockedTeam is the
             // stable identity - it survives tab switches, unlike
@@ -2615,6 +2624,7 @@
                 state.teamStreaksApiCacheKey = cacheKey;
             } catch (err) {
                 console.error('Failed to load Team Streaks data from API:', err);
+                state.teamStreaksApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.teamStreaksApiLoading = false;
             }
@@ -6409,6 +6419,7 @@
                 state.lastTimeApiCacheKey = cacheKey;
             } catch (err) {
                 console.error('Failed to load Last Time When data from API:', err);
+                state.lastTimeApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.lastTimeApiLoading = false;
             }
@@ -6790,15 +6801,20 @@
         }
 
         // Apply point deductions
-        function applyPointDeductions(tableArray, filteredMatches, selectedLeagueDiv) {
+        // dateRange is {start, end} (Date objects or ISO strings both work,
+        // both sides just need to be comparable via `new Date(...)`) -
+        // either derived from a raw matches array (team-scoped table
+        // modes, still computed client-side) or straight from the
+        // standings API's matchDateRange (full-table mode, where no raw
+        // matches are available client-side by design).
+        function applyPointDeductions(tableArray, dateRange, selectedLeagueDiv) {
             if (pointDeductions.length === 0 || !state.pointDeductionsEnabled) return tableArray;
-            
-            if (filteredMatches.length === 0) return tableArray;
-            
-            const matchDates = filteredMatches.map(match => match.dateObj);
-            const filterStartDate = new Date(Math.min(...matchDates));
-            const filterEndDate = new Date(Math.max(...matchDates));
-            
+
+            if (!dateRange) return tableArray;
+
+            const filterStartDate = new Date(dateRange.start);
+            const filterEndDate = new Date(dateRange.end);
+
             return tableArray.map(team => {
                 let adjustedPoints = team.points;
                 
@@ -6824,9 +6840,153 @@
         }
 
         // Calculate table (abbreviated - same logic as original)
+        // Fetches (or reuses a cached) full-division standings from the
+        // standings API - the one League Table mode that legitimately
+        // needs every team's data at once (unlike a single team or a
+        // head-to-head pair, there's no way to scope this down further).
+        // Same fire-and-forget pattern as the other ensure*Loaded()
+        // functions: kicks off a fetch if the cache is missing/stale,
+        // then calls updateTable() again once it resolves.
+        async function ensureStandingsLoaded(div, params) {
+            const cacheKey = [
+                div, params.dateFrom || '', params.dateTo || '', params.dayOfWeek || '',
+                params.threePointSystem, params.homeFilter, params.awayFilter,
+            ].join('::');
+            if (state.standingsApiCacheKey === cacheKey) return;
+            if (state.standingsApiLoading) return;
+
+            state.standingsApiLoading = true;
+            try {
+                const qs = new URLSearchParams({
+                    div,
+                    threePointSystem: String(params.threePointSystem),
+                    homeFilter: String(params.homeFilter),
+                    awayFilter: String(params.awayFilter),
+                });
+                if (params.dateFrom) qs.set('dateFrom', params.dateFrom);
+                if (params.dateTo) qs.set('dateTo', params.dateTo);
+                if (params.dayOfWeek) qs.set('dayOfWeek', params.dayOfWeek);
+
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/standings?${qs.toString()}`);
+                if (!res.ok) throw new Error(`Standings request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.standingsApiCache = data;
+                state.standingsApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load standings from API:', err);
+                state.standingsApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.standingsApiLoading = false;
+            }
+
+            updateTable();
+        }
+
+        // Shared tail of calculateTable(): point deductions, sorting,
+        // historic-season ranking overrides, and position assignment.
+        // Identical regardless of whether tableArray came from the
+        // standings API (no team selected) or was aggregated client-side
+        // from a team-scoped cache (one or two teams selected).
+        function finalizeTable(tableArray, dateRangeForDeductions, selectedDiv, matchCount) {
+            tableArray = applyPointDeductions(tableArray, dateRangeForDeductions, selectedDiv);
+
+            // First, sort by points to establish the base ranking
+            let pointsSortedArray = [...tableArray].sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+                return b.goalsFor - a.goalsFor;
+            });
+
+            // Apply ranking overrides for historic seasons to the points-sorted array
+            if (!state.sortConfig.key) {
+                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+            } else {
+                // Apply custom sorting if requested - work with pointsSortedArray to preserve position logic
+                pointsSortedArray.sort((a, b) => {
+                    let aVal = a[state.sortConfig.key];
+                    let bVal = b[state.sortConfig.key];
+
+                    if (typeof aVal === 'string') {
+                        return state.sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    }
+
+                    return state.sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+            }
+
+            // Only apply position assignment logic when not using custom sorting
+            if (!state.sortConfig.key) {
+                // Add original position based on the final points/override ranking
+                // Calculate positions properly handling ties and gaps
+
+                // Step 1: Find all override positions and calculate blocked positions
+                const overridePositions = [];
+                const blockedPositions = new Set();
+
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        overridePositions.push(team.sharedPosition);
+                    }
+                });
+
+                // Group override positions and calculate blocked ranges
+                const positionCounts = {};
+                overridePositions.forEach(pos => {
+                    positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+                });
+
+                // Block positions based on ties (e.g., two 4s block positions 4 and 5)
+                Object.keys(positionCounts).forEach(pos => {
+                    const position = parseInt(pos);
+                    const count = positionCounts[pos];
+
+                    // Block 'count' positions starting from 'position'
+                    for (let i = 0; i < count; i++) {
+                        blockedPositions.add(position + i);
+                    }
+                });
+
+                // Step 2: Assign positions to regular teams (skip blocked positions)
+                let currentPosition = 1;
+                const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
+
+                regularTeams.forEach(team => {
+                    // Find next available position (skip blocked ones)
+                    while (blockedPositions.has(currentPosition)) {
+                        currentPosition++;
+                    }
+
+                    team.originalPosition = currentPosition;
+                    currentPosition++;
+                });
+
+                // Step 3: Set override positions
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        team.originalPosition = team.sharedPosition;
+                    }
+                });
+
+                // Step 4: Sort teams by their final position for proper display order
+                pointsSortedArray.sort((a, b) => {
+                    if (a.originalPosition !== b.originalPosition) {
+                        return a.originalPosition - b.originalPosition;
+                    }
+                    // If positions are equal, maintain original order (sub-order for tied teams)
+                    return 0;
+                });
+            } else {
+                // For custom sorting, just assign sequential positions based on current order
+                pointsSortedArray.forEach((team, index) => {
+                    team.originalPosition = index + 1;
+                });
+            }
+
+            return { tableData: pointsSortedArray, matchCount };
+        }
+
         function calculateTable() {
-            let filtered = [...state.data];
-            
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1',
@@ -6834,10 +6994,42 @@
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
-            
             const selectedDiv = leagueMapping[state.selectedLeague];
-            filtered = filtered.filter(row => row.Div === selectedDiv);
-            
+
+            // No team selected: the one League Table mode that needs every
+            // team's data at once, served from the standings API instead
+            // of scanning the full in-memory gist dataset.
+            if (!state.selectedTeam1) {
+                if (selectedDiv) {
+                    ensureStandingsLoaded(selectedDiv, {
+                        dateFrom: state.dateFrom,
+                        dateTo: state.dateTo,
+                        dayOfWeek: state.selectedDayOfWeek,
+                        threePointSystem: state.threePointSystem,
+                        homeFilter: state.homeFilter,
+                        awayFilter: state.awayFilter
+                    });
+                }
+
+                const cached = state.standingsApiCache;
+                const tableArray = (cached?.standings || []).map(team => ({
+                    ...team,
+                    goalDifference: team.goalsFor - team.goalsAgainst
+                }));
+                return finalizeTable(tableArray, cached?.matchDateRange || null, selectedDiv, cached?.matchCount || 0);
+            }
+
+            // One or two teams selected: naturally narrow, so reuse
+            // whichever of teamHistoryApiCache/h2hApiCache the sibling
+            // calculateMatchHistory()/calculateHeadToHead() calls are
+            // already keeping current for this exact selection (every
+            // call site that reaches this branch also calls one of those
+            // in the same tick - see updateTable() and the match-history
+            // filter event handlers - so no separate fetch is needed here).
+            let filtered = state.selectedTeam2
+                ? [...(state.h2hApiCache || [])]
+                : [...(state.teamHistoryApiCache || [])];
+
             // Date filters
             if (state.dateFrom) {
                 filtered = filtered.filter(row => {
@@ -6845,14 +7037,14 @@
                     return matchDateStr >= state.dateFrom;
                 });
             }
-            
+
             if (state.dateTo) {
                 filtered = filtered.filter(row => {
                     const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
                     return matchDateStr <= state.dateTo;
                 });
             }
-            
+
             // Day of week filter
             if (state.selectedDayOfWeek !== '') {
                 filtered = filtered.filter(row => {
@@ -6860,23 +7052,11 @@
                     return dayOfWeek.toString() === state.selectedDayOfWeek;
                 });
             }
-            
-            if (state.selectedTeam1 && state.selectedTeam2) {
-                // Handle Big 6 selection
-                if (state.selectedTeam2 === 'BIG_6' && state.big6Opponents) {
-                    // Filter for matches where Team 1 played against any Big 6 opponent
-                    filtered = filtered.filter(row =>
-                        (row.HomeTeam === state.selectedTeam1 && state.big6Opponents.includes(row.AwayTeam)) ||
-                        (row.AwayTeam === state.selectedTeam1 && state.big6Opponents.includes(row.HomeTeam))
-                    );
-                } else {
-                    // Regular H2H matches
-                    filtered = filtered.filter(row =>
-                        (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
-                        (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
-                    );
-                }
-                
+
+            if (state.selectedTeam2) {
+                // Already scoped to team1 vs team2/Big 6 by the API - no
+                // opponent re-filtering needed here.
+
                 // Apply home/away filtering based on state (same logic as calculateHeadToHead)
                 if (state.homeFilter && !state.awayFilter) {
                     // Show only matches where Team 1 is home
@@ -6886,7 +7066,7 @@
                     filtered = filtered.filter(row => row.AwayTeam === state.selectedTeam1);
                 }
                 // If both are checked or both unchecked, show all H2H matches
-                
+
                 // Apply recent H2H filter if specified
                 if (state.recentH2HCount !== 'All') {
                     // Sort by date (most recent first) and take the specified number
@@ -6894,9 +7074,9 @@
                         .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
                         .slice(0, parseInt(state.recentH2HCount));
                 }
-            } else if (state.selectedTeam1) {
-                // Single team selected - apply match history filters
-                filtered = filtered.filter(row => row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1);
+            } else {
+                // Already scoped to this team by the API - no team
+                // re-filtering needed here.
 
                 // Apply match history home/away filtering
                 if (!state.matchHistoryHomeFilter) {
@@ -6916,20 +7096,12 @@
                         .slice(0, parseInt(state.recentMatchesCount));
                 }
             }
-            
+
             // Determine teams to show
-            let teamsToShow;
-            if (state.selectedTeam1 && state.selectedTeam2) {
-                teamsToShow = [state.selectedTeam1, state.selectedTeam2];
-            } else if (state.selectedTeam1) {
-                teamsToShow = [state.selectedTeam1];
-            } else {
-                teamsToShow = [...new Set([
-                    ...filtered.map(row => row.HomeTeam),
-                    ...filtered.map(row => row.AwayTeam)
-                ])];
-            }
-            
+            const teamsToShow = state.selectedTeam2
+                ? [state.selectedTeam1, state.selectedTeam2]
+                : [state.selectedTeam1];
+
             const table = {};
             teamsToShow.forEach(team => {
                 table[team] = {
@@ -6944,18 +7116,18 @@
                     points: 0
                 };
             });
-            
+
             // Process matches with historical point systems
             filtered.forEach(match => {
                 const homeTeam = table[match.HomeTeam];
                 const awayTeam = table[match.AwayTeam];
-                
+
                 const homeGoals = parseInt(match.FTHG) || 0;
                 const awayGoals = parseInt(match.FTAG) || 0;
-                
+
                 // Determine points system based on league and date
                 let winPoints = 3;
-                
+
                 // If 3-point system is enabled, always use 3 points for wins
                 if (state.threePointSystem) {
                     winPoints = 3;
@@ -6978,13 +7150,13 @@
                         winPoints = 2;
                     }
                 }
-                
+
                 // Home team stats
                 if (homeTeam && (state.homeFilter || (state.selectedTeam1 && state.selectedTeam2))) {
                     homeTeam.played++;
                     homeTeam.goalsFor += homeGoals;
                     homeTeam.goalsAgainst += awayGoals;
-                    
+
                     if (homeGoals > awayGoals) {
                         homeTeam.won++;
                         homeTeam.points += winPoints;
@@ -6995,13 +7167,13 @@
                         homeTeam.points += 1;
                     }
                 }
-                
+
                 // Away team stats
                 if (awayTeam && (state.awayFilter || (state.selectedTeam1 && state.selectedTeam2))) {
                     awayTeam.played++;
                     awayTeam.goalsFor += awayGoals;
                     awayTeam.goalsAgainst += homeGoals;
-                    
+
                     if (awayGoals > homeGoals) {
                         awayTeam.won++;
                         awayTeam.points += winPoints;
@@ -7013,112 +7185,21 @@
                     }
                 }
             });
-            
-            let tableArray = Object.values(table)
+
+            const tableArray = Object.values(table)
                 .filter(team => team.played > 0)
                 .map(team => ({
                     ...team,
                     goalDifference: team.goalsFor - team.goalsAgainst
                 }));
-            
-            tableArray = applyPointDeductions(tableArray, filtered, selectedDiv);
-            
-            // First, sort by points to establish the base ranking
-            let pointsSortedArray = [...tableArray].sort((a, b) => {
-                if (b.points !== a.points) return b.points - a.points;
-                if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
-                return b.goalsFor - a.goalsFor;
-            });
-            
-            // Apply ranking overrides for historic seasons to the points-sorted array
-            if (!state.sortConfig.key) {
-                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
-            } else {
-                // Apply custom sorting if requested - work with pointsSortedArray to preserve position logic
-                pointsSortedArray.sort((a, b) => {
-                    let aVal = a[state.sortConfig.key];
-                    let bVal = b[state.sortConfig.key];
-                    
-                    if (typeof aVal === 'string') {
-                        return state.sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                    }
-                    
-                    return state.sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
-                });
+
+            let dateRangeForDeductions = null;
+            if (filtered.length > 0) {
+                const matchDates = filtered.map(m => m.dateObj);
+                dateRangeForDeductions = { start: new Date(Math.min(...matchDates)), end: new Date(Math.max(...matchDates)) };
             }
-            
-            // Only apply position assignment logic when not using custom sorting
-            if (!state.sortConfig.key) {
-                // Add original position based on the final points/override ranking
-                // Calculate positions properly handling ties and gaps
-                
-                // Step 1: Find all override positions and calculate blocked positions
-                const overridePositions = [];
-                const blockedPositions = new Set();
-                
-                pointsSortedArray.forEach(team => {
-                    if (team.sharedPosition) {
-                        overridePositions.push(team.sharedPosition);
-                    }
-                });
-                
-                // Group override positions and calculate blocked ranges
-                const positionCounts = {};
-                overridePositions.forEach(pos => {
-                    positionCounts[pos] = (positionCounts[pos] || 0) + 1;
-                });
-                
-                // Block positions based on ties (e.g., two 4s block positions 4 and 5)
-                Object.keys(positionCounts).forEach(pos => {
-                    const position = parseInt(pos);
-                    const count = positionCounts[pos];
-                    
-                    // Block 'count' positions starting from 'position'
-                    for (let i = 0; i < count; i++) {
-                        blockedPositions.add(position + i);
-                    }
-                });
-                
-                // Step 2: Assign positions to regular teams (skip blocked positions)
-                let currentPosition = 1;
-                const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
-                
-                regularTeams.forEach(team => {
-                    // Find next available position (skip blocked ones)
-                    while (blockedPositions.has(currentPosition)) {
-                        currentPosition++;
-                    }
-                    
-                    team.originalPosition = currentPosition;
-                    currentPosition++;
-                });
-                
-                // Step 3: Set override positions
-                pointsSortedArray.forEach(team => {
-                    if (team.sharedPosition) {
-                        team.originalPosition = team.sharedPosition;
-                    }
-                });
-                
-                // Step 4: Sort teams by their final position for proper display order
-                pointsSortedArray.sort((a, b) => {
-                    if (a.originalPosition !== b.originalPosition) {
-                        return a.originalPosition - b.originalPosition;
-                    }
-                    // If positions are equal, maintain original order (sub-order for tied teams)
-                    return 0;
-                });
-            } else {
-                // For custom sorting, just assign sequential positions based on current order
-                pointsSortedArray.forEach((team, index) => {
-                    team.originalPosition = index + 1;
-                });
-            }
-            
-            // Use the properly sorted array for display
-            tableArray = pointsSortedArray;
-            
-            return { tableData: tableArray, matchCount: filtered.length };
+
+            return finalizeTable(tableArray, dateRangeForDeductions, selectedDiv, filtered.length);
         }
 
         // Calculate head-to-head stats (abbreviated - same logic as original)
@@ -7150,6 +7231,7 @@
                 state.h2hApiCacheKey = cacheKey;
             } catch (err) {
                 console.error('Failed to load head-to-head from API:', err);
+                state.h2hApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.h2hApiLoading = false;
             }
@@ -7946,6 +8028,7 @@
                 // Leave the cache as-is rather than throwing - Match
                 // History just shows no matches instead of breaking the
                 // rest of the page.
+                state.teamHistoryApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.teamHistoryApiLoading = false;
             }
