@@ -17,9 +17,9 @@ function toInsertStatements(matches, batchSize = 300) {
     const statements = [];
     for (let i = 0; i < matches.length; i += batchSize) {
         const batch = matches.slice(i, i + batchSize);
-        const values = batch.map(m => `(${sqlEscape(m.div)}, ${sqlEscape(m.date)}, ${sqlEscape(m.homeTeam)}, ${sqlEscape(m.awayTeam)}, ${m.homeGoals}, ${m.awayGoals}, ${sqlEscape(m.competitionPhase)}, ${m.isQualifier ? 1 : 0})`);
+        const values = batch.map(m => `(${sqlEscape(m.div)}, ${sqlEscape(m.date)}, ${sqlEscape(m.homeTeam)}, ${sqlEscape(m.awayTeam)}, ${m.homeGoals}, ${m.awayGoals}, ${sqlEscape(m.competitionPhase)}, ${m.isQualifier ? 1 : 0}, ${sqlEscape(m.additionalInfo)})`);
         statements.push(
-            `INSERT INTO matches (div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier) VALUES\n${values.join(',\n')};`
+            `INSERT INTO matches (div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info) VALUES\n${values.join(',\n')};`
         );
     }
     return statements;

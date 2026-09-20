@@ -59,11 +59,11 @@ async function getTotalRowCount() {
 }
 
 function toInsertOrIgnore(batch) {
-    const placeholders = batch.map(() => '(?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
+    const placeholders = batch.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, ?)').join(', ');
     const params = batch.flatMap(m => [
-        m.div, m.date, m.homeTeam, m.awayTeam, m.homeGoals, m.awayGoals, m.competitionPhase, m.isQualifier ? 1 : 0,
+        m.div, m.date, m.homeTeam, m.awayTeam, m.homeGoals, m.awayGoals, m.competitionPhase, m.isQualifier ? 1 : 0, m.additionalInfo,
     ]);
-    const sql = `INSERT OR IGNORE INTO matches (div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier) VALUES ${placeholders}`;
+    const sql = `INSERT OR IGNORE INTO matches (div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info) VALUES ${placeholders}`;
     return { sql, params };
 }
 
@@ -97,9 +97,9 @@ async function main() {
     // new rows landed" figure comes from a before/after COUNT instead.
     const countBefore = await getTotalRowCount();
 
-    // D1 caps bound parameters at 100 per query; 8 columns per row means
-    // at most 12 rows per batch (12 * 8 = 96).
-    const batchSize = 12;
+    // D1 caps bound parameters at 100 per query; 9 columns per row means
+    // at most 11 rows per batch (11 * 9 = 99).
+    const batchSize = 11;
     for (let i = 0; i < candidates.length; i += batchSize) {
         const batch = candidates.slice(i, i + batchSize);
         const { sql, params } = toInsertOrIgnore(batch);

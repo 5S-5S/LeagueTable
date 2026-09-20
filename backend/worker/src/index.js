@@ -5,7 +5,7 @@
 // gist-based path in the frontend until each has its own endpoint here.
 //
 // GET /api/team-history?div=E0&team=Arsenal%20FC
-//   -> { team, div, matches: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase, isQualifier }, ...] }
+//   -> { team, div, matches: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase, isQualifier, additionalInfo }, ...] }
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -28,7 +28,7 @@ async function handleTeamHistory(url, env) {
     }
 
     const { results } = await env.DB.prepare(
-        `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier
+        `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
          FROM matches
          WHERE div = ?1 AND (home_team = ?2 OR away_team = ?2)
          ORDER BY date ASC`
@@ -42,6 +42,7 @@ async function handleTeamHistory(url, env) {
         awayGoals: row.away_goals,
         competitionPhase: row.competition_phase,
         isQualifier: !!row.is_qualifier,
+        additionalInfo: row.additional_info,
     }));
 
     return jsonResponse({ team, div, matches });

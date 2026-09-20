@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS matches (
     home_goals INTEGER NOT NULL,
     away_goals INTEGER NOT NULL,
     competition_phase TEXT,          -- Continental only (e.g. 'Group Stage', 'Final'); NULL for Domestic
-    is_qualifier INTEGER NOT NULL DEFAULT 0  -- Continental only; 0/1
+    is_qualifier INTEGER NOT NULL DEFAULT 0,  -- Continental only; 0/1
+    additional_info TEXT              -- Continental only (e.g. 'pso 4:3' for penalty shootouts); NULL otherwise
 );
 
 -- The query patterns we need to serve fast:
