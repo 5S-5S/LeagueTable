@@ -1021,6 +1021,12 @@
             teamHistoryApiCacheKey: null,
             teamHistoryApiLoading: false,
 
+            // Head-to-Head's data now comes from the head-to-head API
+            // the same way. Cache keyed by "div::team1::sortedOpponents".
+            h2hApiCache: null,
+            h2hApiCacheKey: null,
+            h2hApiLoading: false,
+
             h2hPenaltyFilter: false,
             
             // H2H sort config
@@ -7628,22 +7634,84 @@
         }
 
         // Calculate head-to-head stats (abbreviated - same logic as original)
+        // Fetches (or reuses a cached) head-to-head match list for one
+        // team vs one or more opponents (a single team, or a country
+        // grouping already resolved to concrete team names by the caller).
+        // Same fire-and-forget pattern as ensureTeamHistoryLoaded(): kicks
+        // off a fetch if the cache is missing/stale, then calls
+        // updateTable() again once it resolves.
+        async function ensureHeadToHeadLoaded(team1, opponents, div) {
+            const cacheKey = `${div}::${team1}::${[...opponents].sort().join(',')}`;
+            if (state.h2hApiCacheKey === cacheKey) return;
+            if (state.h2hApiLoading) return;
+
+            state.h2hApiLoading = true;
+            try {
+                const url = `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Head-to-head request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.h2hApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals,
+                    CompetitionPhase: m.competitionPhase,
+                    isQualifier: m.isQualifier,
+                    AdditionalInfo: m.additionalInfo
+                }));
+                state.h2hApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load head-to-head from API:', err);
+            } finally {
+                state.h2hApiLoading = false;
+            }
+
+            if (state.selectedTeam1 === team1) {
+                updateTable();
+            }
+        }
+
         function calculateHeadToHead() {
             if (!state.selectedTeam1 || !state.selectedTeam2) return null;
-            
-            // Use all Champions League data (no division filtering needed)
-            let filtered = [...state.data];
-            
+
+            const leagueMapping = {
+                'champions-league': 'C1',
+                'europa-league': 'E1',
+                'conference-league': 'C2'
+            };
+            const div = leagueMapping[state.selectedLeague];
+
+            const opponents = isCountryOpponentValue(state.selectedTeam2)
+                ? getCountryOpponents(countryFromOpponentValue(state.selectedTeam2), state.selectedTeam1)
+                : [state.selectedTeam2];
+
+            // Served from the head-to-head API instead of the full
+            // in-memory gist dataset - kicks off a fetch if this
+            // team/opponent combination isn't already cached;
+            // updateTable() re-runs once it lands.
+            if (div && opponents.length > 0) {
+                ensureHeadToHeadLoaded(state.selectedTeam1, opponents, div);
+            }
+
+            // Already scoped to team1 vs these opponents by the API, so no
+            // more opponent filtering needed here - just the user's other
+            // active filters.
+            let filtered = [...(state.h2hApiCache || [])];
+
             // Apply qualifier exclusion filter if enabled
             if (state.excludeQualifiers) {
                 filtered = filtered.filter(row => !row.isQualifier);
             }
-            
+
             // Apply main stage exclusion filter if enabled
             if (state.excludeMainStage) {
                 filtered = filtered.filter(row => row.isQualifier);
             }
-            
+
             // Apply date filters
             if (state.dateFrom) {
                 filtered = filtered.filter(row => {
@@ -7651,14 +7719,14 @@
                     return matchDateStr >= state.dateFrom;
                 });
             }
-            
+
             if (state.dateTo) {
                 filtered = filtered.filter(row => {
                     const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
                     return matchDateStr <= state.dateTo;
                 });
             }
-            
+
             // Day of week filter
             if (state.selectedDayOfWeek !== '') {
                 filtered = filtered.filter(row => {
@@ -7666,7 +7734,7 @@
                     return dayOfWeek.toString() === state.selectedDayOfWeek;
                 });
             }
-            
+
             // Apply stage filter if selected
             if (state.h2hStage !== '') {
                 filtered = filtered.filter(row => {
@@ -7682,10 +7750,8 @@
                 );
             }
 
-            // Filter for head-to-head matches
-            let h2hMatches = filterMatchesByOpponent(filtered, state.selectedTeam1, state.selectedTeam2)
-                .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
-            
+            let h2hMatches = filtered.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+
             // Apply home/away filtering first (same logic as in updateH2HMatchesTable)
             if (state.homeFilter && !state.awayFilter) {
                 // Only include matches where Team 1 is home
