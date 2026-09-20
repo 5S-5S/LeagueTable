@@ -8,6 +8,7 @@
 // Usage: npm install && node verify-head-to-head.mjs
 
 import { collectAllMatches } from './lib.mjs';
+import { fetchApiJson, QuotaExceededError } from './api-client.mjs';
 
 const API_BASE = 'https://leaguetable-api.league-table-api.workers.dev';
 const DIVS_TO_CHECK = ['E0', 'SP1', 'I1', 'D1', 'F1', 'C1'];
@@ -31,38 +32,38 @@ function expectedH2H(all, div, team1, opponents) {
 
 async function fetchApiH2H(div, team1, opponents) {
     const url = `${API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const data = await fetchApiJson(url);
     return data.matches;
 }
 
-function checkPair(all, div, team1, opponents, mismatches, label) {
-    return (async () => {
-        const expected = expectedH2H(all, div, team1, opponents);
-        const expectedKeys = new Set(expected.map(matchKey));
+// Throws QuotaExceededError up to the caller (rather than swallowing it
+// into `mismatches` like other failures) so main()'s loop can stop
+// entirely instead of burning through the rest of the sample set.
+async function checkPair(all, div, team1, opponents, mismatches, label) {
+    const expected = expectedH2H(all, div, team1, opponents);
+    const expectedKeys = new Set(expected.map(matchKey));
 
-        let actual;
-        try {
-            actual = await fetchApiH2H(div, team1, opponents);
-        } catch (err) {
-            mismatches.push({ div, team1, opponents, error: err.message });
-            return;
-        }
-        const actualKeys = new Set(actual.map(matchKey));
+    let actual;
+    try {
+        actual = await fetchApiH2H(div, team1, opponents);
+    } catch (err) {
+        if (err instanceof QuotaExceededError) throw err;
+        mismatches.push({ div, team1, opponents, error: err.message });
+        return;
+    }
+    const actualKeys = new Set(actual.map(matchKey));
 
-        const missingInApi = [...expectedKeys].filter(k => !actualKeys.has(k));
-        const extraInApi = [...actualKeys].filter(k => !expectedKeys.has(k));
-        if (missingInApi.length > 0 || extraInApi.length > 0) {
-            mismatches.push({
-                div, team1, opponents, label,
-                expectedCount: expectedKeys.size,
-                actualCount: actualKeys.size,
-                missingInApi: missingInApi.slice(0, 5),
-                extraInApi: extraInApi.slice(0, 5),
-            });
-        }
-    })();
+    const missingInApi = [...expectedKeys].filter(k => !actualKeys.has(k));
+    const extraInApi = [...actualKeys].filter(k => !expectedKeys.has(k));
+    if (missingInApi.length > 0 || extraInApi.length > 0) {
+        mismatches.push({
+            div, team1, opponents, label,
+            expectedCount: expectedKeys.size,
+            actualCount: actualKeys.size,
+            missingInApi: missingInApi.slice(0, 5),
+            extraInApi: extraInApi.slice(0, 5),
+        });
+    }
 }
 
 async function main() {
@@ -79,37 +80,56 @@ async function main() {
 
     const mismatches = [];
     let totalChecked = 0;
+    let quotaExhausted = null;
 
+    outer:
     for (const div of DIVS_TO_CHECK) {
         const teams = [...(byDiv.get(div) || [])].sort();
         if (teams.length < 2) continue;
 
         console.error(`${div}: sampling ${Math.min(PAIRS_PER_DIV, teams.length)} single-opponent pairs...`);
         const step = Math.max(1, Math.floor(teams.length / PAIRS_PER_DIV));
-        for (let i = 0; i + step < teams.length && totalChecked < PAIRS_PER_DIV * DIVS_TO_CHECK.length; i += step) {
-            const team1 = teams[i];
-            const team2 = teams[i + step];
-            totalChecked++;
-            await checkPair(all, div, team1, [team2], mismatches, 'single');
-        }
+        try {
+            for (let i = 0; i + step < teams.length && totalChecked < PAIRS_PER_DIV * DIVS_TO_CHECK.length; i += step) {
+                const team1 = teams[i];
+                const team2 = teams[i + step];
+                totalChecked++;
+                await checkPair(all, div, team1, [team2], mismatches, 'single');
+            }
 
-        // One grouped-opponent case per division (5 opponents, like Big 6
-        // minus the selected team) to exercise the multi-team IN-list path.
-        if (teams.length >= 6) {
-            const team1 = teams[0];
-            const opponents = teams.slice(1, 6);
-            totalChecked++;
-            await checkPair(all, div, team1, opponents, mismatches, 'grouped');
-        }
+            // One grouped-opponent case per division (5 opponents, like Big 6
+            // minus the selected team) to exercise the multi-team IN-list path.
+            if (teams.length >= 6) {
+                const team1 = teams[0];
+                const opponents = teams.slice(1, 6);
+                totalChecked++;
+                await checkPair(all, div, team1, opponents, mismatches, 'grouped');
+            }
 
-        // One "teams that (probably) never met" edge case - just confirms
-        // an empty result comes back cleanly, not an error.
-        if (teams.length >= 2) {
-            const team1 = teams[0];
-            const team2 = teams[teams.length - 1];
-            totalChecked++;
-            await checkPair(all, div, team1, [team2], mismatches, 'edge');
+            // One "teams that (probably) never met" edge case - just confirms
+            // an empty result comes back cleanly, not an error.
+            if (teams.length >= 2) {
+                const team1 = teams[0];
+                const team2 = teams[teams.length - 1];
+                totalChecked++;
+                await checkPair(all, div, team1, [team2], mismatches, 'edge');
+            }
+        } catch (err) {
+            if (err instanceof QuotaExceededError) {
+                quotaExhausted = err;
+                break outer;
+            }
+            throw err;
         }
+    }
+
+    if (quotaExhausted) {
+        console.error(`\nD1 read quota exhausted after ${totalChecked} checks - stopping early ` +
+            `(every remaining request would just fail the same way):\n${quotaExhausted.message}`);
+        console.log(`INCOMPLETE: quota exhausted after ${totalChecked} checks. ` +
+            `${mismatches.length} mismatches found before stopping.`);
+        if (mismatches.length > 0) console.log(JSON.stringify(mismatches, null, 2));
+        process.exit(2);
     }
 
     console.error(`\nChecked ${totalChecked} head-to-head queries across ${DIVS_TO_CHECK.length} divisions.`);

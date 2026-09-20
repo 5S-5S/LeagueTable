@@ -136,6 +136,20 @@ changes, bulk updates, a new endpoint reading raw D1 rows) - it'll catch
 exactly this kind of drift by diffing every team's full match list against
 the live gists.
 
+**Mind D1's free-tier daily row-read limit (5,000,000 rows/day).** A single
+day of running `verify-parity.mjs` a few times, a couple of full-table
+`UPDATE` fixes, and `verify-head-to-head.mjs` was enough to exhaust it -
+`UPDATE ... WHERE div = ? AND home_team = ?` in particular reads far more
+rows than it writes (one 18-statement rename fix alone read 246,400 rows).
+Both verify scripts use `api-client.mjs`'s `fetchApiJson()`, which detects
+the quota error and aborts the whole run immediately instead of looping
+through the remaining checks (which would all fail the same way) - so a
+verify script stopping with `INCOMPLETE` most likely means the quota
+tripped, not that something's broken. When re-running verification after a
+fix, prefer running each script once rather than repeating it "just to be
+sure" - re-running an already-passed check burns quota for no new
+information.
+
 ## Next steps
 
 1. Build the next endpoint (head-to-head is the next simplest: two teams,

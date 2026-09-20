@@ -8,6 +8,7 @@
 // Usage: npm install && node verify-parity.mjs
 
 import { collectAllMatches } from './lib.mjs';
+import { fetchApiJson, QuotaExceededError } from './api-client.mjs';
 
 const API_BASE = 'https://leaguetable-api.league-table-api.workers.dev';
 
@@ -26,9 +27,7 @@ function matchKey(m) {
 
 async function fetchApiHistory(div, team) {
     const url = `${API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
+    const data = await fetchApiJson(url);
     return data.matches;
 }
 
@@ -70,6 +69,14 @@ async function main() {
             try {
                 actual = await fetchApiHistory(div, team);
             } catch (err) {
+                if (err instanceof QuotaExceededError) {
+                    console.error(`\nD1 read quota exhausted after ${totalChecked} checks - stopping early ` +
+                        `(every remaining request would just fail the same way):\n${err.message}`);
+                    console.log(`INCOMPLETE: quota exhausted after ${totalChecked} checks. ` +
+                        `${mismatches.length} mismatches found before stopping.`);
+                    if (mismatches.length > 0) console.log(JSON.stringify(mismatches, null, 2));
+                    process.exit(2);
+                }
                 mismatches.push({ div, team, error: err.message });
                 continue;
             }
