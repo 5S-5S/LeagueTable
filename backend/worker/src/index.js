@@ -1,9 +1,5 @@
 // LeagueTable API - Cloudflare Worker
 //
-// Endpoints so far: single-team match history, head-to-head. Everything
-// else (standings, Team Seasons filters, etc.) stays on the gist-based
-// path in the frontend until each has its own endpoint here.
-//
 // GET /api/team-history?div=E0&team=Arsenal%20FC
 //   -> { team, div, matches: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase, isQualifier, additionalInfo }, ...] }
 //
@@ -48,13 +44,16 @@
 //   is also Continental-only, used to determine tournament progression
 //   (e.g. did the team win the Final) without a second per-team request.
 //
-// Caching: /api/standings and /api/season-standings both scan an entire
-// division on every call, so their results are cached in KV (see
-// withCache()/getCacheVersion() below) rather than re-reading D1 per
-// request. Invalidation is version-based, not a blind TTL - sync.mjs
-// bumps the 'cache-version' KV key as its last step, once its D1 writes
-// for the day commit, so cached results are never more stale than "since
-// the last sync" (the same lag that already exists in the data itself).
+// Caching: every endpoint above is cached in KV (see
+// withCache()/getCacheVersion() below) rather than re-reading D1 on every
+// request - /api/standings and /api/season-standings because they each
+// scan an entire division, and /api/team-history and /api/head-to-head
+// because even a "cheap, single-team" read adds up once traffic (or
+// heavy testing) sends enough of them in a day. Invalidation is
+// version-based, not a blind TTL - sync.mjs bumps the 'cache-version' KV
+// key as its last step, once its D1 writes for the day commit, so cached
+// results are never more stale than "since the last sync" (the same lag
+// that already exists in the data itself).
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -133,25 +132,29 @@ async function handleTeamHistory(url, env) {
         return jsonResponse({ error: 'div and team query params are required' }, 400);
     }
 
-    const { results } = await env.DB.prepare(
-        `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
-         FROM matches
-         WHERE div = ?1 AND (home_team = ?2 OR away_team = ?2)
-         ORDER BY date ASC`
-    ).bind(div, team).all();
+    const body = await withCache(env, ['team-history', canonicalQueryKey(url)], async () => {
+        const { results } = await env.DB.prepare(
+            `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
+             FROM matches
+             WHERE div = ?1 AND (home_team = ?2 OR away_team = ?2)
+             ORDER BY date ASC`
+        ).bind(div, team).all();
 
-    const matches = results.map(row => ({
-        date: row.date,
-        homeTeam: row.home_team,
-        awayTeam: row.away_team,
-        homeGoals: row.home_goals,
-        awayGoals: row.away_goals,
-        competitionPhase: row.competition_phase,
-        isQualifier: !!row.is_qualifier,
-        additionalInfo: row.additional_info,
-    }));
+        const matches = results.map(row => ({
+            date: row.date,
+            homeTeam: row.home_team,
+            awayTeam: row.away_team,
+            homeGoals: row.home_goals,
+            awayGoals: row.away_goals,
+            competitionPhase: row.competition_phase,
+            isQualifier: !!row.is_qualifier,
+            additionalInfo: row.additional_info,
+        }));
 
-    return jsonResponse({ team, div, matches });
+        return { team, div, matches };
+    });
+
+    return jsonResponse(body);
 }
 
 async function handleHeadToHead(url, env) {
@@ -168,30 +171,34 @@ async function handleHeadToHead(url, env) {
         return jsonResponse({ error: 'team2 must contain at least one team name' }, 400);
     }
 
-    const placeholders = opponents.map(() => '?').join(', ');
-    const { results } = await env.DB.prepare(
-        `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
-         FROM matches
-         WHERE div = ?
-           AND (
-             (home_team = ? AND away_team IN (${placeholders}))
-             OR (away_team = ? AND home_team IN (${placeholders}))
-           )
-         ORDER BY date ASC`
-    ).bind(div, team1, ...opponents, team1, ...opponents).all();
+    const body = await withCache(env, ['head-to-head', canonicalQueryKey(url)], async () => {
+        const placeholders = opponents.map(() => '?').join(', ');
+        const { results } = await env.DB.prepare(
+            `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
+             FROM matches
+             WHERE div = ?
+               AND (
+                 (home_team = ? AND away_team IN (${placeholders}))
+                 OR (away_team = ? AND home_team IN (${placeholders}))
+               )
+             ORDER BY date ASC`
+        ).bind(div, team1, ...opponents, team1, ...opponents).all();
 
-    const matches = results.map(row => ({
-        date: row.date,
-        homeTeam: row.home_team,
-        awayTeam: row.away_team,
-        homeGoals: row.home_goals,
-        awayGoals: row.away_goals,
-        competitionPhase: row.competition_phase,
-        isQualifier: !!row.is_qualifier,
-        additionalInfo: row.additional_info,
-    }));
+        const matches = results.map(row => ({
+            date: row.date,
+            homeTeam: row.home_team,
+            awayTeam: row.away_team,
+            homeGoals: row.home_goals,
+            awayGoals: row.away_goals,
+            competitionPhase: row.competition_phase,
+            isQualifier: !!row.is_qualifier,
+            additionalInfo: row.additional_info,
+        }));
 
-    return jsonResponse({ team1, team2: opponents, div, matches });
+        return { team1, team2: opponents, div, matches };
+    });
+
+    return jsonResponse(body);
 }
 
 // Historical point-system rule: 3 points for a win unless threePointSystem
