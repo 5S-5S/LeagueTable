@@ -91,9 +91,11 @@ actually ready to cut over.
       `withCache()`/`canonicalQueryKey()` machinery as `/api/standings`/
       `/api/season-standings`. **Every D1-backed endpoint the Worker
       currently exposes is now KV-cached** - no uncached read path left
-      for existing traffic to exhaust the D1 quota through. Not yet
-      deployed (held pending review before pushing to production - all
-      three of these changes go out together).
+      for existing traffic to exhaust the D1 quota through. **Deployed and
+      verified live** (2026-09-21): cache-miss vs cache-hit timing -
+      team-history 0.62s→0.12s, head-to-head 0.71s→0.08s, season-matches
+      0.47s→0.07s - byte-identical responses, and confirmed present via
+      `wrangler kv key list`.
 - [x] `getLeagueTeams()` (team-name dropdown population) cut over to the
       hardcoded color/logo table on the two Domestic pages
       (`DomesticEurope.html`, `DomesticEuropeMobile.html`) — verified each
@@ -259,14 +261,12 @@ never been requested that day) pays the full row-read cost.
 
 ## Next steps
 
-1. Deploy the pending `/api/team-history`/`/api/head-to-head` KV caching
-   change (committed, not yet deployed).
-2. Build a small dedicated endpoint for Continental's team roster (e.g.
+1. Build a small dedicated endpoint for Continental's team roster (e.g.
    `GET /api/teams?div=C1`, distinct team names from D1, KV-cached) and
    cut `getLeagueTeams()` over to it on the two Continental pages - the
    hardcoded color table can't be reused for this one (see Status above).
    This is the last remaining `state.data`-dependent feature anywhere.
-3. Once nothing reads `state.data` for its own computation, drop
+2. Once nothing reads `state.data` for its own computation, drop
    `loadGistData()`'s call in `init()` on all four pages - that's the step
    that actually stops the client from downloading the gists, and is the
    real finish line for this migration (not just "every tab has an API").
