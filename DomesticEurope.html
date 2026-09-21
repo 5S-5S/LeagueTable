@@ -971,6 +971,16 @@
             standingsApiCacheKey: null,
             standingsApiLoading: false,
 
+            // Team Seasons needs a full per-team-per-season table (to find
+            // the selected team's rank each season) across every season a
+            // division has data for - served from the season-standings
+            // batch API (one request, bucketed server-side) instead of the
+            // full in-memory gist dataset. Cache keyed by div + season list
+            // (see ensureSeasonStandingsLoaded).
+            seasonStandingsApiCache: null,
+            seasonStandingsApiCacheKey: null,
+            seasonStandingsApiLoading: false,
+
             // Team Dashboard state (locked team via ?league=&team= URL params,
             // or picked from the in-page search). dashboardLockedTeam is the
             // stable identity - it survives tab switches, unlike
@@ -6883,6 +6893,57 @@
             updateTable();
         }
 
+        // Fetches (or reuses a cached) full-history, per-season standings
+        // for one division from the season-standings batch API - used by
+        // showTeamHistory() (Team Seasons) to find a team's rank each
+        // season without downloading the division's entire raw match
+        // history. Always requests every real season the division has
+        // (ignoring any era filter the user picked in Team Seasons - that
+        // filter only narrows which seasons are displayed, not which are
+        // fetched), so the cache is reusable across era changes and only
+        // needs one request per division. Same fire-and-forget pattern as
+        // the other ensure*Loaded() functions.
+        async function ensureSeasonStandingsLoaded(div, leagueToUse) {
+            if (state.seasonStandingsApiCacheKey === div) return;
+            if (state.seasonStandingsApiLoading) return;
+
+            state.seasonStandingsApiLoading = true;
+            try {
+                const originalSelectedLeague = state.selectedLeague;
+                state.selectedLeague = leagueToUse;
+                const seasons = getAvailableSeasons(leagueToUse)
+                    .filter(s => !(s.includes('all-') || s.includes('-era-') || s.includes('french-division-1')))
+                    .map(s => {
+                        const range = getSeasonDateRange(s);
+                        return range ? { season: s, start: range.start, end: range.end } : null;
+                    })
+                    .filter(Boolean);
+                state.selectedLeague = originalSelectedLeague;
+
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/season-standings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ div, seasons }),
+                });
+                if (!res.ok) throw new Error(`Season standings request failed: ${res.status}`);
+                const data = await res.json();
+
+                const bySeason = {};
+                data.seasons.forEach(s => { bySeason[s.season] = s; });
+                state.seasonStandingsApiCache = bySeason;
+                state.seasonStandingsApiCacheKey = div;
+            } catch (err) {
+                console.error('Failed to load season standings from API:', err);
+                state.seasonStandingsApiCacheKey = div; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.seasonStandingsApiLoading = false;
+            }
+
+            if (state.teamSeasonsSelectedTeam) {
+                showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+            }
+        }
+
         // Shared tail of calculateTable(): point deductions, sorting,
         // historic-season ranking overrides, and position assignment.
         // Identical regardless of whether tableArray came from the
@@ -9174,7 +9235,14 @@
             
             const divCode = leagueMapping[leagueToUse];
             if (!divCode) return;
-            
+
+            // Served from the season-standings batch API instead of the
+            // full in-memory gist dataset - kicks off a fetch if this
+            // division isn't already cached; ensureSeasonStandingsLoaded
+            // re-invokes showTeamHistory() once it resolves.
+            ensureSeasonStandingsLoaded(divCode, leagueToUse);
+            const seasonStandingsBySeasonName = state.seasonStandingsApiCacheKey === divCode ? state.seasonStandingsApiCache : {};
+
             // Get all available seasons for this league
             const availableSeasons = getAvailableSeasons(leagueToUse);
             // Available seasons found
@@ -9230,7 +9298,7 @@
                 
                 // Processing season for team
                 
-                // Get season date range
+                // Get season date range (still needed for point-deduction overlap checks)
                 const originalSelectedLeague = state.selectedLeague;
                 state.selectedLeague = leagueToUse; // Temporarily set for date range lookup
                 const seasonDates = getSeasonDateRange(seasonFilter);
@@ -9239,157 +9307,77 @@
                     // No season dates found
                     return;
                 }
-                // Season dates found
-                
-                // Filter data for this season - use date-only comparisons
-                const seasonStart = new Date(seasonDates.start);
-                seasonStart.setUTCHours(0, 0, 0, 0); // Start of day UTC
-                const seasonEnd = new Date(seasonDates.end);
-                seasonEnd.setUTCHours(23, 59, 59, 999); // End of day UTC
-                
-                // Extract the year from the season (e.g., "2019-20" -> 2019, "2020-21" -> 2020)
-                const seasonYear = parseInt(seasonFilter.split('-')[0]);
-                
-                // Get ALL games for this season (not just for the selected team)
-                const allSeasonData = state.data.filter(row => {
-                    if (row.Div !== divCode) return false;
-                    
-                    const matchDate = new Date(row.dateObj);
-                    const gameYear = matchDate.getFullYear();
-                    
-                    // Pre-filter: only consider games from years that could belong to this season
-                    // For season "2019-20", only look at games from 2019 and 2020
-                    if (gameYear < seasonYear || gameYear > seasonYear + 1) return false;
-                    
-                    const inRange = matchDate >= seasonStart && matchDate <= seasonEnd;
-                    
-                    
-                    return inRange;
-                });
-                
-                // Get games specifically for this team
-                const teamMatches = allSeasonData.filter(row => 
-                    row.HomeTeam === teamName || row.AwayTeam === teamName
-                );
-                
-                if (teamMatches.length === 0) return; // Team not present in this season
-                
-                // Calculate team stats for this season
-                let played = 0, won = 0, drawn = 0, lost = 0;
-                let goalsFor = 0, goalsAgainst = 0;
-                
-                teamMatches.forEach(match => {
-                    played++;
-                    const homeGoals = parseInt(match.FTHG) || 0;
-                    const awayGoals = parseInt(match.FTAG) || 0;
-                    
-                    
-                    if (match.HomeTeam === teamName) {
-                        goalsFor += homeGoals;
-                        goalsAgainst += awayGoals;
-                        if (homeGoals > awayGoals) won++;
-                        else if (homeGoals === awayGoals) drawn++;
-                        else lost++;
-                    } else {
-                        goalsFor += awayGoals;
-                        goalsAgainst += homeGoals;
-                        if (awayGoals > homeGoals) won++;
-                        else if (awayGoals === homeGoals) drawn++;
-                        else lost++;
-                    }
-                });
-                
+
+                // Full-division standings for this season, from the
+                // season-standings API (raw/undeducted historical points -
+                // deductions and ranking overrides are applied below,
+                // exactly as before the cutover).
+                const seasonStandings = seasonStandingsBySeasonName[seasonFilter];
+                if (!seasonStandings) return; // not loaded yet, or no data for this season
+
+                const teamRow = seasonStandings.standings.find(row => row.team === teamName);
+                if (!teamRow) return; // Team not present in this season
+
+                const played = teamRow.played, won = teamRow.won, drawn = teamRow.drawn, lost = teamRow.lost;
+                const goalsFor = teamRow.goalsFor, goalsAgainst = teamRow.goalsAgainst;
                 const goalDifference = goalsFor - goalsAgainst;
-                const winPoints = getHistoricalPointSystem(seasonFilter, leagueToUse);
-                let points = won * winPoints + drawn;
-                
+                let points = teamRow.points;
+
                 // Apply point deductions for this season
                 if (seasonDates) {
                     const seasonStart = new Date(seasonDates.start);
                     const seasonEnd = new Date(seasonDates.end);
-                    
+
                     pointDeductions.forEach(deduction => {
                         if (deduction.team === teamName && deduction.league === divCode) {
                             const deductionStart = new Date(deduction.startDate);
                             const deductionEnd = new Date(deduction.endDate);
-                            
+
                             const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
-                            
+
                             if (hasOverlap && state.pointDeductionsEnabled) {
                                 points -= deduction.points;
                             }
                         }
                     });
                 }
-                
-                // Calculate position by building full league table for this season
-                const leagueTeams = {};
-                allSeasonData.forEach(match => {
-                    [match.HomeTeam, match.AwayTeam].forEach(team => {
-                        if (!leagueTeams[team]) {
-                            leagueTeams[team] = { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0 };
-                        }
-                    });
-                });
-                
-                // Calculate stats for all teams
-                allSeasonData.forEach(match => {
-                    const homeGoals = parseInt(match.FTHG) || 0;
-                    const awayGoals = parseInt(match.FTAG) || 0;
-                    
-                    leagueTeams[match.HomeTeam].played++;
-                    leagueTeams[match.AwayTeam].played++;
-                    
-                    leagueTeams[match.HomeTeam].goalsFor += homeGoals;
-                    leagueTeams[match.HomeTeam].goalsAgainst += awayGoals;
-                    leagueTeams[match.AwayTeam].goalsFor += awayGoals;
-                    leagueTeams[match.AwayTeam].goalsAgainst += homeGoals;
-                    
-                    if (homeGoals > awayGoals) {
-                        leagueTeams[match.HomeTeam].won++;
-                        leagueTeams[match.AwayTeam].lost++;
-                    } else if (homeGoals === awayGoals) {
-                        leagueTeams[match.HomeTeam].drawn++;
-                        leagueTeams[match.AwayTeam].drawn++;
-                    } else {
-                        leagueTeams[match.HomeTeam].lost++;
-                        leagueTeams[match.AwayTeam].won++;
-                    }
-                });
-                
-                // Convert to array and calculate points
-                const winPointsForSeason = getHistoricalPointSystem(seasonFilter, leagueToUse);
-                const seasonTable = Object.keys(leagueTeams).map(team => {
-                    const stats = leagueTeams[team];
-                    let teamPoints = stats.won * winPointsForSeason + stats.drawn;
-                    
+
+                // Build the full season table (all teams) to determine position
+                const seasonTable = seasonStandings.standings.map(stats => {
+                    let teamPoints = stats.points;
+
                     // Apply point deductions for each team
                     if (seasonDates) {
                         const seasonStart = new Date(seasonDates.start);
                         const seasonEnd = new Date(seasonDates.end);
-                        
+
                         pointDeductions.forEach(deduction => {
-                            if (deduction.team === team && deduction.league === divCode) {
+                            if (deduction.team === stats.team && deduction.league === divCode) {
                                 const deductionStart = new Date(deduction.startDate);
                                 const deductionEnd = new Date(deduction.endDate);
-                                
+
                                 const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
-                                
+
                                 if (hasOverlap && state.pointDeductionsEnabled) {
                                     teamPoints -= deduction.points;
                                 }
                             }
                         });
                     }
-                    
+
                     return {
-                        team,
-                        ...stats,
+                        team: stats.team,
+                        played: stats.played,
+                        won: stats.won,
+                        drawn: stats.drawn,
+                        lost: stats.lost,
+                        goalsFor: stats.goalsFor,
+                        goalsAgainst: stats.goalsAgainst,
                         goalDifference: stats.goalsFor - stats.goalsAgainst,
                         points: teamPoints
                     };
                 });
-                
+
                 // Sort by points, then goal difference, then goals for
                 seasonTable.sort((a, b) => {
                     if (b.points !== a.points) return b.points - a.points;
