@@ -81,15 +81,27 @@ actually ready to cut over.
       wrapped in try/catch and won't fail the sync job if it's missing,
       but check `sync.mjs`'s logs after the next scheduled run for
       "Bumped cache-version" vs a "Failed to bump cache-version" warning.
-- [ ] Everything else still reads from the gists: team-name dropdown
-      population, the Team Dashboard's "last results" widgets, and a
-      handful of smaller per-page utilities (each still has its own
-      `state.data.filter(...)` call — see `git grep 'state\.data'` in the
-      four frontend files for the current list). The full-history gist
-      fetch (`loadGistData()`) can't be removed from any page until every
-      one of these is migrated too - the goal isn't just moving
-      computation to the API, it's making the gist URLs themselves
-      unreachable from the client.
+- [x] Team Dashboard's "Last 5" snapshot and its date-range utilities
+      (`getSeasonEraEndYear()`, `handleLeagueChange()`'s per-league
+      default range, `updateLastDataUpdate()`, `clearFilters()`) cut over
+      to team-history/the standings API's `matchDateRange`, on all four
+      pages.
+- [x] KV response cache extended to `/api/team-history` and
+      `/api/head-to-head` — reuses the same `withCache()`/
+      `canonicalQueryKey()` machinery as `/api/standings`/
+      `/api/season-standings`. Not yet deployed (held pending review
+      before pushing to production).
+- [ ] Only `getLeagueTeams()` (team-name dropdown population) still reads
+      `state.data` on all four pages — deliberately left alone so far,
+      since the team roster is already covered by the hardcoded
+      color/logo table (verified 65/65 for Premier League, not yet
+      checked for the other leagues/Continental). This is now the *only*
+      remaining `state.data.filter(...)` call outside the gist-loading
+      pipeline itself — see `git grep 'state\.data'` in the four frontend
+      files to confirm. The full-history gist fetch (`loadGistData()`)
+      can't be removed from any page until this one is migrated too - the
+      goal isn't just moving computation to the API, it's making the gist
+      URLs themselves unreachable from the client.
 
 ## Keeping D1 in sync
 
@@ -209,12 +221,13 @@ never been requested that day) pays the full row-read cost.
 
 ## Next steps
 
-1. Migrate the remaining `state.data`-dependent features (team dropdown
-   population, Team Dashboard "last results" widgets, and the other small
-   per-page utilities noted above in Status) - most are narrow/team-scoped
-   and can likely reuse the existing team-history/head-to-head endpoints
-   the way Match History and Team Streaks already do.
-2. Once nothing reads `state.data` for its own computation, drop
+1. Deploy the pending `/api/team-history`/`/api/head-to-head` KV caching
+   change (committed, not yet deployed).
+2. Verify the hardcoded color/logo table's team roster against the
+   gists for every league/division (not just Premier League), then switch
+   `getLeagueTeams()` on all four pages to read from it instead of
+   `state.data` - the last remaining `state.data`-dependent feature.
+3. Once nothing reads `state.data` for its own computation, drop
    `loadGistData()`'s call in `init()` on all four pages - that's the step
    that actually stops the client from downloading the gists, and is the
    real finish line for this migration (not just "every tab has an API").
