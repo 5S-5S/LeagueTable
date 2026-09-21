@@ -106,28 +106,36 @@ actually ready to cut over.
       names within the same 2026 Champions League campaign (same class of
       drift as the 9 teams already noted below under "Data integrity",
       except inconsistent within a single season rather than just stale).
-- [ ] Continental's `getLeagueTeams()` (`ContinentalEurope.html`,
-      `ContinentalEuropeMobile.html`) still reads `state.data` -
-      deliberately **not** cut over to the hardcoded table the same way.
-      Its `getTeamColors()` buckets are split per team's *domestic*
-      league and only unioned for color lookup (`getTeamColor()`'s
-      "search across all leagues" branch); that structure can't
-      reconstruct "teams that played in this competition" the way
-      Domestic's single-bucket-per-division table can. The
-      `champions-league` bucket alone is missing ~90 teams whose color
-      already lives in their domestic bucket; unioning all 6 buckets
-      instead pulls in ~240 teams that never played Champions League at
-      all. Neither reproduces the real 567-team C1 roster - this needs
-      its own solution (most likely a small dedicated endpoint, e.g.
-      `GET /api/teams?div=C1` returning distinct team names from D1,
-      KV-cached the same way as the other endpoints) rather than reusing
-      the color table. This is now the *only* remaining
-      `state.data.filter(...)` call outside the gist-loading pipeline
-      itself on any of the four pages — see `git grep 'state\.data'` to
-      confirm. The full-history gist fetch (`loadGistData()`) can't be
-      removed from any page until this one is migrated too - the goal
-      isn't just moving computation to the API, it's making the gist URLs
-      themselves unreachable from the client.
+- [x] `GET /api/teams?div=` added - distinct team roster per division
+      from D1 (DISTINCT/UNION over home_team/away_team), KV-cached like
+      `/api/standings` since it's a full-division scan. Built for
+      Continental's `getLeagueTeams()`, which (unlike Domestic's) can't
+      reuse the hardcoded color table - see the code comment on
+      `handleTeams()` in `src/index.js` for why. **Committed but not yet
+      deployed, and not yet wired into the frontend** - see the D1
+      staleness blocker directly below.
+- [ ] **Blocked:** cutting Continental's `getLeagueTeams()` over to
+      `/api/teams` (the last remaining `state.data.filter(...)` call on
+      any of the four pages, outside the gist-loading pipeline itself -
+      see `git grep 'state\.data'` to confirm). Verifying the new
+      endpoint against production surfaced real D1/gist drift for C1: 7
+      teams under stale/renamed spellings (e.g. `AC Sparta Praha` vs the
+      gists' current `Sparta Prague` - the *exact* case already written
+      up below under "Data integrity" as previously fixed, apparently
+      recurring or never fully caught) plus `Como 1907` missing from D1
+      entirely (one real match from 2026-09-10 that never synced). The
+      live team dropdown today reads names straight from the gists at
+      request time, so this drift is currently invisible to users -
+      cutting over to the D1-backed endpoint before fixing it would make
+      it visible (wrong names, a missing team) instead of fixing
+      anything. Also hit D1's exhausted daily read quota mid-verification
+      (a `wrangler d1 execute --remote` cross-check), so the full scope
+      of the drift isn't confirmed yet either - see "Data integrity"
+      below for the investigation once quota resets. The full-history
+      gist fetch (`loadGistData()`) can't be removed from any page until
+      this is unblocked and migrated too - the goal isn't just moving
+      computation to the API, it's making the gist URLs themselves
+      unreachable from the client.
 
 ## Keeping D1 in sync
 
@@ -235,6 +243,32 @@ inconsistency" commit). Fixing it properly means picking a canonical
 name and a D1 `UPDATE`, the same pattern as the 9-team fix above -
 watch for it recurring if the gists rename this team again next season.
 
+**2026-09-21, investigation in progress, not yet confirmed against
+production:** building `GET /api/teams?div=` (see Status above) and
+testing it against the **local dev D1 replica** turned up what looks
+like the 9-team fix above either regressing or never having covered
+everything - `AC Sparta Praha` (one of the exact 9 already renamed
+above) showed up stale again, alongside 6 more of the same shape
+(`AIK Solna`/`AIK`, `Rapid Wien`/`Rapid Vienna`, `RC Celta`/
+`Celta de Vigo`, `Sporting Braga`/`S.C. Braga`, `Neftçi PFK`/
+`Neftchi Baku PFK`, `Paphos FC`/`Pafos FC` - D1's spelling listed
+first) - plus `Como 1907` missing from D1 outright (one real C1 match
+from 2026-09-10 that never synced). **Caveat: the local dev D1 replica
+is not guaranteed to reflect current production** - it's whatever was
+last loaded/synced locally, which could itself just be stale relative
+to the real database. A `wrangler d1 execute --remote` cross-check
+against production hit the exhausted daily quota (see below) before it
+could confirm or rule this out. Needs, once quota resets: (1) confirm
+each of these against production directly, (2) figure out *why* the
+9-team fix didn't stick for at least `AC Sparta Praha` - possibilities
+include the fix never covering everything it should have, or something
+(a `migrate.mjs` rebuild? a schema change?) reintroducing stale rows
+since - and (3) check whether `Como 1907`'s missing match is just
+`sync.mjs`'s normal one-day lag (2026-09-10 is 11 days ago as of this
+writing, which is well past a "hasn't synced yet" window if the daily
+job is actually running - worth checking `sync.mjs`'s GitHub Actions
+run history for silent failures).
+
 **Mind D1's free-tier daily row-read limit (5,000,000 rows/day).** A single
 day of running `verify-parity.mjs` a few times, a couple of full-table
 `UPDATE` fixes, and `verify-head-to-head.mjs` was enough to exhaust it -
@@ -261,12 +295,20 @@ never been requested that day) pays the full row-read cost.
 
 ## Next steps
 
-1. Build a small dedicated endpoint for Continental's team roster (e.g.
-   `GET /api/teams?div=C1`, distinct team names from D1, KV-cached) and
-   cut `getLeagueTeams()` over to it on the two Continental pages - the
-   hardcoded color table can't be reused for this one (see Status above).
-   This is the last remaining `state.data`-dependent feature anywhere.
-2. Once nothing reads `state.data` for its own computation, drop
+1. Once D1's daily quota resets, investigate the C1 team drift found
+   2026-09-21 (see "Data integrity" above): confirm it against production
+   directly, find out why `AC Sparta Praha` regressed after already being
+   fixed once, and check `sync.mjs`'s Actions run history for why
+   `Como 1907` never synced. Fix with D1 `UPDATE`s the same way as the
+   original 9-team fix.
+2. Only once that's fixed (or otherwise resolved): deploy
+   `GET /api/teams?div=` (already built, see Status above) and cut
+   `getLeagueTeams()` over to it on the two Continental pages - the
+   hardcoded color table can't be reused for this one. This is the last
+   remaining `state.data`-dependent feature anywhere. Don't deploy or wire
+   this up before step 1 - it would surface the drift to users (wrong
+   names, a missing team) instead of fixing anything.
+3. Once nothing reads `state.data` for its own computation, drop
    `loadGistData()`'s call in `init()` on all four pages - that's the step
    that actually stops the client from downloading the gists, and is the
    real finish line for this migration (not just "every tab has an API").
