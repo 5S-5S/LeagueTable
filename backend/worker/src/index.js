@@ -47,13 +47,15 @@
 // Caching: every endpoint above is cached in KV (see
 // withCache()/getCacheVersion() below) rather than re-reading D1 on every
 // request - /api/standings and /api/season-standings because they each
-// scan an entire division, and /api/team-history and /api/head-to-head
+// scan an entire division, /api/team-history and /api/head-to-head
 // because even a "cheap, single-team" read adds up once traffic (or
-// heavy testing) sends enough of them in a day. Invalidation is
-// version-based, not a blind TTL - sync.mjs bumps the 'cache-version' KV
-// key as its last step, once its D1 writes for the day commit, so cached
-// results are never more stale than "since the last sync" (the same lag
-// that already exists in the data itself).
+// heavy testing) sends enough of them in a day, and /api/season-matches
+// for the same reason as team-history/head-to-head (bounded to one
+// season, but still a per-visitor D1 read with no cache otherwise).
+// Invalidation is version-based, not a blind TTL - sync.mjs bumps the
+// 'cache-version' KV key as its last step, once its D1 writes for the
+// day commit, so cached results are never more stale than "since the
+// last sync" (the same lag that already exists in the data itself).
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -385,29 +387,33 @@ async function handleSeasonMatches(url, env) {
         return jsonResponse({ error: 'div query param is required' }, 400);
     }
 
-    const dateFrom = url.searchParams.get('dateFrom');
-    const dateTo = url.searchParams.get('dateTo');
+    const body = await withCache(env, ['season-matches', canonicalQueryKey(url)], async () => {
+        const dateFrom = url.searchParams.get('dateFrom');
+        const dateTo = url.searchParams.get('dateTo');
 
-    let sql = `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info FROM matches WHERE div = ?1`;
-    const params = [div];
-    if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
-    if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
-    sql += ` ORDER BY date ASC`;
+        let sql = `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info FROM matches WHERE div = ?1`;
+        const params = [div];
+        if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
+        if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
+        sql += ` ORDER BY date ASC`;
 
-    const { results } = await env.DB.prepare(sql).bind(...params).all();
+        const { results } = await env.DB.prepare(sql).bind(...params).all();
 
-    const matches = results.map(row => ({
-        date: row.date,
-        homeTeam: row.home_team,
-        awayTeam: row.away_team,
-        homeGoals: row.home_goals,
-        awayGoals: row.away_goals,
-        competitionPhase: row.competition_phase,
-        isQualifier: !!row.is_qualifier,
-        additionalInfo: row.additional_info,
-    }));
+        const matches = results.map(row => ({
+            date: row.date,
+            homeTeam: row.home_team,
+            awayTeam: row.away_team,
+            homeGoals: row.home_goals,
+            awayGoals: row.away_goals,
+            competitionPhase: row.competition_phase,
+            isQualifier: !!row.is_qualifier,
+            additionalInfo: row.additional_info,
+        }));
 
-    return jsonResponse({ div, matches });
+        return { div, matches };
+    });
+
+    return jsonResponse(body);
 }
 
 // Buckets a sorted match list into sorted, possibly slightly-overlapping
