@@ -6,3 +6,7 @@ compatibility_date = "2025-09-01"
 binding = "DB"
 database_name = "leaguetable"
 database_id = "7069d435-b2d1-4b49-9510-8be2cf8119d9"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "b2fa8b93e59540749923768aaf1fc08d"

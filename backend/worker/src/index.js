@@ -47,6 +47,14 @@
 //   homeTeam, awayTeam, scores, competitionPhase, additionalInfo, or null)
 //   is also Continental-only, used to determine tournament progression
 //   (e.g. did the team win the Final) without a second per-team request.
+//
+// Caching: /api/standings and /api/season-standings both scan an entire
+// division on every call, so their results are cached in KV (see
+// withCache()/getCacheVersion() below) rather than re-reading D1 per
+// request. Invalidation is version-based, not a blind TTL - sync.mjs
+// bumps the 'cache-version' KV key as its last step, once its D1 writes
+// for the day commit, so cached results are never more stale than "since
+// the last sync" (the same lag that already exists in the data itself).
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -59,6 +67,62 @@ function jsonResponse(body, status = 200) {
         status,
         headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
     });
+}
+
+// Response cache for the two full-division-scan endpoints (/api/standings
+// and /api/season-standings) - both read the entire division from D1 on
+// every call today, which is fine for one request but doesn't scale with
+// traffic (every visitor viewing League Table's default view or Team
+// Seasons pays the full read again). Match data only changes once a day
+// (the sync workflow), so there's nothing to gain from re-reading D1 more
+// often than that.
+//
+// Invalidation is version-based rather than a blind TTL: sync.mjs bumps
+// the 'cache-version' key in KV as its last step, after its D1 writes
+// commit, and every cache key here folds that version in - so entries
+// from before today's sync become unreachable immediately rather than
+// serving stale data until an arbitrary timer expires. CACHE_TTL_SECONDS
+// below is just a backstop so orphaned old-version entries eventually get
+// garbage collected even if nothing ever re-reads them.
+const CACHE_TTL_SECONDS = 60 * 60 * 48;
+
+async function getCacheVersion(env) {
+    return (await env.CACHE.get('cache-version')) || '0';
+}
+
+// Wraps an expensive compute step with a KV cache keyed by an endpoint
+// name plus caller-supplied key parts (which must include every request
+// parameter that affects the result - the classic caching bug is a
+// parameter that's missing from the key, causing one query's response to
+// be silently served for a different one). A cache write failure doesn't
+// fail the request - caching is an optimization, not a correctness
+// requirement, so the response is still returned either way.
+async function withCache(env, keyParts, compute) {
+    const version = await getCacheVersion(env);
+    const key = `v${version}:${keyParts.join(':')}`;
+
+    const cached = await env.CACHE.get(key);
+    if (cached !== null) {
+        return JSON.parse(cached);
+    }
+
+    const result = await compute();
+    try {
+        await env.CACHE.put(key, JSON.stringify(result), { expirationTtl: CACHE_TTL_SECONDS });
+    } catch (err) {
+        console.error('Failed to write cache entry:', err);
+    }
+    return result;
+}
+
+// Canonical, order-independent representation of a request's query
+// params, for use as a cache key - sorted so ?div=E0&dateFrom=X and
+// ?dateFrom=X&div=E0 hit the same cache entry.
+function canonicalQueryKey(url) {
+    return [...url.searchParams.entries()]
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k}=${v}`)
+        .join('&');
 }
 
 async function handleTeamHistory(url, env) {
@@ -281,27 +345,31 @@ async function handleStandings(url, env) {
     const excludeMainStage = parseBoolParam(url, 'excludeMainStage', false);
     const competitionStage = url.searchParams.get('competitionStage') || '';
 
-    let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier FROM matches WHERE div = ?1`;
-    const params = [div];
-    if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
-    if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
-    if (dayOfWeek !== null) { params.push(dayOfWeek); sql += ` AND CAST(strftime('%w', date) AS INTEGER) = ?${params.length}`; }
+    const body = await withCache(env, ['standings', canonicalQueryKey(url)], async () => {
+        let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier FROM matches WHERE div = ?1`;
+        const params = [div];
+        if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
+        if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
+        if (dayOfWeek !== null) { params.push(dayOfWeek); sql += ` AND CAST(strftime('%w', date) AS INTEGER) = ?${params.length}`; }
 
-    const { results } = await env.DB.prepare(sql).bind(...params).all();
+        const { results } = await env.DB.prepare(sql).bind(...params).all();
 
-    let matches = results.map(row => ({
-        div: row.div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
-        homeGoals: row.home_goals, awayGoals: row.away_goals,
-        competitionPhase: row.competition_phase, isQualifier: !!row.is_qualifier,
-    }));
+        let matches = results.map(row => ({
+            div: row.div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
+            homeGoals: row.home_goals, awayGoals: row.away_goals,
+            competitionPhase: row.competition_phase, isQualifier: !!row.is_qualifier,
+        }));
 
-    if (excludeQualifiers || excludeMainStage || competitionStage) {
-        matches = filterContinentalMatches(matches, { excludeQualifiers, excludeMainStage, competitionStage });
-    }
+        if (excludeQualifiers || excludeMainStage || competitionStage) {
+            matches = filterContinentalMatches(matches, { excludeQualifiers, excludeMainStage, competitionStage });
+        }
 
-    const { matchDateRange, standings } = aggregateStandings(matches, { threePointSystem, homeFilter, awayFilter });
+        const { matchDateRange, standings } = aggregateStandings(matches, { threePointSystem, homeFilter, awayFilter });
 
-    return jsonResponse({ div, matchCount: matches.length, matchDateRange, standings });
+        return { div, matchCount: matches.length, matchDateRange, standings };
+    });
+
+    return jsonResponse(body);
 }
 
 async function handleSeasonMatches(url, env) {
@@ -384,56 +452,69 @@ async function handleSeasonStandings(request, env) {
         }
     }
 
-    const { results } = await env.DB.prepare(
-        `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
-         FROM matches WHERE div = ?1 ORDER BY date ASC`
-    ).bind(div).all();
+    // Cached by div + exclude flags only, not the season list itself - the
+    // frontend always requests every real season a division has
+    // (ensureSeasonStandingsLoaded ignores any era filter when building
+    // the request), so for a given div/flag combination the season list
+    // is effectively constant in practice. A caller sending a different
+    // or partial season list for the same div+flags would get back this
+    // cached full-season response instead of its own narrower one - fine
+    // for this endpoint's only consumer, but worth knowing if it's ever
+    // reused elsewhere.
+    const responseBody = await withCache(env, ['season-standings', div, !!excludeQualifiers, !!excludeMainStage], async () => {
+        const { results } = await env.DB.prepare(
+            `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
+             FROM matches WHERE div = ?1 ORDER BY date ASC`
+        ).bind(div).all();
 
-    let matches = results.map(row => ({
-        div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
-        homeGoals: row.home_goals, awayGoals: row.away_goals, isQualifier: !!row.is_qualifier,
-        competitionPhase: row.competition_phase, additionalInfo: row.additional_info,
-    }));
+        let matches = results.map(row => ({
+            div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
+            homeGoals: row.home_goals, awayGoals: row.away_goals, isQualifier: !!row.is_qualifier,
+            competitionPhase: row.competition_phase, additionalInfo: row.additional_info,
+        }));
 
-    if (excludeQualifiers) matches = matches.filter(m => !m.isQualifier);
-    if (excludeMainStage) matches = matches.filter(m => m.isQualifier);
+        if (excludeQualifiers) matches = matches.filter(m => !m.isQualifier);
+        if (excludeMainStage) matches = matches.filter(m => m.isQualifier);
 
-    const buckets = bucketMatchesBySeason(matches, seasons);
+        const buckets = bucketMatchesBySeason(matches, seasons);
 
-    // Continental's Team Seasons view needs each team's chronologically
-    // last match of the season (its competitionPhase, score, and
-    // additionalInfo) to determine how far they progressed (e.g. did they
-    // win the Final -> Champions). Matches within each bucket are already
-    // date-sorted (inherited from the ORDER BY above), so a single
-    // forward pass per bucket - overwriting each team's entry as we go -
-    // lands on the right match with no extra sorting.
-    function lastMatchPerTeam(seasonMatches) {
-        const last = new Map();
-        for (const m of seasonMatches) {
-            last.set(m.homeTeam, m);
-            last.set(m.awayTeam, m);
+        // Continental's Team Seasons view needs each team's chronologically
+        // last match of the season (its competitionPhase, score, and
+        // additionalInfo) to determine how far they progressed (e.g. did they
+        // win the Final -> Champions). Matches within each bucket are already
+        // date-sorted (inherited from the ORDER BY above), so a single
+        // forward pass per bucket - overwriting each team's entry as we go -
+        // lands on the right match with no extra sorting.
+        function lastMatchPerTeam(seasonMatches) {
+            const last = new Map();
+            for (const m of seasonMatches) {
+                last.set(m.homeTeam, m);
+                last.set(m.awayTeam, m);
+            }
+            return last;
         }
-        return last;
-    }
 
-    const seasonResults = buckets.map(({ season, matches: seasonMatches }) => {
-        const { standings } = aggregateStandings(seasonMatches, { threePointSystem: false, homeFilter: true, awayFilter: true });
-        const lastByTeam = lastMatchPerTeam(seasonMatches);
-        const standingsWithLastMatch = standings.map(row => {
-            const lm = lastByTeam.get(row.team);
-            return {
-                ...row,
-                lastMatch: lm ? {
-                    date: lm.date, homeTeam: lm.homeTeam, awayTeam: lm.awayTeam,
-                    homeGoals: lm.homeGoals, awayGoals: lm.awayGoals,
-                    competitionPhase: lm.competitionPhase, additionalInfo: lm.additionalInfo,
-                } : null,
-            };
+        const seasonResults = buckets.map(({ season, matches: seasonMatches }) => {
+            const { standings } = aggregateStandings(seasonMatches, { threePointSystem: false, homeFilter: true, awayFilter: true });
+            const lastByTeam = lastMatchPerTeam(seasonMatches);
+            const standingsWithLastMatch = standings.map(row => {
+                const lm = lastByTeam.get(row.team);
+                return {
+                    ...row,
+                    lastMatch: lm ? {
+                        date: lm.date, homeTeam: lm.homeTeam, awayTeam: lm.awayTeam,
+                        homeGoals: lm.homeGoals, awayGoals: lm.awayGoals,
+                        competitionPhase: lm.competitionPhase, additionalInfo: lm.additionalInfo,
+                    } : null,
+                };
+            });
+            return { season, matchCount: seasonMatches.length, standings: standingsWithLastMatch };
         });
-        return { season, matchCount: seasonMatches.length, standings: standingsWithLastMatch };
+
+        return { div, seasons: seasonResults };
     });
 
-    return jsonResponse({ div, seasons: seasonResults });
+    return jsonResponse(responseBody);
 }
 
 export default {

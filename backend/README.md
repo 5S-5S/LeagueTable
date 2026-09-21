@@ -62,6 +62,25 @@ actually ready to cut over.
       (`lastMatch`, Continental-only, for tournament-progression display).
       Powers Team Seasons on all four pages (Domestic: rank-by-season;
       Continental: rank-by-season + progression/"reached the Final" search).
+- [x] KV response cache for `/api/standings` and `/api/season-standings` —
+      both scan an entire division on every call, so without caching the
+      D1 read cost scales with *traffic* (a single visitor viewing League
+      Table's default view plus Team Seasons for a couple of teams can
+      read 150K+ rows; modest daily traffic can exhaust the 5M/day quota
+      from normal use alone, not just heavy testing). Cached in the
+      `leaguetable_cache` KV namespace (binding `CACHE` in
+      `wrangler.toml`), keyed by a version counter rather than a blind
+      TTL: `sync.mjs` bumps the `cache-version` KV key as its last step,
+      only when new rows actually landed, so cached responses are never
+      staler than "since the last sync" (the same lag already in the
+      data) and a no-op sync doesn't needlessly invalidate anything.
+      **Verify after setting up**: the CI `CLOUDFLARE_API_TOKEN` secret
+      needs `Workers KV Storage:Edit` permission for the bump to work -
+      it's a separate, narrower token from local `wrangler login`, so this
+      isn't guaranteed by the D1 permissions it already has. The bump is
+      wrapped in try/catch and won't fail the sync job if it's missing,
+      but check `sync.mjs`'s logs after the next scheduled run for
+      "Bumped cache-version" vs a "Failed to bump cache-version" warning.
 - [ ] Everything else still reads from the gists: team-name dropdown
       population, the Team Dashboard's "last results" widgets, and a
       handful of smaller per-page utilities (each still has its own
@@ -177,6 +196,16 @@ tripped, not that something's broken. When re-running verification after a
 fix, prefer running each script once rather than repeating it "just to be
 sure" - re-running an already-passed check burns quota for no new
 information.
+
+**Note this applies to manual/testing usage of D1 directly** (curl,
+`wrangler d1 execute`, the verify scripts) - it does not describe the
+Worker's own read cost anymore for `/api/standings` and
+`/api/season-standings`, which are now KV-cached (see Status above) and
+only hit D1 once per division per day. Testing *those* two endpoints
+specifically is cheap regardless of how many times they're called, as
+long as the cache isn't being bypassed - only a fresh D1 query (the first
+call after a cache-version bump, or a query-param combination that's
+never been requested that day) pays the full row-read cost.
 
 ## Next steps
 

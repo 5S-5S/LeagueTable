@@ -14,8 +14,14 @@
 // can run unattended in CI with just an API token - see
 // .github/workflows/sync-d1.yml.
 //
+// Last step: if any new rows actually landed, bumps a version counter in
+// KV that the Worker's standings/season-standings caches are keyed on
+// (see CACHE_KV_NAMESPACE_ID below) - this is what invalidates those
+// caches once a day's worth of new matches is in, instead of a blind TTL.
+//
 // Required env vars: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_DATABASE_ID,
-// CLOUDFLARE_API_TOKEN
+// CLOUDFLARE_API_TOKEN (the same token already needs workers_kv:write
+// scope for this - check via `wrangler whoami` if the KV write 403s)
 
 import { collectAllMatches } from './lib.mjs';
 
@@ -27,6 +33,30 @@ if (!CLOUDFLARE_ACCOUNT_ID || !CLOUDFLARE_DATABASE_ID || !CLOUDFLARE_API_TOKEN) 
 }
 
 const D1_QUERY_URL = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/d1/database/${CLOUDFLARE_DATABASE_ID}/query`;
+
+// KV namespace the Worker uses to cache /api/standings and
+// /api/season-standings responses (see withCache()/getCacheVersion() in
+// backend/worker/src/index.js) - both scan an entire division on every
+// call, so re-reading D1 for the same division more than once a day would
+// be pure waste. Not a secret - same ID as the [[kv_namespaces]] binding
+// in backend/worker/wrangler.toml.
+const CACHE_KV_NAMESPACE_ID = 'b2fa8b93e59540749923768aaf1fc08d';
+
+async function bumpCacheVersion() {
+    const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces/${CACHE_KV_NAMESPACE_ID}/values/cache-version`;
+    const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`,
+            'Content-Type': 'text/plain',
+        },
+        body: new Date().toISOString(),
+    });
+    const json = await res.json();
+    if (!json.success) {
+        throw new Error(`KV cache-version write failed: ${JSON.stringify(json.errors)}`);
+    }
+}
 
 async function runD1Query(sql, params = []) {
     const res = await fetch(D1_QUERY_URL, {
@@ -107,7 +137,27 @@ async function main() {
     }
 
     const countAfter = await getTotalRowCount();
-    log(`Done. ${countAfter - countBefore} genuinely new rows written (out of ${candidates.length} candidates checked). Total rows now: ${countAfter}.`);
+    const newRowCount = countAfter - countBefore;
+    log(`Done. ${newRowCount} genuinely new rows written (out of ${candidates.length} candidates checked). Total rows now: ${countAfter}.`);
+
+    // Only invalidate the standings/season-standings cache when something
+    // actually changed - bumping it on a no-op sync would just force every
+    // division to be needlessly re-read from D1 on the next request, for
+    // an identical result. Non-fatal: the sync's actual job (getting new
+    // matches into D1) already succeeded by this point, so a KV problem
+    // (e.g. CLOUDFLARE_API_TOKEN missing Workers KV Storage:Edit scope)
+    // shouldn't fail the whole run - it just means cached responses stay
+    // stale a bit longer, not that anything is broken.
+    if (newRowCount > 0) {
+        try {
+            await bumpCacheVersion();
+            log('Bumped cache-version in KV - cached standings responses will be recomputed on next request.');
+        } catch (err) {
+            console.error('Failed to bump cache-version (non-fatal - D1 sync itself succeeded):', err.message);
+        }
+    } else {
+        log('No new rows landed - leaving cache-version untouched.');
+    }
 }
 
 main().catch(err => {
