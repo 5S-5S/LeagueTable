@@ -4519,222 +4519,6 @@
         }
 
         // Show all teams that finished at a specific position
-        function showAllTeamsAtPosition(position, league) {
-            const selectedPos = parseInt(position);
-            const leagueMapping = {
-                'champions-league': 'C1',
-                'europa-league': 'E1',
-                'conference-league': 'C2'
-            };
-            
-            const divCode = leagueMapping[league];
-            if (!divCode) return;
-            
-            const availableSeasons = getAvailableSeasons(league);
-            const allPositionData = [];
-            
-            // Process each season to build complete league tables
-            availableSeasons.forEach(seasonFilter => {
-                // Skip special seasons
-                if (seasonFilter.includes('all-') || seasonFilter.includes('-era-') || seasonFilter.includes('french-division-1')) {
-                    return;
-                }
-                
-                // Get season date range
-                const originalSelectedLeague = state.selectedLeague;
-                state.selectedLeague = league;
-                const seasonDates = getSeasonDateRange(seasonFilter);
-                state.selectedLeague = originalSelectedLeague;
-                
-                if (!seasonDates) return;
-                
-                // Filter data for this season
-                const seasonStart = new Date(seasonDates.start);
-                seasonStart.setUTCHours(0, 0, 0, 0);
-                const seasonEnd = new Date(seasonDates.end);
-                seasonEnd.setUTCHours(23, 59, 59, 999);
-                
-                let seasonData = state.data.filter(match => 
-                    match.Div === divCode &&
-                    match.dateObj >= seasonStart &&
-                    match.dateObj <= seasonEnd
-                );
-                
-                // Apply qualifier exclusion filter if enabled
-                if (state.excludeQualifiers) {
-                    seasonData = seasonData.filter(row => !row.isQualifier);
-                }
-                
-                // Apply main stage exclusion filter if enabled
-                if (state.excludeMainStage) {
-                    seasonData = seasonData.filter(row => row.isQualifier);
-                }
-                
-                if (seasonData.length === 0) return;
-                
-                // Build complete league table for this season
-                const teams = [...new Set([
-                    ...seasonData.map(row => row.HomeTeam),
-                    ...seasonData.map(row => row.AwayTeam)
-                ])].filter(team => team && team.length > 1);
-                
-                const seasonTable = teams.map(team => {
-                    const stats = { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0 };
-                    
-                    seasonData.forEach(match => {
-                        if (match.HomeTeam === team || match.AwayTeam === team) {
-                            const isHome = match.HomeTeam === team;
-                            const teamScore = isHome ? match.FTHG : match.FTAG;
-                            const opponentScore = isHome ? match.FTAG : match.FTHG;
-                            
-                            if (teamScore !== undefined && opponentScore !== undefined) {
-                                stats.played++;
-                                stats.goalsFor += teamScore;
-                                stats.goalsAgainst += opponentScore;
-                                
-                                if (teamScore > opponentScore) stats.won++;
-                                else if (teamScore === opponentScore) stats.drawn++;
-                                else stats.lost++;
-                            }
-                        }
-                    });
-                    
-                    const pointsPerWin = getHistoricalPointSystem(seasonFilter, league);
-                    let teamPoints = stats.won * pointsPerWin + stats.drawn;
-                    
-                    // Apply point deductions for this team and season
-                    if (seasonDates) {
-                        const seasonStart = new Date(seasonDates.start);
-                        const seasonEnd = new Date(seasonDates.end);
-                        
-                        pointDeductions.forEach(deduction => {
-                            if (deduction.team === team && deduction.league === divCode) {
-                                const deductionStart = new Date(deduction.startDate);
-                                const deductionEnd = new Date(deduction.endDate);
-                                
-                                const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
-                                if (hasOverlap && state.pointDeductionsEnabled) {
-                                    teamPoints -= deduction.points;
-                                }
-                            }
-                        });
-                    }
-                    
-                    return {
-                        team,
-                        ...stats,
-                        goalDifference: stats.goalsFor - stats.goalsAgainst,
-                        points: teamPoints
-                    };
-                });
-                
-                // Sort table by points, goal difference, goals for
-                seasonTable.sort((a, b) => {
-                    if (b.points !== a.points) return b.points - a.points;
-                    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
-                    return b.goalsFor - a.goalsFor;
-                });
-                
-                // Apply ranking overrides
-                const overriddenTable = applyRankingOverrides(seasonTable, league, seasonFilter);
-                
-                // Extract all teams at the requested position (handle shared positions)
-                if (overriddenTable.length >= selectedPos) {
-                    // Find all teams that share the same position or have sharedPosition property
-                    const teamsAtPosition = [];
-                    
-                    // First, check if there are teams with sharedPosition matching our target
-                    overriddenTable.forEach((team, index) => {
-                        if (team.sharedPosition === selectedPos) {
-                            teamsAtPosition.push(team);
-                        }
-                    });
-                    
-                    // If no shared positions found, get the team at the array index
-                    if (teamsAtPosition.length === 0) {
-                        const teamAtIndex = overriddenTable[selectedPos - 1];
-                        if (teamAtIndex) {
-                            teamsAtPosition.push(teamAtIndex);
-                            
-                            // Check for other teams with the same points/stats (tied positions)
-                            overriddenTable.forEach((team, index) => {
-                                if (index !== selectedPos - 1 && 
-                                    team.points === teamAtIndex.points && 
-                                    team.goalDifference === teamAtIndex.goalDifference &&
-                                    team.goalsFor === teamAtIndex.goalsFor) {
-                                    // Check if this tied team would be in the same position range
-                                    const teamActualPosition = index + 1;
-                                    if (Math.abs(teamActualPosition - selectedPos) < teamsAtPosition.length) {
-                                        teamsAtPosition.push(team);
-                                    }
-                                }
-                            });
-                        }
-                    }
-                    
-                    // Process each team at this position
-                    teamsAtPosition.forEach(teamAtPosition => {
-                        // Check if this season should be included (34+ games or historical incomplete season)
-                        const shouldInclude = teamAtPosition.played >= 34 || seasonFilter !== '2026-27';
-                        
-                        // Check for stripped champions (position-only filtering, no team filter)
-                        const isStripped = isStrippedChampion(teamAtPosition.team, divCode, seasonFilter, selectedPos, false, true);
-                        
-                        if (shouldInclude && !isStripped) {
-                            allPositionData.push({
-                                season: seasonFilter,
-                                team: teamAtPosition.team,
-                                position: selectedPos,
-                                played: teamAtPosition.played,
-                                won: teamAtPosition.won,
-                                drawn: teamAtPosition.drawn,
-                                lost: teamAtPosition.lost,
-                                goalsFor: teamAtPosition.goalsFor,
-                                goalsAgainst: teamAtPosition.goalsAgainst,
-                                goalDifference: teamAtPosition.goalDifference,
-                                points: teamAtPosition.points
-                            });
-                        }
-                    });
-                }
-            });
-            
-            // Sort by season (most recent first), then by team name
-            allPositionData.sort((a, b) => {
-                const yearA = parseInt(a.season.split('-')[0]);
-                const yearB = parseInt(b.season.split('-')[0]);
-                if (yearB !== yearA) return yearB - yearA;
-                return a.team.localeCompare(b.team);
-            });
-            
-            // Add count column - count chronologically from oldest to most recent
-            const teamCounts = {};
-            // First sort by oldest to count chronologically
-            const chronologicalData = [...allPositionData].sort((a, b) => {
-                const yearA = parseInt(a.season.split('-')[0]);
-                const yearB = parseInt(b.season.split('-')[0]);
-                return yearA - yearB; // oldest first for counting
-            });
-            
-            // Assign count numbers chronologically
-            chronologicalData.forEach(season => {
-                if (!teamCounts[season.team]) {
-                    teamCounts[season.team] = 0;
-                }
-                teamCounts[season.team]++;
-                season.count = teamCounts[season.team];
-            });
-            
-            // Update position info
-            const ordinalPosition = getOrdinal(selectedPos);
-            const totalCount = allPositionData.length;
-            const countText = totalCount === 1 ? 'time' : 'times';
-            elements.teamSeasonsPositionInfo.textContent = `${totalCount} teams finished ${ordinalPosition} a total of ${totalCount} ${countText}`;
-            
-            // Display the results
-            displayAllTeamsAtPosition(allPositionData, selectedPos, league);
-        }
-
         // Show all teams that reached a specific progression level
         function showAllTeamsAtProgression(progression, league) {
             const leagueMapping = {
@@ -5175,20 +4959,6 @@
             }).join('');
         }
 
-        // Display all teams at specific position
-        function displayAllTeamsAtPosition(allPositionData, selectedPos, league) {
-            // Clear any previous team-specific data first
-            window.currentTeamHistoryData = null;
-            window.currentTeamHistoryName = null;
-            
-            // Just call the render function
-            renderPositionOnlyTable(allPositionData, selectedPos, league);
-            
-            // Store data for potential sorting
-            window.currentTeamHistoryData = allPositionData;
-            window.currentTeamHistoryName = `All teams (Position ${selectedPos})`;
-        }
-
         // Handle team seasons team selection
         function handleTeamSeasonsTeamChange(selectedTeam) {
             // handleTeamSeasonsTeamChange called
@@ -5586,11 +5356,11 @@
                     // Refresh single team view
                     showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
                 } else if (state.teamSeasonsSelectedPosition) {
-                    // Refresh position-only view
-                    showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
+                    // Refresh progression-only view
+                    showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
                 }
             });
-            
+
             elements.threePointCheckbox.addEventListener('click', () => {
                 state.threePointSystem = !state.threePointSystem;
                 elements.threePointCheckbox.className = `checkbox ${state.threePointSystem ? 'checked' : ''}`;
@@ -5615,10 +5385,10 @@
                 if (state.teamSeasonsSelectedTeam) {
                     showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
                 } else if (state.teamSeasonsSelectedPosition) {
-                    showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
+                    showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
                 }
             });
-            
+
             elements.excludeMainStageCheckbox.addEventListener('click', () => {
                 state.excludeMainStage = !state.excludeMainStage;
                 elements.excludeMainStageCheckbox.className = `checkbox ${state.excludeMainStage ? 'checked' : ''}`;
@@ -5637,7 +5407,7 @@
                 if (state.teamSeasonsSelectedTeam) {
                     showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
                 } else if (state.teamSeasonsSelectedPosition) {
-                    showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
+                    showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
                 }
             });
 
