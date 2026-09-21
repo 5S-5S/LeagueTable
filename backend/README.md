@@ -86,11 +86,14 @@ actually ready to cut over.
       default range, `updateLastDataUpdate()`, `clearFilters()`) cut over
       to team-history/the standings API's `matchDateRange`, on all four
       pages.
-- [x] KV response cache extended to `/api/team-history` and
-      `/api/head-to-head` — reuses the same `withCache()`/
-      `canonicalQueryKey()` machinery as `/api/standings`/
-      `/api/season-standings`. Not yet deployed (held pending review
-      before pushing to production).
+- [x] KV response cache extended to `/api/team-history`,
+      `/api/head-to-head`, and `/api/season-matches` — reuses the same
+      `withCache()`/`canonicalQueryKey()` machinery as `/api/standings`/
+      `/api/season-standings`. **Every D1-backed endpoint the Worker
+      currently exposes is now KV-cached** - no uncached read path left
+      for existing traffic to exhaust the D1 quota through. Not yet
+      deployed (held pending review before pushing to production - all
+      three of these changes go out together).
 - [x] `getLeagueTeams()` (team-name dropdown population) cut over to the
       hardcoded color/logo table on the two Domestic pages
       (`DomesticEurope.html`, `DomesticEuropeMobile.html`) — verified each
