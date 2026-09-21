@@ -3387,21 +3387,22 @@
 
         // Find the match where the opposite result occurred
         function findOppositeResultMatch(team1, team2, streakType, location) {
-            // Use all Champions League data (no division filtering needed)
-            let matches = state.data;
-            
+            // Same underlying match set as calculateActiveStreaks() /
+            // calculateHistoricStreaks() - already scoped to team1 vs
+            // team2/country-aggregate by the team-streaks API
+            // (loadTeamStreaksData reuses whatever's cached from those, or
+            // kicks off the fetch itself if this is somehow called first).
+            let matches = loadTeamStreaksData(team1, team2);
+
             // Apply qualifier exclusion filter if enabled
             if (state.excludeQualifiers) {
                 matches = matches.filter(row => !row.isQualifier);
             }
-            
+
             // Apply main stage exclusion filter if enabled
             if (state.excludeMainStage) {
                 matches = matches.filter(row => row.isQualifier);
             }
-            
-            // Filter by teams
-            matches = filterMatchesByOpponent(matches, team1, team2);
 
             // Filter by location
             if (location === 'home') {
