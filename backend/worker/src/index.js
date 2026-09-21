@@ -10,6 +10,15 @@
 //   client-side (unchanged) and just sends the resolved names here.
 //   -> { team1, team2: [...], div, matches: [...] }
 //
+// GET /api/teams?div=C1
+//   -> { div, teams: [name, ...] }
+//   Every distinct team name that's played in this division, sorted.
+//   Exists specifically for Continental, where (unlike Domestic) the
+//   frontend's hardcoded color/logo table can't stand in for "teams that
+//   played in this competition" - see getLeagueTeams() in
+//   ContinentalEurope.html for why, and backend/README.md's migration
+//   status for the fuller writeup.
+//
 // GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=&excludeQualifiers=&excludeMainStage=&competitionStage=
 //   -> { div, matchCount, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
 //   excludeQualifiers/excludeMainStage/competitionStage are Continental-
@@ -49,13 +58,15 @@
 // request - /api/standings and /api/season-standings because they each
 // scan an entire division, /api/team-history and /api/head-to-head
 // because even a "cheap, single-team" read adds up once traffic (or
-// heavy testing) sends enough of them in a day, and /api/season-matches
-// for the same reason as team-history/head-to-head (bounded to one
-// season, but still a per-visitor D1 read with no cache otherwise).
-// Invalidation is version-based, not a blind TTL - sync.mjs bumps the
-// 'cache-version' KV key as its last step, once its D1 writes for the
-// day commit, so cached results are never more stale than "since the
-// last sync" (the same lag that already exists in the data itself).
+// heavy testing) sends enough of them in a day, /api/season-matches for
+// the same reason as team-history/head-to-head (bounded to one season,
+// but still a per-visitor D1 read with no cache otherwise), and
+// /api/teams because its DISTINCT/UNION query scans the whole division
+// the same way /api/standings does. Invalidation is version-based, not a
+// blind TTL - sync.mjs bumps the 'cache-version' KV key as its last
+// step, once its D1 writes for the day commit, so cached results are
+// never more stale than "since the last sync" (the same lag that
+// already exists in the data itself).
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -198,6 +209,26 @@ async function handleHeadToHead(url, env) {
         }));
 
         return { team1, team2: opponents, div, matches };
+    });
+
+    return jsonResponse(body);
+}
+
+async function handleTeams(url, env) {
+    const div = url.searchParams.get('div');
+    if (!div) {
+        return jsonResponse({ error: 'div query param is required' }, 400);
+    }
+
+    const body = await withCache(env, ['teams', canonicalQueryKey(url)], async () => {
+        const { results } = await env.DB.prepare(
+            `SELECT DISTINCT home_team AS team FROM matches WHERE div = ?1
+             UNION
+             SELECT DISTINCT away_team AS team FROM matches WHERE div = ?1
+             ORDER BY team ASC`
+        ).bind(div).all();
+
+        return { div, teams: results.map(row => row.team) };
     });
 
     return jsonResponse(body);
@@ -545,6 +576,10 @@ export default {
 
             if (url.pathname === '/api/head-to-head') {
                 return await handleHeadToHead(url, env);
+            }
+
+            if (url.pathname === '/api/teams') {
+                return await handleTeams(url, env);
             }
 
             if (url.pathname === '/api/standings') {
