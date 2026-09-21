@@ -91,17 +91,38 @@ actually ready to cut over.
       `canonicalQueryKey()` machinery as `/api/standings`/
       `/api/season-standings`. Not yet deployed (held pending review
       before pushing to production).
-- [ ] Only `getLeagueTeams()` (team-name dropdown population) still reads
-      `state.data` on all four pages — deliberately left alone so far,
-      since the team roster is already covered by the hardcoded
-      color/logo table (verified 65/65 for Premier League, not yet
-      checked for the other leagues/Continental). This is now the *only*
-      remaining `state.data.filter(...)` call outside the gist-loading
-      pipeline itself — see `git grep 'state\.data'` in the four frontend
-      files to confirm. The full-history gist fetch (`loadGistData()`)
-      can't be removed from any page until this one is migrated too - the
-      goal isn't just moving computation to the API, it's making the gist
-      URLs themselves unreachable from the client.
+- [x] `getLeagueTeams()` (team-name dropdown population) cut over to the
+      hardcoded color/logo table on the two Domestic pages
+      (`DomesticEurope.html`, `DomesticEuropeMobile.html`) — verified each
+      league's bucket is a complete, exact match for the gists' actual
+      roster first (fetched fresh from the gists, not D1 - zero D1 cost).
+      Found and fixed one real data inconsistency along the way: "Viking
+      FC"/"Viking FK" are the same club recorded under two different
+      names within the same 2026 Champions League campaign (same class of
+      drift as the 9 teams already noted below under "Data integrity",
+      except inconsistent within a single season rather than just stale).
+- [ ] Continental's `getLeagueTeams()` (`ContinentalEurope.html`,
+      `ContinentalEuropeMobile.html`) still reads `state.data` -
+      deliberately **not** cut over to the hardcoded table the same way.
+      Its `getTeamColors()` buckets are split per team's *domestic*
+      league and only unioned for color lookup (`getTeamColor()`'s
+      "search across all leagues" branch); that structure can't
+      reconstruct "teams that played in this competition" the way
+      Domestic's single-bucket-per-division table can. The
+      `champions-league` bucket alone is missing ~90 teams whose color
+      already lives in their domestic bucket; unioning all 6 buckets
+      instead pulls in ~240 teams that never played Champions League at
+      all. Neither reproduces the real 567-team C1 roster - this needs
+      its own solution (most likely a small dedicated endpoint, e.g.
+      `GET /api/teams?div=C1` returning distinct team names from D1,
+      KV-cached the same way as the other endpoints) rather than reusing
+      the color table. This is now the *only* remaining
+      `state.data.filter(...)` call outside the gist-loading pipeline
+      itself on any of the four pages — see `git grep 'state\.data'` to
+      confirm. The full-history gist fetch (`loadGistData()`) can't be
+      removed from any page until this one is migrated too - the goal
+      isn't just moving computation to the API, it's making the gist URLs
+      themselves unreachable from the client.
 
 ## Keeping D1 in sync
 
@@ -195,6 +216,20 @@ changes, bulk updates, a new endpoint reading raw D1 rows) - it'll catch
 exactly this kind of drift by diffing every team's full match list against
 the live gists.
 
+A second, different flavor of the same problem: **"Viking FC" / "Viking
+FK"** (Norway) is recorded under both names within the same 2026
+Champions League campaign - "Viking FC" for its August qualifiers,
+"Viking FK" once it reached the League Phase in September. Unlike the
+9-team case above, this isn't stale-vs-current drift fixed once and done
+- it's the gists themselves being inconsistent about one club's name
+within a single season, so D1 (and the API) currently has this team's
+matches split across two identities. Not yet fixed in D1 - only worked
+around in the frontend's hardcoded color table (both spellings map to
+the same color/crestId, see `git log` for the "Viking FK/Viking FC data
+inconsistency" commit). Fixing it properly means picking a canonical
+name and a D1 `UPDATE`, the same pattern as the 9-team fix above -
+watch for it recurring if the gists rename this team again next season.
+
 **Mind D1's free-tier daily row-read limit (5,000,000 rows/day).** A single
 day of running `verify-parity.mjs` a few times, a couple of full-table
 `UPDATE` fixes, and `verify-head-to-head.mjs` was enough to exhaust it -
@@ -223,10 +258,11 @@ never been requested that day) pays the full row-read cost.
 
 1. Deploy the pending `/api/team-history`/`/api/head-to-head` KV caching
    change (committed, not yet deployed).
-2. Verify the hardcoded color/logo table's team roster against the
-   gists for every league/division (not just Premier League), then switch
-   `getLeagueTeams()` on all four pages to read from it instead of
-   `state.data` - the last remaining `state.data`-dependent feature.
+2. Build a small dedicated endpoint for Continental's team roster (e.g.
+   `GET /api/teams?div=C1`, distinct team names from D1, KV-cached) and
+   cut `getLeagueTeams()` over to it on the two Continental pages - the
+   hardcoded color table can't be reused for this one (see Status above).
+   This is the last remaining `state.data`-dependent feature anywhere.
 3. Once nothing reads `state.data` for its own computation, drop
    `loadGistData()`'s call in `init()` on all four pages - that's the step
    that actually stops the client from downloading the gists, and is the
