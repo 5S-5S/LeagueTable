@@ -41,8 +41,36 @@ actually ready to cut over.
 - [x] `migration/verify-parity.mjs` — full parity check (every team,
       every division) between the live gists and the API; run after any
       backend change that touches match data
-- [ ] Everything else (head-to-head, standings, Team Seasons filters) —
-      one endpoint at a time, same pattern
+- [x] `GET /api/head-to-head?div=&team1=&team2=` — two teams (team2 may be
+      a comma-separated list, e.g. a "Big 6"/country grouping already
+      resolved client-side). Match History and Team Streaks also cut over
+      to team-history/head-to-head on all four pages.
+- [x] `GET /api/standings?div=&dateFrom=&dateTo=&...` — full-division
+      aggregated standings (raw/undeducted points; deductions stay
+      client-side). Powers League Table with no team selected (Domestic
+      and Continental's flat/non-grouped case), on all four pages.
+- [x] `GET /api/season-matches?div=&dateFrom=&dateTo=` — raw matches for
+      one division bounded to a single season. Powers Continental's
+      League Table when a specific season is selected (the
+      grouped-by-competition-phase view, which needs match-level
+      granularity for its per-phase mini-tables and knockout
+      match-history display), on both Continental pages.
+- [x] `POST /api/season-standings` — batches a division's entire match
+      history into requested season date ranges in one query/pass,
+      returning each season's full (all-teams, raw/undeducted) standings
+      plus each team's chronologically last match of the season
+      (`lastMatch`, Continental-only, for tournament-progression display).
+      Powers Team Seasons on all four pages (Domestic: rank-by-season;
+      Continental: rank-by-season + progression/"reached the Final" search).
+- [ ] Everything else still reads from the gists: team-name dropdown
+      population, the Team Dashboard's "last results" widgets, and a
+      handful of smaller per-page utilities (each still has its own
+      `state.data.filter(...)` call — see `git grep 'state\.data'` in the
+      four frontend files for the current list). The full-history gist
+      fetch (`loadGistData()`) can't be removed from any page until every
+      one of these is migrated too - the goal isn't just moving
+      computation to the API, it's making the gist URLs themselves
+      unreachable from the client.
 
 ## Keeping D1 in sync
 
@@ -152,10 +180,15 @@ information.
 
 ## Next steps
 
-1. Build the next endpoint (head-to-head is the next simplest: two teams,
-   optionally two divs).
-2. Keep working through the rest of the site's features the same way -
-   standings, Team Seasons filters, etc.
+1. Migrate the remaining `state.data`-dependent features (team dropdown
+   population, Team Dashboard "last results" widgets, and the other small
+   per-page utilities noted above in Status) - most are narrow/team-scoped
+   and can likely reuse the existing team-history/head-to-head endpoints
+   the way Match History and Team Streaks already do.
+2. Once nothing reads `state.data` for its own computation, drop
+   `loadGistData()`'s call in `init()` on all four pages - that's the step
+   that actually stops the client from downloading the gists, and is the
+   real finish line for this migration (not just "every tab has an API").
 
 ## Regenerating the seed data (manual full rebuild only)
 
