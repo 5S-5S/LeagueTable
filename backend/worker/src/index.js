@@ -17,18 +17,41 @@
 // GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=&excludeQualifiers=&excludeMainStage=&competitionStage=
 //   -> { div, matchCount, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
 //   excludeQualifiers/excludeMainStage/competitionStage are Continental-
-//   only and only cover the FLAT (non-grouped) table - the branch
+//   only and cover the FLAT (non-grouped) table - the branch
 //   calculateTable() in ContinentalEurope.html takes when no specific
-//   season is selected (no season, or an era filter). A specific season
-//   selected groups into per-competition-phase mini-tables, which the
-//   frontend still computes client-side (see backend/README.md's Data
-//   integrity / Next steps). Points are raw/undeducted - point
-//   deductions stay a client-side correction (the table is hardcoded in
-//   the frontend, not duplicated here).
+//   season is selected (no season, or an era filter). Points are
+//   raw/undeducted - point deductions stay a client-side correction (the
+//   table is hardcoded in the frontend, not duplicated here).
+//
+// GET /api/season-matches?div=C1&dateFrom=&dateTo=
+//   -> { div, matches: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase, isQualifier, additionalInfo }, ...] }
+//   Raw match rows (same shape as team-history/head-to-head) for one
+//   division bounded to a date range - used for Continental's
+//   grouped-by-competition-phase standings view, which needs match-level
+//   granularity (competitionPhase, individual scores) to build its
+//   per-phase mini-tables and knockout match-history display client-side.
+//   Always called with a single season's date range, so the result stays
+//   small (one season's matches, not the full division history).
+//
+// POST /api/season-standings  body: { div, seasons: [{season, start, end}, ...], excludeQualifiers?, excludeMainStage? }
+//   -> { div, seasons: [{ season, matchCount, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points, lastMatch }, ...] }, ...] }
+//   Batch version of /api/standings for Team Seasons: buckets one
+//   division's entire match history into the given season date ranges in
+//   a single query/pass, returning each season's full (all-teams,
+//   raw/undeducted) standings. The client applies point deductions and
+//   ranking overrides itself (unchanged, hardcoded, never duplicated
+//   here) to find the requested team's final position per season - this
+//   endpoint only supplies the compact per-team-per-season aggregates.
+//   excludeQualifiers/excludeMainStage are Continental-only. lastMatch
+//   (each team's chronologically final match that season - date,
+//   homeTeam, awayTeam, scores, competitionPhase, additionalInfo, or null)
+//   is also Continental-only, used to determine tournament progression
+//   (e.g. did the team win the Final) without a second per-team request.
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
 };
 
 function jsonResponse(body, status = 200) {
@@ -281,6 +304,138 @@ async function handleStandings(url, env) {
     return jsonResponse({ div, matchCount: matches.length, matchDateRange, standings });
 }
 
+async function handleSeasonMatches(url, env) {
+    const div = url.searchParams.get('div');
+    if (!div) {
+        return jsonResponse({ error: 'div query param is required' }, 400);
+    }
+
+    const dateFrom = url.searchParams.get('dateFrom');
+    const dateTo = url.searchParams.get('dateTo');
+
+    let sql = `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info FROM matches WHERE div = ?1`;
+    const params = [div];
+    if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
+    if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
+    sql += ` ORDER BY date ASC`;
+
+    const { results } = await env.DB.prepare(sql).bind(...params).all();
+
+    const matches = results.map(row => ({
+        date: row.date,
+        homeTeam: row.home_team,
+        awayTeam: row.away_team,
+        homeGoals: row.home_goals,
+        awayGoals: row.away_goals,
+        competitionPhase: row.competition_phase,
+        isQualifier: !!row.is_qualifier,
+        additionalInfo: row.additional_info,
+    }));
+
+    return jsonResponse({ div, matches });
+}
+
+// Buckets a sorted match list into sorted, possibly slightly-overlapping
+// season date ranges (a handful of leagues have deliberately-extended
+// COVID/post-war season boundaries that overlap their neighbor by a few
+// days - see the `seasons` table in the frontend). A single forward
+// pointer keeps this O(matches + seasons): for each match we advance past
+// any seasons fully behind it, then test membership in the season the
+// pointer landed on plus its immediate neighbors (overlaps never reach
+// beyond one season away).
+function bucketMatchesBySeason(matches, seasons) {
+    const sorted = [...seasons].sort((a, b) => a.start < b.start ? -1 : a.start > b.start ? 1 : 0);
+    const buckets = sorted.map(() => []);
+    let i = 0;
+
+    for (const m of matches) {
+        while (i < sorted.length - 1 && m.date > sorted[i].end && m.date >= sorted[i + 1].start) {
+            i++;
+        }
+        for (const j of [i - 1, i, i + 1]) {
+            if (j < 0 || j >= sorted.length) continue;
+            if (m.date >= sorted[j].start && m.date <= sorted[j].end) {
+                buckets[j].push(m);
+            }
+        }
+    }
+
+    return sorted.map((s, idx) => ({ season: s.season, matches: buckets[idx] }));
+}
+
+async function handleSeasonStandings(request, env) {
+    let body;
+    try {
+        body = await request.json();
+    } catch {
+        return jsonResponse({ error: 'request body must be JSON' }, 400);
+    }
+
+    const { div, seasons, excludeQualifiers, excludeMainStage } = body || {};
+    if (!div || !Array.isArray(seasons) || seasons.length === 0) {
+        return jsonResponse({ error: 'div and a non-empty seasons array are required' }, 400);
+    }
+    if (seasons.length > 400) {
+        return jsonResponse({ error: 'too many seasons requested (max 400)' }, 400);
+    }
+    for (const s of seasons) {
+        if (!s || typeof s.season !== 'string' || typeof s.start !== 'string' || typeof s.end !== 'string') {
+            return jsonResponse({ error: 'each season entry needs season, start, and end strings' }, 400);
+        }
+    }
+
+    const { results } = await env.DB.prepare(
+        `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
+         FROM matches WHERE div = ?1 ORDER BY date ASC`
+    ).bind(div).all();
+
+    let matches = results.map(row => ({
+        div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
+        homeGoals: row.home_goals, awayGoals: row.away_goals, isQualifier: !!row.is_qualifier,
+        competitionPhase: row.competition_phase, additionalInfo: row.additional_info,
+    }));
+
+    if (excludeQualifiers) matches = matches.filter(m => !m.isQualifier);
+    if (excludeMainStage) matches = matches.filter(m => m.isQualifier);
+
+    const buckets = bucketMatchesBySeason(matches, seasons);
+
+    // Continental's Team Seasons view needs each team's chronologically
+    // last match of the season (its competitionPhase, score, and
+    // additionalInfo) to determine how far they progressed (e.g. did they
+    // win the Final -> Champions). Matches within each bucket are already
+    // date-sorted (inherited from the ORDER BY above), so a single
+    // forward pass per bucket - overwriting each team's entry as we go -
+    // lands on the right match with no extra sorting.
+    function lastMatchPerTeam(seasonMatches) {
+        const last = new Map();
+        for (const m of seasonMatches) {
+            last.set(m.homeTeam, m);
+            last.set(m.awayTeam, m);
+        }
+        return last;
+    }
+
+    const seasonResults = buckets.map(({ season, matches: seasonMatches }) => {
+        const { standings } = aggregateStandings(seasonMatches, { threePointSystem: false, homeFilter: true, awayFilter: true });
+        const lastByTeam = lastMatchPerTeam(seasonMatches);
+        const standingsWithLastMatch = standings.map(row => {
+            const lm = lastByTeam.get(row.team);
+            return {
+                ...row,
+                lastMatch: lm ? {
+                    date: lm.date, homeTeam: lm.homeTeam, awayTeam: lm.awayTeam,
+                    homeGoals: lm.homeGoals, awayGoals: lm.awayGoals,
+                    competitionPhase: lm.competitionPhase, additionalInfo: lm.additionalInfo,
+                } : null,
+            };
+        });
+        return { season, matchCount: seasonMatches.length, standings: standingsWithLastMatch };
+    });
+
+    return jsonResponse({ div, seasons: seasonResults });
+}
+
 export default {
     async fetch(request, env) {
         if (request.method === 'OPTIONS') {
@@ -300,6 +455,14 @@ export default {
 
             if (url.pathname === '/api/standings') {
                 return await handleStandings(url, env);
+            }
+
+            if (url.pathname === '/api/season-matches') {
+                return await handleSeasonMatches(url, env);
+            }
+
+            if (url.pathname === '/api/season-standings' && request.method === 'POST') {
+                return await handleSeasonStandings(request, env);
             }
 
             return jsonResponse({ error: 'not found' }, 404);
