@@ -1,4 +1,4 @@
-# Backend migration (complete on this branch, not yet merged to main)
+# Backend migration (complete and live on main)
 
 Moved match data off public gist URLs (anyone can `curl` the raw CSV
 forever) into a Cloudflare D1 database sitting behind a Cloudflare Worker
@@ -7,14 +7,15 @@ head-to-head, a table) — it never hands back the full dataset in one
 request, the way the gists used to.
 
 This happened gradually on the `backend-migration` branch, one endpoint
-at a time, each proven before the frontend cut over to it. As of
-2026-09-21, `loadGistData()` and every gist-fetching function have been
-deleted from all four frontend pages (`DomesticEurope.html`,
+at a time, each proven before the frontend cut over to it, and was merged
+to `main` on 2026-09-22 (merge commit `922d85f`). As of that merge,
+`loadGistData()` and every gist-fetching function have been deleted from
+all four frontend pages (`DomesticEurope.html`,
 `DomesticEuropeMobile.html`, `ContinentalEurope.html`,
 `ContinentalEuropeMobile.html`) - the gist URLs are no longer reachable
 from the client at all, which was always the actual finish line (not
-just "every tab has an API"). **This branch has not been merged to
-`main` yet** - that's a separate, deliberate step (see "Next steps").
+just "every tab has an API"). **Live on `main` since 2026-09-22** - real
+visitors are now served by the API, not the gists.
 
 ## Status
 
@@ -155,6 +156,11 @@ just "every tab has an API"). **This branch has not been merged to
       to `calculateGroupedTable()`, whose result is split per competition
       phase instead (fixed by searching every phase). See `git log` for
       the "Drop gist fetching entirely from ___" commits for full detail.
+- [x] `/api/team-history` and `/api/head-to-head` rewritten to stop
+      reading entire divisions per lookup (`INDEXED BY`-forced composite
+      indexes, merged in JS instead of SQL `UNION`) - deployed and
+      verified live (2026-09-22). See "Data integrity" below for the
+      incident that found this and the full mechanism.
 
 ## Keeping D1 in sync
 
@@ -297,6 +303,32 @@ fix, prefer running each script once rather than repeating it "just to be
 sure" - re-running an already-passed check burns quota for no new
 information.
 
+**2026-09-20/21, real incident: the daily sync silently failed for two
+days straight**, both times hitting the exact quota-exhaustion error
+above. A user noticed stale "Last Data Update" dates on the live site
+before anything else surfaced it - the `sync-d1.yml` workflow has no
+failure notification, so a failed scheduled run just does nothing,
+visibly. Root cause traced via `wrangler d1 insights leaguetable
+--time-period=7d`: `/api/team-history` and `/api/head-to-head` had read
+**73 million rows combined over 7 days** - roughly 10x the entire daily
+quota, from two endpoints - at 2.36% and 0.08% query efficiency
+respectively. That's not a caching problem (both were already
+KV-cached, see Status) - caching only saves *repeat* lookups of the
+same team within a day; every first-time-per-day lookup for any team
+was still paying this inflated cost, and the investigation/testing
+traffic that triggered the actual outage is exactly the kind of load
+caching can't help with (many different teams, not repeats). Fixed by
+rewriting both queries - see the "Fix team-history/head-to-head reading
+entire divisions per query" commit and the code comment on
+`queryTeamMatches()` in `src/index.js` for the full mechanism (two
+composite indexes, forced via `INDEXED BY` since this database has no
+`ANALYZE` statistics and the planner won't pick them on its own, merged
+in JS rather than SQL `UNION` since `UNION`'s merge/sort step re-reads
+both sides again). Verified: the same lookup that read 51,381 rows (an
+entire division) now reads 4,407 for 4,405 actual matches. Caught up
+the two missed sync days with a manual `gh workflow run sync-d1.yml`
+once the quota reset.
+
 **Note this applies to manual/testing usage of D1 directly** (curl,
 `wrangler d1 execute`, the verify scripts) - it does not describe the
 Worker's own read cost anymore for `/api/standings` and
@@ -309,16 +341,28 @@ never been requested that day) pays the full row-read cost.
 
 ## Next steps
 
-The migration itself is done - `git grep 'loadGistData\|GIST_URLS'` across
-all four frontend pages returns nothing. What's left is entirely about
-shipping it:
+The migration is done and live on `main` (see intro). What's left is
+smaller cleanup/hardening, not required for correctness:
 
-1. Merge `backend-migration` to `main` when ready. This is the step that
-   actually takes the site live on the new backend - nothing before this
-   point has touched `main` or affected real users. Confirm first: the
-   daily sync workflow is active (see "Activating the daily sync" above),
-   and it's worth a final `verify-parity.mjs` run beforehand given D1's
-   free-tier daily read quota (see "Data integrity").
+1. Consider adding failure notifications on the `sync-d1.yml` workflow -
+   its two-day outage (see "Data integrity") was only caught because a
+   user happened to notice stale match dates on the live site, not
+   because anything alerted anyone. A failed scheduled run currently
+   fails silently.
+2. Consider upgrading off D1's free tier. Now that the site is live,
+   normal traffic competes for the same 5M-row/day quota as any manual
+   testing/investigation work - the quota-exhaustion incident showed how
+   easily that budget can be exhausted, and the error message itself
+   points at this as the fix.
+3. The `/api/teams` endpoint's `DISTINCT ... UNION ... ORDER BY` query is
+   also inefficient (verified: ~0.8% efficiency, reading ~35,195 rows on
+   average) for the same underlying reason as team-history/head-to-head
+   below - much lower priority since it's called far less often (4 times
+   in the last 7 days vs thousands), but the same `INDEXED BY` + JS-merge
+   fix would apply if it ever becomes a real contributor.
+4. The old single-column `idx_matches_home_team`/`idx_matches_away_team`
+   indexes are now redundant (see "Data integrity" below) - fine to drop
+   in a future cleanup pass, not urgent.
 
 ## Regenerating the seed data (manual full rebuild only)
 
