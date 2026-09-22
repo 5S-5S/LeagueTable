@@ -246,9 +246,6 @@
                     </div>
                     
                     <div class="flex gap-3">
-                        <button id="reloadGistsBtn" class="btn btn-blue">
-                            <span class="icon-link"></span>Reload Data
-                        </button>
                         <button id="resetBtn" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
@@ -803,34 +800,8 @@
     </div>
 
     <script>
-        // Pre-configured Gist URLs (Single Base64 Encoded)
-        // Updated GIST URLs with single base64 encoding (encoded with new user-provided URLs)
-        const GIST_URLS = [
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy85OTg4YTEzMzNjNDMwYWFkNTE4ZWJiNDM4YzVkOGRiMS9yYXcvYjliNTM1MGIzZTY3NGE3ODMwY2I3ZDczOWU2MGZhYjQyYjZkNmZlNC9idW5kZXNsaWdhLmNzdg==',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy83NDM1ZmE2OWY1YTYzZDVmM2NjY2E1M2I0ZDA0OWZkZi9yYXcvOGUxNzRlMTJmMjU5YWJiNmY5ZWFlODcxYzY4NGU4OTk2NGIzYjA3My9sYWxpZ2EuY3N2',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy85NDhlMTMwNTYyMGFmM2ExNzJiNDMzOWFiYmEzMWU2Ny9yYXcvYjI0ZjQ3ZTI2ZTUyMDdiYjFkZTM5YTFhZjZkMzg0OThlN2MxNmYzMi9saWd1ZS5jc3Y=',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iZWFhMWNhYzhmYjM3MDlkYzdjMmY0YmIzZDc5OWI0MS9yYXcvMjk1YmM1ZGI5ZWFjNzcxY2Q3MTdlZmRjZjdmM2JlNWMzNzI0YTE3Yy9zZXJpZWEuY3N2',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9jODk1ZGM3Zjg4MTdiZjM3Y2ZmN2FlOTBjZGEzMWZlMS9yYXcvOTA3OWJkYjZhYWMwNTgzYTM4MGUyYzVhZWNkZDlkNmY5Yjk5OGUzNC9wcmVtLmNzdg==',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9mYTM1M2RmYTExZTE4Mzk1ZmY2NTdmMjE5NmE0NTEyOS9yYXcvNzFiM2U3ZjE0ZjNhYzFlMzA3YjlkMzFjZGU0ZGYzMjkwOGJhZjhkMC8yNTI2cHJlbS5jc3Y=',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8wMzkyOGU0YThlYTE4OTk4MjZmYTg1MDdkZTdhNzc1My9yYXcvZjFiMjIzYzkyN2RmNTkyMGE3MjNmM2IyZDgyMDRlNmU3NzhjMzg1NC8yNTI2bGFsaWdhLmNzdg==',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iY2Y2NmE4NzMzMThmODI4NzM2MjE5NGJmNTRlMWM5Yi9yYXcvOTJlNjQzYjk2MTBhMzM1ZTI1YTExOTc5YWFiZDgwYjM0ZmNjNmI0MS8yNTI2c2VyaWVhLmNzdg==',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy84MTc4MDM4ODc0YzgzMjgwNDI1MjdkNDYwYjA2NzdlZC9yYXcvNGE2NjQxMTgzNDcyMzcwYWE1MTEyNzNlZDgxMTg0ZjIyMTZhMDc0Zi8yNTI2YnVuZGVzbGlnYS5jc3Y=',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy8xZjMyODJmNmYwMjQyMjYyMmM0N2I3YTdhNzUxMmM5MS9yYXcvNGQ2ZTkxNGUwODAzNTk1ZmMzZWNmMmIwOGMzZmI0ZWE3ODMzMDZlMC8yNTI2bGlndWUuY3N2'
-        ];
-        
-        // League code mapping for filtering data
-        const LEAGUE_CODES = {
-            'serie-a': 'I1',
-            'premier-league': 'E0',
-            'la-liga': 'SP1',
-            'bundesliga': 'D1',
-            'ligue-1': 'F1'
-        };
-
         // Application state
         const state = {
-            data: [],
-            teams: [],
             error: '',
             
             // Filter states
@@ -881,6 +852,70 @@
             matchHistoryAwayFilter: true,
             recentMatchesCount: 'All',
             matchHistorySortConfig: { key: null, direction: null },
+
+            // Match History's data now comes from the team-history API
+            // instead of the full in-memory gist dataset (see
+            // backend/README.md). Cache keyed by "div::team" so re-renders
+            // triggered by filter changes don't re-fetch.
+            teamHistoryApiCache: null,
+            teamHistoryApiCacheKey: null,
+            teamHistoryApiLoading: false,
+
+            // Head-to-Head's data now comes from the head-to-head API
+            // the same way. Cache keyed by "div::team1::sortedOpponents".
+            h2hApiCache: null,
+            h2hApiCacheKey: null,
+            h2hApiLoading: false,
+
+            // Team Streaks and The Last Time When... each have their own
+            // team selection independent of League Filters, so they get
+            // their own cache slots - sharing h2hApiCache/teamHistoryApiCache
+            // would thrash (and briefly show the wrong team's data) whenever
+            // a different team is selected on a different tab.
+            teamStreaksApiCache: null,
+            teamStreaksApiCacheKey: null,
+            teamStreaksApiLoading: false,
+
+            lastTimeApiCache: null,
+            lastTimeApiCacheKey: null,
+            lastTimeApiLoading: false,
+
+            // League Table (no team selected) comes from the standings API
+            // - it's the one view that legitimately needs many teams' data
+            // at once, so unlike Match History/Head-to-Head/etc. this
+            // can't just be "one team's data, narrowly scoped". Cache
+            // keyed by every param that changes the aggregation.
+            standingsApiCache: null,
+            standingsApiCacheKey: null,
+            standingsApiLoading: false,
+
+            // Team Seasons needs a full per-team-per-season table (to find
+            // the selected team's rank each season) across every season a
+            // division has data for - served from the season-standings
+            // batch API (one request, bucketed server-side) instead of the
+            // full in-memory gist dataset. Cache keyed by div + season list
+            // (see ensureSeasonStandingsLoaded).
+            seasonStandingsApiCache: null,
+            seasonStandingsApiCacheKey: null,
+            seasonStandingsApiLoading: false,
+
+            // Team Dashboard's "Last 5" form chips need one team's recent
+            // match history - own cache slot (not the shared
+            // teamHistoryApiCache) since the dashboard-locked team can be
+            // displayed on any tab regardless of what that tab's own team
+            // selection currently is, so sharing a slot would thrash.
+            teamDashboardHistoryApiCache: null,
+            teamDashboardHistoryApiCacheKey: null,
+            teamDashboardHistoryApiLoading: false,
+
+            // Division-wide earliest/latest match date - a small,
+            // independent cache (keyed by div) reused by several small
+            // utilities (era-season dropdown labels, the "Last Data
+            // Update" banner, Clear Filters' date-range reset, the
+            // per-league default date range on a league switch) that each
+            // just need a min/max date, not a full standings fetch.
+            divDateRangeApiCache: {},
+            divDateRangeApiLoading: {},
 
             // Team Dashboard state (locked team via ?league=&team= URL params,
             // or picked from the in-page search). dashboardLockedTeam is the
@@ -2132,7 +2167,6 @@
         const elements = {
             lastDataUpdate: document.getElementById('lastDataUpdate'),
             controlsSection: document.getElementById('controlsSection'),
-            reloadGistsBtn: document.getElementById('reloadGistsBtn'),
             errorState: document.getElementById('errorState'),
             errorMessage: document.getElementById('errorMessage'),
             tableContainer: document.getElementById('tableContainer'),
@@ -2404,14 +2438,6 @@
             state.teamStreaksBig6Opponents = null;
             state.historicStreaksSortConfig = { key: null, direction: null };
 
-            // Load league data if not already loaded
-            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
-                await loadLeagueDataForDevice(newLeague);
-            } else {
-                // If already loaded, just filter/update UI
-                filterDataForCurrentLeague(newLeague);
-            }
-
             createTeamStreaksLeagueButtons();
             updateTeamStreaksSelects();
         }
@@ -2501,9 +2527,55 @@
         }
         
         // Calculate active streaks (original logic)
-        function calculateActiveStreaks(team1, team2, location, streakType) {
+        // Fetches (or reuses a cached) match list for Team Streaks - team1
+        // alone (all opponents, via team-history) or team1 vs a specific
+        // opponent/group (via head-to-head). Own cache slot, separate from
+        // League Filters' - this tab can have a different team selected at
+        // the same time. Same fire-and-forget pattern as
+        // ensureTeamHistoryLoaded()/ensureHeadToHeadLoaded(), except it
+        // re-renders via calculateTeamStreaks() (which re-reads the
+        // current dropdown values itself) rather than updateTable().
+        async function ensureTeamStreaksDataLoaded(team1, opponents, div) {
+            const cacheKey = opponents
+                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
+                : `${div}::${team1}::__all__`;
+            if (state.teamStreaksApiCacheKey === cacheKey) return;
+            if (state.teamStreaksApiLoading) return;
 
-            // Get league mapping
+            state.teamStreaksApiLoading = true;
+            try {
+                const url = opponents
+                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
+                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Team Streaks data request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.teamStreaksApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.teamStreaksApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load Team Streaks data from API:', err);
+                state.teamStreaksApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.teamStreaksApiLoading = false;
+            }
+
+            calculateTeamStreaks();
+        }
+
+        // Resolves Team Streaks' team2 dropdown value (a real team, or
+        // 'BIG_6') into the div + concrete opponent list the API needs,
+        // and kicks off ensureTeamStreaksDataLoaded() if needed. Shared by
+        // calculateActiveStreaks() and calculateHistoricStreaks() since
+        // both want the exact same underlying match set.
+        function loadTeamStreaksData(team1, team2) {
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1',
@@ -2511,31 +2583,19 @@
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
+            const div = leagueMapping[state.selectedLeague];
+            const opponents = team2
+                ? ((team2 === 'BIG_6' && state.teamStreaksBig6Opponents) ? state.teamStreaksBig6Opponents : [team2])
+                : null;
 
-            // Filter matches by league
-            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-
-            // Filter by teams
-            if (team2) {
-                if (team2 === 'BIG_6' && state.teamStreaksBig6Opponents) {
-                    // Big 6 mode: filter for matches where Team 1 played against any Big 6 opponent
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && state.teamStreaksBig6Opponents.includes(row.AwayTeam)) ||
-                        (row.AwayTeam === team1 && state.teamStreaksBig6Opponents.includes(row.HomeTeam))
-                    );
-                } else {
-                    // Regular head-to-head matches only
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                        (row.HomeTeam === team2 && row.AwayTeam === team1)
-                    );
-                }
-            } else {
-                // One team selected - matches against all opponents
-                matches = matches.filter(row => 
-                    row.HomeTeam === team1 || row.AwayTeam === team1
-                );
+            if (div) {
+                ensureTeamStreaksDataLoaded(team1, opponents, div);
             }
+            return [...(state.teamStreaksApiCache || [])];
+        }
+
+        function calculateActiveStreaks(team1, team2, location, streakType) {
+            let matches = loadTeamStreaksData(team1, team2);
 
             // Filter by location
             if (location === 'home') {
@@ -2550,64 +2610,21 @@
 
             // Calculate streak based on type
             const streak = calculateStreak(matches, team1, streakType);
-            
+
             // Display results
             displayStreakResults(streak, team1, team2, streakType, location);
         }
-        
+
         // Calculate historic streaks - find all streaks of 3+ games throughout history
         function calculateHistoricStreaks(team1, team2, location, streakType) {
-            // Check if data is loaded
-            if (!state.data || state.data.length === 0) {
-                elements.teamStreaksResults.innerHTML = `
-                    <div class="text-center py-8">
-                        <p class="text-gray-600">Loading data...</p>
-                    </div>
-                `;
-                elements.teamStreaksResults.classList.remove('hidden');
-                return;
-            }
-            
             // Reset sort config when parameters change (except when called from sort handler)
             const currentParams = `${team1}-${team2}-${location}-${streakType}`;
             if (!state.lastHistoricStreaksParams || state.lastHistoricStreaksParams !== currentParams) {
                 state.historicStreaksSortConfig = { key: null, direction: null };
                 state.lastHistoricStreaksParams = currentParams;
             }
-            
-            // Get league mapping
-            const leagueMapping = {
-                'premier-league': 'E0',
-                'la-liga': 'SP1',
-                'serie-a': 'I1',
-                'bundesliga': 'D1',
-                'ligue-1': 'F1'
-            };
 
-            // Filter matches by league
-            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-            
-            // Filter by teams
-            if (team2) {
-                if (team2 === 'BIG_6' && state.teamStreaksBig6Opponents) {
-                    // Big 6 mode: filter for matches where Team 1 played against any Big 6 opponent
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && state.teamStreaksBig6Opponents.includes(row.AwayTeam)) ||
-                        (row.AwayTeam === team1 && state.teamStreaksBig6Opponents.includes(row.HomeTeam))
-                    );
-                } else {
-                    // Regular head-to-head matches only
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                        (row.HomeTeam === team2 && row.AwayTeam === team1)
-                    );
-                }
-            } else {
-                // One team selected - matches against all opponents
-                matches = matches.filter(row => 
-                    row.HomeTeam === team1 || row.AwayTeam === team1
-                );
-            }
+            let matches = loadTeamStreaksData(team1, team2);
 
             // Filter by location
             if (location === 'home') {
@@ -2621,10 +2638,10 @@
 
             // Find all historic streaks
             const allStreaks = findAllHistoricStreaks(matches, team1, streakType);
-            
+
             // Filter streaks to only include those with 3+ games
             const significantStreaks = allStreaks.filter(streak => streak.count >= 3);
-            
+
             // Display results
             displayHistoricStreaksResults(significantStreaks, team1, team2, streakType, location);
         }
@@ -3065,134 +3082,14 @@
             elements.teamStreaksResults.classList.remove('hidden');
         }
 
-        // Find the specific match that ended the current streak
-        function findStreakEndingMatch(streak, team1, team2, streakType, location) {
-            if (streak.length === 0) return null;
-
-            // We need to re-run the same filtering logic that was used to build the streak
-            // to find the match that would have broken the streak
-
-            // Get league mapping
-            const leagueMapping = {
-                'premier-league': 'E0',
-                'la-liga': 'SP1',
-                'serie-a': 'I1',
-                'bundesliga': 'D1',
-                'ligue-1': 'F1'
-            };
-
-            // Filter matches by league
-            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-
-            // Filter by teams (same logic as in calculateActiveStreaks)
-            if (team2) {
-                if (team2 === 'BIG_6') {
-                    // Big 6 filtering logic
-                    const big6Opponents = state.teamStreaksBig6Opponents || [];
-                    matches = matches.filter(row => {
-                        const homeTeam = row.HomeTeam;
-                        const awayTeam = row.AwayTeam;
-
-                        return (homeTeam === team1 && big6Opponents.includes(awayTeam)) ||
-                               (awayTeam === team1 && big6Opponents.includes(homeTeam));
-                    });
-                } else {
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                        (row.HomeTeam === team2 && row.AwayTeam === team1)
-                    );
-                }
-            } else {
-                matches = matches.filter(row =>
-                    row.HomeTeam === team1 || row.AwayTeam === team1
-                );
-            }
-
-            // Filter by location (same logic as in calculateActiveStreaks)
-            if (location === 'home') {
-                matches = matches.filter(row => row.HomeTeam === team1);
-            } else if (location === 'away') {
-                matches = matches.filter(row => row.AwayTeam === team1);
-            }
-
-            // Sort by date (most recent first) - same as in calculateActiveStreaks
-            matches.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
-
-            // Now iterate through matches just like calculateStreak does
-            // to find the match that would break the streak
-            let streakMatchCount = 0;
-
-            for (const match of matches) {
-                const isHome = match.HomeTeam === team1;
-                const teamScore = isHome ? parseInt(match.FTHG) || 0 : parseInt(match.FTAG) || 0;
-                const opponentScore = isHome ? parseInt(match.FTAG) || 0 : parseInt(match.FTHG) || 0;
-
-                let result;
-                if (teamScore > opponentScore) {
-                    result = 'win';
-                } else if (teamScore === opponentScore) {
-                    result = 'draw';
-                } else {
-                    result = 'loss';
-                }
-
-                // Check if this match continues the streak
-                const continuesStreak = checkStreakContinuation(result, streakType, teamScore, opponentScore);
-
-                if (continuesStreak) {
-                    streakMatchCount++;
-                } else {
-                    // This is the match that breaks/broke the streak
-                    // But only if we've seen the same number of streak matches as in our current streak
-                    if (streakMatchCount === streak.length) {
-                        return match;
-                    } else {
-                        // Reset and continue looking for the current streak
-                        streakMatchCount = 0;
-                    }
-                }
-            }
-
-            return null;
-        }
-
         // Find the match where the opposite result occurred
         function findOppositeResultMatch(team1, team2, streakType, location) {
-            // Get league mapping
-            const leagueMapping = {
-                'premier-league': 'E0',
-                'la-liga': 'SP1',
-                'serie-a': 'I1',
-                'bundesliga': 'D1',
-                'ligue-1': 'F1'
-            };
-
-            // Filter matches by league
-            let matches = state.data.filter(row => row.Div === leagueMapping[state.selectedLeague]);
-            
-            // Filter by teams
-            if (team2) {
-                if (team2 === 'BIG_6') {
-                    // Big 6 filtering logic
-                    const big6Opponents = state.teamStreaksBig6Opponents || [];
-                    matches = matches.filter(row => {
-                        const homeTeam = row.HomeTeam;
-                        const awayTeam = row.AwayTeam;
-
-                        return (homeTeam === team1 && big6Opponents.includes(awayTeam)) ||
-                               (awayTeam === team1 && big6Opponents.includes(homeTeam));
-                    });
-                } else {
-                    matches = matches.filter(row =>
-                        (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                        (row.HomeTeam === team2 && row.AwayTeam === team1)
-                    );
-                }
-            } else {
-                matches = matches.filter(row =>
-                    row.HomeTeam === team1 || row.AwayTeam === team1
-                );
-            }
+            // Same underlying match set as calculateActiveStreaks() /
+            // calculateHistoricStreaks() - already scoped to team1 vs
+            // team2/BIG_6 by the team-streaks API (loadTeamStreaksData
+            // reuses whatever's cached from those, or kicks off the fetch
+            // itself if this is somehow called first).
+            let matches = loadTeamStreaksData(team1, team2);
 
             // Filter by location
             if (location === 'home') {
@@ -3364,65 +3261,11 @@
             createTeamSeasonsLeagueButtons();
             initTeamDashboardSearch();
             updateUI();
-            // Auto-load data on page load
-            loadGistData();
-        }
-
-        // Decode base64 encoded URL with backward compatibility for double encoding
-        function decodeSingleBase64Url(encodedUrl) {
-            try {
-                // Validate input
-                if (!encodedUrl || typeof encodedUrl !== 'string') {
-                    console.warn('Invalid encoded URL provided');
-                    return null;
-                }
-                
-                // Clean the input
-                const cleanedInput = encodedUrl.trim().replace(/\s/g, '');
-                
-                // Try single decode first
-                let decoded;
-                try {
-                    decoded = atob(cleanedInput);
-                } catch (atobError) {
-                    console.error('Base64 decode failed:', atobError.message);
-                    return null;
-                }
-                
-                // Strip commit hash from gist URL so we always fetch the latest version
-                // Converts: /raw/HASH/filename.csv -> /raw/filename.csv
-                function stripGistCommitHash(url) {
-                    return url.replace(
-                        /(https:\/\/gist\.githubusercontent\.com\/[^/]+\/[^/]+\/raw\/)([0-9a-f]{40}\/)(.+)/i,
-                        '$1$3'
-                    );
-                }
-
-                // Check if the result is a valid URL (single encoding)
-                if (decoded && decoded.startsWith('https://gist.githubusercontent.com')) {
-                    // Successfully decoded single base64 URL
-                    return stripGistCommitHash(decoded);
-                }
-
-                // If not a valid URL, try double decode (backward compatibility)
-                try {
-                    const doubleDecoded = atob(decoded);
-                    if (doubleDecoded && doubleDecoded.startsWith('https://gist.githubusercontent.com')) {
-                        // Successfully decoded double base64 URL
-                        return stripGistCommitHash(doubleDecoded);
-                    }
-                } catch (error) {
-                    // Ignore double decode errors
-                }
-                
-                console.warn('Could not decode URL as single or double base64:', encodedUrl.substring(0, 50) + '...');
-                return null;
-                
-            } catch (error) {
-                console.error('Error in decodeSingleBase64Url:', error);
-                console.error('Stack trace:', error.stack);
-                return null;
-            }
+            updateTeamSelects();
+            updateTeamSeasonsTeamSelect();
+            updateSeasonOptions();
+            updateLastDataUpdate();
+            updateTable();
         }
 
         // Mobile device detection
@@ -3442,446 +3285,6 @@
             
             // Only consider mobile if we have explicit mobile UA AND (small screen OR touch)
             return hasMobileUA && (hasSmallScreen || hasTouchScreen);
-        }
-        
-        // Load data from GitHub Gists - now uses league-specific loading for all devices
-        async function loadGistData() {
-            // Using league-specific loading for optimal performance
-            await loadLeagueDataForDevice(state.selectedLeague);
-        }
-        
-        // Universal league-specific loading for all devices
-        async function loadLeagueDataForDevice(leagueId) {
-            // Loading data for league
-            
-            // Check if already loaded
-            if (state.loadedLeagues && state.loadedLeagues.has(leagueId)) {
-                // League already loaded, filtering existing data
-                filterDataForCurrentLeague(leagueId);
-                return;
-            }
-            
-            // Initialize loadedLeagues if not exists
-            if (!state.loadedLeagues) {
-                state.loadedLeagues = new Set();
-            }
-            
-            // Initialize allLeagueData to store all data if not exists
-            if (!state.allLeagueData) {
-                state.allLeagueData = [];
-            }
-            
-            // Prevent double loading
-            if (state.currentlyLoadingLeague === leagueId) {
-                // League already loading, please wait
-                return;
-            }
-            
-            state.currentlyLoadingLeague = leagueId;
-            state.error = '';
-            
-            // Show loading indicator
-            const leagueName = getLeagueName(leagueId);
-            state.error = `⚽ Loading ${leagueName} data...`;
-            updateUI();
-            
-            try {
-                // Load ALL gist URLs since each contains data for all leagues
-                const gistUrls = GIST_URLS;
-                
-                // Fetching files (contains all leagues)
-                const allData = [];
-                
-                for (let i = 0; i < gistUrls.length; i++) {
-                    const encodedUrl = gistUrls[i];
-                    
-                    try {
-                        const url = decodeSingleBase64Url(encodedUrl);
-                        if (!url) {
-                            console.warn(`Skipping invalid URL at index ${i}`);
-                            continue;
-                        }
-                        
-                        // Check for obviously malformed URLs
-                        if (!url.startsWith('http')) {
-                            console.warn(`Skipping malformed URL at index ${i}: ${url.substring(0, 50)}...`);
-                            continue;
-                        }
-                        
-                        // Fetching URL
-
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 15000);
-
-                        // Append cache-busting param so GitHub CDN always returns the latest gist content
-                        const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-                        const response = await fetch(cacheBustUrl, {
-                            signal: controller.signal,
-                            headers: { 'Accept': 'text/csv,text/plain,*/*' }
-                        });
-                        clearTimeout(timeoutId);
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        
-                        const text = await response.text();
-                        if (!text || text.length === 0) {
-                            throw new Error('Empty response from server');
-                        }
-                        
-                        const parsed = Papa.parse(text, { 
-                            header: true, 
-                            dynamicTyping: false,
-                            skipEmptyLines: true,
-                            transformHeader: (header) => header.trim().replace(/\r/g, ''),
-                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
-                        });
-                        
-                        if (parsed.errors && parsed.errors.length > 0) {
-                            console.warn('CSV parsing errors:', parsed.errors);
-                        }
-                        
-                        if (parsed.data && parsed.data.length > 0) {
-                            // Successfully parsed rows
-                            allData.push(...parsed.data);
-                        }
-                        
-                        // Update progress
-                        const progress = Math.round(((i + 1) / gistUrls.length) * 100);
-                        state.error = `⚽ Loading data... ${progress}%`;
-                        updateUI();
-                        
-                        // Small delay to keep UI responsive
-                        await new Promise(resolve => setTimeout(resolve, 50));
-                        
-                    } catch (fileError) {
-                        console.warn(`Failed to load file ${i}:`, fileError.message);
-                    }
-                }
-                
-                // Process all the raw data
-                // Processing all league data
-                const cleanedData = processRawData(allData);
-                
-                if (cleanedData.length === 0) {
-                    throw new Error(`No valid match data found`);
-                }
-                
-                // Store all data for future league switches
-                state.allLeagueData = cleanedData;
-                
-                // Mark all leagues as loaded since we loaded everything
-                state.loadedLeagues.add('serie-a');
-                state.loadedLeagues.add('premier-league');
-                state.loadedLeagues.add('la-liga');
-                state.loadedLeagues.add('bundesliga');
-                state.loadedLeagues.add('ligue-1');
-                
-                state.currentlyLoadingLeague = null;
-                state.error = '';
-                
-                // Filter data for the requested league
-                filterDataForCurrentLeague(leagueId);
-                
-                // All data loaded successfully
-                updateLastDataUpdate();
-            } catch (error) {
-                console.error(`Error loading data:`, error);
-                state.error = `Failed to load data: ${error.message}`;
-                state.currentlyLoadingLeague = null;
-                updateUI();
-            }
-        }
-        
-        // Get human-readable league name
-        function getLeagueName(leagueId) {
-            const leagueMap = {
-                'serie-a': 'Serie A',
-                'premier-league': 'Premier League',
-                'la-liga': 'La Liga',
-                'bundesliga': 'Bundesliga',
-                'ligue-1': 'Ligue 1'
-            };
-            return leagueMap[leagueId] || leagueId;
-        }
-        
-        // Filter existing data for current league (when switching between loaded leagues)
-        function filterDataForCurrentLeague(leagueId) {
-            if (!state.allLeagueData || state.allLeagueData.length === 0) return;
-            
-            const leagueCode = LEAGUE_CODES[leagueId];
-            if (!leagueCode) {
-                console.warn(`Unknown league ID: ${leagueId}`);
-                return;
-            }
-            
-            // Filter data for the specific league
-            const filteredData = state.allLeagueData.filter(row => row.Div === leagueCode);
-            
-            // Filtered matches for league
-            
-            // Update state with filtered data
-            state.data = filteredData;
-            
-            // Update teams list for this league
-            const allTeams = [...new Set([
-                ...filteredData.map(row => row.HomeTeam),
-                ...filteredData.map(row => row.AwayTeam)
-            ])].filter(team => team && team.length > 1).sort();
-            
-            state.teams = allTeams;
-            
-            // Update date range for this league
-            if (filteredData.length > 0) {
-                const dates = filteredData.map(row => row.dateObj);
-                const minDate = new Date(Math.min(...dates));
-                const maxDate = new Date(Math.max(...dates));
-                
-                state.dateFrom = minDate.toISOString().split('T')[0];
-                state.dateTo = maxDate.toISOString().split('T')[0];
-            }
-            
-            // Update the UI with filtered data
-            updateUI();
-            updateTeamSelects();
-            updateTeamSeasonsTeamSelect();
-            updateSeasonOptions();
-            updateLastDataUpdate();
-            updateTable();
-        }
-        
-        // Chunked loading for desktop browsers (prevents stack overflow)
-        async function loadGistDataChunked() {
-            const gistUrls = GIST_URLS;
-            
-            state.error = '';
-            // Starting chunked data load
-
-            try {
-                const allData = [];
-                let loadedGists = 0;
-                
-                // Process files in smaller batches to prevent stack overflow
-                const batchSize = 5; // Process 5 files at a time
-                
-                for (let batchStart = 0; batchStart < gistUrls.length; batchStart += batchSize) {
-                    const batchEnd = Math.min(batchStart + batchSize, gistUrls.length);
-                    // Processing batch
-                    
-                    // Process batch of files
-                    for (let i = batchStart; i < batchEnd; i++) {
-                    const encodedUrl = gistUrls[i];
-                    // Processing URL
-                    
-                    const url = decodeSingleBase64Url(encodedUrl);
-                    
-                    // Skip if URL decoding failed
-                    if (!url) {
-                        console.warn(`Skipping invalid URL at index ${i}`);
-                        continue;
-                    }
-                    
-                    try {
-                        // Fetching URL
-                        
-                        // Add timeout to fetch
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-                        
-                        const response = await fetch(url, { 
-                            signal: controller.signal,
-                            headers: {
-                                'Accept': 'text/csv,text/plain,*/*'
-                            }
-                        });
-                        clearTimeout(timeoutId);
-                        if (!response.ok) {
-                            if (response.status === 404) {
-                                console.warn(`File not found (404) at index ${i}, skipping: ${url.substring(url.lastIndexOf('/') + 1)}`);
-                                continue;
-                            }
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        
-                        const text = await response.text();
-                        // Received CSV data
-                        
-                        if (!text || text.length === 0) {
-                            throw new Error('Empty response from server');
-                        }
-                        
-                        const parsed = Papa.parse(text, { 
-                            header: true, 
-                            dynamicTyping: false,
-                            skipEmptyLines: true,
-                            transformHeader: (header) => header.trim().replace(/\r/g, ''),
-                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
-                        });
-                        
-                        if (parsed.errors && parsed.errors.length > 0) {
-                            console.warn('CSV parsing errors:', parsed.errors);
-                        }
-                        
-                        if (parsed.data && parsed.data.length > 0) {
-                            // Successfully parsed rows from file
-                            
-                            // Always use chunked processing for desktop stability
-                            if (parsed.data.length > 500) {
-                                // Process in chunks for all browsers
-                                const chunkSize = 300;
-                                for (let i = 0; i < parsed.data.length; i += chunkSize) {
-                                    const chunk = parsed.data.slice(i, i + chunkSize);
-                                    allData.push(...chunk);
-                                    
-                                    // Small delay to prevent stack overflow
-                                    if (i + chunkSize < parsed.data.length) {
-                                        await new Promise(resolve => setTimeout(resolve, 25));
-                                    }
-                                }
-                            } else {
-                                allData.push(...parsed.data);
-                            }
-                            loadedGists++;
-                        } else {
-                            console.warn('No data found in parsed CSV');
-                        }
-                    } catch (gistError) {
-                        console.warn(`Failed to load ${url}:`, gistError.message);
-                    }
-                    
-                    // Small delay between files within batch
-                    if (i < batchEnd - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 10));
-                    }
-                    }
-                    
-                    // Delay between batches to prevent stack overflow  
-                    if (batchEnd < gistUrls.length) {
-                        const progress = Math.round((batchEnd / gistUrls.length) * 100);
-                        state.error = `🔄 Loading data... ${progress}% complete (${loadedGists} files processed)`;
-                        updateUI();
-                        // Batch complete
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                }
-                
-                if (loadedGists === 0) {
-                    throw new Error('No valid data could be loaded from any Gist');
-                }
-                
-                // Clear loading message and show processing status
-                state.error = '⚙️ Processing data...';
-                updateUI();
-                
-                // Process the data
-                // Starting data processing
-                const cleanedData = processRawData(allData);
-                // Data processing completed
-                
-                if (cleanedData.length === 0) {
-                    throw new Error('No valid match data found in the loaded Gists');
-                }
-                
-                const allTeams = [...new Set([
-                    ...cleanedData.map(row => row.HomeTeam), 
-                    ...cleanedData.map(row => row.AwayTeam)
-                ])]
-                    .filter(team => team && team.length > 1)
-                    .sort();
-                
-                const dates = cleanedData.map(row => row.dateObj);
-                const minDate = new Date(Math.min(...dates));
-                const maxDate = new Date(Math.max(...dates));
-                
-                state.data = cleanedData;
-                state.teams = allTeams;
-                state.dateFrom = minDate.toISOString().split('T')[0];
-                state.dateTo = maxDate.toISOString().split('T')[0];
-                state.error = ''; // Clear loading message
-                
-                // Data loaded successfully
-                updateUI();
-                updateTeamSelects();
-                updateTeamSeasonsTeamSelect();
-                updateSeasonOptions();
-                updateTable();
-                
-            } catch (error) {
-                console.error('Error loading Gist data:', error);
-                state.error = error.message;
-            } finally {
-                updateUI();
-            }
-        }
-
-        // Process raw CSV data
-        function processRawData(allData) {
-            return allData
-                .filter(row => {
-                    return row && 
-                           row.HomeTeam && 
-                           row.AwayTeam && 
-                           row.Date &&
-                           row.Div &&
-                           typeof row.HomeTeam === 'string' &&
-                           typeof row.AwayTeam === 'string' &&
-                           row.HomeTeam.length > 0 &&
-                           row.AwayTeam.length > 0 &&
-                           row.Div.length > 0;
-                })
-                .map(row => {
-                    try {
-                        let dateStr = String(row.Date).trim().replace(/\r/g, '');
-                        let dateObj;
-                        
-                        if (dateStr.includes('/')) {
-                            const parts = dateStr.split('/');
-                            if (parts.length === 3) {
-                                const day = parseInt(parts[0]);
-                                const month = parseInt(parts[1]);
-                                let year = parseInt(parts[2]);
-                                
-                                if (year < 100) {
-                                    year = year <= 30 ? 2000 + year : 1900 + year;
-                                }
-                                
-                                dateObj = new Date(year, month - 1, day);
-                            }
-                        } else if (dateStr.includes('-')) {
-                            dateObj = new Date(dateStr);
-                        }
-                        
-                        if (!dateObj || isNaN(dateObj.getTime())) {
-                            return null;
-                        }
-                        
-                        dateObj.setHours(0, 0, 0, 0);
-                        
-                        let homeGoals = 0;
-                        let awayGoals = 0;
-                        
-                        if (row.FTHG !== undefined && row.FTHG !== null && row.FTHG !== '') {
-                            homeGoals = parseInt(String(row.FTHG)) || 0;
-                        }
-                        if (row.FTAG !== undefined && row.FTAG !== null && row.FTAG !== '') {
-                            awayGoals = parseInt(String(row.FTAG)) || 0;
-                        }
-                        
-                        return {
-                            ...row,
-                            dateObj: dateObj,
-                            HomeTeam: String(row.HomeTeam).trim().replace(/\r/g, ''),
-                            AwayTeam: String(row.AwayTeam).trim().replace(/\r/g, ''),
-                            FTHG: homeGoals,
-                            FTAG: awayGoals,
-                            Div: String(row.Div || '').trim().replace(/\r/g, '')
-                        };
-                    } catch (parseError) {
-                        return null;
-                    }
-                })
-                .filter(row => row !== null);
         }
 
         // Create league selection buttons
@@ -4007,14 +3410,6 @@
             state.includeBetterResults = false;
             state.includeHistoricSeasons = false;
             state.firstOccurrenceOnly = false;
-
-            // Load league data if not already loaded
-            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
-                await loadLeagueDataForDevice(newLeague);
-            } else {
-                // If already loaded, just filter/update UI
-                filterDataForCurrentLeague(newLeague);
-            }
             
             createTeamSeasonsLeagueButtons();
             updateTeamSeasonsTeamSelect();
@@ -4080,21 +3475,18 @@
         // filter labels ("Premier League Era (1992-2027)") stay correct as
         // new data comes in instead of being hardcoded to a fixed year.
         function getSeasonEraEndYear(divCode, fallbackYear) {
-            const leagueData = state.data.filter(row => row.Div === divCode);
-            if (leagueData.length === 0) return fallbackYear;
+            // Served from the division date-range cache instead of the
+            // full in-memory gist dataset - kicks off a fetch if this
+            // division isn't already cached; ensureDivDateRangeLoaded
+            // re-renders the season dropdown once it resolves, correcting
+            // this label from fallbackYear to the real value.
+            ensureDivDateRangeLoaded(divCode);
+            const range = state.divDateRangeApiCache[divCode];
+            if (!range || !range.end) return fallbackYear;
 
-            let mostRecentDate = null;
-            leagueData.forEach(row => {
-                if (row.dateObj instanceof Date && !isNaN(row.dateObj)) {
-                    if (!mostRecentDate || row.dateObj > mostRecentDate) {
-                        mostRecentDate = row.dateObj;
-                    }
-                }
-            });
-            if (!mostRecentDate) return fallbackYear;
-
-            const year = mostRecentDate.getFullYear();
-            const month = mostRecentDate.getMonth() + 1; // 1-12
+            // range.end is an ISO 'YYYY-MM-DD' string
+            const year = parseInt(range.end.slice(0, 4), 10);
+            const month = parseInt(range.end.slice(5, 7), 10);
             // Seasons run July-June, so a match from July onward belongs to
             // the season ending the following year.
             return month >= 7 ? year + 1 : year;
@@ -4361,7 +3753,14 @@
             
             const divCode = leagueMapping[league];
             if (!divCode) return;
-            
+
+            // Served from the season-standings batch API instead of the
+            // full in-memory gist dataset - kicks off a fetch if this
+            // division isn't already cached; ensureSeasonStandingsLoaded
+            // re-invokes showAllTeamsAtPosition() once it resolves.
+            ensureSeasonStandingsLoaded(divCode, league);
+            const seasonStandingsBySeasonName = state.seasonStandingsApiCacheKey === divCode ? state.seasonStandingsApiCache : {};
+
             const availableSeasons = getAvailableSeasons(league);
             const allPositionData = [];
 
@@ -4413,68 +3812,34 @@
                     return;
                 }
                 
-                // Get season date range
+                // Get season date range (still needed for point-deduction overlap checks)
                 const originalSelectedLeague = state.selectedLeague;
                 state.selectedLeague = league;
                 const seasonDates = getSeasonDateRange(seasonFilter);
                 state.selectedLeague = originalSelectedLeague;
-                
+
                 if (!seasonDates) return;
-                
-                // Filter data for this season
-                const seasonStart = new Date(seasonDates.start);
-                seasonStart.setUTCHours(0, 0, 0, 0);
-                const seasonEnd = new Date(seasonDates.end);
-                seasonEnd.setUTCHours(23, 59, 59, 999);
-                
-                const seasonData = state.data.filter(match => 
-                    match.Div === divCode &&
-                    match.dateObj >= seasonStart &&
-                    match.dateObj <= seasonEnd
-                );
-                
-                if (seasonData.length === 0) return;
-                
-                // Build complete league table for this season
-                const teams = [...new Set([
-                    ...seasonData.map(row => row.HomeTeam),
-                    ...seasonData.map(row => row.AwayTeam)
-                ])].filter(team => team && team.length > 1);
-                
-                const seasonTable = teams.map(team => {
-                    const stats = { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0 };
-                    
-                    seasonData.forEach(match => {
-                        if (match.HomeTeam === team || match.AwayTeam === team) {
-                            const isHome = match.HomeTeam === team;
-                            const teamScore = isHome ? match.FTHG : match.FTAG;
-                            const opponentScore = isHome ? match.FTAG : match.FTHG;
-                            
-                            if (teamScore !== undefined && opponentScore !== undefined) {
-                                stats.played++;
-                                stats.goalsFor += teamScore;
-                                stats.goalsAgainst += opponentScore;
-                                
-                                if (teamScore > opponentScore) stats.won++;
-                                else if (teamScore === opponentScore) stats.drawn++;
-                                else stats.lost++;
-                            }
-                        }
-                    });
-                    
-                    const pointsPerWin = getHistoricalPointSystem(seasonFilter, league);
-                    let teamPoints = stats.won * pointsPerWin + stats.drawn;
-                    
+
+                // Full-division standings for this season, from the
+                // season-standings API (raw/undeducted - deductions and
+                // ranking overrides are applied below, exactly as before
+                // the cutover).
+                const seasonStandings = seasonStandingsBySeasonName[seasonFilter];
+                if (!seasonStandings) return; // not loaded yet, or no data for this season
+
+                const seasonTable = seasonStandings.standings.map(stats => {
+                    let teamPoints = stats.points;
+
                     // Apply point deductions for this team and season
                     if (seasonDates) {
                         const seasonStart = new Date(seasonDates.start);
                         const seasonEnd = new Date(seasonDates.end);
-                        
+
                         pointDeductions.forEach(deduction => {
-                            if (deduction.team === team && deduction.league === divCode) {
+                            if (deduction.team === stats.team && deduction.league === divCode) {
                                 const deductionStart = new Date(deduction.startDate);
                                 const deductionEnd = new Date(deduction.endDate);
-                                
+
                                 const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
                                 if (hasOverlap && state.pointDeductionsEnabled) {
                                     teamPoints -= deduction.points;
@@ -4482,15 +3847,20 @@
                             }
                         });
                     }
-                    
+
                     return {
-                        team,
-                        ...stats,
+                        team: stats.team,
+                        played: stats.played,
+                        won: stats.won,
+                        drawn: stats.drawn,
+                        lost: stats.lost,
+                        goalsFor: stats.goalsFor,
+                        goalsAgainst: stats.goalsAgainst,
                         goalDifference: stats.goalsFor - stats.goalsAgainst,
                         points: teamPoints
                     };
                 });
-                
+
                 // Sort table by points, goal difference, goals for
                 seasonTable.sort((a, b) => {
                     if (b.points !== a.points) return b.points - a.points;
@@ -5040,10 +4410,7 @@
             document.getElementById('teamSeasonsTab').addEventListener('click', () => switchTab('team-seasons'));
             document.getElementById('lastTimeWhenTab').addEventListener('click', () => switchTab('last-time-when'));
             document.getElementById('teamStreaksTab').addEventListener('click', () => switchTab('team-streaks'));
-            
-            // Gist loading
-            elements.reloadGistsBtn.addEventListener('click', loadGistData);
-            
+
             // League selection
             elements.leagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -5321,7 +4688,7 @@
             });
             elements.retryBtn.addEventListener('click', () => {
                 state.error = '';
-                loadGistData();
+                updateUI();
             });
 
             // H2H controls
@@ -5470,15 +4837,7 @@
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
             state.selectedSeason = '';
-            
-            // Load league data if not already loaded
-            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
-                await loadLeagueDataForDevice(newLeague);
-            } else {
-                // If already loaded, just filter/update UI
-                filterDataForCurrentLeague(newLeague);
-            }
-            
+
             // Reset Last Time When state
             state.lastTimeTeam1 = '';
             state.lastTimeTeam2 = '';
@@ -5513,14 +4872,14 @@
                 state.dateFrom = '1992-08-01';
                 state.dateTo = '2027-06-30';
             } else {
-                // For other leagues, use the full data range
-                const leagueData = state.data.filter(row => row.Div === leagueMapping[newLeague]);
-                if (leagueData.length > 0) {
-                    const dates = leagueData.map(row => row.dateObj);
-                    const minDate = new Date(Math.min(...dates));
-                    const maxDate = new Date(Math.max(...dates));
-                    state.dateFrom = minDate.toISOString().split('T')[0];
-                    state.dateTo = maxDate.toISOString().split('T')[0];
+                // For other leagues, use the full data range - served from
+                // the division date-range cache instead of the full
+                // in-memory gist dataset.
+                await ensureDivDateRangeLoaded(leagueMapping[newLeague]);
+                const range = state.divDateRangeApiCache[leagueMapping[newLeague]];
+                if (range && range.start && range.end) {
+                    state.dateFrom = range.start;
+                    state.dateTo = range.end;
                 }
             }
             
@@ -6238,51 +5597,89 @@
         }
 
         // Calculate last time when results
+        // Fetches (or reuses a cached) match list for The Last Time
+        // When... - team1 alone (all opponents, via team-history) or
+        // team1 vs a specific opponent/group (via head-to-head). Own
+        // cache slot, separate from League Filters' and Team Streaks' -
+        // this tab can have a different team selected at the same time.
+        // Same fire-and-forget pattern as ensureTeamHistoryLoaded()/
+        // ensureHeadToHeadLoaded(), except it re-renders via
+        // calculateLastTimeWhen() (which re-reads current state itself)
+        // rather than updateTable().
+        async function ensureLastTimeDataLoaded(team1, opponents, div) {
+            const cacheKey = opponents
+                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
+                : `${div}::${team1}::__all__`;
+            if (state.lastTimeApiCacheKey === cacheKey) return;
+            if (state.lastTimeApiLoading) return;
+
+            state.lastTimeApiLoading = true;
+            try {
+                const url = opponents
+                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
+                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Last Time When data request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.lastTimeApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.lastTimeApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load Last Time When data from API:', err);
+                state.lastTimeApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.lastTimeApiLoading = false;
+            }
+
+            calculateLastTimeWhen();
+        }
+
         function calculateLastTimeWhen() {
             if (!state.lastTimeTeam1) {
                 elements.lastTimeResults.classList.add('hidden');
                 return;
             }
-            
+
             // Handle single team scenario (Team 1 only selected)
             if (!state.lastTimeTeam2) {
                 calculateSingleTeamResults();
                 return;
             }
-            
+
             if (state.lastTimeTeam1 === state.lastTimeTeam2) {
                 elements.lastTimeResults.classList.add('hidden');
                 return;
             }
-            
+
             // Hide all sections initially
             hideAllLastTimeSections();
-            
+
             const leagueMapping = {
                 'premier-league': 'E0',
-                'la-liga': 'SP1', 
+                'la-liga': 'SP1',
                 'serie-a': 'I1',
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
-            
-            let matches;
-            if (state.lastTimeTeam2 === 'BIG_6' && state.lastTimeBig6Opponents) {
-                // Filter for matches where Team 1 played against any Big 6 opponent
-                matches = state.data.filter(row =>
-                    row.Div === leagueMapping[state.selectedLeague] &&
-                    ((row.HomeTeam === state.lastTimeTeam1 && state.lastTimeBig6Opponents.includes(row.AwayTeam)) ||
-                     (row.AwayTeam === state.lastTimeTeam1 && state.lastTimeBig6Opponents.includes(row.HomeTeam)))
-                );
-            } else {
-                // Regular head-to-head matches
-                matches = state.data.filter(row =>
-                    row.Div === leagueMapping[state.selectedLeague] &&
-                    ((row.HomeTeam === state.lastTimeTeam1 && row.AwayTeam === state.lastTimeTeam2) ||
-                     (row.HomeTeam === state.lastTimeTeam2 && row.AwayTeam === state.lastTimeTeam1))
-                );
+            const div = leagueMapping[state.selectedLeague];
+
+            const opponents = (state.lastTimeTeam2 === 'BIG_6' && state.lastTimeBig6Opponents)
+                ? state.lastTimeBig6Opponents
+                : [state.lastTimeTeam2];
+
+            if (div && opponents.length > 0) {
+                ensureLastTimeDataLoaded(state.lastTimeTeam1, opponents, div);
             }
-            
+
+            let matches = [...(state.lastTimeApiCache || [])];
+
             // Apply day of week filter if selected
             if (state.lastTimeDayOfWeek !== '') {
                 matches = matches.filter(row => {
@@ -6404,17 +5801,19 @@
             hideAllLastTimeSections();
             const leagueMapping = {
                 'premier-league': 'E0',
-                'la-liga': 'SP1', 
+                'la-liga': 'SP1',
                 'serie-a': 'I1',
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
-            
-            let matches = state.data.filter(row => 
-                row.Div === leagueMapping[state.selectedLeague] &&
-                (row.HomeTeam === state.lastTimeTeam1 || row.AwayTeam === state.lastTimeTeam1)
-            );
-            
+            const div = leagueMapping[state.selectedLeague];
+
+            if (div) {
+                ensureLastTimeDataLoaded(state.lastTimeTeam1, null, div);
+            }
+
+            let matches = [...(state.lastTimeApiCache || [])];
+
             // Apply day of week filter if selected
             if (state.lastTimeDayOfWeek !== '') {
                 matches = matches.filter(row => {
@@ -6541,26 +5940,17 @@
             elements.lastTimeResults.classList.remove('hidden');
         }
 
-        // Get teams for selected league
+        // Get teams for selected league. Sources from the hardcoded
+        // color/logo table (getTeamColors()) instead of scanning state.data -
+        // verified equal to the gists' actual team roster per league (see
+        // backend/README.md's migration status). Each division's bucket
+        // there is a complete, standalone roster (unlike Continental's,
+        // which is split across per-country buckets and can't be used the
+        // same way - see getLeagueTeams() in ContinentalEuropeMobile.html).
         function getLeagueTeams(league = null) {
-            const leagueMapping = {
-                'premier-league': 'E0',
-                'la-liga': 'SP1',
-                'serie-a': 'I1',
-                'bundesliga': 'D1',
-                'ligue-1': 'F1'
-            };
-            
-            const selectedDiv = leagueMapping[league || state.selectedLeague];
-            const leagueData = state.data.filter(row => row.Div === selectedDiv);
-            const leagueTeams = [...new Set([
-                ...leagueData.map(row => row.HomeTeam), 
-                ...leagueData.map(row => row.AwayTeam)
-            ])]
-                .filter(team => team && team.length > 1)
-                .sort();
-            
-            return leagueTeams;
+            const teamColors = getTeamColors();
+            const leagueColors = teamColors[league || state.selectedLeague] || [];
+            return leagueColors.map(([name]) => name).sort();
         }
 
         // Update season options
@@ -6616,15 +6006,20 @@
         }
 
         // Apply point deductions
-        function applyPointDeductions(tableArray, filteredMatches, selectedLeagueDiv) {
+        // dateRange is {start, end} (Date objects or ISO strings both work,
+        // both sides just need to be comparable via `new Date(...)`) -
+        // either derived from a raw matches array (team-scoped table
+        // modes, still computed client-side) or straight from the
+        // standings API's matchDateRange (full-table mode, where no raw
+        // matches are available client-side by design).
+        function applyPointDeductions(tableArray, dateRange, selectedLeagueDiv) {
             if (pointDeductions.length === 0 || !state.pointDeductionsEnabled) return tableArray;
-            
-            if (filteredMatches.length === 0) return tableArray;
-            
-            const matchDates = filteredMatches.map(match => match.dateObj);
-            const filterStartDate = new Date(Math.min(...matchDates));
-            const filterEndDate = new Date(Math.max(...matchDates));
-            
+
+            if (!dateRange) return tableArray;
+
+            const filterStartDate = new Date(dateRange.start);
+            const filterEndDate = new Date(dateRange.end);
+
             return tableArray.map(team => {
                 let adjustedPoints = team.points;
                 
@@ -6650,9 +6045,276 @@
         }
 
         // Calculate table (abbreviated - same logic as original)
+        // Fetches (or reuses a cached) full-division standings from the
+        // standings API - the one League Table mode that legitimately
+        // needs every team's data at once (unlike a single team or a
+        // head-to-head pair, there's no way to scope this down further).
+        // Same fire-and-forget pattern as the other ensure*Loaded()
+        // functions: kicks off a fetch if the cache is missing/stale,
+        // then calls updateTable() again once it resolves.
+        async function ensureStandingsLoaded(div, params) {
+            const cacheKey = [
+                div, params.dateFrom || '', params.dateTo || '', params.dayOfWeek || '',
+                params.threePointSystem, params.homeFilter, params.awayFilter,
+            ].join('::');
+            if (state.standingsApiCacheKey === cacheKey) return;
+            if (state.standingsApiLoading) return;
+
+            state.standingsApiLoading = true;
+            try {
+                const qs = new URLSearchParams({
+                    div,
+                    threePointSystem: String(params.threePointSystem),
+                    homeFilter: String(params.homeFilter),
+                    awayFilter: String(params.awayFilter),
+                });
+                if (params.dateFrom) qs.set('dateFrom', params.dateFrom);
+                if (params.dateTo) qs.set('dateTo', params.dateTo);
+                if (params.dayOfWeek) qs.set('dayOfWeek', params.dayOfWeek);
+
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/standings?${qs.toString()}`);
+                if (!res.ok) throw new Error(`Standings request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.standingsApiCache = data;
+                state.standingsApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load standings from API:', err);
+                state.standingsApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.standingsApiLoading = false;
+            }
+
+            updateTable();
+        }
+
+        // Fetches (or reuses a cached) full-history, per-season standings
+        // for one division from the season-standings batch API - used by
+        // showTeamHistory() and showAllTeamsAtPosition() (Team Seasons) to
+        // find teams' ranks each season without downloading the
+        // division's entire raw match history. Always requests every real
+        // season the division has
+        // (ignoring any era filter the user picked in Team Seasons - that
+        // filter only narrows which seasons are displayed, not which are
+        // fetched), so the cache is reusable across era changes and only
+        // needs one request per division. Same fire-and-forget pattern as
+        // the other ensure*Loaded() functions.
+        async function ensureSeasonStandingsLoaded(div, leagueToUse) {
+            if (state.seasonStandingsApiCacheKey === div) return;
+            if (state.seasonStandingsApiLoading) return;
+
+            state.seasonStandingsApiLoading = true;
+            try {
+                const originalSelectedLeague = state.selectedLeague;
+                state.selectedLeague = leagueToUse;
+                const seasons = getAvailableSeasons(leagueToUse)
+                    .filter(s => !(s.includes('all-') || s.includes('-era-') || s.includes('french-division-1')))
+                    .map(s => {
+                        const range = getSeasonDateRange(s);
+                        return range ? { season: s, start: range.start, end: range.end } : null;
+                    })
+                    .filter(Boolean);
+                state.selectedLeague = originalSelectedLeague;
+
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/season-standings`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ div, seasons }),
+                });
+                if (!res.ok) throw new Error(`Season standings request failed: ${res.status}`);
+                const data = await res.json();
+
+                const bySeason = {};
+                data.seasons.forEach(s => { bySeason[s.season] = s; });
+                state.seasonStandingsApiCache = bySeason;
+                state.seasonStandingsApiCacheKey = div;
+            } catch (err) {
+                console.error('Failed to load season standings from API:', err);
+                state.seasonStandingsApiCacheKey = div; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.seasonStandingsApiLoading = false;
+            }
+
+            if (state.teamSeasonsSelectedTeam) {
+                showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+            } else if (state.teamSeasonsSelectedPosition) {
+                showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
+            }
+        }
+
+        // Fetches (or reuses a cached) recent match history for the Team
+        // Dashboard's locked team - a dedicated cache (not the shared
+        // teamHistoryApiCache) since the dashboard header can be showing
+        // a different team than whatever the currently active tab's own
+        // team selector has, and can be visible on any tab regardless of
+        // which one triggered the fetch. Same fire-and-forget pattern as
+        // the other ensure*Loaded() functions.
+        async function ensureTeamDashboardHistoryLoaded(team, div) {
+            const cacheKey = `${div}::${team}`;
+            if (state.teamDashboardHistoryApiCacheKey === cacheKey) return;
+            if (state.teamDashboardHistoryApiLoading) return;
+
+            state.teamDashboardHistoryApiLoading = true;
+            try {
+                const url = `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Team history request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.teamDashboardHistoryApiCache = data.matches.map(m => ({
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                }));
+                state.teamDashboardHistoryApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load team dashboard history from API:', err);
+                state.teamDashboardHistoryApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.teamDashboardHistoryApiLoading = false;
+            }
+
+            updateTeamDashboardHeader();
+        }
+
+        // Fetches (or reuses a cached) earliest/latest match date for one
+        // division - a byproduct of the standings API's matchDateRange
+        // field, requested with the same default (no filters) params the
+        // flat League Table view uses, so it shares that KV-cached
+        // response server-side even though it's tracked in its own small
+        // client-side cache here to avoid thrashing League Table's own
+        // live filter state. Reused by several small utilities
+        // (era-season dropdown labels, the "Last Data Update" banner,
+        // Clear Filters' date-range reset, the per-league default date
+        // range on a league switch) that each just need a min/max date.
+        async function ensureDivDateRangeLoaded(div) {
+            if (state.divDateRangeApiCache[div]) return;
+            if (state.divDateRangeApiLoading[div]) return;
+
+            state.divDateRangeApiLoading[div] = true;
+            try {
+                const qs = new URLSearchParams({ div, threePointSystem: 'true', homeFilter: 'true', awayFilter: 'true' });
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/standings?${qs.toString()}`);
+                if (!res.ok) throw new Error(`Standings request failed: ${res.status}`);
+                const data = await res.json();
+                state.divDateRangeApiCache[div] = data.matchDateRange || { start: null, end: null };
+            } catch (err) {
+                console.error('Failed to load division date range from API:', err);
+                state.divDateRangeApiCache[div] = { start: null, end: null }; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.divDateRangeApiLoading[div] = false;
+            }
+
+            updateSeasonOptions();
+            updateLastDataUpdate();
+        }
+
+        // Shared tail of calculateTable(): point deductions, sorting,
+        // historic-season ranking overrides, and position assignment.
+        // Identical regardless of whether tableArray came from the
+        // standings API (no team selected) or was aggregated client-side
+        // from a team-scoped cache (one or two teams selected).
+        function finalizeTable(tableArray, dateRangeForDeductions, selectedDiv, matchCount) {
+            tableArray = applyPointDeductions(tableArray, dateRangeForDeductions, selectedDiv);
+
+            // First, sort by points to establish the base ranking
+            let pointsSortedArray = [...tableArray].sort((a, b) => {
+                if (b.points !== a.points) return b.points - a.points;
+                if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+                return b.goalsFor - a.goalsFor;
+            });
+
+            // Apply ranking overrides for historic seasons to the points-sorted array
+            if (!state.sortConfig.key) {
+                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+            } else {
+                // Apply custom sorting if requested - work with pointsSortedArray to preserve position logic
+                pointsSortedArray.sort((a, b) => {
+                    let aVal = a[state.sortConfig.key];
+                    let bVal = b[state.sortConfig.key];
+
+                    if (typeof aVal === 'string') {
+                        return state.sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+                    }
+
+                    return state.sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+                });
+            }
+
+            // Only apply position assignment logic when not using custom sorting
+            if (!state.sortConfig.key) {
+                // Add original position based on the final points/override ranking
+                // Calculate positions properly handling ties and gaps
+
+                // Step 1: Find all override positions and calculate blocked positions
+                const overridePositions = [];
+                const blockedPositions = new Set();
+
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        overridePositions.push(team.sharedPosition);
+                    }
+                });
+
+                // Group override positions and calculate blocked ranges
+                const positionCounts = {};
+                overridePositions.forEach(pos => {
+                    positionCounts[pos] = (positionCounts[pos] || 0) + 1;
+                });
+
+                // Block positions based on ties (e.g., two 4s block positions 4 and 5)
+                Object.keys(positionCounts).forEach(pos => {
+                    const position = parseInt(pos);
+                    const count = positionCounts[pos];
+
+                    // Block 'count' positions starting from 'position'
+                    for (let i = 0; i < count; i++) {
+                        blockedPositions.add(position + i);
+                    }
+                });
+
+                // Step 2: Assign positions to regular teams (skip blocked positions)
+                let currentPosition = 1;
+                const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
+
+                regularTeams.forEach(team => {
+                    // Find next available position (skip blocked ones)
+                    while (blockedPositions.has(currentPosition)) {
+                        currentPosition++;
+                    }
+
+                    team.originalPosition = currentPosition;
+                    currentPosition++;
+                });
+
+                // Step 3: Set override positions
+                pointsSortedArray.forEach(team => {
+                    if (team.sharedPosition) {
+                        team.originalPosition = team.sharedPosition;
+                    }
+                });
+
+                // Step 4: Sort teams by their final position for proper display order
+                pointsSortedArray.sort((a, b) => {
+                    if (a.originalPosition !== b.originalPosition) {
+                        return a.originalPosition - b.originalPosition;
+                    }
+                    // If positions are equal, maintain original order (sub-order for tied teams)
+                    return 0;
+                });
+            } else {
+                // For custom sorting, just assign sequential positions based on current order
+                pointsSortedArray.forEach((team, index) => {
+                    team.originalPosition = index + 1;
+                });
+            }
+
+            return { tableData: pointsSortedArray, matchCount };
+        }
+
         function calculateTable() {
-            let filtered = [...state.data];
-            
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1',
@@ -6660,10 +6322,42 @@
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
-            
             const selectedDiv = leagueMapping[state.selectedLeague];
-            filtered = filtered.filter(row => row.Div === selectedDiv);
-            
+
+            // No team selected: the one League Table mode that needs every
+            // team's data at once, served from the standings API instead
+            // of scanning the full in-memory gist dataset.
+            if (!state.selectedTeam1) {
+                if (selectedDiv) {
+                    ensureStandingsLoaded(selectedDiv, {
+                        dateFrom: state.dateFrom,
+                        dateTo: state.dateTo,
+                        dayOfWeek: state.selectedDayOfWeek,
+                        threePointSystem: state.threePointSystem,
+                        homeFilter: state.homeFilter,
+                        awayFilter: state.awayFilter
+                    });
+                }
+
+                const cached = state.standingsApiCache;
+                const tableArray = (cached?.standings || []).map(team => ({
+                    ...team,
+                    goalDifference: team.goalsFor - team.goalsAgainst
+                }));
+                return finalizeTable(tableArray, cached?.matchDateRange || null, selectedDiv, cached?.matchCount || 0);
+            }
+
+            // One or two teams selected: naturally narrow, so reuse
+            // whichever of teamHistoryApiCache/h2hApiCache the sibling
+            // calculateMatchHistory()/calculateHeadToHead() calls are
+            // already keeping current for this exact selection (every
+            // call site that reaches this branch also calls one of those
+            // in the same tick - see updateTable() and the match-history
+            // filter event handlers - so no separate fetch is needed here).
+            let filtered = state.selectedTeam2
+                ? [...(state.h2hApiCache || [])]
+                : [...(state.teamHistoryApiCache || [])];
+
             // Date filters
             if (state.dateFrom) {
                 filtered = filtered.filter(row => {
@@ -6671,14 +6365,14 @@
                     return matchDateStr >= state.dateFrom;
                 });
             }
-            
+
             if (state.dateTo) {
                 filtered = filtered.filter(row => {
                     const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
                     return matchDateStr <= state.dateTo;
                 });
             }
-            
+
             // Day of week filter
             if (state.selectedDayOfWeek !== '') {
                 filtered = filtered.filter(row => {
@@ -6686,23 +6380,11 @@
                     return dayOfWeek.toString() === state.selectedDayOfWeek;
                 });
             }
-            
-            if (state.selectedTeam1 && state.selectedTeam2) {
-                // Handle Big 6 selection
-                if (state.selectedTeam2 === 'BIG_6' && state.big6Opponents) {
-                    // Filter for matches where Team 1 played against any Big 6 opponent
-                    filtered = filtered.filter(row =>
-                        (row.HomeTeam === state.selectedTeam1 && state.big6Opponents.includes(row.AwayTeam)) ||
-                        (row.AwayTeam === state.selectedTeam1 && state.big6Opponents.includes(row.HomeTeam))
-                    );
-                } else {
-                    // Regular H2H matches
-                    filtered = filtered.filter(row =>
-                        (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
-                        (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
-                    );
-                }
-                
+
+            if (state.selectedTeam2) {
+                // Already scoped to team1 vs team2/Big 6 by the API - no
+                // opponent re-filtering needed here.
+
                 // Apply home/away filtering based on state (same logic as calculateHeadToHead)
                 if (state.homeFilter && !state.awayFilter) {
                     // Show only matches where Team 1 is home
@@ -6712,7 +6394,7 @@
                     filtered = filtered.filter(row => row.AwayTeam === state.selectedTeam1);
                 }
                 // If both are checked or both unchecked, show all H2H matches
-                
+
                 // Apply recent H2H filter if specified
                 if (state.recentH2HCount !== 'All') {
                     // Sort by date (most recent first) and take the specified number
@@ -6720,9 +6402,9 @@
                         .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
                         .slice(0, parseInt(state.recentH2HCount));
                 }
-            } else if (state.selectedTeam1) {
-                // Single team selected - apply match history filters
-                filtered = filtered.filter(row => row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1);
+            } else {
+                // Already scoped to this team by the API - no team
+                // re-filtering needed here.
 
                 // Apply match history home/away filtering
                 if (!state.matchHistoryHomeFilter) {
@@ -6742,20 +6424,12 @@
                         .slice(0, parseInt(state.recentMatchesCount));
                 }
             }
-            
+
             // Determine teams to show
-            let teamsToShow;
-            if (state.selectedTeam1 && state.selectedTeam2) {
-                teamsToShow = [state.selectedTeam1, state.selectedTeam2];
-            } else if (state.selectedTeam1) {
-                teamsToShow = [state.selectedTeam1];
-            } else {
-                teamsToShow = [...new Set([
-                    ...filtered.map(row => row.HomeTeam),
-                    ...filtered.map(row => row.AwayTeam)
-                ])];
-            }
-            
+            const teamsToShow = state.selectedTeam2
+                ? [state.selectedTeam1, state.selectedTeam2]
+                : [state.selectedTeam1];
+
             const table = {};
             teamsToShow.forEach(team => {
                 table[team] = {
@@ -6770,18 +6444,18 @@
                     points: 0
                 };
             });
-            
+
             // Process matches with historical point systems
             filtered.forEach(match => {
                 const homeTeam = table[match.HomeTeam];
                 const awayTeam = table[match.AwayTeam];
-                
+
                 const homeGoals = parseInt(match.FTHG) || 0;
                 const awayGoals = parseInt(match.FTAG) || 0;
-                
+
                 // Determine points system based on league and date
                 let winPoints = 3;
-                
+
                 // If 3-point system is enabled, always use 3 points for wins
                 if (state.threePointSystem) {
                     winPoints = 3;
@@ -6804,13 +6478,13 @@
                         winPoints = 2;
                     }
                 }
-                
+
                 // Home team stats
                 if (homeTeam && (state.homeFilter || (state.selectedTeam1 && state.selectedTeam2))) {
                     homeTeam.played++;
                     homeTeam.goalsFor += homeGoals;
                     homeTeam.goalsAgainst += awayGoals;
-                    
+
                     if (homeGoals > awayGoals) {
                         homeTeam.won++;
                         homeTeam.points += winPoints;
@@ -6821,13 +6495,13 @@
                         homeTeam.points += 1;
                     }
                 }
-                
+
                 // Away team stats
                 if (awayTeam && (state.awayFilter || (state.selectedTeam1 && state.selectedTeam2))) {
                     awayTeam.played++;
                     awayTeam.goalsFor += awayGoals;
                     awayTeam.goalsAgainst += homeGoals;
-                    
+
                     if (awayGoals > homeGoals) {
                         awayTeam.won++;
                         awayTeam.points += winPoints;
@@ -6839,119 +6513,65 @@
                     }
                 }
             });
-            
-            let tableArray = Object.values(table)
+
+            const tableArray = Object.values(table)
                 .filter(team => team.played > 0)
                 .map(team => ({
                     ...team,
                     goalDifference: team.goalsFor - team.goalsAgainst
                 }));
-            
-            tableArray = applyPointDeductions(tableArray, filtered, selectedDiv);
-            
-            // First, sort by points to establish the base ranking
-            let pointsSortedArray = [...tableArray].sort((a, b) => {
-                if (b.points !== a.points) return b.points - a.points;
-                if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
-                return b.goalsFor - a.goalsFor;
-            });
-            
-            // Apply ranking overrides for historic seasons to the points-sorted array
-            if (!state.sortConfig.key) {
-                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
-            } else {
-                // Apply custom sorting if requested - work with pointsSortedArray to preserve position logic
-                pointsSortedArray.sort((a, b) => {
-                    let aVal = a[state.sortConfig.key];
-                    let bVal = b[state.sortConfig.key];
-                    
-                    if (typeof aVal === 'string') {
-                        return state.sortConfig.direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
-                    }
-                    
-                    return state.sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
-                });
+
+            let dateRangeForDeductions = null;
+            if (filtered.length > 0) {
+                const matchDates = filtered.map(m => m.dateObj);
+                dateRangeForDeductions = { start: new Date(Math.min(...matchDates)), end: new Date(Math.max(...matchDates)) };
             }
-            
-            // Only apply position assignment logic when not using custom sorting
-            if (!state.sortConfig.key) {
-                // Add original position based on the final points/override ranking
-                // Calculate positions properly handling ties and gaps
-                
-                // Step 1: Find all override positions and calculate blocked positions
-                const overridePositions = [];
-                const blockedPositions = new Set();
-                
-                pointsSortedArray.forEach(team => {
-                    if (team.sharedPosition) {
-                        overridePositions.push(team.sharedPosition);
-                    }
-                });
-                
-                // Group override positions and calculate blocked ranges
-                const positionCounts = {};
-                overridePositions.forEach(pos => {
-                    positionCounts[pos] = (positionCounts[pos] || 0) + 1;
-                });
-                
-                // Block positions based on ties (e.g., two 4s block positions 4 and 5)
-                Object.keys(positionCounts).forEach(pos => {
-                    const position = parseInt(pos);
-                    const count = positionCounts[pos];
-                    
-                    // Block 'count' positions starting from 'position'
-                    for (let i = 0; i < count; i++) {
-                        blockedPositions.add(position + i);
-                    }
-                });
-                
-                // Step 2: Assign positions to regular teams (skip blocked positions)
-                let currentPosition = 1;
-                const regularTeams = pointsSortedArray.filter(team => !team.sharedPosition);
-                
-                regularTeams.forEach(team => {
-                    // Find next available position (skip blocked ones)
-                    while (blockedPositions.has(currentPosition)) {
-                        currentPosition++;
-                    }
-                    
-                    team.originalPosition = currentPosition;
-                    currentPosition++;
-                });
-                
-                // Step 3: Set override positions
-                pointsSortedArray.forEach(team => {
-                    if (team.sharedPosition) {
-                        team.originalPosition = team.sharedPosition;
-                    }
-                });
-                
-                // Step 4: Sort teams by their final position for proper display order
-                pointsSortedArray.sort((a, b) => {
-                    if (a.originalPosition !== b.originalPosition) {
-                        return a.originalPosition - b.originalPosition;
-                    }
-                    // If positions are equal, maintain original order (sub-order for tied teams)
-                    return 0;
-                });
-            } else {
-                // For custom sorting, just assign sequential positions based on current order
-                pointsSortedArray.forEach((team, index) => {
-                    team.originalPosition = index + 1;
-                });
-            }
-            
-            // Use the properly sorted array for display
-            tableArray = pointsSortedArray;
-            
-            return { tableData: tableArray, matchCount: filtered.length };
+
+            return finalizeTable(tableArray, dateRangeForDeductions, selectedDiv, filtered.length);
         }
 
         // Calculate head-to-head stats (abbreviated - same logic as original)
+        // Fetches (or reuses a cached) head-to-head match list for one
+        // team vs one or more opponents (a single team, or a grouped list
+        // like Big 6). Same fire-and-forget pattern as
+        // ensureTeamHistoryLoaded(): kicks off a fetch if the cache is
+        // missing/stale, then calls updateTable() again once it resolves.
+        async function ensureHeadToHeadLoaded(team1, opponents, div) {
+            const cacheKey = `${div}::${team1}::${[...opponents].sort().join(',')}`;
+            if (state.h2hApiCacheKey === cacheKey) return;
+            if (state.h2hApiLoading) return;
+
+            state.h2hApiLoading = true;
+            try {
+                const url = `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Head-to-head request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.h2hApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.h2hApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load head-to-head from API:', err);
+                state.h2hApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.h2hApiLoading = false;
+            }
+
+            if (state.selectedTeam1 === team1) {
+                updateTable();
+            }
+        }
+
         function calculateHeadToHead() {
             if (!state.selectedTeam1 || !state.selectedTeam2) return null;
-            
-            let filtered = [...state.data];
+
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1',
@@ -6959,10 +6579,25 @@
                 'bundesliga': 'D1',
                 'ligue-1': 'F1'
             };
-            
-            const selectedDiv = leagueMapping[state.selectedLeague];
-            filtered = filtered.filter(row => row.Div === selectedDiv);
-            
+            const div = leagueMapping[state.selectedLeague];
+
+            const opponents = (state.selectedTeam2 === 'BIG_6' && state.big6Opponents)
+                ? state.big6Opponents
+                : [state.selectedTeam2];
+
+            // Served from the head-to-head API instead of the full
+            // in-memory gist dataset - kicks off a fetch if this
+            // team/opponent combination isn't already cached;
+            // updateTable() re-runs once it lands.
+            if (div && opponents.length > 0) {
+                ensureHeadToHeadLoaded(state.selectedTeam1, opponents, div);
+            }
+
+            // Already scoped to team1 vs these opponents by the API, so no
+            // more filtering for the match-up itself - just the user's
+            // other active filters.
+            let filtered = [...(state.h2hApiCache || [])];
+
             // Apply date filters
             if (state.dateFrom) {
                 filtered = filtered.filter(row => {
@@ -6970,14 +6605,14 @@
                     return matchDateStr >= state.dateFrom;
                 });
             }
-            
+
             if (state.dateTo) {
                 filtered = filtered.filter(row => {
                     const matchDateStr = new Date(row.dateObj).toISOString().split('T')[0];
                     return matchDateStr <= state.dateTo;
                 });
             }
-            
+
             // Day of week filter
             if (state.selectedDayOfWeek !== '') {
                 filtered = filtered.filter(row => {
@@ -6985,23 +6620,9 @@
                     return dayOfWeek.toString() === state.selectedDayOfWeek;
                 });
             }
-            
-            // Filter for head-to-head matches
-            let h2hMatches;
-            if (state.selectedTeam2 === 'BIG_6' && state.big6Opponents) {
-                // Filter for matches where Team 1 played against any Big 6 opponent
-                h2hMatches = filtered.filter(row =>
-                    (row.HomeTeam === state.selectedTeam1 && state.big6Opponents.includes(row.AwayTeam)) ||
-                    (row.AwayTeam === state.selectedTeam1 && state.big6Opponents.includes(row.HomeTeam))
-                ).sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
-            } else {
-                // Regular H2H matches
-                h2hMatches = filtered.filter(row =>
-                    (row.HomeTeam === state.selectedTeam1 && row.AwayTeam === state.selectedTeam2) ||
-                    (row.HomeTeam === state.selectedTeam2 && row.AwayTeam === state.selectedTeam1)
-                ).sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
-            }
-            
+
+            let h2hMatches = filtered.sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj));
+
             // Apply home/away filtering first (same logic as in updateH2HMatchesTable)
             if (state.homeFilter && !state.awayFilter) {
                 // Only include matches where Team 1 is home
@@ -7255,8 +6876,6 @@
 
         // Update table and all related UI
         function updateTable() {
-            if (state.data.length === 0) return;
-
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
             const matchHistoryResult = calculateMatchHistory();
@@ -7345,7 +6964,7 @@
         // (temporarily cleared of any team filter, i.e. the full league table)
         // and the raw match data - no new calculation logic.
         function getTeamDashboardSnapshot(teamName) {
-            if (!teamName || state.data.length === 0) return null;
+            if (!teamName) return null;
 
             const leagueMapping = {
                 'premier-league': 'E0',
@@ -7370,8 +6989,17 @@
             const standing = standings.find(row => row.team === teamName);
             if (!standing) return null;
 
-            const lastResults = state.data
-                .filter(row => row.Div === selectedDiv && (row.HomeTeam === teamName || row.AwayTeam === teamName))
+            // Served from a dedicated team-history cache instead of the
+            // full in-memory gist dataset - kicks off a fetch if this
+            // team isn't already cached; ensureTeamDashboardHistoryLoaded
+            // re-invokes updateTeamDashboardHeader() once it resolves.
+            ensureTeamDashboardHistoryLoaded(teamName, selectedDiv);
+            const teamCacheKey = `${selectedDiv}::${teamName}`;
+            const teamMatches = state.teamDashboardHistoryApiCacheKey === teamCacheKey
+                ? (state.teamDashboardHistoryApiCache || [])
+                : [];
+
+            const lastResults = [...teamMatches]
                 .sort((a, b) => new Date(b.dateObj) - new Date(a.dateObj))
                 .slice(0, 5)
                 .map(match => {
@@ -7396,8 +7024,7 @@
             if (!state.teamLocked || !state.dashboardLockedTeam) {
                 headerEl.classList.add('hidden');
                 headerEl.innerHTML = '';
-                // Only offer the search box once there's data for it to search
-                if (searchEl) searchEl.classList.toggle('hidden', state.data.length === 0);
+                if (searchEl) searchEl.classList.remove('hidden');
                 return;
             }
 
@@ -7407,7 +7034,7 @@
             if (!snapshot) {
                 headerEl.classList.add('hidden');
                 headerEl.innerHTML = '';
-                if (searchEl) searchEl.classList.toggle('hidden', state.data.length === 0);
+                if (searchEl) searchEl.classList.remove('hidden');
                 return;
             }
 
@@ -7659,28 +7286,89 @@
             }
         }
 
+        // Team History API - first slice of the site cut over from public
+        // gist URLs (anyone could curl the whole dataset, forever, from
+        // the Network tab) to a small backend that only ever answers one
+        // specific question per request. See backend/README.md.
+        const TEAM_HISTORY_API_BASE = 'https://leaguetable-api.league-table-api.workers.dev';
+
+        // Parses an ISO 'YYYY-MM-DD' string as local-timezone midnight, not
+        // UTC midnight - so day-of-week filtering and sorting match what a
+        // viewer in their own timezone expects.
+        function isoDateToLocalDateObj(isoDateStr) {
+            const [year, month, day] = isoDateStr.split('-').map(Number);
+            const dateObj = new Date(year, month - 1, day);
+            dateObj.setHours(0, 0, 0, 0);
+            return dateObj;
+        }
+
+        // Fetches (or reuses a cached) match history for one team from the
+        // API. Fire-and-forget from calculateMatchHistory(): if the cache
+        // is missing/stale this kicks off a fetch and calls updateTable()
+        // again once it resolves, rather than making the whole render path
+        // async.
+        async function ensureTeamHistoryLoaded(team, div) {
+            const cacheKey = `${div}::${team}`;
+            if (state.teamHistoryApiCacheKey === cacheKey) return;
+            if (state.teamHistoryApiLoading) return;
+
+            state.teamHistoryApiLoading = true;
+            try {
+                const url = `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Team history request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.teamHistoryApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.teamHistoryApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load team history from API:', err);
+                // Leave the cache as-is rather than throwing - Match
+                // History just shows no matches instead of breaking the
+                // rest of the page.
+                state.teamHistoryApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.teamHistoryApiLoading = false;
+            }
+
+            // Only re-render if the user hasn't since moved on to a
+            // different team while this fetch was in flight.
+            if (state.selectedTeam1 === team) {
+                updateTable();
+            }
+        }
+
         // Calculate match history data for single team
         function calculateMatchHistory() {
             if (!state.selectedTeam1 || (state.selectedTeam2 && state.selectedTeam2 !== '')) return null;
 
-            // Apply all existing filters first
-            let filtered = [...state.data];
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+            const div = leagueMapping[state.selectedLeague];
 
-            // Apply league filter
-            if (state.selectedLeague) {
-                const leagueMapping = {
-                    'premier-league': 'E0',
-                    'la-liga': 'SP1',
-                    'serie-a': 'I1',
-                    'bundesliga': 'D1',
-                    'ligue-1': 'F1'
-                };
-
-                const divFilter = leagueMapping[state.selectedLeague];
-                if (divFilter) {
-                    filtered = filtered.filter(row => row.Div === divFilter);
-                }
+            // Served from the team-history API instead of the full
+            // in-memory gist dataset - kicks off a fetch if this team
+            // isn't already cached; updateTable() re-runs once it lands.
+            if (div) {
+                ensureTeamHistoryLoaded(state.selectedTeam1, div);
             }
+
+            // Already scoped to this team and division by the API, so no
+            // league or team filter needed here - just the user's other
+            // active filters.
+            let filtered = [...(state.teamHistoryApiCache || [])];
 
             // Apply date filters (compare as ISO date strings, not raw Date
             // objects - row.dateObj carries a local-timezone-derived time
@@ -7713,10 +7401,7 @@
                 });
             }
 
-            // Filter for selected team matches
-            let teamMatches = filtered.filter(row =>
-                row.HomeTeam === state.selectedTeam1 || row.AwayTeam === state.selectedTeam1
-            );
+            let teamMatches = filtered;
 
             // Apply home/away filter for match history
             if (state.matchHistoryHomeFilter && !state.matchHistoryAwayFilter) {
@@ -8489,61 +8174,63 @@
 
         // Update last data update based on most recent game
         function updateLastDataUpdate() {
-            if (!state.data || state.data.length === 0) {
-                elements.lastDataUpdate.textContent = 'Last Data Update: No data available';
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+            const divCode = leagueMapping[state.selectedLeague];
+            if (!divCode) {
+                elements.lastDataUpdate.textContent = 'Last Data Update: Unknown';
                 return;
             }
 
-            // Find the most recent game date
-            let mostRecentDate = null;
+            // Served from the division date-range cache instead of the
+            // full in-memory gist dataset - kicks off a fetch if this
+            // division isn't already cached; ensureDivDateRangeLoaded
+            // re-invokes this function once it resolves.
+            ensureDivDateRangeLoaded(divCode);
+            const range = state.divDateRangeApiCache[divCode];
 
-            state.data.forEach(match => {
-                if (match.dateObj && match.dateObj instanceof Date && !isNaN(match.dateObj)) {
-                    if (!mostRecentDate || match.dateObj > mostRecentDate) {
-                        mostRecentDate = match.dateObj;
-                    }
-                }
-            });
-
-            if (mostRecentDate) {
+            if (range && range.end) {
                 // Format the date as "Month Day, Year"
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                const formattedDate = mostRecentDate.toLocaleDateString('en-US', options);
+                const formattedDate = isoDateToLocalDateObj(range.end).toLocaleDateString('en-US', options);
                 elements.lastDataUpdate.textContent = `Last Data Update: ${formattedDate}`;
-            } else {
+            } else if (range) {
                 elements.lastDataUpdate.textContent = 'Last Data Update: Unknown';
+            } else {
+                elements.lastDataUpdate.textContent = 'Last Data Update: Loading...';
             }
         }
 
         // Update table info display
         function updateTableInfo(tableResult) {
-            if (state.data.length > 0) {
-                const leagueNames = {
-                    'premier-league': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League',
-                    'la-liga': '🇪🇸 La Liga',
-                    'serie-a': '🇮🇹 Serie A',
-                    'bundesliga': '🇩🇪 Bundesliga',
-                    'ligue-1': '🇫🇷 Ligue 1'
-                };
-                
-                let text = leagueNames[state.selectedLeague];
-                
-                if (state.homeFilter && state.awayFilter) text += ' - All Results';
-                else if (state.homeFilter) text += ' - Home Results Only';
-                else if (state.awayFilter) text += ' - Away Results Only';
-                else text += ' - No Results Selected';
-                
-                text += ` (${tableResult.matchCount} matches) • ${tableResult.tableData.length} teams`;
-                
-                elements.tableInfoText.textContent = text;
-                
-                // Only show table info if we're on the League Filters tab
-                const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
-                if (isLeagueFiltersActive) {
-                    elements.tableInfo.classList.remove('hidden');
-                } else {
-                    elements.tableInfo.classList.add('hidden');
-                }
+            const leagueNames = {
+                'premier-league': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League',
+                'la-liga': '🇪🇸 La Liga',
+                'serie-a': '🇮🇹 Serie A',
+                'bundesliga': '🇩🇪 Bundesliga',
+                'ligue-1': '🇫🇷 Ligue 1'
+            };
+
+            let text = leagueNames[state.selectedLeague];
+
+            if (state.homeFilter && state.awayFilter) text += ' - All Results';
+            else if (state.homeFilter) text += ' - Home Results Only';
+            else if (state.awayFilter) text += ' - Away Results Only';
+            else text += ' - No Results Selected';
+
+            text += ` (${tableResult.matchCount} matches) • ${tableResult.tableData.length} teams`;
+
+            elements.tableInfoText.textContent = text;
+
+            // Only show table info if we're on the League Filters tab
+            const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
+            if (isLeagueFiltersActive) {
+                elements.tableInfo.classList.remove('hidden');
             } else {
                 elements.tableInfo.classList.add('hidden');
             }
@@ -8672,9 +8359,6 @@
 
         // Show team history across seasons
         function showTeamHistory(teamName, sourceLeague = null) {
-            // showTeamHistory called
-            // Current state.data length
-
             // Determine which league to use based on source
             let leagueToUse;
             if (sourceLeague) {
@@ -8722,7 +8406,14 @@
             
             const divCode = leagueMapping[leagueToUse];
             if (!divCode) return;
-            
+
+            // Served from the season-standings batch API instead of the
+            // full in-memory gist dataset - kicks off a fetch if this
+            // division isn't already cached; ensureSeasonStandingsLoaded
+            // re-invokes showTeamHistory() once it resolves.
+            ensureSeasonStandingsLoaded(divCode, leagueToUse);
+            const seasonStandingsBySeasonName = state.seasonStandingsApiCacheKey === divCode ? state.seasonStandingsApiCache : {};
+
             // Get all available seasons for this league
             const availableSeasons = getAvailableSeasons(leagueToUse);
             // Available seasons found
@@ -8778,7 +8469,7 @@
                 
                 // Processing season for team
                 
-                // Get season date range
+                // Get season date range (still needed for point-deduction overlap checks)
                 const originalSelectedLeague = state.selectedLeague;
                 state.selectedLeague = leagueToUse; // Temporarily set for date range lookup
                 const seasonDates = getSeasonDateRange(seasonFilter);
@@ -8787,157 +8478,77 @@
                     // No season dates found
                     return;
                 }
-                // Season dates found
-                
-                // Filter data for this season - use date-only comparisons
-                const seasonStart = new Date(seasonDates.start);
-                seasonStart.setUTCHours(0, 0, 0, 0); // Start of day UTC
-                const seasonEnd = new Date(seasonDates.end);
-                seasonEnd.setUTCHours(23, 59, 59, 999); // End of day UTC
-                
-                // Extract the year from the season (e.g., "2019-20" -> 2019, "2020-21" -> 2020)
-                const seasonYear = parseInt(seasonFilter.split('-')[0]);
-                
-                // Get ALL games for this season (not just for the selected team)
-                const allSeasonData = state.data.filter(row => {
-                    if (row.Div !== divCode) return false;
-                    
-                    const matchDate = new Date(row.dateObj);
-                    const gameYear = matchDate.getFullYear();
-                    
-                    // Pre-filter: only consider games from years that could belong to this season
-                    // For season "2019-20", only look at games from 2019 and 2020
-                    if (gameYear < seasonYear || gameYear > seasonYear + 1) return false;
-                    
-                    const inRange = matchDate >= seasonStart && matchDate <= seasonEnd;
-                    
-                    
-                    return inRange;
-                });
-                
-                // Get games specifically for this team
-                const teamMatches = allSeasonData.filter(row => 
-                    row.HomeTeam === teamName || row.AwayTeam === teamName
-                );
-                
-                if (teamMatches.length === 0) return; // Team not present in this season
-                
-                // Calculate team stats for this season
-                let played = 0, won = 0, drawn = 0, lost = 0;
-                let goalsFor = 0, goalsAgainst = 0;
-                
-                teamMatches.forEach(match => {
-                    played++;
-                    const homeGoals = parseInt(match.FTHG) || 0;
-                    const awayGoals = parseInt(match.FTAG) || 0;
-                    
-                    
-                    if (match.HomeTeam === teamName) {
-                        goalsFor += homeGoals;
-                        goalsAgainst += awayGoals;
-                        if (homeGoals > awayGoals) won++;
-                        else if (homeGoals === awayGoals) drawn++;
-                        else lost++;
-                    } else {
-                        goalsFor += awayGoals;
-                        goalsAgainst += homeGoals;
-                        if (awayGoals > homeGoals) won++;
-                        else if (awayGoals === homeGoals) drawn++;
-                        else lost++;
-                    }
-                });
-                
+
+                // Full-division standings for this season, from the
+                // season-standings API (raw/undeducted historical points -
+                // deductions and ranking overrides are applied below,
+                // exactly as before the cutover).
+                const seasonStandings = seasonStandingsBySeasonName[seasonFilter];
+                if (!seasonStandings) return; // not loaded yet, or no data for this season
+
+                const teamRow = seasonStandings.standings.find(row => row.team === teamName);
+                if (!teamRow) return; // Team not present in this season
+
+                const played = teamRow.played, won = teamRow.won, drawn = teamRow.drawn, lost = teamRow.lost;
+                const goalsFor = teamRow.goalsFor, goalsAgainst = teamRow.goalsAgainst;
                 const goalDifference = goalsFor - goalsAgainst;
-                const winPoints = getHistoricalPointSystem(seasonFilter, leagueToUse);
-                let points = won * winPoints + drawn;
-                
+                let points = teamRow.points;
+
                 // Apply point deductions for this season
                 if (seasonDates) {
                     const seasonStart = new Date(seasonDates.start);
                     const seasonEnd = new Date(seasonDates.end);
-                    
+
                     pointDeductions.forEach(deduction => {
                         if (deduction.team === teamName && deduction.league === divCode) {
                             const deductionStart = new Date(deduction.startDate);
                             const deductionEnd = new Date(deduction.endDate);
-                            
+
                             const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
-                            
+
                             if (hasOverlap && state.pointDeductionsEnabled) {
                                 points -= deduction.points;
                             }
                         }
                     });
                 }
-                
-                // Calculate position by building full league table for this season
-                const leagueTeams = {};
-                allSeasonData.forEach(match => {
-                    [match.HomeTeam, match.AwayTeam].forEach(team => {
-                        if (!leagueTeams[team]) {
-                            leagueTeams[team] = { played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0 };
-                        }
-                    });
-                });
-                
-                // Calculate stats for all teams
-                allSeasonData.forEach(match => {
-                    const homeGoals = parseInt(match.FTHG) || 0;
-                    const awayGoals = parseInt(match.FTAG) || 0;
-                    
-                    leagueTeams[match.HomeTeam].played++;
-                    leagueTeams[match.AwayTeam].played++;
-                    
-                    leagueTeams[match.HomeTeam].goalsFor += homeGoals;
-                    leagueTeams[match.HomeTeam].goalsAgainst += awayGoals;
-                    leagueTeams[match.AwayTeam].goalsFor += awayGoals;
-                    leagueTeams[match.AwayTeam].goalsAgainst += homeGoals;
-                    
-                    if (homeGoals > awayGoals) {
-                        leagueTeams[match.HomeTeam].won++;
-                        leagueTeams[match.AwayTeam].lost++;
-                    } else if (homeGoals === awayGoals) {
-                        leagueTeams[match.HomeTeam].drawn++;
-                        leagueTeams[match.AwayTeam].drawn++;
-                    } else {
-                        leagueTeams[match.HomeTeam].lost++;
-                        leagueTeams[match.AwayTeam].won++;
-                    }
-                });
-                
-                // Convert to array and calculate points
-                const winPointsForSeason = getHistoricalPointSystem(seasonFilter, leagueToUse);
-                const seasonTable = Object.keys(leagueTeams).map(team => {
-                    const stats = leagueTeams[team];
-                    let teamPoints = stats.won * winPointsForSeason + stats.drawn;
-                    
+
+                // Build the full season table (all teams) to determine position
+                const seasonTable = seasonStandings.standings.map(stats => {
+                    let teamPoints = stats.points;
+
                     // Apply point deductions for each team
                     if (seasonDates) {
                         const seasonStart = new Date(seasonDates.start);
                         const seasonEnd = new Date(seasonDates.end);
-                        
+
                         pointDeductions.forEach(deduction => {
-                            if (deduction.team === team && deduction.league === divCode) {
+                            if (deduction.team === stats.team && deduction.league === divCode) {
                                 const deductionStart = new Date(deduction.startDate);
                                 const deductionEnd = new Date(deduction.endDate);
-                                
+
                                 const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
-                                
+
                                 if (hasOverlap && state.pointDeductionsEnabled) {
                                     teamPoints -= deduction.points;
                                 }
                             }
                         });
                     }
-                    
+
                     return {
-                        team,
-                        ...stats,
+                        team: stats.team,
+                        played: stats.played,
+                        won: stats.won,
+                        drawn: stats.drawn,
+                        lost: stats.lost,
+                        goalsFor: stats.goalsFor,
+                        goalsAgainst: stats.goalsAgainst,
                         goalDifference: stats.goalsFor - stats.goalsAgainst,
                         points: teamPoints
                     };
                 });
-                
+
                 // Sort by points, then goal difference, then goals for
                 seasonTable.sort((a, b) => {
                     if (b.points !== a.points) return b.points - a.points;
@@ -9374,12 +8985,24 @@
 
         // Clear filters
         function clearFilters() {
-            if (state.data.length > 0) {
-                const dates = state.data.map(row => row.dateObj);
-                const minDate = new Date(Math.min(...dates));
-                const maxDate = new Date(Math.max(...dates));
-                state.dateFrom = minDate.toISOString().split('T')[0];
-                state.dateTo = maxDate.toISOString().split('T')[0];
+            // Served from the division date-range cache instead of the
+            // full in-memory gist dataset - by the time a user can click
+            // Clear Filters, the current league has already been switched
+            // to at least once (which awaits this same cache), so it's
+            // virtually always already warm here.
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+            const divCode = leagueMapping[state.selectedLeague];
+            if (divCode) ensureDivDateRangeLoaded(divCode); // self-heals via updateLastDataUpdate() if this is somehow the very first call
+            const range = divCode ? state.divDateRangeApiCache[divCode] : null;
+            if (range && range.start && range.end) {
+                state.dateFrom = range.start;
+                state.dateTo = range.end;
                 elements.dateFrom.value = state.dateFrom;
                 elements.dateTo.value = state.dateTo;
             }
@@ -9434,42 +9057,37 @@
 
             elements.errorState.classList.add('hidden');
 
-            if (state.data.length > 0) {
-                // Showing controls section
-                elements.controlsSection.classList.remove('hidden');
-                
-                // Only show table-related sections if we're on the League Filters tab
-                const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
-                if (isLeagueFiltersActive) {
-                    elements.tableContainer.classList.remove('hidden');
-                    
-                    // Show appropriate section based on team selection
-                    if (state.selectedTeam1 && state.selectedTeam2) {
-                        // Two teams selected: show H2H, hide match history
-                        elements.h2hSection.classList.remove('hidden');
-                        elements.matchHistorySection.classList.add('hidden');
-                    } else if (state.selectedTeam1 && !state.selectedTeam2) {
-                        // One team selected: show main table above match history, hide H2H
-                        elements.tableContainer.classList.remove('hidden');  // Show main table above
-                        elements.h2hSection.classList.add('hidden');
-                        elements.matchHistorySection.classList.remove('hidden');
-                        // Note: matchHistoryStatsTable visibility is managed in updateMatchHistoryDisplay
-                    } else {
-                        // No teams or invalid selection: hide both
-                        elements.h2hSection.classList.add('hidden');
-                        elements.matchHistorySection.classList.add('hidden');
-                        elements.matchHistoryStatsTable.classList.add('hidden');
-                    }
+            elements.controlsSection.classList.remove('hidden');
+
+            // Only show table-related sections if we're on the League Filters tab
+            const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
+            if (isLeagueFiltersActive) {
+                elements.tableContainer.classList.remove('hidden');
+
+                // Show appropriate section based on team selection
+                if (state.selectedTeam1 && state.selectedTeam2) {
+                    // Two teams selected: show H2H, hide match history
+                    elements.h2hSection.classList.remove('hidden');
+                    elements.matchHistorySection.classList.add('hidden');
+                } else if (state.selectedTeam1 && !state.selectedTeam2) {
+                    // One team selected: show main table above match history, hide H2H
+                    elements.tableContainer.classList.remove('hidden');  // Show main table above
+                    elements.h2hSection.classList.add('hidden');
+                    elements.matchHistorySection.classList.remove('hidden');
+                    // Note: matchHistoryStatsTable visibility is managed in updateMatchHistoryDisplay
                 } else {
-                    // Keep table hidden on other tabs
-                    elements.tableContainer.classList.add('hidden');
+                    // No teams or invalid selection: hide both
                     elements.h2hSection.classList.add('hidden');
                     elements.matchHistorySection.classList.add('hidden');
                     elements.matchHistoryStatsTable.classList.add('hidden');
-                    elements.tableInfo.classList.add('hidden');
                 }
             } else {
-                // Data length is 0, keeping controls hidden
+                // Keep table hidden on other tabs
+                elements.tableContainer.classList.add('hidden');
+                elements.h2hSection.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
+                elements.matchHistoryStatsTable.classList.add('hidden');
+                elements.tableInfo.classList.add('hidden');
             }
 
 

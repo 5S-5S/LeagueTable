@@ -96,6 +96,7 @@ function normalizeRow(row) {
         awayGoals: parseInt(String(row.FTAG ?? '0'), 10) || 0,
         competitionPhase: row.CompetitionPhase ? String(row.CompetitionPhase).trim() : null,
         isQualifier: false,
+        additionalInfo: row.AdditionalInfo ? String(row.AdditionalInfo).trim() : null,
     };
 }
 
