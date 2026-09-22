@@ -1046,6 +1046,13 @@
             divDateRangeApiCache: {},
             divDateRangeApiLoading: {},
 
+            // getLeagueTeams()'s roster per division, from GET /api/teams -
+            // state.data can't be used the way Domestic's hardcoded
+            // color table can here (see backend/README.md's migration
+            // status for why). Keyed by div like divDateRangeApiCache.
+            teamsApiCache: {},
+            teamsApiLoading: {},
+
             h2hPenaltyFilter: false,
             
             // H2H sort config
@@ -6756,24 +6763,52 @@
             }
         }
 
-        // Get teams for selected league
+        // Get teams for selected league. Sourced from GET /api/teams (D1),
+        // not state.data - see teamsApiCache's declaration for why this
+        // can't reuse the hardcoded color table the way Domestic's
+        // getLeagueTeams() does. Synchronous by necessity (all of this
+        // function's callers are) - returns whatever's cached so far and
+        // kicks off ensureTeamsLoaded() if needed, same eventual-
+        // consistency pattern as ensureDivDateRangeLoaded/
+        // divDateRangeApiCache: callers re-render once the fetch resolves.
         function getLeagueTeams(league = null) {
             const leagueMapping = {
                 'champions-league': 'C1',
                 'europa-league': 'E1',
                 'conference-league': 'C2'
             };
-            
-            const selectedDiv = leagueMapping[league || state.selectedLeague];
-            const leagueData = state.data.filter(row => row.Div === selectedDiv);
-            const leagueTeams = [...new Set([
-                ...leagueData.map(row => row.HomeTeam), 
-                ...leagueData.map(row => row.AwayTeam)
-            ])]
-                .filter(team => team && team.length > 1)
-                .sort();
-            
-            return leagueTeams;
+
+            const div = leagueMapping[league || state.selectedLeague];
+            ensureTeamsLoaded(div);
+            return state.teamsApiCache[div] || [];
+        }
+
+        // Fetches (or reuses a cached) team roster for one division from
+        // GET /api/teams. Same fire-and-forget pattern as the other
+        // ensure*Loaded() functions (see ensureDivDateRangeLoaded) -
+        // re-renders every consumer of getLeagueTeams() once loaded rather
+        // than tracking which one triggered the load.
+        async function ensureTeamsLoaded(div) {
+            if (state.teamsApiCache[div]) return;
+            if (state.teamsApiLoading[div]) return;
+
+            state.teamsApiLoading[div] = true;
+            try {
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/teams?div=${encodeURIComponent(div)}`);
+                if (!res.ok) throw new Error(`Teams request failed: ${res.status}`);
+                const data = await res.json();
+                state.teamsApiCache[div] = data.teams || [];
+            } catch (err) {
+                console.error('Failed to load team roster from API:', err);
+                state.teamsApiCache[div] = []; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.teamsApiLoading[div] = false;
+            }
+
+            updateTeamSelects();
+            updateTeamStreaksSelects();
+            updateTeamSeasonsTeamSelect();
+            refreshTeam2CountryOptions();
         }
 
         // Update season options
