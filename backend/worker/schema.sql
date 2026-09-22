@@ -27,6 +27,23 @@ CREATE INDEX IF NOT EXISTS idx_matches_away_team ON matches(away_team);
 CREATE INDEX IF NOT EXISTS idx_matches_div ON matches(div);
 CREATE INDEX IF NOT EXISTS idx_matches_date ON matches(date);
 
+-- team-history/head-to-head's actual query shape is "div = ? AND
+-- home_team = ?" (and the away_team equivalent) - this database has no
+-- ANALYZE statistics, so D1/SQLite's query planner can't tell that's far
+-- more selective than the div-only prefix of idx_matches_unique, and
+-- picks that for every team lookup regardless (verified: read the whole
+-- division - 51,381 rows - to return one team's ~4,400 matches, 8.6%
+-- efficient). These composite indexes are forced explicitly via
+-- INDEXED BY in src/index.js's queryTeamMatches()/
+-- queryHeadToHeadMatches() rather than left for the planner to pick -
+-- with them, the same lookup reads 4,407 rows for 4,405 actual matches.
+-- idx_matches_home_team/idx_matches_away_team above are now redundant
+-- (a composite index already serves any query on its leading column
+-- alone) but left in place - not worth the extra DDL risk to drop on
+-- production for a write-cost-only cleanup.
+CREATE INDEX IF NOT EXISTS idx_matches_home_team_div ON matches(home_team, div);
+CREATE INDEX IF NOT EXISTS idx_matches_away_team_div ON matches(away_team, div);
+
 -- Lets the daily sync use INSERT OR IGNORE to add only genuinely new
 -- matches without re-writing the whole table (D1's free tier caps writes
 -- at 100,000 rows/day - well under our 166k+ total row count).

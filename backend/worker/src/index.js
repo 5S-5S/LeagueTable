@@ -146,28 +146,75 @@ async function handleTeamHistory(url, env) {
     }
 
     const body = await withCache(env, ['team-history', canonicalQueryKey(url)], async () => {
-        const { results } = await env.DB.prepare(
-            `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
-             FROM matches
-             WHERE div = ?1 AND (home_team = ?2 OR away_team = ?2)
-             ORDER BY date ASC`
-        ).bind(div, team).all();
-
-        const matches = results.map(row => ({
-            date: row.date,
-            homeTeam: row.home_team,
-            awayTeam: row.away_team,
-            homeGoals: row.home_goals,
-            awayGoals: row.away_goals,
-            competitionPhase: row.competition_phase,
-            isQualifier: !!row.is_qualifier,
-            additionalInfo: row.additional_info,
-        }));
-
+        const matches = await queryTeamMatches(env, div, team);
         return { team, div, matches };
     });
 
     return jsonResponse(body);
+}
+
+// Shared row shape used by team-history/head-to-head's D1 rows.
+function rowToMatch(row) {
+    return {
+        date: row.date,
+        homeTeam: row.home_team,
+        awayTeam: row.away_team,
+        homeGoals: row.home_goals,
+        awayGoals: row.away_goals,
+        competitionPhase: row.competition_phase,
+        isQualifier: !!row.is_qualifier,
+        additionalInfo: row.additional_info,
+    };
+}
+
+// Every match for one team in one division, sorted by date. Deliberately
+// NOT `WHERE div = ? AND (home_team = ? OR away_team = ?)` - D1/SQLite has
+// no ANALYZE statistics on this database, so its query planner can't tell
+// that home_team/away_team equality is far more selective than div
+// equality, and picks the div-only prefix of idx_matches_unique for both
+// the OR'd and even a UNION'd version of that query, scanning the entire
+// division every time regardless (verified empirically: div='E0' AND
+// (home_team=? OR away_team=?) read 51,381 rows - the whole division -
+// to return one team's ~4,400 matches, 8.6% efficient). Two separate
+// equality-only queries, each INDEXED BY the composite index built for
+// exactly this shape, seek directly to that team's rows: 2,203 + 2,204 =
+// 4,407 rows read for 4,405 actual matches, ~100% efficient. Merging in
+// JS instead of a SQL UNION matters too - UNION's merge/sort step reread
+// both sides again, ~2x the cost (8,812 rows) of just concatenating and
+// sorting two already-small arrays here.
+async function queryTeamMatches(env, div, team) {
+    const sql = side => `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
+         FROM matches INDEXED BY idx_matches_${side}_team_div
+         WHERE div = ?1 AND ${side}_team = ?2`;
+
+    const [homeResult, awayResult] = await Promise.all([
+        env.DB.prepare(sql('home')).bind(div, team).all(),
+        env.DB.prepare(sql('away')).bind(div, team).all(),
+    ]);
+
+    return [...homeResult.results, ...awayResult.results]
+        .map(rowToMatch)
+        .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+}
+
+// Same fix as queryTeamMatches(), extended with the away_team IN (...)/
+// home_team IN (...) opponent filter - applied after the composite-index
+// seek already narrows to team1's matches in this division, so it stays
+// cheap (filtering a few thousand already-fetched rows, not scanning).
+async function queryHeadToHeadMatches(env, div, team1, opponents) {
+    const placeholders = opponents.map(() => '?').join(', ');
+    const sql = side => `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
+         FROM matches INDEXED BY idx_matches_${side}_team_div
+         WHERE div = ? AND ${side}_team = ? AND ${side === 'home' ? 'away' : 'home'}_team IN (${placeholders})`;
+
+    const [homeResult, awayResult] = await Promise.all([
+        env.DB.prepare(sql('home')).bind(div, team1, ...opponents).all(),
+        env.DB.prepare(sql('away')).bind(div, team1, ...opponents).all(),
+    ]);
+
+    return [...homeResult.results, ...awayResult.results]
+        .map(rowToMatch)
+        .sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
 }
 
 async function handleHeadToHead(url, env) {
@@ -185,29 +232,7 @@ async function handleHeadToHead(url, env) {
     }
 
     const body = await withCache(env, ['head-to-head', canonicalQueryKey(url)], async () => {
-        const placeholders = opponents.map(() => '?').join(', ');
-        const { results } = await env.DB.prepare(
-            `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
-             FROM matches
-             WHERE div = ?
-               AND (
-                 (home_team = ? AND away_team IN (${placeholders}))
-                 OR (away_team = ? AND home_team IN (${placeholders}))
-               )
-             ORDER BY date ASC`
-        ).bind(div, team1, ...opponents, team1, ...opponents).all();
-
-        const matches = results.map(row => ({
-            date: row.date,
-            homeTeam: row.home_team,
-            awayTeam: row.away_team,
-            homeGoals: row.home_goals,
-            awayGoals: row.away_goals,
-            competitionPhase: row.competition_phase,
-            isQualifier: !!row.is_qualifier,
-            additionalInfo: row.additional_info,
-        }));
-
+        const matches = await queryHeadToHeadMatches(env, div, team1, opponents);
         return { team1, team2: opponents, div, matches };
     });
 
