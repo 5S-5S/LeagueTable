@@ -1,15 +1,20 @@
-# Backend migration (in progress)
+# Backend migration (complete on this branch, not yet merged to main)
 
-Moving match data off public gist URLs (anyone can `curl` the raw CSV
+Moved match data off public gist URLs (anyone can `curl` the raw CSV
 forever) into a Cloudflare D1 database sitting behind a Cloudflare Worker
 API. The Worker only ever answers specific questions (a team's history, a
 head-to-head, a table) — it never hands back the full dataset in one
-request, the way the gists currently do.
+request, the way the gists used to.
 
-This is happening gradually on the `backend-migration` branch. The
-frontend keeps working against the gists as today until each endpoint
-below is built and proven; nothing on `main` changes until a piece is
-actually ready to cut over.
+This happened gradually on the `backend-migration` branch, one endpoint
+at a time, each proven before the frontend cut over to it. As of
+2026-09-21, `loadGistData()` and every gist-fetching function have been
+deleted from all four frontend pages (`DomesticEurope.html`,
+`DomesticEuropeMobile.html`, `ContinentalEurope.html`,
+`ContinentalEuropeMobile.html`) - the gist URLs are no longer reachable
+from the client at all, which was always the actual finish line (not
+just "every tab has an API"). **This branch has not been merged to
+`main` yet** - that's a separate, deliberate step (see "Next steps").
 
 ## Status
 
@@ -125,6 +130,31 @@ actually ready to cut over.
       from the real 567-team C1 roster, no console errors. **This was the
       last `state.data`-dependent feature on any of the four pages** -
       see "Next steps" for what that actually unlocks.
+- [x] `loadGistData()` and the entire gist-fetching pipeline (
+      `loadLeagueDataForDevice`, `filterDataForCurrentLeague`,
+      `loadGistDataChunked`, `processRawData`, `decodeSingleBase64Url`,
+      the `GIST_URLS`/`LEAGUE_CODES` constants, and Continental's
+      qualifier-specific `isQualifierMatch`/`processQualifierData`)
+      deleted from all four pages - this is what actually stops the
+      client from downloading the gists, the real finish line for the
+      whole migration. Several UI sections were still gated on
+      `state.data.length` (the controls section, the table info line,
+      the Team Dashboard search box) - dead weight that would have kept
+      everything permanently hidden once nothing populated `state.data`
+      anymore, fixed alongside the removal. `init()` needed an explicit
+      `updateTable()`/etc. call added back too, since that used to only
+      happen at the end of the now-deleted gist-load completion chain.
+      Testing this surfaced two real, pre-existing frontend bugs in the
+      Continental pages (both latent under the old design, only now
+      visibly triggered): `state.teamSeasonsSelectedLeague` defaulted to
+      `'serie-a'` (a Domestic value, meaningless here - fixed to
+      `'champions-league'`), and `getTeamDashboardSnapshot()` crashed
+      whenever a team was locked in the Team Dashboard *and* a specific
+      season was selected, since it assumed `calculateTable()` always
+      returns a flat `tableData` array, but a specific season delegates
+      to `calculateGroupedTable()`, whose result is split per competition
+      phase instead (fixed by searching every phase). See `git log` for
+      the "Drop gist fetching entirely from ___" commits for full detail.
 
 ## Keeping D1 in sync
 
@@ -279,21 +309,16 @@ never been requested that day) pays the full row-read cost.
 
 ## Next steps
 
-Nothing reads `state.data` for its own computation anymore on any of the
-four pages - confirmed via `git grep 'state\.data'`, the only matches left
-are the `loadGistData()` pipeline's own assignment
-(`state.data = filteredData`/`cleanedData`) and a handful of
-`state.data.length === 0`/`> 0` checks used purely as "has the gist fetch
-finished yet" loading-state gates, not per-row computation.
+The migration itself is done - `git grep 'loadGistData\|GIST_URLS'` across
+all four frontend pages returns nothing. What's left is entirely about
+shipping it:
 
-1. Drop `loadGistData()`'s call in `init()` on all four pages, and the
-   `.length`-based loading gates that only exist to guard against it not
-   having run yet - that's the step that actually stops the client from
-   downloading the gists, and is the real finish line for this migration
-   (not just "every tab has an API"). Worth a careful pass: check what
-   else in each file depends on `loadGistData()` having run at all (e.g.
-   `Last Data Update` banner logic, any leftover loading-spinner state)
-   before just deleting the call.
+1. Merge `backend-migration` to `main` when ready. This is the step that
+   actually takes the site live on the new backend - nothing before this
+   point has touched `main` or affected real users. Confirm first: the
+   daily sync workflow is active (see "Activating the daily sync" above),
+   and it's worth a final `verify-parity.mjs` run beforehand given D1's
+   free-tier daily read quota (see "Data integrity").
 
 ## Regenerating the seed data (manual full rebuild only)
 
