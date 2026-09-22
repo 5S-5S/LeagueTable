@@ -344,11 +344,18 @@ never been requested that day) pays the full row-read cost.
 The migration is done and live on `main` (see intro). What's left is
 smaller cleanup/hardening, not required for correctness:
 
-1. Consider adding failure notifications on the `sync-d1.yml` workflow -
-   its two-day outage (see "Data integrity") was only caught because a
-   user happened to notice stale match dates on the live site, not
-   because anything alerted anyone. A failed scheduled run currently
-   fails silently.
+1. ~~Consider adding failure notifications on the `sync-d1.yml`
+   workflow~~ **Done (2026-09-22).** Its two-day outage (see "Data
+   integrity") was only caught because a user happened to notice stale
+   match dates on the live site - a failed scheduled run failed
+   silently otherwise. Added a step (`if: failure()`) that files a
+   GitHub issue labeled `sync-failure`, or comments on the existing open
+   one if a previous failure's issue is still open (so a multi-day
+   outage gets one issue with a comment per day, not a new issue each
+   time) - see the workflow file. Not yet verified against a real
+   failure (only checked with `actionlint` and by reasoning through the
+   `octokit` calls) - worth confirming it actually fires correctly next
+   time `sync.mjs` genuinely fails.
 2. Consider upgrading off D1's free tier. Now that the site is live,
    normal traffic competes for the same 5M-row/day quota as any manual
    testing/investigation work - the quota-exhaustion incident showed how
