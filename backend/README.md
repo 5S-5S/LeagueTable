@@ -106,15 +106,25 @@ actually ready to cut over.
       names within the same 2026 Champions League campaign (same class of
       drift as the 9 teams already noted below under "Data integrity",
       except inconsistent within a single season rather than just stale).
-- [x] `GET /api/teams?div=` added - distinct team roster per division
-      from D1 (DISTINCT/UNION over home_team/away_team), KV-cached like
-      `/api/standings` since it's a full-division scan. Built for
-      Continental's `getLeagueTeams()`, which (unlike Domestic's) can't
-      reuse the hardcoded color table - see the code comment on
-      `handleTeams()` in `src/index.js` for why. Verified against
-      production D1 (2026-09-21, see "Data integrity" below) - no drift,
-      clean to use. **Committed but not yet deployed, and not yet wired
-      into the frontend** - unblocked, this is now just Next Steps #1.
+- [x] `GET /api/teams?div=` added, deployed, and wired up - distinct team
+      roster per division from D1 (DISTINCT/UNION over
+      home_team/away_team), KV-cached like `/api/standings` since it's a
+      full-division scan. Built for Continental's `getLeagueTeams()`,
+      which (unlike Domestic's) can't reuse the hardcoded color table -
+      see the code comment on `handleTeams()` in `src/index.js` for why.
+      Verified against production D1 (2026-09-21, see "Data integrity"
+      below) - no drift, clean to use.
+- [x] Continental's `getLeagueTeams()` (`ContinentalEurope.html`,
+      `ContinentalEuropeMobile.html`) cut over to `/api/teams`. Stays
+      synchronous for its callers (returns whatever's cached) while a new
+      `ensureTeamsLoaded(div)` does the fetch and re-renders every
+      consumer once it resolves - same eventual-consistency pattern as
+      `ensureDivDateRangeLoaded`/`divDateRangeApiCache` already used
+      elsewhere in these files. Verified live: team search, Team Seasons'
+      dropdown, and Team Streaks' Team 1 dropdown all populate correctly
+      from the real 567-team C1 roster, no console errors. **This was the
+      last `state.data`-dependent feature on any of the four pages** -
+      see "Next steps" for what that actually unlocks.
 
 ## Keeping D1 in sync
 
@@ -269,15 +279,21 @@ never been requested that day) pays the full row-read cost.
 
 ## Next steps
 
-1. Deploy `GET /api/teams?div=` (already built and verified against
-   production - see Status above) and cut `getLeagueTeams()` over to it
-   on the two Continental pages, the same way Domestic's was - the
-   hardcoded color table can't be reused for this one. This is the last
-   remaining `state.data`-dependent feature anywhere.
-2. Once nothing reads `state.data` for its own computation, drop
-   `loadGistData()`'s call in `init()` on all four pages - that's the step
-   that actually stops the client from downloading the gists, and is the
-   real finish line for this migration (not just "every tab has an API").
+Nothing reads `state.data` for its own computation anymore on any of the
+four pages - confirmed via `git grep 'state\.data'`, the only matches left
+are the `loadGistData()` pipeline's own assignment
+(`state.data = filteredData`/`cleanedData`) and a handful of
+`state.data.length === 0`/`> 0` checks used purely as "has the gist fetch
+finished yet" loading-state gates, not per-row computation.
+
+1. Drop `loadGistData()`'s call in `init()` on all four pages, and the
+   `.length`-based loading gates that only exist to guard against it not
+   having run yet - that's the step that actually stops the client from
+   downloading the gists, and is the real finish line for this migration
+   (not just "every tab has an API"). Worth a careful pass: check what
+   else in each file depends on `loadGistData()` having run at all (e.g.
+   `Last Data Update` banner logic, any leftover loading-spinner state)
+   before just deleting the call.
 
 ## Regenerating the seed data (manual full rebuild only)
 
