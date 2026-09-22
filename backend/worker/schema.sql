@@ -22,8 +22,6 @@ CREATE TABLE IF NOT EXISTS matches (
 --   1. Every match for one team (home or away), within one competition   -> team history
 --   2. Every match between two specific teams                            -> head-to-head
 --   3. Every match within one competition (to build a full table)        -> standings
-CREATE INDEX IF NOT EXISTS idx_matches_home_team ON matches(home_team);
-CREATE INDEX IF NOT EXISTS idx_matches_away_team ON matches(away_team);
 CREATE INDEX IF NOT EXISTS idx_matches_div ON matches(div);
 CREATE INDEX IF NOT EXISTS idx_matches_date ON matches(date);
 
@@ -37,12 +35,21 @@ CREATE INDEX IF NOT EXISTS idx_matches_date ON matches(date);
 -- INDEXED BY in src/index.js's queryTeamMatches()/
 -- queryHeadToHeadMatches() rather than left for the planner to pick -
 -- with them, the same lookup reads 4,407 rows for 4,405 actual matches.
--- idx_matches_home_team/idx_matches_away_team above are now redundant
--- (a composite index already serves any query on its leading column
--- alone) but left in place - not worth the extra DDL risk to drop on
--- production for a write-cost-only cleanup.
 CREATE INDEX IF NOT EXISTS idx_matches_home_team_div ON matches(home_team, div);
 CREATE INDEX IF NOT EXISTS idx_matches_away_team_div ON matches(away_team, div);
+
+-- idx_matches_home_team/idx_matches_away_team (single-column, no div)
+-- used to exist here too, superseded by the composite indexes above (a
+-- composite index already serves any query filtering on just its
+-- leading column). Being dropped from production as a cleanup -
+-- idx_matches_home_team is already gone; idx_matches_away_team's DROP
+-- hit D1's daily write-quota limit mid-cleanup (2026-09-22) and is
+-- still pending - see backend/README.md's "Data integrity" section
+-- before assuming this is finished. Deliberately not listed here even
+-- though production still has one of them lingering - schema.sql is
+-- CREATE-only/idempotent, so leaving them out doesn't touch production
+-- either way, and a fresh database built from this file was never going
+-- to have them.
 
 -- Lets the daily sync use INSERT OR IGNORE to add only genuinely new
 -- matches without re-writing the whole table (D1's free tier caps writes

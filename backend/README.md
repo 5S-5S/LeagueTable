@@ -354,15 +354,32 @@ smaller cleanup/hardening, not required for correctness:
    testing/investigation work - the quota-exhaustion incident showed how
    easily that budget can be exhausted, and the error message itself
    points at this as the fix.
-3. The `/api/teams` endpoint's `DISTINCT ... UNION ... ORDER BY` query is
-   also inefficient (verified: ~0.8% efficiency, reading ~35,195 rows on
-   average) for the same underlying reason as team-history/head-to-head
-   below - much lower priority since it's called far less often (4 times
-   in the last 7 days vs thousands), but the same `INDEXED BY` + JS-merge
-   fix would apply if it ever becomes a real contributor.
-4. The old single-column `idx_matches_home_team`/`idx_matches_away_team`
-   indexes are now redundant (see "Data integrity" below) - fine to drop
-   in a future cleanup pass, not urgent.
+3. **In progress, blocked on D1's write quota (2026-09-22):**
+   `/api/teams`'s `DISTINCT ... UNION ... ORDER BY` query is also
+   inefficient (~0.8% efficiency, ~35,195 rows read on average) for the
+   same underlying reason as team-history/head-to-head - measured a C1
+   lookup at 18,953 rows read via the current `UNION`, or 17,822 split
+   into two plain `DISTINCT` queries with *no* new index (only a
+   ~6% win, since `DISTINCT` still needs to scan the whole division
+   without an index leading with `div`). A proper fix needs new
+   `(div, home_team)`/`(div, away_team)` composite indexes to let SQLite
+   skip-scan straight to the distinct values - not yet built, since
+   `CREATE INDEX`s from step 4 below used up today's write quota first.
+   Still low priority (4 calls/week vs thousands for team-history), so
+   this is safe to leave exactly as-is until quota resets.
+4. **Half-done, blocked on the same write quota:** dropping the now-
+   redundant `idx_matches_home_team`/`idx_matches_away_team` single-
+   column indexes (superseded by the `*_div` composite indexes above -
+   see "Data integrity" for why they exist). `idx_matches_home_team` is
+   dropped from production. `idx_matches_away_team` is **not** -
+   its `DROP INDEX` hit the write-quota wall right after. `schema.sql`
+   already reflects the target end state (neither listed - safe, since
+   it's CREATE-only and never touches this on its own), but production
+   itself is inconsistent with that until the second drop actually
+   runs. Finish with:
+   `wrangler d1 execute leaguetable --remote --command "DROP INDEX IF EXISTS idx_matches_away_team"`
+   once quota resets (D1 write quota resets at UTC midnight, same as
+   the read quota).
 
 ## Regenerating the seed data (manual full rebuild only)
 
