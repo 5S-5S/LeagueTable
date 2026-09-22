@@ -265,9 +265,6 @@
                     </div>
 
                     <div class="flex gap-3">
-                        <button id="reloadGistsBtn" class="btn btn-blue">
-                            <span class="icon-link"></span>Reload Data
-                        </button>
                         <button id="resetBtn" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
@@ -894,51 +891,8 @@
     </div>
 
     <script>
-        // Pre-configured Gist URLs (Single Base64 Encoded)
-        // Updated GIST URLs with single base64 encoding (encoded with new user-provided URLs)
-        // Main Champions League data URLs
-        const MAIN_GIST_URLS = [
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy82MWI1NzlmYTljMzM5MzNmYjRiNzg3YzZhOWQzODhlYy9yYXcvYjA4YTBiZWU4MGNiYWI0MDNkMTdkMzY1MmI0MzRhOTdkNDJkNDQxNy9jaGFtcGlvbnNsZWFndWUuY3N2',
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iMWU1NTcwZTk4NWQ3ZmNhNGRlYWJjYzhhMDA0ZTllMC9yYXcvY2VhNGJmNDJkZjYyZmIxZGZmNzE5YTQ5N2MwZmQ4ZWZkMmQyODhmOS9jaGFtcGlvbnNsZWFndWUyNTI2LmNzdg=='
-        ];
-        
-        // Qualifier data URLs
-        const QUALIFIER_GIST_URLS = [
-            'aHR0cHM6Ly9naXN0LmdpdGh1YnVzZXJjb250ZW50LmNvbS81Uy01Uy9iYmMyMGMzMmQyNWNjZGMwZmVkZjI1YmM4N2Q0NDY2ZS9yYXcvZjZhNTQ5NDg1YzZlNDNiZWJmNmUzYjZmNmU3NDMyNGFiNDY1YWZjMi9jbHF1YWxpZmllcnMuY3N2'
-        ];
-        
-        // Combined URLs for loading
-        const GIST_URLS = [...MAIN_GIST_URLS, ...QUALIFIER_GIST_URLS];
-        
-        // League code mapping for filtering data
-        const LEAGUE_CODES = {
-            'champions-league': 'C1',
-            'europa-league': 'E1',
-            'conference-league': 'C2'
-        };
-        
-        // Function to identify if a match is from qualifier data
-        function isQualifierMatch(row, sourceUrl) {
-            // Check if the data came from a qualifier URL
-            return QUALIFIER_GIST_URLS.some(url => sourceUrl === url);
-        }
-        
-        // Function to process qualifier matches by adding "Qualification " prefix
-        function processQualifierData(data, sourceUrl) {
-            if (isQualifierMatch(data[0], sourceUrl)) {
-                return data.map(row => ({
-                    ...row,
-                    CompetitionPhase: row.CompetitionPhase ? `Qualification ${row.CompetitionPhase}` : 'Qualification',
-                    isQualifier: true
-                }));
-            }
-            return data.map(row => ({ ...row, isQualifier: false }));
-        }
-
         // Application state
         const state = {
-            data: [],
-            teams: [],
             error: '',
             
             // Filter states
@@ -1066,7 +1020,7 @@
             lastTimeStage: '',
             
             // Team Seasons state
-            teamSeasonsSelectedLeague: 'serie-a',
+            teamSeasonsSelectedLeague: 'champions-league',
             teamSeasonsSelectedTeam: '',
             teamSeasonsSelectedSeason: '',
             teamSeasonsSelectedPosition: '',
@@ -2578,7 +2532,6 @@
         const elements = {
             lastDataUpdate: document.getElementById('lastDataUpdate'),
             controlsSection: document.getElementById('controlsSection'),
-            reloadGistsBtn: document.getElementById('reloadGistsBtn'),
             errorState: document.getElementById('errorState'),
             errorMessage: document.getElementById('errorMessage'),
             tableContainer: document.getElementById('tableContainer'),
@@ -2762,14 +2715,6 @@
             elements.teamStreaksResults.classList.add('hidden');
             state.teamStreaksStage = '';
             state.historicStreaksSortConfig = { key: null, direction: null };
-
-            // Load league data if not already loaded
-            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
-                await loadLeagueDataForDevice(newLeague);
-            } else {
-                // If already loaded, just filter/update UI
-                filterDataForCurrentLeague(newLeague);
-            }
 
             createTeamStreaksLeagueButtons();
             updateTeamStreaksSelects();
@@ -3604,65 +3549,11 @@
             updateCompetitionStageOptions(); // Set initial dropdown options
             initTeamDashboardSearch();
             updateUI();
-            // Auto-load data on page load
-            loadGistData();
-        }
-
-        // Decode base64 encoded URL with backward compatibility for double encoding
-        function decodeSingleBase64Url(encodedUrl) {
-            try {
-                // Validate input
-                if (!encodedUrl || typeof encodedUrl !== 'string') {
-                    console.warn('Invalid encoded URL provided');
-                    return null;
-                }
-                
-                // Clean the input
-                const cleanedInput = encodedUrl.trim().replace(/\s/g, '');
-                
-                // Try single decode first
-                let decoded;
-                try {
-                    decoded = atob(cleanedInput);
-                } catch (atobError) {
-                    console.error('Base64 decode failed:', atobError.message);
-                    return null;
-                }
-                
-                // Strip commit hash from gist URL so we always fetch the latest version
-                // Converts: /raw/HASH/filename.csv -> /raw/filename.csv
-                function stripGistCommitHash(url) {
-                    return url.replace(
-                        /(https:\/\/gist\.githubusercontent\.com\/[^/]+\/[^/]+\/raw\/)([0-9a-f]{40}\/)(.+)/i,
-                        '$1$3'
-                    );
-                }
-
-                // Check if the result is a valid URL (single encoding)
-                if (decoded && decoded.startsWith('https://gist.githubusercontent.com')) {
-                    // Successfully decoded single base64 URL
-                    return stripGistCommitHash(decoded);
-                }
-
-                // If not a valid URL, try double decode (backward compatibility)
-                try {
-                    const doubleDecoded = atob(decoded);
-                    if (doubleDecoded && doubleDecoded.startsWith('https://gist.githubusercontent.com')) {
-                        // Successfully decoded double base64 URL
-                        return stripGistCommitHash(doubleDecoded);
-                    }
-                } catch (error) {
-                    // Ignore double decode errors
-                }
-                
-                console.warn('Could not decode URL as single or double base64:', encodedUrl.substring(0, 50) + '...');
-                return null;
-                
-            } catch (error) {
-                console.error('Error in decodeSingleBase64Url:', error);
-                console.error('Stack trace:', error.stack);
-                return null;
-            }
+            updateTeamSelects();
+            updateTeamSeasonsTeamSelect();
+            updateSeasonOptions();
+            updateLastDataUpdate();
+            updateTable();
         }
 
         // Mobile device detection
@@ -3684,484 +3575,6 @@
             return hasMobileUA && (hasSmallScreen || hasTouchScreen);
         }
         
-        // Load data from GitHub Gists - now uses league-specific loading for all devices
-        async function loadGistData() {
-            // Using league-specific loading for optimal performance
-            await loadLeagueDataForDevice(state.selectedLeague);
-        }
-        
-        // Universal league-specific loading for all devices
-        async function loadLeagueDataForDevice(leagueId) {
-            // Loading data for league
-            
-            // Check if already loaded
-            if (state.loadedLeagues && state.loadedLeagues.has(leagueId)) {
-                // League already loaded, filtering existing data
-                filterDataForCurrentLeague(leagueId);
-                return;
-            }
-            
-            // Initialize loadedLeagues if not exists
-            if (!state.loadedLeagues) {
-                state.loadedLeagues = new Set();
-            }
-            
-            // Initialize allLeagueData to store all data if not exists
-            if (!state.allLeagueData) {
-                state.allLeagueData = [];
-            }
-            
-            // Prevent double loading
-            if (state.currentlyLoadingLeague === leagueId) {
-                // League already loading, please wait
-                return;
-            }
-            
-            state.currentlyLoadingLeague = leagueId;
-            state.error = '';
-            
-            // Show loading indicator
-            const leagueName = getLeagueName(leagueId);
-            state.error = `⚽ Loading ${leagueName} data...`;
-            updateUI();
-            
-            try {
-                // Load ALL gist URLs since each contains data for all leagues
-                const gistUrls = GIST_URLS;
-                
-                // Fetching files (contains all leagues)
-                const allData = [];
-                
-                for (let i = 0; i < gistUrls.length; i++) {
-                    const encodedUrl = gistUrls[i];
-                    
-                    try {
-                        const url = decodeSingleBase64Url(encodedUrl);
-                        if (!url) {
-                            console.warn(`Skipping invalid URL at index ${i}`);
-                            continue;
-                        }
-                        
-                        // Check for obviously malformed URLs
-                        if (!url.startsWith('http')) {
-                            console.warn(`Skipping malformed URL at index ${i}: ${url.substring(0, 50)}...`);
-                            continue;
-                        }
-                        
-                        // Fetching URL
-                        
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 15000);
-                        
-                        const cacheBustUrl = url + (url.includes('?') ? '&' : '?') + '_cb=' + Date.now();
-                        const response = await fetch(cacheBustUrl, {
-                            signal: controller.signal,
-                            headers: { 'Accept': 'text/csv,text/plain,*/*' }
-                        });
-                        clearTimeout(timeoutId);
-                        
-                        if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        
-                        const text = await response.text();
-                        if (!text || text.length === 0) {
-                            throw new Error('Empty response from server');
-                        }
-                        
-                        const parsed = Papa.parse(text, { 
-                            header: true, 
-                            dynamicTyping: false,
-                            skipEmptyLines: true,
-                            transformHeader: (header) => header.trim().replace(/\r/g, ''),
-                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
-                        });
-                        
-                        if (parsed.errors && parsed.errors.length > 0) {
-                            console.warn('CSV parsing errors:', parsed.errors);
-                        }
-                        
-                        if (parsed.data && parsed.data.length > 0) {
-                            // Successfully parsed rows - process qualifier data
-                            const processedData = processQualifierData(parsed.data, encodedUrl);
-                            allData.push(...processedData);
-                        }
-                        
-                        // Update progress
-                        const progress = Math.round(((i + 1) / gistUrls.length) * 100);
-                        state.error = `⚽ Loading data... ${progress}%`;
-                        updateUI();
-                        
-                        // Small delay to keep UI responsive
-                        await new Promise(resolve => setTimeout(resolve, 50));
-                        
-                    } catch (fileError) {
-                        console.warn(`Failed to load file ${i}:`, fileError.message);
-                    }
-                }
-                
-                // Process all the raw data
-                // Processing all league data
-                const cleanedData = processRawData(allData);
-                
-                if (cleanedData.length === 0) {
-                    throw new Error(`No valid match data found`);
-                }
-                
-                // Store all data for future league switches
-                state.allLeagueData = cleanedData;
-                
-                // Mark all leagues as loaded since we loaded everything
-                state.loadedLeagues.add('serie-a');
-                state.loadedLeagues.add('premier-league');
-                state.loadedLeagues.add('la-liga');
-                state.loadedLeagues.add('bundesliga');
-                state.loadedLeagues.add('ligue-1');
-                
-                state.currentlyLoadingLeague = null;
-                state.error = '';
-                
-                // Filter data for the requested league
-                filterDataForCurrentLeague(leagueId);
-                
-                // All data loaded successfully
-                updateLastDataUpdate();
-
-            } catch (error) {
-                console.error(`Error loading data:`, error);
-                state.error = `Failed to load data: ${error.message}`;
-                state.currentlyLoadingLeague = null;
-                updateUI();
-            }
-        }
-        
-        // Get human-readable league name
-        function getLeagueName(leagueId) {
-            const leagueMap = {
-                'champions-league': 'Champions League',
-                'europa-league': 'Europa League',
-                'conference-league': 'Conference League'
-            };
-            return leagueMap[leagueId] || leagueId;
-        }
-        
-        // Filter existing data for current league (when switching between loaded leagues)
-        function filterDataForCurrentLeague(leagueId) {
-            if (!state.allLeagueData || state.allLeagueData.length === 0) return;
-            
-            const leagueCode = LEAGUE_CODES[leagueId];
-            if (!leagueCode) {
-                console.warn(`Unknown league ID: ${leagueId}`);
-                return;
-            }
-            
-            // Filter data for the specific league
-            const filteredData = state.allLeagueData.filter(row => row.Div === leagueCode);
-            
-            // Filtered matches for league
-            
-            // Update state with filtered data
-            state.data = filteredData;
-            
-            // Update teams list for this league
-            const allTeams = [...new Set([
-                ...filteredData.map(row => row.HomeTeam),
-                ...filteredData.map(row => row.AwayTeam)
-            ])].filter(team => team && team.length > 1).sort();
-            
-            state.teams = allTeams;
-            
-            // Update date range for this league
-            if (filteredData.length > 0) {
-                const dates = filteredData.map(row => row.dateObj);
-                const minDate = new Date(Math.min(...dates));
-                const maxDate = new Date(Math.max(...dates));
-                
-                state.dateFrom = minDate.toISOString().split('T')[0];
-                state.dateTo = maxDate.toISOString().split('T')[0];
-            }
-            
-            // Update the UI with filtered data
-            updateUI();
-            updateTeamSelects();
-            updateTeamSeasonsTeamSelect();
-            updateSeasonOptions();
-            updateLastDataUpdate();
-            updateTable();
-        }
-        
-        // Chunked loading for desktop browsers (prevents stack overflow)
-        async function loadGistDataChunked() {
-            const gistUrls = GIST_URLS;
-            
-            state.error = '';
-            // Starting chunked data load
-
-            try {
-                const allData = [];
-                let loadedGists = 0;
-                
-                // Process files in smaller batches to prevent stack overflow
-                const batchSize = 5; // Process 5 files at a time
-                
-                for (let batchStart = 0; batchStart < gistUrls.length; batchStart += batchSize) {
-                    const batchEnd = Math.min(batchStart + batchSize, gistUrls.length);
-                    // Processing batch
-                    
-                    // Process batch of files
-                    for (let i = batchStart; i < batchEnd; i++) {
-                    const encodedUrl = gistUrls[i];
-                    // Processing URL
-                    
-                    const url = decodeSingleBase64Url(encodedUrl);
-                    
-                    // Skip if URL decoding failed
-                    if (!url) {
-                        console.warn(`Skipping invalid URL at index ${i}`);
-                        continue;
-                    }
-                    
-                    try {
-                        // Fetching URL
-                        
-                        // Add timeout to fetch
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-                        
-                        const response = await fetch(url, { 
-                            signal: controller.signal,
-                            headers: {
-                                'Accept': 'text/csv,text/plain,*/*'
-                            }
-                        });
-                        clearTimeout(timeoutId);
-                        if (!response.ok) {
-                            if (response.status === 404) {
-                                console.warn(`File not found (404) at index ${i}, skipping: ${url.substring(url.lastIndexOf('/') + 1)}`);
-                                continue;
-                            }
-                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                        }
-                        
-                        const text = await response.text();
-                        // Received CSV data
-                        
-                        if (!text || text.length === 0) {
-                            throw new Error('Empty response from server');
-                        }
-                        
-                        const parsed = Papa.parse(text, { 
-                            header: true, 
-                            dynamicTyping: false,
-                            skipEmptyLines: true,
-                            transformHeader: (header) => header.trim().replace(/\r/g, ''),
-                            transform: (value) => typeof value === 'string' ? value.trim().replace(/\r/g, '') : value
-                        });
-                        
-                        if (parsed.errors && parsed.errors.length > 0) {
-                            console.warn('CSV parsing errors:', parsed.errors);
-                        }
-                        
-                        if (parsed.data && parsed.data.length > 0) {
-                            // Successfully parsed rows from file
-                            
-                            // Always use chunked processing for desktop stability
-                            if (parsed.data.length > 500) {
-                                // Process in chunks for all browsers
-                                const chunkSize = 300;
-                                for (let i = 0; i < parsed.data.length; i += chunkSize) {
-                                    const chunk = parsed.data.slice(i, i + chunkSize);
-                                    allData.push(...chunk);
-                                    
-                                    // Small delay to prevent stack overflow
-                                    if (i + chunkSize < parsed.data.length) {
-                                        await new Promise(resolve => setTimeout(resolve, 25));
-                                    }
-                                }
-                            } else {
-                                allData.push(...parsed.data);
-                            }
-                            loadedGists++;
-                        } else {
-                            console.warn('No data found in parsed CSV');
-                        }
-                    } catch (gistError) {
-                        console.warn(`Failed to load ${url}:`, gistError.message);
-                    }
-                    
-                    // Small delay between files within batch
-                    if (i < batchEnd - 1) {
-                        await new Promise(resolve => setTimeout(resolve, 10));
-                    }
-                    }
-                    
-                    // Delay between batches to prevent stack overflow  
-                    if (batchEnd < gistUrls.length) {
-                        const progress = Math.round((batchEnd / gistUrls.length) * 100);
-                        state.error = `🔄 Loading data... ${progress}% complete (${loadedGists} files processed)`;
-                        updateUI();
-                        // Batch complete
-                        await new Promise(resolve => setTimeout(resolve, 100));
-                    }
-                }
-                
-                if (loadedGists === 0) {
-                    throw new Error('No valid data could be loaded from any Gist');
-                }
-                
-                // Clear loading message and show processing status
-                state.error = '⚙️ Processing data...';
-                updateUI();
-                
-                // Process the data
-                // Starting data processing
-                const cleanedData = processRawData(allData);
-                // Data processing completed
-                
-                if (cleanedData.length === 0) {
-                    throw new Error('No valid match data found in the loaded Gists');
-                }
-                
-                const allTeams = [...new Set([
-                    ...cleanedData.map(row => row.HomeTeam), 
-                    ...cleanedData.map(row => row.AwayTeam)
-                ])]
-                    .filter(team => team && team.length > 1)
-                    .sort();
-                
-                const dates = cleanedData.map(row => row.dateObj);
-                const minDate = new Date(Math.min(...dates));
-                const maxDate = new Date(Math.max(...dates));
-                
-                state.data = cleanedData;
-                state.teams = allTeams;
-                state.dateFrom = minDate.toISOString().split('T')[0];
-                state.dateTo = maxDate.toISOString().split('T')[0];
-                state.error = ''; // Clear loading message
-                
-                // Data loaded successfully
-                updateUI();
-                updateTeamSelects();
-                updateTeamSeasonsTeamSelect();
-                updateSeasonOptions();
-                updateTable();
-                
-            } catch (error) {
-                console.error('Error loading Gist data:', error);
-                state.error = error.message;
-            } finally {
-                updateUI();
-            }
-        }
-
-        // Process raw CSV data
-        function processRawData(allData) {
-            const filtered = allData.filter(row => {
-                    return row && 
-                           row.HomeTeam && 
-                           row.AwayTeam && 
-                           row.Date &&
-                           row.Div &&
-                           typeof row.HomeTeam === 'string' &&
-                           typeof row.AwayTeam === 'string' &&
-                           row.HomeTeam.length > 0 &&
-                           row.AwayTeam.length > 0 &&
-                           row.Div.length > 0;
-                });
-            
-            const processed = filtered.map(row => {
-                    try {
-                        let dateStr = String(row.Date).trim().replace(/\r/g, '');
-                        let dateObj;
-                        
-                        if (dateStr.includes('/')) {
-                            const parts = dateStr.split('/');
-                            if (parts.length === 3) {
-                                const day = parseInt(parts[0]);
-                                const month = parseInt(parts[1]);
-                                let year = parseInt(parts[2]);
-                                
-                                if (year < 100) {
-                                    year = year <= 30 ? 2000 + year : 1900 + year;
-                                }
-                                
-                                dateObj = new Date(year, month - 1, day);
-                            }
-                        } else if (dateStr.includes('-')) {
-                            dateObj = new Date(dateStr);
-                        }
-                        
-                        if (!dateObj || isNaN(dateObj.getTime())) {
-                            return null;
-                        }
-                        
-                        dateObj.setHours(0, 0, 0, 0);
-                        
-                        let homeGoals = 0;
-                        let awayGoals = 0;
-                        
-                        if (row.FTHG !== undefined && row.FTHG !== null && row.FTHG !== '') {
-                            homeGoals = parseInt(String(row.FTHG)) || 0;
-                        }
-                        if (row.FTAG !== undefined && row.FTAG !== null && row.FTAG !== '') {
-                            awayGoals = parseInt(String(row.FTAG)) || 0;
-                        }
-                        
-                        return {
-                            ...row,
-                            dateObj: dateObj,
-                            HomeTeam: String(row.HomeTeam).trim().replace(/\r/g, ''),
-                            AwayTeam: String(row.AwayTeam).trim().replace(/\r/g, ''),
-                            FTHG: homeGoals,
-                            FTAG: awayGoals,
-                            Div: String(row.Div || '').trim().replace(/\r/g, '')
-                        };
-                    } catch (parseError) {
-                        return null;
-                    }
-                })
-                .filter(row => row !== null);
-
-            // Deduplication logic (commented out - enable if duplicates appear in future)
-            /*
-            const uniqueMatches = new Map();
-
-            processed.forEach(match => {
-                // Try multiple deduplication strategies
-                const keys = [
-                    // Primary key: exact match with scores
-                    `${match.dateObj.getTime()}-${match.HomeTeam}-${match.AwayTeam}-${match.FTHG || 0}-${match.FTAG || 0}`,
-                    // Secondary key: match without scores (in case scores differ)
-                    `${match.dateObj.getTime()}-${match.HomeTeam}-${match.AwayTeam}`,
-                    // Tertiary key: date string format (in case timestamp differs)
-                    `${match.dateObj.toISOString().split('T')[0]}-${match.HomeTeam}-${match.AwayTeam}-${match.FTHG || 0}-${match.FTAG || 0}`
-                ];
-
-                let isUnique = true;
-                for (const key of keys) {
-                    if (uniqueMatches.has(key)) {
-                        isUnique = false;
-                        // If duplicate found, prefer the one with more complete data
-                        const existing = uniqueMatches.get(key);
-                        if (match.CompetitionPhase && !existing.CompetitionPhase) {
-                            uniqueMatches.set(key, match);
-                        }
-                        break;
-                    }
-                }
-
-                if (isUnique) {
-                    // Store under primary key
-                    uniqueMatches.set(keys[0], match);
-                }
-            });
-
-            return Array.from(uniqueMatches.values());
-            */
-
-            return processed;
-        }
-
         // Create league selection buttons
         function createLeagueButtons() {
             const leagues = [
@@ -4254,14 +3667,6 @@
             state.teamSeasonsSelectedPosition = '';
             state.includeBetterResults = false;
             state.firstOccurrenceOnly = false;
-
-            // Load league data if not already loaded
-            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
-                await loadLeagueDataForDevice(newLeague);
-            } else {
-                // If already loaded, just filter/update UI
-                filterDataForCurrentLeague(newLeague);
-            }
 
             createTeamSeasonsLeagueButtons();
             updateTeamSeasonsTeamSelect();
@@ -5181,10 +4586,7 @@
             document.getElementById('teamSeasonsTab').addEventListener('click', () => switchTab('team-seasons'));
             document.getElementById('lastTimeWhenTab').addEventListener('click', () => switchTab('last-time-when'));
             document.getElementById('teamStreaksTab').addEventListener('click', () => switchTab('team-streaks'));
-            
-            // Gist loading
-            elements.reloadGistsBtn.addEventListener('click', loadGistData);
-            
+
             // League selection
             elements.leagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -5374,7 +4776,7 @@
             });
             elements.retryBtn.addEventListener('click', () => {
                 state.error = '';
-                loadGistData();
+                updateUI();
             });
 
             // H2H controls
@@ -5641,15 +5043,7 @@
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
             state.selectedSeason = '';
-            
-            // Load league data if not already loaded
-            if (!state.loadedLeagues || !state.loadedLeagues.has(newLeague)) {
-                await loadLeagueDataForDevice(newLeague);
-            } else {
-                // If already loaded, just filter/update UI
-                filterDataForCurrentLeague(newLeague);
-            }
-            
+
             // Reset Last Time When state
             state.lastTimeTeam1 = '';
             state.lastTimeTeam2 = '';
@@ -8856,8 +8250,6 @@
 
         // Update table and all related UI
         function updateTable() {
-            if (state.data.length === 0) return;
-
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
             const matchHistoryResult = calculateMatchHistory();
@@ -8974,10 +8366,8 @@
 
         // Team's current standing + last 5 results, reusing calculateTable()
         // (temporarily cleared of any team filter, i.e. the full standings
-        // table under whatever season/stage filter is currently active) and
-        // the raw match data - no new calculation logic. Continental has no
-        // Div/league to filter match data by (all state.data is Champions
-        // League), unlike Domestic.
+        // table under whatever season/stage filter is currently active) -
+        // no new calculation logic.
         function getTeamDashboardSnapshot(teamName) {
             if (!teamName) return null;
 
@@ -8985,9 +8375,19 @@
             const savedTeam2 = state.selectedTeam2;
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
-            const standings = calculateTable().tableData;
+            const tableResult = calculateTable();
             state.selectedTeam1 = savedTeam1;
             state.selectedTeam2 = savedTeam2;
+
+            // A specific season delegates to calculateGroupedTable(), whose
+            // result has no flat tableData - it's split per competition
+            // phase instead (see calculateGroupedTable()'s return shape).
+            // Search every phase for this team rather than assuming the
+            // flat shape, so a locked dashboard team doesn't crash the
+            // page whenever a specific season is also selected.
+            const standings = tableResult.isGroupedByPhase
+                ? Object.values(tableResult.phases).flatMap(p => p.tableData)
+                : tableResult.tableData;
 
             const standing = standings.find(row => row.team === teamName);
             if (!standing) return null;
@@ -9033,8 +8433,7 @@
             if (!state.teamLocked || !state.dashboardLockedTeam) {
                 headerEl.classList.add('hidden');
                 headerEl.innerHTML = '';
-                // Only offer the search box once there's data for it to search
-                if (searchEl) searchEl.classList.toggle('hidden', state.data.length === 0);
+                if (searchEl) searchEl.classList.remove('hidden');
                 return;
             }
 
@@ -9044,7 +8443,7 @@
             if (!snapshot) {
                 headerEl.classList.add('hidden');
                 headerEl.innerHTML = '';
-                if (searchEl) searchEl.classList.toggle('hidden', state.data.length === 0);
+                if (searchEl) searchEl.classList.remove('hidden');
                 return;
             }
 
@@ -10419,55 +9818,51 @@
 
         // Update table info display
         function updateTableInfo(tableResult) {
-            if (state.data.length > 0) {
-                const leagueNames = {
-                    'champions-league': '🇪🇺 Champions League',
-                    // 'europa-league': '🇪🇺 Europa League',
-                    // 'conference-league': '🇪🇺 Conference League'
-                };
-                
-                let text = leagueNames[state.selectedLeague];
-                
-                // Don't show "All Results" text for 2023-24 season
-                const hide2023Results = state.selectedSeason === '2023-24';
-                
-                if (state.homeFilter && state.awayFilter && !hide2023Results) text += ' - All Results';
-                else if (state.homeFilter) text += ' - Home Results Only';
-                else if (state.awayFilter) text += ' - Away Results Only';
-                else text += ' - No Results Selected';
-                
-                // Handle grouped competition phase display
-                if (tableResult.isGroupedByPhase) {
-                    text += ` (${tableResult.totalMatchCount} total matches) • ${tableResult.phaseNames.length} competition phases`;
-                    if (state.selectedSeason) {
-                        text += ` • ${state.selectedSeason} season`;
-                    }
+            const leagueNames = {
+                'champions-league': '🇪🇺 Champions League',
+                // 'europa-league': '🇪🇺 Europa League',
+                // 'conference-league': '🇪🇺 Conference League'
+            };
+
+            let text = leagueNames[state.selectedLeague];
+
+            // Don't show "All Results" text for 2023-24 season
+            const hide2023Results = state.selectedSeason === '2023-24';
+
+            if (state.homeFilter && state.awayFilter && !hide2023Results) text += ' - All Results';
+            else if (state.homeFilter) text += ' - Home Results Only';
+            else if (state.awayFilter) text += ' - Away Results Only';
+            else text += ' - No Results Selected';
+
+            // Handle grouped competition phase display
+            if (tableResult.isGroupedByPhase) {
+                text += ` (${tableResult.totalMatchCount} total matches) • ${tableResult.phaseNames.length} competition phases`;
+                if (state.selectedSeason) {
+                    text += ` • ${state.selectedSeason} season`;
+                }
+            } else {
+                const teamCount = tableResult.tableData ? tableResult.tableData.length : 0;
+                text += ` (${tableResult.matchCount} matches) • ${teamCount} teams`;
+            }
+
+            // Add competition stage filter info
+            if (state.competitionStage) {
+                if (state.competitionStage === 'group-stage') {
+                    text += ` • League/Group Stage only`;
+                } else if (state.competitionStage === 'knockout-stage') {
+                    text += ` • Knock-Out Stage only`;
                 } else {
-                    const teamCount = tableResult.tableData ? tableResult.tableData.length : 0;
-                    text += ` (${tableResult.matchCount} matches) • ${teamCount} teams`;
+                    // Show the specific stage name
+                    text += ` • ${state.competitionStage} only`;
                 }
-                
-                // Add competition stage filter info
-                if (state.competitionStage) {
-                    if (state.competitionStage === 'group-stage') {
-                        text += ` • League/Group Stage only`;
-                    } else if (state.competitionStage === 'knockout-stage') {
-                        text += ` • Knock-Out Stage only`;
-                    } else {
-                        // Show the specific stage name
-                        text += ` • ${state.competitionStage} only`;
-                    }
-                }
-                
-                elements.tableInfoText.textContent = text;
-                
-                // Only show table info if we're on the League Filters tab
-                const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
-                if (isLeagueFiltersActive) {
-                    elements.tableInfo.classList.remove('hidden');
-                } else {
-                    elements.tableInfo.classList.add('hidden');
-                }
+            }
+
+            elements.tableInfoText.textContent = text;
+
+            // Only show table info if we're on the League Filters tab
+            const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
+            if (isLeagueFiltersActive) {
+                elements.tableInfo.classList.remove('hidden');
             } else {
                 elements.tableInfo.classList.add('hidden');
             }
@@ -10589,9 +9984,6 @@
 
         // Show team history across seasons
         function showTeamHistory(teamName, sourceLeague = null) {
-            // showTeamHistory called
-            // Current state.data length
-
             // Determine which league to use based on source
             let leagueToUse;
             if (sourceLeague) {
@@ -11325,29 +10717,24 @@
 
             elements.errorState.classList.add('hidden');
 
-            if (state.data.length > 0) {
-                // Showing controls section
-                elements.controlsSection.classList.remove('hidden');
-                
-                // Only show table-related sections if we're on the League Filters tab
-                const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
-                if (isLeagueFiltersActive) {
-                    elements.tableContainer.classList.remove('hidden');
-                    
-                    // Only show H2H section when both teams are selected
-                    if (state.selectedTeam1 && state.selectedTeam2) {
-                        elements.h2hSection.classList.remove('hidden');
-                    } else {
-                        elements.h2hSection.classList.add('hidden');
-                    }
+            elements.controlsSection.classList.remove('hidden');
+
+            // Only show table-related sections if we're on the League Filters tab
+            const isLeagueFiltersActive = document.getElementById('leagueFiltersTab').classList.contains('active');
+            if (isLeagueFiltersActive) {
+                elements.tableContainer.classList.remove('hidden');
+
+                // Only show H2H section when both teams are selected
+                if (state.selectedTeam1 && state.selectedTeam2) {
+                    elements.h2hSection.classList.remove('hidden');
                 } else {
-                    // Keep table hidden on Last Time When tab
-                    elements.tableContainer.classList.add('hidden');
                     elements.h2hSection.classList.add('hidden');
-                    elements.tableInfo.classList.add('hidden');
                 }
             } else {
-                // Data length is 0, keeping controls hidden
+                // Keep table hidden on Last Time When tab
+                elements.tableContainer.classList.add('hidden');
+                elements.h2hSection.classList.add('hidden');
+                elements.tableInfo.classList.add('hidden');
             }
 
 
