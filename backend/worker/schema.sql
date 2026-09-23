@@ -39,17 +39,20 @@ CREATE INDEX IF NOT EXISTS idx_matches_home_team_div ON matches(home_team, div);
 CREATE INDEX IF NOT EXISTS idx_matches_away_team_div ON matches(away_team, div);
 
 -- idx_matches_home_team/idx_matches_away_team (single-column, no div)
--- used to exist here too, superseded by the composite indexes above (a
--- composite index already serves any query filtering on just its
--- leading column). Being dropped from production as a cleanup -
--- idx_matches_home_team is already gone; idx_matches_away_team's DROP
--- hit D1's daily write-quota limit mid-cleanup (2026-09-22) and is
--- still pending - see backend/README.md's "Data integrity" section
--- before assuming this is finished. Deliberately not listed here even
--- though production still has one of them lingering - schema.sql is
--- CREATE-only/idempotent, so leaving them out doesn't touch production
--- either way, and a fresh database built from this file was never going
--- to have them.
+-- used to exist here too - dropped from production (2026-09-22),
+-- superseded by the composite indexes above (a composite index already
+-- serves any query filtering on just its leading column).
+
+-- /api/teams' query ("every distinct team name in this division") has
+-- no single equality target for an index to seek to the way team-
+-- history/head-to-head do, so the fix there is different: these two
+-- composite indexes (div leading, not trailing, unlike the pair above)
+-- let src/index.js's queryDistinctTeams() walk distinct values directly
+-- via a recursive-CTE loose index scan instead of reading the whole
+-- division (verified: 266 rows read for E0's 65 teams, vs 102,892 for
+-- the naive DISTINCT/UNION query it replaced - 387x fewer).
+CREATE INDEX IF NOT EXISTS idx_matches_div_home_team ON matches(div, home_team);
+CREATE INDEX IF NOT EXISTS idx_matches_div_away_team ON matches(div, away_team);
 
 -- Lets the daily sync use INSERT OR IGNORE to add only genuinely new
 -- matches without re-writing the whole table (D1's free tier caps writes
