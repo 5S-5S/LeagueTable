@@ -2,9 +2,23 @@
 
 Feature ideas, not yet scheduled.
 
-- **Biggest Win / Biggest Loss / Closest Match finders** — e.g. "Arsenal's
-  biggest ever win" or "closest 1-goal games this season." Same match data,
-  different sort/filter lens.
+- On hold: **Biggest Win / Biggest Loss / Closest Match finders** — shelved
+  (2026-09-23), same reason as the mini-league item below: one open question
+  before starting. "Arsenal's biggest ever win" (team-scoped) and "closest
+  1-goal games this season" (league-wide, no team implied) are two different
+  features wearing one description:
+  - **Team-scoped** is cheap - it's `calculateLastTimeWhen()`'s exact shape
+    with the sort key swapped (max/min `|homeGoals - awayGoals|` instead of
+    max date), reusing the same team-scoped match cache, day-of-week/
+    location filters, and one-card-per-category rendering. Fits as a new
+    mode inside The Last Time When... tab.
+  - **League-wide** ("closest games this season," no team required) doesn't
+    fit there at all - that tab hard-requires Team 1 before it loads
+    anything. Needs a different data source (a full division/season scan,
+    closer to League Table's no-team-selected view) and probably a ranked
+    top-N list UI instead of single-card-per-category.
+  - Decide which (or both) before starting - team-only is the cheap path,
+    league-wide is a real second feature bolted onto the same name.
 
 - On hold: **Multi-team table filter / mini-league** — scoped out
   (2026-09-04), paused while other ideas are explored. Turned out to be a
