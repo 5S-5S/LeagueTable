@@ -1919,9 +1919,92 @@
         function getTeamColor(teamName, league) {
             const teamColors = getTeamColors();
             const leagueColors = teamColors[league] || [];
-            
+
             const teamColorEntry = leagueColors.find(([name, color]) => name === teamName);
             return teamColorEntry ? teamColorEntry[1] : null;
+        }
+
+        // WCAG relative luminance / contrast ratio, and a hex<->rgb pair -
+        // shared by ensureReadableOnDark() below. getContrastColor()
+        // above already does its own quick luminance estimate, but only
+        // to pick a binary black-or-white pairing partner; this needs an
+        // actual ratio against a fixed background to know how far a
+        // color is from passing, and by how much to lighten it.
+        function hexToRgb(hex) {
+            const clean = hex.replace('#', '');
+            const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+            return {
+                r: parseInt(full.substring(0, 2), 16),
+                g: parseInt(full.substring(2, 4), 16),
+                b: parseInt(full.substring(4, 6), 16),
+            };
+        }
+
+        function rgbToHex({ r, g, b }) {
+            const clamp = c => Math.max(0, Math.min(255, Math.round(c)));
+            return '#' + [r, g, b].map(c => clamp(c).toString(16).padStart(2, '0')).join('');
+        }
+
+        function relativeLuminance({ r, g, b }) {
+            const channel = c => {
+                const v = c / 255;
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+            };
+            return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+        }
+
+        function contrastRatio(rgb1, rgb2) {
+            const l1 = relativeLuminance(rgb1);
+            const l2 = relativeLuminance(rgb2);
+            const lighter = Math.max(l1, l2);
+            const darker = Math.min(l1, l2);
+            return (lighter + 0.05) / (darker + 0.05);
+        }
+
+        // Team brand colors are chosen for legibility on WHITE (many
+        // clubs use navy, maroon, or black), so used as bare TEXT on
+        // the dark-mode page background they can be close to invisible
+        // (e.g. Tottenham's navy: ~1:1 contrast against #222). Lightens
+        // by mixing toward white just enough to clear WCAG AA (4.5:1)
+        // against the dark-mode background, preserving hue - not a flat
+        // fallback color - so it still reads as "that team's color".
+        // Not needed for backgrounds (e.g. team-dashboard-name,
+        // teamBgStyle/team1Style/team2Style below), which already pick
+        // a correctly-contrasting black-or-white text color per swatch
+        // via getContrastColor() regardless of theme.
+        const DARK_MODE_BG_RGB = { r: 0x22, g: 0x22, b: 0x22 };
+
+        function ensureReadableOnDark(hex) {
+            const rgb = hexToRgb(hex);
+            if (contrastRatio(rgb, DARK_MODE_BG_RGB) >= 4.5) return hex;
+            for (let t = 0.1; t <= 1; t += 0.1) {
+                const mixed = {
+                    r: rgb.r + (255 - rgb.r) * t,
+                    g: rgb.g + (255 - rgb.g) * t,
+                    b: rgb.b + (255 - rgb.b) * t,
+                };
+                if (contrastRatio(mixed, DARK_MODE_BG_RGB) >= 4.5) return rgbToHex(mixed);
+            }
+            return '#ffffff';
+        }
+
+        // Team-brand-color text (Match History/Team Streaks/Last Time
+        // When's winner-name and result-indicator coloring) only needs
+        // dark-mode lightening when it will sit on the page's own dark
+        // background (an empty or "team-transparent-highlight" class) -
+        // inside a team1-highlight/team2-highlight pill it sits on that
+        // pill's own light pastel background regardless of theme (that
+        // pill hasn't been given a dark treatment itself, same gap
+        // .h2h-losses had), where the raw brand color already reads
+        // fine as dark-on-light; lightening it there would make
+        // contrast WORSE, not better. Callers pass whichever CSS class
+        // the color is about to be paired with so this can tell the
+        // two cases apart.
+        function pickTeamTextColor(rawColor, cssClass) {
+            if (!rawColor) return rawColor;
+            if (cssClass === 'team1-highlight' || cssClass === 'team2-highlight') return rawColor;
+            if (document.body.getAttribute('data-theme') !== 'dark') return rawColor;
+            return ensureReadableOnDark(rawColor);
         }
 
         // Get team logo number
@@ -4027,7 +4110,9 @@
 
             // Create table rows
             elements.teamHistoryBody.innerHTML = allPositionData.map((season, index) => {
-                const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
+                // bg-gray-50/bg-white (not bg-gray-100/bg-gray-50) - see the
+                // note on the same fix in updateTableDisplay() above.
+                const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
                 const logoUrl = getTeamLogoUrl(season.team, league);
 
                 return `
@@ -5554,12 +5639,21 @@
                 daysElement.textContent = `${daysSince} days ago`;
                 
                 const location = isHome ? 'at Home' : 'Away';
-                const color = resultType === 'Won' ? 'text-green-700' : resultType === 'Drew' ? 'text-gray-600' : 'text-red-600';
+                // .text-gray-400 (not .text-gray-600) to match the same
+                // muted grey used for draw scores/results elsewhere -
+                // .text-gray-600 doubles as a general secondary-text
+                // utility class already mapped to white in dark mode,
+                // which fought this draw-specific meaning.
+                const color = resultType === 'Won' ? 'text-green-700' : resultType === 'Drew' ? 'text-gray-400' : 'text-red-600';
                 titleElement.className = `text-lg font-semibold ${color} mb-3`;
-                
-                // Get team colors
-                const team1Color = getTeamColor(team1Name, state.selectedLeague);
-                const team2Color = team2Name === 'BIG_6' ? '#1e3a8a' : (team2Name ? getTeamColor(team2Name, state.selectedLeague) : null);
+
+                // Get team colors - this title sits as plain text on the
+                // page's own background (no team1-highlight/team2-highlight
+                // pill involved), so unlike the match-row functions above
+                // it always needs dark-mode lightening, not just
+                // conditionally on a CSS class.
+                const team1Color = pickTeamTextColor(getTeamColor(team1Name, state.selectedLeague), '');
+                const team2Color = pickTeamTextColor(team2Name === 'BIG_6' ? '#1e3a8a' : (team2Name ? getTeamColor(team2Name, state.selectedLeague) : null), '');
                 
                 // Use different title format for single-team vs two-team mode
                 if (team2Name && team2Name !== team1Name) {
@@ -7235,8 +7329,20 @@
                         state.selectedTeam2 === team.team
                     );
                     
-                    // Alternating row colors: only if 3+ teams, otherwise all white
-                    const rowBackgroundClass = tableResult.tableData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
+                    // Alternating row colors: only if 3+ teams, otherwise all white.
+                    // bg-gray-50/bg-white (not bg-gray-100/bg-gray-50, which this
+                    // used before) to match Continental's own League Table and
+                    // every other striped table on this page - bg-gray-100's dark
+                    // value is the exact same var(--bg-gray-50) #333333 that
+                    // #tableContainer .league-table's own background already is,
+                    // so every other row was blending invisibly into the
+                    // container instead of alternating, and a single-row table
+                    // (e.g. one team selected) rendered #444444 here while the
+                    // Match History/Head-to-Head boxes right below it render
+                    // #222222 - two different "dark box" shades sitting next to
+                    // each other for no reason, only really noticeable once dark
+                    // mode's colors are distinct enough to show it.
+                    const rowBackgroundClass = tableResult.tableData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
                     
                     return `
                         <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
@@ -7633,8 +7739,16 @@
                 const resultLogoUrl = match.result !== 'Draw' ?
                     getTeamLogoUrl(match.result, state.selectedLeague) : null;
 
+                // Alternating row background, same convention as the
+                // League Table/Team History (rowBackgroundClass there) -
+                // this table never had it at all, in either theme; it's
+                // just far more noticeable now that dark mode's own
+                // --bg-white/--bg-gray-50 are an obvious #222 vs #333
+                // instead of barely-different near-whites.
+                const rowBackgroundClass = matchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+
                 return `
-                    <tr>
+                    <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                         <td class="text-center text-sm">${match.date}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
@@ -8121,9 +8235,17 @@
                 
                 // Get winner logo for result column (if not a draw)
                 const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
-                
+
+                // Alternating row background, same convention as the
+                // League Table/Team History (rowBackgroundClass there) -
+                // this table never had it at all, in either theme; it's
+                // just far more noticeable now that dark mode's own
+                // --bg-white/--bg-gray-50 are an obvious #222 vs #333
+                // instead of barely-different near-whites.
+                const rowBackgroundClass = matchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+
                 return `
-                    <tr>
+                    <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                         <td class="text-center text-sm">${match.date}</td>
                         <td class="text-center">
                             <div class="flex items-center justify-center">
@@ -8755,7 +8877,9 @@
             `;
 
             elements.teamHistoryBody.innerHTML = sortedData.map((season, index) => {
-                const rowBackgroundClass = sortedData.length >= 3 && index % 2 === 1 ? 'bg-gray-100' : 'bg-gray-50';
+                // bg-gray-50/bg-white (not bg-gray-100/bg-gray-50) - see the
+                // note on the same fix in updateTableDisplay() above.
+                const rowBackgroundClass = sortedData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
                 const logoUrl = getTeamLogoUrl(teamName, leagueToUse);
 
                 return `
@@ -9201,54 +9325,80 @@
         }
         
         // Handle table colors by specific column headers
+        // Scoped per .league-table (not a page-wide querySelectorAll) -
+        // Match History/H2H/Streaks/Last Time When tables ALSO carry the
+        // .league-table class (just with entirely different columns:
+        // Date/Home Team/Home Score/.../Result, none of which appear in
+        // columnRules below), and were always present in the DOM at
+        // once alongside the League Table/Team History tables this
+        // function actually targets. A single page-wide
+        // `.league-table thead th` NodeList concatenates every table's
+        // headers together with one running columnIndex, so
+        // `:nth-child(columnIndex + 1)` then matched that Nth cell in
+        // EVERY .league-table on the page - including Match History's
+        // own Home/Away Score and Result cells, whenever their column
+        // position happened to coincide with an unrelated table's
+        // "GD"/"L" position. That's what caused losing scores/draws to
+        // intermittently render wrong: not this function's own logic,
+        // but its lack of scoping to the one table each header set
+        // actually belongs to.
         function handlePositionColors() {
             const isDark = document.body.getAttribute('data-theme') === 'dark';
-            if (!isDark) {
-                // Remove all inline styles in light mode
-                document.querySelectorAll('.league-table tbody tr td').forEach(cell => {
-                    cell.style.color = '';
-                });
-                return;
-            }
-            
-            const headers = document.querySelectorAll('.league-table thead th');
-            const columnRules = {
-                'Season': 'white',
-                'Team': 'white', 
-                'P': 'white',
-                'W': 'white',
-                'D': 'white',
-                'L': 'white',
-                'GF': 'white',
-                'GA': 'white',
-                'GD': 'white',
-                'Pts': 'default',
-                'Pos': 'special' // Special handling for 1,2,3
-            };
-            
-            headers.forEach((header, columnIndex) => {
-                const headerText = header.textContent.trim();
-                const rule = columnRules[headerText];
-                
-                if (rule) {
-                    const cells = document.querySelectorAll(`.league-table tbody tr td:nth-child(${columnIndex + 1})`);
-                    cells.forEach(cell => {
-                        if (rule === 'white') {
-                            cell.style.color = 'white';
-                        } else if (rule === 'default') {
+
+            document.querySelectorAll('.league-table').forEach(table => {
+                if (!isDark) {
+                    // Remove all inline styles in light mode, but preserve win-score and draw-score classes
+                    table.querySelectorAll('tbody tr td').forEach(cell => {
+                        if (!cell.classList.contains('win-score') && !cell.classList.contains('draw-score')) {
                             cell.style.color = '';
-                            cell.style.removeProperty('color');
-                        } else if (rule === 'special' && headerText === 'Pos') {
-                            const text = cell.textContent.trim();
-                            if (text === '1' || text === '2' || text === '3') {
-                                cell.style.color = '';
-                                cell.style.removeProperty('color');
-                            } else {
-                                cell.style.color = 'white';
-                            }
                         }
                     });
+                    return;
                 }
+
+                const headers = table.querySelectorAll('thead th');
+                const columnRules = {
+                    'Season': 'white',
+                    'Team': 'white',
+                    'P': 'white',
+                    'W': 'white',
+                    'D': 'white',
+                    'L': 'white',
+                    'GF': 'white',
+                    'GA': 'white',
+                    'GD': 'white',
+                    'Pts': 'default',
+                    'Pos': 'special' // Special handling for 1,2,3
+                };
+
+                headers.forEach((header, columnIndex) => {
+                    const headerText = header.textContent.trim();
+                    const rule = columnRules[headerText];
+
+                    if (rule) {
+                        const cells = table.querySelectorAll(`tbody tr td:nth-child(${columnIndex + 1})`);
+                        cells.forEach(cell => {
+                            if (cell.classList.contains('win-score') || cell.classList.contains('draw-score')) {
+                                return;
+                            }
+
+                            if (rule === 'white') {
+                                cell.style.color = 'white';
+                            } else if (rule === 'default') {
+                                cell.style.color = '';
+                                cell.style.removeProperty('color');
+                            } else if (rule === 'special' && headerText === 'Pos') {
+                                const text = cell.textContent.trim();
+                                if (text === '1' || text === '2' || text === '3') {
+                                    cell.style.color = '';
+                                    cell.style.removeProperty('color');
+                                } else {
+                                    cell.style.color = 'white';
+                                }
+                            }
+                        });
+                    }
+                });
             });
         }
 

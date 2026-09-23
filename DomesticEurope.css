@@ -1,12 +1,36 @@
-/* CSS Variables for Dark Mode */
+/* CSS Variables for Dark Mode. Background stays a two-color scheme
+   (--bg-white/--bg-gray-50), matching light mode's own two-color
+   background system. Text and semantic (positive/negative) colors are
+   also routed through variables now, not one-off hex values, so a
+   class built on them works in dark mode automatically instead of
+   needing its own entry in a hand-maintained [data-theme="dark"]
+   override list - the kind of gap that left the Goal Difference
+   column (.text-green-700/.text-red-600) and the Head-to-Head "losses"
+   bar with no dark treatment at all. */
 :root {
     --bg-white: #ffffff;
     --bg-gray-50: #f9fafb;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --positive: #059669;
+    --negative: #dc2626;
 }
 
 [data-theme="dark"] {
     --bg-white: #222222;
     --bg-gray-50: #333333;
+    --text-primary: #ffffff;
+    --text-secondary: #9ca3af;
+    /* Lightened from the light-mode brand green/red (#059669/#dc2626) -
+       those pass comfortably on white but fail WCAG AA (~2-3:1) against
+       these dark backgrounds. */
+    --positive: #34d399;
+    --negative: #f87171;
+    /* Hints the browser to render native form controls (date picker
+       popup/icon, scrollbars) in dark chrome by default - belt and
+       suspenders alongside the explicit select/option rules below,
+       since a date input's calendar popup can't be styled directly. */
+    color-scheme: dark;
 }
 
 /* Dark mode text colors */
@@ -20,13 +44,27 @@
 [data-theme="dark"] .text-gray-700,
 [data-theme="dark"] .text-gray-600,
 [data-theme="dark"] .text-gray-500 {
-    color: white;
+    color: var(--text-primary);
 }
 
-/* Keep dropdown/select text dark for readability */
+/* Select/date inputs get a real dark background + light text (previously
+   only text color was set, leaving them bright white boxes - see
+   .form-input's own base rule below, which never had a background
+   override at all). The dropdown POPUP list (<option>) falls back to a
+   light background instead: native option-list chrome isn't reliably
+   themeable across browsers, so - same tradeoff #recentH2HSelect below
+   already made - it stays guaranteed-readable (dark text on light)
+   rather than risking unreadable dark-on-dark in a browser that ignores
+   the color. */
 [data-theme="dark"] .form-input,
-[data-theme="dark"] select,
+[data-theme="dark"] select {
+    background: var(--bg-gray-50);
+    color: var(--text-primary);
+    border-color: #555;
+}
+
 [data-theme="dark"] option {
+    background: white;
     color: #374151;
 }
 
@@ -91,10 +129,21 @@ body {
 .text-gray-700 { color: #374151; }
 .text-gray-600 { color: #4b5563; }
 .text-gray-500 { color: #6b7280; }
-.text-gray-400 { color: #9ca3af; }
+/* !important on these two (not needed on .text-green-700/.win-score's
+   sibling GD usage, which is always span-wrapped inside a td rather
+   than applied to the td itself): a losing/draw SCORE cell carries this
+   class directly on the <td> (e.g. `<td class="text-red-600 ...">`),
+   competing head-to-head with [data-theme="dark"] ...
+   .league-table td ... { color: var(--text-primary) } at HIGHER
+   specificity (class+class+element beats one class alone) - without
+   !important that broader dark-mode rule silently won, painting every
+   losing score and draw score white regardless of this class, while
+   winning scores stayed correct only because .win-score already had
+   !important for the same reason. */
+.text-gray-400 { color: #9ca3af !important; }
 .text-blue-700 { color: #1d4ed8; }
-.text-green-700 { color: #047857; }
-.text-red-600 { color: #dc2626; }
+.text-green-700 { color: var(--positive); }
+.text-red-600 { color: var(--negative) !important; }
 .bg-white { background-color: var(--bg-white); }
 .bg-gray-50 { background: var(--bg-gray-50); }
 .bg-blue-100 { background: #dbeafe; }
@@ -587,14 +636,6 @@ body {
     color: #9ca3af;
 }
 
-/* Keep losing scores red in dark mode */
-[data-theme="dark"] .text-red-600,
-[data-theme="dark"] .h2h-losses {
-    color: #dc2626 !important;
-}
-
-/* JavaScript now handles ALL table cell colors in dark mode */
-
 /* Head-to-Head section text colors in dark mode */
 [data-theme="dark"] #h2hSection .text-sm,
 [data-theme="dark"] #h2hSection span,
@@ -609,34 +650,13 @@ body {
     background: white !important;
 }
 
-/* Head-to-Head Match History - winning scores should be green */
-#h2hTableBody .win-score {
-    color: #059669 !important;
-}
-
-/* Match History - winning scores should be green */
-#matchHistoryTableBody .win-score {
-    color: #059669 !important;
-}
-
-/* Team Streaks - winning scores should be green */
-#teamStreaksResults .win-score,
-#teamStreaksResults td.win-score,
-#teamStreaksResults .text-center.text-lg.win-score {
-    color: #059669 !important;
-}
-
-/* Last Time When - winning scores should be green */
-#lastTimeResults .win-score,
-#lastTimeResults td.win-score,
-#lastTimeResults .text-center.text-lg.win-score {
-    color: #059669 !important;
-}
-
-/* Dark mode support for winning scores */
-[data-theme="dark"] #h2hTableBody .win-score,
-[data-theme="dark"] #matchHistoryTableBody .win-score {
-    color: #059669 !important;
+/* Winning scores are green everywhere they appear (Head-to-Head, Match
+   History, Team Streaks, Last Time When) - one rule via the shared
+   --positive variable instead of a separate hardcoded copy per
+   container id, so a new container using .win-score doesn't need its
+   own dark-mode entry added by hand to work correctly. */
+.win-score {
+    color: var(--positive) !important;
 }
 
 /* League buttons background in dark mode */
@@ -659,8 +679,20 @@ body {
     background-color: var(--bg-white);
 }
 
-/* Dark mode section containers */
-[data-theme="dark"] #matchHistorySection,
+/* Dark mode section containers. #h2hSection carries its own bg-white
+   card background in light mode too, so it needs the same explicit
+   dark background to match. #matchHistorySection is NOT its own card -
+   unlike #h2hSection/#h2hMatchesTable (siblings), it's a plain wrapper
+   AROUND both the visualization bars box and #matchHistoryTable, with
+   no background of its own in light mode - the only place its own
+   background is ever visible is the gap between those two children.
+   Giving it var(--bg-white) here (previously grouped with #h2hSection
+   above) painted that gap the exact same color as the two boxes on
+   either side of it, making the visible card separation the user
+   relies on to tell them apart disappear in dark mode - it needs to
+   stay unset so the gap shows the page's own darker background
+   (.main-card's var(--bg-gray-50)) instead, same contrast relationship
+   light mode already has between the boxes and the page around them. */
 [data-theme="dark"] #h2hSection {
     background: var(--bg-white);
 }
@@ -684,9 +716,12 @@ body {
     background: var(--bg-gray-50);
 }
 
-/* Ensure winning scores stay green in dark mode */
+/* Ensure winning scores stay green (not swept into the generic
+   .league-table td dark-mode white-text rule above) - lightened via the
+   variable rather than staying at the light-mode #059669, which fails
+   contrast against this dark background. */
 [data-theme="dark"] .league-table td[style*="#059669"] {
-    color: #059669 !important;
+    color: var(--positive) !important;
 }
 
 
@@ -993,6 +1028,17 @@ body {
     border-radius: 1rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     overflow-x: auto;
+}
+
+/* The box-shadow above is a subtle BLACK shadow, tuned to read as a
+   "lifted card" against a light page - against an already-dark page it
+   has little room to visibly darken further, so cards relying on it
+   alone (e.g. #h2hMatchesTable's) can look like they've merged into
+   the background. A light, visible border gives every .league-table
+   card (H2H Match History, Match History, Team History, standings) a
+   crisp edge that doesn't depend on the shadow still working. */
+[data-theme="dark"] .league-table {
+    border: 1px solid #444;
 }
 
 /* Gray background for main table container only */
@@ -1337,6 +1383,20 @@ body {
     background: linear-gradient(135deg, #e5e7eb, #d1d5db);
 }
 
+/* .h2h-wins/.h2h-draws are already dark/mid grays that read fine
+   as-is; .h2h-losses is the one segment built on a LIGHT gray
+   gradient, which otherwise stays a light-mode island next to the
+   two dark segments beside it. */
+[data-theme="dark"] .h2h-losses {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    color: var(--text-primary);
+    border-left-color: #555;
+}
+
+[data-theme="dark"] .h2h-losses:hover {
+    background: linear-gradient(135deg, #374151, #1f2937);
+}
+
 .status-message {
     padding: 0.75rem;
     border-radius: 0.5rem;
@@ -1468,6 +1528,14 @@ body {
     color: #374151;
 }
 
+[data-theme="dark"] .close-btn {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .close-btn:hover {
+    color: var(--text-primary);
+}
+
 .menu-nav {
     padding: 1rem 0;
 }
@@ -1484,6 +1552,10 @@ body {
     letter-spacing: 0.05em;
     padding: 0.5rem 1.5rem;
     margin-bottom: 0.5rem;
+}
+
+[data-theme="dark"] .menu-section-title {
+    color: var(--text-secondary);
 }
 
 .menu-item {
@@ -1654,19 +1726,6 @@ body {
     color: white !important;
 }
 
-/* Dark mode for winning scores in Last Time When tab */
-[data-theme="dark"] #lastTimeResults .win-score,
-[data-theme="dark"] #lastTimeResults td.win-score,
-[data-theme="dark"] #lastTimeResults .text-center.text-lg.win-score {
-    color: #059669 !important;
-}
-
-/* Dark mode for winning scores in Team Streaks tab */
-[data-theme="dark"] #teamStreaksResults .win-score,
-[data-theme="dark"] #teamStreaksResults td.win-score,
-[data-theme="dark"] #teamStreaksResults .text-center.text-lg.win-score {
-    color: #059669 !important;
-}
 
 /* Controls Collapse Functionality - Simple Approach */
 .controls-collapsed .collapsible-control {
