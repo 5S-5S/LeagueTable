@@ -9072,6 +9072,29 @@
             }
         }
         
+        // UEFA's away-goals rule: from the 1966-67 season through 2020-21
+        // (its last season before being abolished), a two-legged tie level
+        // on aggregate was decided by whichever team scored more goals
+        // away from home, without going to extra time or a shootout - so
+        // "no penalty info recorded" doesn't mean the data has a gap for
+        // these seasons, it means away goals settled it. Worked out from
+        // each leg's own date rather than a separate season lookup, same
+        // as the rest of this tie logic already does.
+        const AWAY_GOALS_RULE_FIRST_SEASON_START_YEAR = 1966;
+        const AWAY_GOALS_RULE_LAST_SEASON_START_YEAR = 2020;
+
+        function europeanSeasonStartYear(dateObj) {
+            // The season runs roughly July through the following June, so
+            // a match before July belongs to the season that started the
+            // previous calendar year.
+            return dateObj.getMonth() >= 6 ? dateObj.getFullYear() : dateObj.getFullYear() - 1;
+        }
+
+        function isAwayGoalsRuleActive(dateObj) {
+            const seasonStart = europeanSeasonStartYear(dateObj);
+            return seasonStart >= AWAY_GOALS_RULE_FIRST_SEASON_START_YEAR && seasonStart <= AWAY_GOALS_RULE_LAST_SEASON_START_YEAR;
+        }
+
         function calculateAggregateScore(matches) {
             if (matches.length !== 2) return null;
             
@@ -9088,23 +9111,32 @@
             // Calculate total goals for each team across both legs
             let team1Goals = 0;
             let team2Goals = 0;
-            
+            // Goals each team scored specifically while playing away -
+            // the historical away-goals tiebreaker (see
+            // isAwayGoalsRuleActive) compares these, not the aggregate.
+            let team1AwayGoals = 0;
+            let team2AwayGoals = 0;
+
             // First leg
             if (firstLeg.HomeTeam === team1) {
                 team1Goals += parseInt(firstLeg.FTHG) || 0;
                 team2Goals += parseInt(firstLeg.FTAG) || 0;
+                team2AwayGoals += parseInt(firstLeg.FTAG) || 0;
             } else {
                 team1Goals += parseInt(firstLeg.FTAG) || 0;
                 team2Goals += parseInt(firstLeg.FTHG) || 0;
+                team1AwayGoals += parseInt(firstLeg.FTAG) || 0;
             }
-            
+
             // Second leg
             if (secondLeg.HomeTeam === team1) {
                 team1Goals += parseInt(secondLeg.FTHG) || 0;
                 team2Goals += parseInt(secondLeg.FTAG) || 0;
+                team2AwayGoals += parseInt(secondLeg.FTAG) || 0;
             } else {
                 team1Goals += parseInt(secondLeg.FTAG) || 0;
                 team2Goals += parseInt(secondLeg.FTHG) || 0;
+                team1AwayGoals += parseInt(secondLeg.FTAG) || 0;
             }
             
             // Check for additional info (aet, pso) from either match
@@ -9149,6 +9181,21 @@
                 loser = team1;
                 winnerColor = getTeamColor(team2, state.selectedLeague) || '#059669';
                 finalScore = `${team2Goals}-${team1Goals}${additionalInfo}`;
+            } else if (isAwayGoalsRuleActive(secondLeg.dateObj) && team1AwayGoals !== team2AwayGoals) {
+                // Aggregate tie, but the historical away-goals rule
+                // (1966-67 through 2020-21) settles it before extra time
+                // or a shootout ever enters the picture.
+                if (team1AwayGoals > team2AwayGoals) {
+                    winner = team1;
+                    loser = team2;
+                    winnerColor = getTeamColor(team1, state.selectedLeague) || '#059669';
+                    finalScore = `${team1Goals}-${team2Goals}${additionalInfo}, (Away Goals ${team1AwayGoals}-${team2AwayGoals})`;
+                } else {
+                    winner = team2;
+                    loser = team1;
+                    winnerColor = getTeamColor(team2, state.selectedLeague) || '#059669';
+                    finalScore = `${team1Goals}-${team2Goals}${additionalInfo}, (Away Goals ${team2AwayGoals}-${team1AwayGoals})`;
+                }
             } else {
                 // Aggregate tie - check for penalty shootout
                 if (penaltyInfo) {

@@ -72,6 +72,26 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Away-goals tiebreaker missing from two-legged tie results (List View)~~
+  — done (2026-09-22): a two-legged Continental tie level on aggregate
+  with no penalty shootout recorded was rendering as "TIE def. X & Y"
+  instead of showing the actual winner - e.g. Atlético Madrid's 2015-16
+  Quarter-Final away-goals win over Bayern München (1-0 home, 1-2 away,
+  2-2 on aggregate) showed as a tie, since `calculateAggregateScore()`
+  only ever considered aggregate goals, then a shootout - never UEFA's
+  historical away-goals rule. Fixed by adding an away-goals check
+  between those two steps, gated to the seasons the rule actually
+  applied: 1966-67 through 2020-21 (`isAwayGoalsRuleActive()`, deriving
+  each match's season from its own date rather than a separate season
+  lookup). The summary line now reads "Atlético Madrid def. Bayern
+  München 2-2, (Away Goals 1-0)". Verified against that exact example;
+  synthetic tests confirmed post-2020-21 and pre-1966-67 ties still
+  correctly fall through to the existing "shouldn't happen" TIE
+  fallback (rather than wrongly applying away goals) and that
+  penalty-shootout ties are unaffected; spot-checked season boundaries
+  directly (1965-66: 0 away-goals decisions, 1970-71: 5, 2020-21: 1,
+  2021-22: 0); no console errors.
+
 - ~~Shareable filter state~~ — done (2026-09-03): a "🔗 Copy Link" button on
   each of League Tables & Head-to-Head, Team Seasons, The Last Time When, and
   Team Streaks copies a URL that reopens that exact tab with its filters
