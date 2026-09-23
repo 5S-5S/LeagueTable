@@ -161,6 +161,14 @@ visitors are now served by the API, not the gists.
       indexes, merged in JS instead of SQL `UNION`) - deployed and
       verified live (2026-09-22). See "Data integrity" below for the
       incident that found this and the full mechanism.
+- [x] `/api/teams` rewritten the same way, different mechanism (a
+      recursive-CTE loose index scan over two new `div`-leading
+      composite indexes, since "every distinct team" has no single
+      equality target the way one team's matches does) - deployed and
+      verified live (2026-09-22): 387x fewer rows read for E0. The old
+      redundant single-column `idx_matches_home_team`/
+      `idx_matches_away_team` indexes are also fully dropped from
+      production now. See "Data integrity" below.
 
 ## Keeping D1 in sync
 
@@ -329,6 +337,30 @@ entire division) now reads 4,407 for 4,405 actual matches. Caught up
 the two missed sync days with a manual `gh workflow run sync-d1.yml`
 once the quota reset.
 
+**2026-09-22, follow-up: `/api/teams` had the same root cause, different
+fix shape.** Its `DISTINCT ... UNION ... ORDER BY` query was also
+reading entire divisions (~0.8% efficiency, ~35,195 rows read on
+average) - but unlike team-history/head-to-head, "every distinct team
+name" has no single equality value for an index to seek to, so
+`INDEXED BY` alone doesn't help here the same way. Fixed with the
+standard SQLite "loose index scan" trick: a recursive CTE walks two new
+composite indexes (`div, home_team` and `div, away_team`) one distinct
+value at a time (`WHERE div = ? AND home_team > <previous>` on each
+step, an O(log n) seek rather than a scan), over two new composite
+indexes with `div` *leading* this time (the team-history fix's indexes
+have `div` trailing, which doesn't help here). Verified against
+production: E0 (65 teams) went from 102,892 rows read to 266 (133 each
+side) - 387x fewer. C1 (567 teams) went from 18,953 to 2,268.
+Correctness verified against `COUNT(DISTINCT ...)` directly. See
+`queryDistinctTeams()` in `src/index.js`.
+
+Also finished dropping the now-redundant `idx_matches_home_team`/
+`idx_matches_away_team` single-column indexes as part of the same pass
+(started 2026-09-22, interrupted mid-way by the write quota - see the
+"Start dropping redundant indexes, hit D1 write quota mid-cleanup"
+commit - finished the next day once it reset). Both are superseded by
+the composite indexes built for the fixes above.
+
 **Note this applies to manual/testing usage of D1 directly** (curl,
 `wrangler d1 execute`, the verify scripts) - it does not describe the
 Worker's own read cost anymore for `/api/standings` and
@@ -361,32 +393,17 @@ smaller cleanup/hardening, not required for correctness:
    testing/investigation work - the quota-exhaustion incident showed how
    easily that budget can be exhausted, and the error message itself
    points at this as the fix.
-3. **In progress, blocked on D1's write quota (2026-09-22):**
-   `/api/teams`'s `DISTINCT ... UNION ... ORDER BY` query is also
-   inefficient (~0.8% efficiency, ~35,195 rows read on average) for the
-   same underlying reason as team-history/head-to-head - measured a C1
-   lookup at 18,953 rows read via the current `UNION`, or 17,822 split
-   into two plain `DISTINCT` queries with *no* new index (only a
-   ~6% win, since `DISTINCT` still needs to scan the whole division
-   without an index leading with `div`). A proper fix needs new
-   `(div, home_team)`/`(div, away_team)` composite indexes to let SQLite
-   skip-scan straight to the distinct values - not yet built, since
-   `CREATE INDEX`s from step 4 below used up today's write quota first.
-   Still low priority (4 calls/week vs thousands for team-history), so
-   this is safe to leave exactly as-is until quota resets.
-4. **Half-done, blocked on the same write quota:** dropping the now-
-   redundant `idx_matches_home_team`/`idx_matches_away_team` single-
-   column indexes (superseded by the `*_div` composite indexes above -
-   see "Data integrity" for why they exist). `idx_matches_home_team` is
-   dropped from production. `idx_matches_away_team` is **not** -
-   its `DROP INDEX` hit the write-quota wall right after. `schema.sql`
-   already reflects the target end state (neither listed - safe, since
-   it's CREATE-only and never touches this on its own), but production
-   itself is inconsistent with that until the second drop actually
-   runs. Finish with:
-   `wrangler d1 execute leaguetable --remote --command "DROP INDEX IF EXISTS idx_matches_away_team"`
-   once quota resets (D1 write quota resets at UTC midnight, same as
-   the read quota).
+3. ~~`/api/teams`'s inefficient query~~ **Done (2026-09-22).** Fixed
+   with a recursive-CTE loose index scan over two new composite indexes
+   - see "Data integrity" below for the mechanism and verified numbers
+   (387x fewer rows read for E0).
+4. ~~Drop the redundant `idx_matches_home_team`/`idx_matches_away_team`
+   single-column indexes~~ **Done (2026-09-22).** Both dropped from
+   production (the second one needed a follow-up day after the first
+   attempt hit the write quota mid-cleanup). `schema.sql` matches -
+   production's index set is now exactly `idx_matches_div`,
+   `idx_matches_date`, `idx_matches_unique`, and the four composite
+   `*_div`/`div_*` indexes.
 
 ## Regenerating the seed data (manual full rebuild only)
 
