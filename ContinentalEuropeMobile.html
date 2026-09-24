@@ -6707,7 +6707,7 @@
 
             const winnerColor = winner !== 'TIE' ? (getTeamColor(winner, state.selectedLeague) || '#059669') : '#9ca3af';
 
-            return { teamA, teamB, legs, aggregate, penalties, hasAet, decidedByAwayGoals, winner, loser, winnerColor, isSingleLeg: legs.length === 1 };
+            return { teamA, teamB, legs, aggregate, awayGoals, penalties, hasAet, decidedByAwayGoals, winner, loser, winnerColor, isSingleLeg: legs.length === 1 };
         }
 
         // Double-Legged Tie mode: group a team's knockout-phase matches
@@ -6872,6 +6872,7 @@
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
             const valueLabel = isMarginCategory ? 'Agg. Margin' : 'Agg. Goals';
+            const team1 = state.matchFinderTeam1;
 
             elements.matchFinderTieTableHeader.innerHTML = `
                 <th class="text-center cursor-pointer" onclick="handleMatchFinderTieSort('date')">Date</th>
@@ -6898,14 +6899,38 @@
                     valueSort = t.totalGoals;
                 }
 
-                // Penalties get their own full explanatory row instead of a
-                // compact annotation (below, matching Match History/H2H
-                // Match History's format exactly) - away goals has no such
-                // parallel (it only applies to a two-leg aggregate, never a
-                // single match), so it stays a compact annotation here.
-                let annotation = '';
-                if (t.breakdown.decidedByAwayGoals) annotation = 'away goals';
-                else if (t.breakdown.hasAet && !t.breakdown.penalties) annotation = 'aet';
+                // Small line under the big ranked number (margin or total),
+                // always shown: the tie's own aggregate scoreline, colored
+                // by the actual outcome (t.result) rather than raw number
+                // comparison - an away-goals winner can have an aggregate
+                // EQUAL to the team eliminated (e.g. 4-4), so magnitude
+                // alone can't drive the color there. Penalties additionally
+                // get a full explanatory row below (matching Match History/
+                // H2H Match History's format exactly), since that's a
+                // direct parallel to a single match's own shootout row.
+                const b = t.breakdown;
+                const isTeam1A = b.teamA === team1;
+                const team1Agg = isTeam1A ? b.aggregate[b.teamA] : b.aggregate[b.teamB];
+                const oppAgg = isTeam1A ? b.aggregate[b.teamB] : b.aggregate[b.teamA];
+                const team1AggClass = t.result === 'win' ? 'win-score' : t.result === 'loss' ? 'text-red-600' : 'text-gray-400';
+                const oppAggClass = t.result === 'win' ? 'text-red-600' : t.result === 'loss' ? 'win-score' : 'text-gray-400';
+
+                let breakdownHTML;
+                if (b.penalties) {
+                    const team1Pens = isTeam1A ? b.penalties[b.teamA] : b.penalties[b.teamB];
+                    const oppPens = isTeam1A ? b.penalties[b.teamB] : b.penalties[b.teamA];
+                    const team1PensClass = team1Pens > oppPens ? 'win-score' : 'text-red-600';
+                    const oppPensClass = oppPens > team1Pens ? 'win-score' : 'text-red-600';
+                    breakdownHTML = `<span class="${team1AggClass}">${team1Agg}</span>(<span class="${team1PensClass}">${team1Pens}</span>)-<span class="${oppAggClass}">${oppAgg}</span>(<span class="${oppPensClass}">${oppPens}</span>), pso`;
+                } else if (b.decidedByAwayGoals) {
+                    const team1Away = isTeam1A ? b.awayGoals[b.teamA] : b.awayGoals[b.teamB];
+                    const oppAway = isTeam1A ? b.awayGoals[b.teamB] : b.awayGoals[b.teamA];
+                    breakdownHTML = `<span class="${team1AggClass}">${team1Agg}</span>-<span class="${oppAggClass}">${oppAgg}</span>, ag (${team1Away}-${oppAway})`;
+                } else if (b.hasAet) {
+                    breakdownHTML = `<span class="${team1AggClass}">${team1Agg}</span>-<span class="${oppAggClass}">${oppAgg}</span>, aet`;
+                } else {
+                    breakdownHTML = `<span class="${team1AggClass}">${team1Agg}</span>-<span class="${oppAggClass}">${oppAgg}</span>`;
+                }
 
                 // Same PSO row Match History/H2H Match History already show
                 // for a single shootout-decided match - find whichever leg
@@ -6936,7 +6961,7 @@
                     awayTeam: firstLeg.AwayTeam,
                     homeScore: parseInt(firstLeg.FTHG) || 0,
                     awayScore: parseInt(firstLeg.FTAG) || 0,
-                    valueClass, valueText, valueSort, annotation, penaltyInfo,
+                    valueClass, valueText, valueSort, breakdownHTML, penaltyInfo,
                     tie: t
                 };
             });
@@ -6993,7 +7018,7 @@
                     const valueCell = legIndex === 0
                         ? `<td rowspan="${legs.length}" class="text-center text-lg font-bold ${row.valueClass}" style="vertical-align: middle;">
                                ${row.valueText}
-                               ${row.annotation ? `<div class="text-xs font-normal text-gray-500">(${row.annotation})</div>` : ''}
+                               <div class="text-xs font-normal text-gray-500">${row.breakdownHTML}</div>
                            </td>`
                         : '';
 
