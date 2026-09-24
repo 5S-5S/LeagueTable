@@ -424,27 +424,36 @@
                         </div>
                     </div>
 
-                    <!-- Specific Scoreline inputs - only shown when that category is active -->
+                    <!-- Specific Scoreline inputs - only shown when that category is
+                         active. Laid out as a label-above/full-width grid (matching
+                         Team 1/Team 2 and Start/End Date above) rather than a compact
+                         inline row of narrow controls, so it reads as consistent with
+                         the rest of the filter panel instead of a cramped one-off
+                         mini-form. -->
                     <div id="matchFinderScorelineContainer" class="mb-8 collapsible-control hidden">
-                        <div class="flex flex-wrap items-center gap-6">
-                            <span class="text-sm font-semibold text-gray-700">Scoreline:</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700">Home Score:</span>
-                                <select id="matchFinderHomeScoreOpSelect" class="form-input" style="width: auto;">
-                                    <option value="at-least">At Least</option>
-                                    <option value="at-most">At Most</option>
-                                    <option value="exactly">Exactly</option>
-                                </select>
-                                <input type="number" id="matchFinderHomeScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Scoreline:</label>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Home Score</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderHomeScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderHomeScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700">Away Score:</span>
-                                <select id="matchFinderAwayScoreOpSelect" class="form-input" style="width: auto;">
-                                    <option value="at-least">At Least</option>
-                                    <option value="at-most">At Most</option>
-                                    <option value="exactly">Exactly</option>
-                                </select>
-                                <input type="number" id="matchFinderAwayScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Away Score</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderAwayScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderAwayScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -5506,12 +5515,20 @@
             // Hide Last Time When results
             if (elements.lastTimeResults) elements.lastTimeResults.classList.add('hidden');
             hideAllLastTimeSections();
-            
+
+            // Reset Match Finder state
+            state.matchFinderTeam1 = '';
+            state.matchFinderTeam2 = '';
+            if (elements.matchFinderTeam1Select) elements.matchFinderTeam1Select.value = '';
+            if (elements.matchFinderTeam2Select) elements.matchFinderTeam2Select.value = '';
+            if (elements.matchFinderResults) elements.matchFinderResults.classList.add('hidden');
+            if (elements.matchFinderCategoryContainer) elements.matchFinderCategoryContainer.classList.add('hidden');
+
             createLeagueButtons();
             updateTeamSelects();
             updateTeamSeasonsTeamSelect();
             updateSeasonOptions();
-            
+
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1', 

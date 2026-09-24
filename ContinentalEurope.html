@@ -529,48 +529,59 @@
                          based, since Team 1 can be on either side depending on the
                          match); Double-Legged Tie mode filters by Team 1's/the
                          opponent's own aggregate goals instead - exactly one of the
-                         two inner groups shows at a time, matching mode. -->
+                         two inner groups shows at a time, matching mode. Laid out as
+                         a label-above/full-width grid (matching Team 1/Team 2 and
+                         Start/End Date above) rather than a compact inline row of
+                         narrow controls, so it reads as consistent with the rest of
+                         the filter panel instead of a cramped one-off mini-form. -->
                     <div id="matchFinderScorelineContainer" class="mb-8 collapsible-control hidden">
-                        <div class="flex flex-wrap items-center gap-6" id="matchFinderScorelineSingleControls">
-                            <span class="text-sm font-semibold text-gray-700">Scoreline:</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700">Home Score:</span>
-                                <select id="matchFinderHomeScoreOpSelect" class="form-input" style="width: auto;">
-                                    <option value="at-least">At Least</option>
-                                    <option value="at-most">At Most</option>
-                                    <option value="exactly">Exactly</option>
-                                </select>
-                                <input type="number" id="matchFinderHomeScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Scoreline:</label>
+                        <div class="grid grid-cols-2 gap-4" id="matchFinderScorelineSingleControls">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Home Score</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderHomeScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderHomeScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700">Away Score:</span>
-                                <select id="matchFinderAwayScoreOpSelect" class="form-input" style="width: auto;">
-                                    <option value="at-least">At Least</option>
-                                    <option value="at-most">At Most</option>
-                                    <option value="exactly">Exactly</option>
-                                </select>
-                                <input type="number" id="matchFinderAwayScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Away Score</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderAwayScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderAwayScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
                             </div>
                         </div>
-                        <div class="flex flex-wrap items-center gap-6 hidden" id="matchFinderScorelineTieControls">
-                            <span class="text-sm font-semibold text-gray-700">Scoreline:</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700" id="matchFinderTeam1ScoreLabel">Team 1:</span>
-                                <select id="matchFinderTeam1ScoreOpSelect" class="form-input" style="width: auto;">
-                                    <option value="at-least">At Least</option>
-                                    <option value="at-most">At Most</option>
-                                    <option value="exactly">Exactly</option>
-                                </select>
-                                <input type="number" id="matchFinderTeam1ScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                        <div class="grid grid-cols-2 gap-4 hidden" id="matchFinderScorelineTieControls">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" id="matchFinderTeam1ScoreLabel">Team 1</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderTeam1ScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderTeam1ScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-sm font-medium text-gray-700" id="matchFinderOpponentScoreLabel">Opponent:</span>
-                                <select id="matchFinderOpponentScoreOpSelect" class="form-input" style="width: auto;">
-                                    <option value="at-least">At Least</option>
-                                    <option value="at-most">At Most</option>
-                                    <option value="exactly">Exactly</option>
-                                </select>
-                                <input type="number" id="matchFinderOpponentScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2" id="matchFinderOpponentScoreLabel">Opponent</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderOpponentScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderOpponentScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -6038,12 +6049,20 @@
             // Hide Last Time When results
             if (elements.lastTimeResults) elements.lastTimeResults.classList.add('hidden');
             hideAllLastTimeSections();
-            
+
+            // Reset Match Finder state
+            state.matchFinderTeam1 = '';
+            state.matchFinderTeam2 = '';
+            if (elements.matchFinderTeam1Select) elements.matchFinderTeam1Select.value = '';
+            if (elements.matchFinderTeam2Select) elements.matchFinderTeam2Select.value = '';
+            if (elements.matchFinderResults) elements.matchFinderResults.classList.add('hidden');
+            if (elements.matchFinderCategoryContainer) elements.matchFinderCategoryContainer.classList.add('hidden');
+
             createLeagueButtons();
             updateTeamSelects();
             updateTeamSeasonsTeamSelect();
             updateSeasonOptions();
-            
+
             // Use the full data range for whichever competition was
             // selected - served from the division date-range cache
             // instead of the full in-memory gist dataset. (The previous
@@ -6749,8 +6768,8 @@
         // "Opponent", same as the rest of Match Finder already does (e.g.
         // matchFinderSubtitle()).
         function updateMatchFinderScorelineLabels() {
-            elements.matchFinderTeam1ScoreLabel.textContent = state.matchFinderTeam1 ? `${state.matchFinderTeam1}:` : 'Team 1:';
-            elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? `${getOpponentDisplayLabel(state.matchFinderTeam2)}:` : 'Opponent:';
+            elements.matchFinderTeam1ScoreLabel.textContent = state.matchFinderTeam1 || 'Team 1';
+            elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? getOpponentDisplayLabel(state.matchFinderTeam2) : 'Opponent';
         }
 
         function clearMatchFinderFilters() {
@@ -7512,10 +7531,18 @@
                            </td>`
                         : '';
 
+                    // Both legs of a tie always share the same Stage (e.g.
+                    // "Round of 16"), so merge it into one cell the same way
+                    // the Value column already merges - one row-spanned cell
+                    // instead of repeating the identical text on each leg.
+                    const stageCell = legIndex === 0
+                        ? `<td rowspan="${legs.length}" class="text-center text-sm" style="vertical-align: middle;">${row.stage}</td>`
+                        : '';
+
                     return `
                         <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
                             <td class="text-center text-sm">${leg.dateObj.toLocaleDateString()}</td>
-                            <td class="text-center text-sm">${leg.CompetitionPhase || ''}</td>
+                            ${stageCell}
                             <td class="text-center">
                                 <div class="flex items-center justify-center">
                                     ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${leg.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
