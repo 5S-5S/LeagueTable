@@ -524,6 +524,56 @@
                         </div>
                     </div>
 
+                    <!-- Specific Scoreline inputs - only shown when that category is
+                         active. Single Match mode filters by Home/Away score (venue-
+                         based, since Team 1 can be on either side depending on the
+                         match); Double-Legged Tie mode filters by Team 1's/the
+                         opponent's own aggregate goals instead - exactly one of the
+                         two inner groups shows at a time, matching mode. -->
+                    <div id="matchFinderScorelineContainer" class="mb-8 collapsible-control hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">Scoreline:</label>
+                        <div class="flex flex-wrap items-center gap-6" id="matchFinderScorelineSingleControls">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-gray-700">Home Score:</span>
+                                <select id="matchFinderHomeScoreOpSelect" class="form-input" style="width: auto;">
+                                    <option value="at-least">At Least</option>
+                                    <option value="at-most">At Most</option>
+                                    <option value="exactly">Exactly</option>
+                                </select>
+                                <input type="number" id="matchFinderHomeScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-gray-700">Away Score:</span>
+                                <select id="matchFinderAwayScoreOpSelect" class="form-input" style="width: auto;">
+                                    <option value="at-least">At Least</option>
+                                    <option value="at-most">At Most</option>
+                                    <option value="exactly">Exactly</option>
+                                </select>
+                                <input type="number" id="matchFinderAwayScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-6 hidden" id="matchFinderScorelineTieControls">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-gray-700" id="matchFinderTeam1ScoreLabel">Team 1:</span>
+                                <select id="matchFinderTeam1ScoreOpSelect" class="form-input" style="width: auto;">
+                                    <option value="at-least">At Least</option>
+                                    <option value="at-most">At Most</option>
+                                    <option value="exactly">Exactly</option>
+                                </select>
+                                <input type="number" id="matchFinderTeam1ScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-medium text-gray-700" id="matchFinderOpponentScoreLabel">Opponent:</span>
+                                <select id="matchFinderOpponentScoreOpSelect" class="form-input" style="width: auto;">
+                                    <option value="at-least">At Least</option>
+                                    <option value="at-most">At Most</option>
+                                    <option value="exactly">Exactly</option>
+                                </select>
+                                <input type="number" id="matchFinderOpponentScoreValueInput" class="form-input" style="width: 4.5rem;" min="0" placeholder="Any">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Results -->
                     <div id="matchFinderResults" class="hidden">
                         <!-- Single Match mode: one flat sortable table -->
@@ -1333,7 +1383,18 @@
             matchFinderAwayGoalsOnlyFilter: false,
             matchFinderExcludeQualifiers: false,
             matchFinderExcludeMainStage: false,
-            matchFinderCategory: 'victories', // 'victories' | 'defeats' | 'draws' | 'totalGoals'
+            // Specific Scoreline category - Single Match mode (venue-based)
+            matchFinderHomeScoreOp: 'at-least', // 'at-least' | 'at-most' | 'exactly'
+            matchFinderHomeScoreValue: '',
+            matchFinderAwayScoreOp: 'at-least',
+            matchFinderAwayScoreValue: '',
+            // Specific Scoreline category - Double-Legged Tie mode (team-based,
+            // not venue-based - a tie's two legs swap home/away)
+            matchFinderTeam1ScoreOp: 'at-least',
+            matchFinderTeam1ScoreValue: '',
+            matchFinderOpponentScoreOp: 'at-least',
+            matchFinderOpponentScoreValue: '',
+            matchFinderCategory: 'victories', // 'victories' | 'defeats' | 'draws' | 'totalGoals' | 'leastGoals' | 'scoreline'
             matchFinderSortConfig: { key: null, direction: null },
             matchFinderTieSortConfig: { key: null, direction: null },
             matchFinderApiCache: null,
@@ -2679,6 +2740,24 @@
                 if (state.matchFinderExcludeQualifiers) params.set('exQ', '1');
                 if (state.matchFinderExcludeMainStage) params.set('exM', '1');
                 if (state.matchFinderCategory !== 'victories') params.set('cat', state.matchFinderCategory);
+                if (state.matchFinderCategory === 'scoreline') {
+                    if (state.matchFinderHomeScoreValue !== '') {
+                        params.set('hsOp', state.matchFinderHomeScoreOp);
+                        params.set('hsVal', state.matchFinderHomeScoreValue);
+                    }
+                    if (state.matchFinderAwayScoreValue !== '') {
+                        params.set('asOp', state.matchFinderAwayScoreOp);
+                        params.set('asVal', state.matchFinderAwayScoreValue);
+                    }
+                    if (state.matchFinderTeam1ScoreValue !== '') {
+                        params.set('t1sOp', state.matchFinderTeam1ScoreOp);
+                        params.set('t1sVal', state.matchFinderTeam1ScoreValue);
+                    }
+                    if (state.matchFinderOpponentScoreValue !== '') {
+                        params.set('osOp', state.matchFinderOpponentScoreOp);
+                        params.set('osVal', state.matchFinderOpponentScoreValue);
+                    }
+                }
             }
 
             return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -2889,7 +2968,39 @@
                 const cat = params.get('cat');
                 if (cat && MATCH_FINDER_CATEGORIES.some(c => c.key === cat)) {
                     state.matchFinderCategory = cat;
+                    if (cat === 'scoreline') {
+                        const hsOp = params.get('hsOp'), hsVal = params.get('hsVal');
+                        if (hsVal !== null) {
+                            state.matchFinderHomeScoreOp = hsOp || 'at-least';
+                            state.matchFinderHomeScoreValue = hsVal;
+                            elements.matchFinderHomeScoreOpSelect.value = state.matchFinderHomeScoreOp;
+                            elements.matchFinderHomeScoreValueInput.value = hsVal;
+                        }
+                        const asOp = params.get('asOp'), asVal = params.get('asVal');
+                        if (asVal !== null) {
+                            state.matchFinderAwayScoreOp = asOp || 'at-least';
+                            state.matchFinderAwayScoreValue = asVal;
+                            elements.matchFinderAwayScoreOpSelect.value = state.matchFinderAwayScoreOp;
+                            elements.matchFinderAwayScoreValueInput.value = asVal;
+                        }
+                        const t1sOp = params.get('t1sOp'), t1sVal = params.get('t1sVal');
+                        if (t1sVal !== null) {
+                            state.matchFinderTeam1ScoreOp = t1sOp || 'at-least';
+                            state.matchFinderTeam1ScoreValue = t1sVal;
+                            elements.matchFinderTeam1ScoreOpSelect.value = state.matchFinderTeam1ScoreOp;
+                            elements.matchFinderTeam1ScoreValueInput.value = t1sVal;
+                        }
+                        const osOp = params.get('osOp'), osVal = params.get('osVal');
+                        if (osVal !== null) {
+                            state.matchFinderOpponentScoreOp = osOp || 'at-least';
+                            state.matchFinderOpponentScoreValue = osVal;
+                            elements.matchFinderOpponentScoreOpSelect.value = state.matchFinderOpponentScoreOp;
+                            elements.matchFinderOpponentScoreValueInput.value = osVal;
+                        }
+                    }
                     renderMatchFinderCategoryButtons();
+                    updateMatchFinderScorelineVisibility();
+                    updateMatchFinderScorelineLabels();
                     calculateMatchFinder();
                 }
             }
@@ -3205,6 +3316,19 @@
             copyLinkBtnMatchFinder: document.getElementById('copyLinkBtnMatchFinder'),
             matchFinderCategoryContainer: document.getElementById('matchFinderCategoryContainer'),
             matchFinderCategoryButtons: document.getElementById('matchFinderCategoryButtons'),
+            matchFinderScorelineContainer: document.getElementById('matchFinderScorelineContainer'),
+            matchFinderScorelineSingleControls: document.getElementById('matchFinderScorelineSingleControls'),
+            matchFinderScorelineTieControls: document.getElementById('matchFinderScorelineTieControls'),
+            matchFinderHomeScoreOpSelect: document.getElementById('matchFinderHomeScoreOpSelect'),
+            matchFinderHomeScoreValueInput: document.getElementById('matchFinderHomeScoreValueInput'),
+            matchFinderAwayScoreOpSelect: document.getElementById('matchFinderAwayScoreOpSelect'),
+            matchFinderAwayScoreValueInput: document.getElementById('matchFinderAwayScoreValueInput'),
+            matchFinderTeam1ScoreLabel: document.getElementById('matchFinderTeam1ScoreLabel'),
+            matchFinderTeam1ScoreOpSelect: document.getElementById('matchFinderTeam1ScoreOpSelect'),
+            matchFinderTeam1ScoreValueInput: document.getElementById('matchFinderTeam1ScoreValueInput'),
+            matchFinderOpponentScoreLabel: document.getElementById('matchFinderOpponentScoreLabel'),
+            matchFinderOpponentScoreOpSelect: document.getElementById('matchFinderOpponentScoreOpSelect'),
+            matchFinderOpponentScoreValueInput: document.getElementById('matchFinderOpponentScoreValueInput'),
             matchFinderResults: document.getElementById('matchFinderResults'),
             matchFinderTableCaption: document.getElementById('matchFinderTableCaption'),
             matchFinderTableTitle: document.getElementById('matchFinderTableTitle'),
@@ -5474,10 +5598,12 @@
             elements.matchFinderTeam1Select.addEventListener('change', (e) => {
                 state.matchFinderTeam1 = e.target.value;
                 refreshTeam2CountryOptions();
+                updateMatchFinderScorelineLabels();
                 calculateMatchFinder();
             });
             elements.matchFinderTeam2Select.addEventListener('change', (e) => {
                 state.matchFinderTeam2 = e.target.value;
+                updateMatchFinderScorelineLabels();
                 calculateMatchFinder();
             });
             elements.matchFinderHomeCheckbox.addEventListener('click', () => {
@@ -5505,6 +5631,38 @@
                 elements.matchFinderAwayGoalsCheckbox.className = `checkbox ${state.matchFinderAwayGoalsOnlyFilter ? 'checked' : ''}`;
                 calculateMatchFinder();
             });
+            elements.matchFinderHomeScoreOpSelect.addEventListener('change', (e) => {
+                state.matchFinderHomeScoreOp = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderHomeScoreValueInput.addEventListener('input', (e) => {
+                state.matchFinderHomeScoreValue = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayScoreOpSelect.addEventListener('change', (e) => {
+                state.matchFinderAwayScoreOp = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayScoreValueInput.addEventListener('input', (e) => {
+                state.matchFinderAwayScoreValue = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderTeam1ScoreOpSelect.addEventListener('change', (e) => {
+                state.matchFinderTeam1ScoreOp = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderTeam1ScoreValueInput.addEventListener('input', (e) => {
+                state.matchFinderTeam1ScoreValue = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderOpponentScoreOpSelect.addEventListener('change', (e) => {
+                state.matchFinderOpponentScoreOp = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderOpponentScoreValueInput.addEventListener('input', (e) => {
+                state.matchFinderOpponentScoreValue = e.target.value;
+                calculateMatchFinder();
+            });
             elements.matchFinderExcludeQualifiersCheckbox.addEventListener('click', () => {
                 state.matchFinderExcludeQualifiers = !state.matchFinderExcludeQualifiers;
                 elements.matchFinderExcludeQualifiersCheckbox.className = `checkbox ${state.matchFinderExcludeQualifiers ? 'checked' : ''}`;
@@ -5522,6 +5680,7 @@
                 if (button) {
                     state.matchFinderCategory = button.dataset.category;
                     renderMatchFinderCategoryButtons();
+                    updateMatchFinderScorelineVisibility();
                     calculateMatchFinder();
                 }
             });
@@ -5541,6 +5700,8 @@
                     }
                     renderMatchFinderModeButtons();
                     renderMatchFinderCategoryButtons();
+                    updateMatchFinderScorelineVisibility();
+                    updateMatchFinderScorelineLabels();
                     calculateMatchFinder();
                 }
             });
@@ -6491,10 +6652,11 @@
             { key: 'defeats', label: 'Biggest Defeats' },
             { key: 'draws', label: 'Highest-Scoring Draws' },
             { key: 'totalGoals', label: 'Most Total Goals' },
-            { key: 'leastGoals', label: 'Least Total Goals' }
+            { key: 'leastGoals', label: 'Least Total Goals' },
+            { key: 'scoreline', label: 'Specific Scoreline' }
         ];
 
-        // Double-Legged Tie mode display labels for the same 5 category
+        // Double-Legged Tie mode display labels for the same 6 category
         // keys - underlying classification logic is identical, only the
         // label changes (see calculateMatchFinderTieMode).
         const MATCH_FINDER_TIE_CATEGORY_LABELS = {
@@ -6502,7 +6664,8 @@
             defeats: 'Biggest Aggregate Defeats',
             draws: 'Highest-Scoring Aggregate Ties',
             totalGoals: 'Most Total Aggregate Goals',
-            leastGoals: 'Fewest Aggregate Goals'
+            leastGoals: 'Fewest Aggregate Goals',
+            scoreline: 'Specific Aggregate Scoreline'
         };
 
         const MATCH_FINDER_MODES = [
@@ -6533,6 +6696,35 @@
             `).join('');
         }
 
+        // Specific Scoreline's own filter inputs depend on BOTH the active
+        // category (only relevant/shown for 'scoreline') AND the active mode
+        // (Single Match uses Home/Away venue-based inputs, Double-Legged Tie
+        // uses Team 1/Opponent team-based inputs instead) - called wherever
+        // either one changes.
+        function updateMatchFinderScorelineVisibility() {
+            if (state.matchFinderCategory === 'scoreline') {
+                elements.matchFinderScorelineContainer.classList.remove('hidden');
+                if (state.matchFinderMode === 'tie') {
+                    elements.matchFinderScorelineSingleControls.classList.add('hidden');
+                    elements.matchFinderScorelineTieControls.classList.remove('hidden');
+                } else {
+                    elements.matchFinderScorelineSingleControls.classList.remove('hidden');
+                    elements.matchFinderScorelineTieControls.classList.add('hidden');
+                }
+            } else {
+                elements.matchFinderScorelineContainer.classList.add('hidden');
+            }
+        }
+
+        // Team 1/Opponent labels for the Tie mode scoreline inputs - shows
+        // the actual team names once known instead of a generic "Team 1"/
+        // "Opponent", same as the rest of Match Finder already does (e.g.
+        // matchFinderSubtitle()).
+        function updateMatchFinderScorelineLabels() {
+            elements.matchFinderTeam1ScoreLabel.textContent = state.matchFinderTeam1 ? `${state.matchFinderTeam1}:` : 'Team 1:';
+            elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? `${getOpponentDisplayLabel(state.matchFinderTeam2)}:` : 'Opponent:';
+        }
+
         function clearMatchFinderFilters() {
             state.matchFinderTeam1 = '';
             state.matchFinderTeam2 = '';
@@ -6549,6 +6741,14 @@
             state.matchFinderAwayGoalsOnlyFilter = false;
             state.matchFinderExcludeQualifiers = false;
             state.matchFinderExcludeMainStage = false;
+            state.matchFinderHomeScoreOp = 'at-least';
+            state.matchFinderHomeScoreValue = '';
+            state.matchFinderAwayScoreOp = 'at-least';
+            state.matchFinderAwayScoreValue = '';
+            state.matchFinderTeam1ScoreOp = 'at-least';
+            state.matchFinderTeam1ScoreValue = '';
+            state.matchFinderOpponentScoreOp = 'at-least';
+            state.matchFinderOpponentScoreValue = '';
             state.matchFinderCategory = 'victories';
             state.matchFinderSortConfig = { key: null, direction: null };
             state.matchFinderTieSortConfig = { key: null, direction: null };
@@ -6571,6 +6771,16 @@
             elements.matchFinderExcludeMainStageCheckbox.className = 'checkbox';
             elements.matchFinderHomeAwayContainer.classList.remove('hidden');
             elements.matchFinderAwayGoalsOnlyContainer.classList.add('hidden');
+            elements.matchFinderHomeScoreOpSelect.value = 'at-least';
+            elements.matchFinderHomeScoreValueInput.value = '';
+            elements.matchFinderAwayScoreOpSelect.value = 'at-least';
+            elements.matchFinderAwayScoreValueInput.value = '';
+            elements.matchFinderTeam1ScoreOpSelect.value = 'at-least';
+            elements.matchFinderTeam1ScoreValueInput.value = '';
+            elements.matchFinderOpponentScoreOpSelect.value = 'at-least';
+            elements.matchFinderOpponentScoreValueInput.value = '';
+            updateMatchFinderScorelineVisibility();
+            updateMatchFinderScorelineLabels();
             renderMatchFinderModeButtons();
             renderMatchFinderCategoryButtons();
 
@@ -6840,6 +7050,29 @@
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
             } else if (state.matchFinderCategory === 'leastGoals') {
                 classified.sort((a, b) => a.totalGoals - b.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'scoreline') {
+                // Venue-based (Home/Away), not team-relative - Team 1 can be
+                // on either side depending on the specific match, unlike Tie
+                // mode's Team 1/Opponent framing below.
+                if (state.matchFinderHomeScoreValue !== '') {
+                    const val = parseInt(state.matchFinderHomeScoreValue);
+                    classified = classified.filter(entry => {
+                        const homeScore = parseInt(entry.match.FTHG) || 0;
+                        if (state.matchFinderHomeScoreOp === 'at-least') return homeScore >= val;
+                        if (state.matchFinderHomeScoreOp === 'at-most') return homeScore <= val;
+                        return homeScore === val;
+                    });
+                }
+                if (state.matchFinderAwayScoreValue !== '') {
+                    const val = parseInt(state.matchFinderAwayScoreValue);
+                    classified = classified.filter(entry => {
+                        const awayScore = parseInt(entry.match.FTAG) || 0;
+                        if (state.matchFinderAwayScoreOp === 'at-least') return awayScore >= val;
+                        if (state.matchFinderAwayScoreOp === 'at-most') return awayScore <= val;
+                        return awayScore === val;
+                    });
+                }
+                classified.sort((a, b) => b.match.dateObj - a.match.dateObj);
             }
 
             updateMatchFinderTable(classified);
@@ -7011,6 +7244,26 @@
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'leastGoals') {
                 classified.sort((a, b) => a.totalGoals - b.totalGoals || b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'scoreline') {
+                // Team-based (Team 1/Opponent), not venue-based - a tie's two
+                // legs swap home/away, so there's no fixed "home aggregate".
+                if (state.matchFinderTeam1ScoreValue !== '') {
+                    const val = parseInt(state.matchFinderTeam1ScoreValue);
+                    classified = classified.filter(t => {
+                        if (state.matchFinderTeam1ScoreOp === 'at-least') return t.team1Goals >= val;
+                        if (state.matchFinderTeam1ScoreOp === 'at-most') return t.team1Goals <= val;
+                        return t.team1Goals === val;
+                    });
+                }
+                if (state.matchFinderOpponentScoreValue !== '') {
+                    const val = parseInt(state.matchFinderOpponentScoreValue);
+                    classified = classified.filter(t => {
+                        if (state.matchFinderOpponentScoreOp === 'at-least') return t.opponentGoals >= val;
+                        if (state.matchFinderOpponentScoreOp === 'at-most') return t.opponentGoals <= val;
+                        return t.opponentGoals === val;
+                    });
+                }
+                classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
             }
 
             updateMatchFinderTieResults(classified);
