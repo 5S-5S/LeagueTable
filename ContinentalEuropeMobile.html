@@ -117,6 +117,7 @@
                 <!-- Tab Container -->
                 <div class="tab-container">
                     <button class="tab-button active" id="leagueFiltersTab" data-mobile-text="Tables & H2H">League Tables & Head to Head Stats</button>
+                    <button class="tab-button" id="matchFinderTab" data-mobile-text="Match Finder">Match Finder</button>
                     <button class="tab-button" id="teamSeasonsTab" data-mobile-text="Team Seasons">Team Seasons</button>
                     <button class="tab-button" id="lastTimeWhenTab" data-mobile-text="Last Time">The Last Time When...</button>
                     <button class="tab-button" id="teamStreaksTab" data-mobile-text="Streaks">Team Streaks</button>
@@ -283,6 +284,225 @@
                         <span class="text-sm font-medium">Exclude Main Stage</span>
                     </label>
                 </div>
+                </div>
+
+                <!-- Match Finder Tab Content -->
+                <div id="matchFinderContent" class="tab-content">
+                    <!-- Description -->
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
+                        <p class="text-gray-700 text-sm leading-relaxed w-full">
+                            Find a team's standout individual matches - biggest wins, biggest losses, highest-scoring draws, and highest-scoring matches overall. Select Team 1 to begin; add Team 2 to narrow to head-to-head matches only.
+                        </p>
+                        <button id="copyLinkBtnMatchFinder" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                    </div>
+
+                    <!-- League Selection -->
+                    <div class="mb-8 collapsible-control">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">Select Competition:</label>
+                        <div class="league-buttons" id="matchFinderLeagueButtons">
+                            <!-- League buttons will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Mode selector: Single Match vs. Double-Legged Tie (Continental only - Domestic has no multi-leg ties) -->
+                    <div class="mb-8 collapsible-control">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">Mode:</label>
+                        <div class="league-buttons" id="matchFinderModeButtons">
+                            <!-- Mode buttons populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6 collapsible-control">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-search mr-2"></span>Season
+                                </label>
+                                <select id="matchFinderSeasonSelect" class="form-input">
+                                    <option value="">Select Season</option>
+                                </select>
+                            </div>
+
+                            <!-- Competition Stage Filter -->
+                            <div id="matchFinderStageContainer">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-trophy mr-2">🏆</span>Stage
+                                </label>
+                                <select id="matchFinderStageSelect" class="form-input">
+                                    <option value="">All</option>
+                                    <option value="group-stage">League/Group Stage</option>
+                                    <option value="knockout-stage">Knock-Out Stage</option>
+                                    <option value="Final">Final</option>
+                                    <option value="Semi-Finals">Semi-Finals</option>
+                                    <option value="Quarter-Finals">Quarter-Finals</option>
+                                    <option value="Round Of 16">Round Of 16</option>
+                                    <option value="Play-Offs">Play-Offs</option>
+                                    <option value="2. Round">2. Round</option>
+                                    <option value="1. Round">1. Round</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
+                                </label>
+                                <input type="date" id="matchFinderDateFrom" class="form-input">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
+                                </label>
+                                <input type="date" id="matchFinderDateTo" class="form-input">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <span class="icon-calendar mr-2"></span>Day of Week
+                            </label>
+                            <select id="matchFinderDayOfWeekSelect" class="form-input">
+                                <option value="">All Days</option>
+                                <option value="0">Sunday</option>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-search mr-2"></span>Team 1
+                                </label>
+                                <div class="combobox-container" id="matchFinderTeam1ComboboxContainer">
+                                    <input type="text" id="matchFinderTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="matchFinderTeam1ComboboxDropdown"></div>
+                                </div>
+                                <select id="matchFinderTeam1Select" class="form-input" style="display: none;">
+                                    <option value="">Select Team 1</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-search mr-2"></span>Team 2
+                                </label>
+                                <div class="combobox-container" id="matchFinderTeam2ComboboxContainer">
+                                    <input type="text" id="matchFinderTeam2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="matchFinderTeam2ComboboxDropdown"></div>
+                                </div>
+                                <select id="matchFinderTeam2Select" class="form-input" style="display: none;">
+                                    <option value="">No Team</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Type and Action Buttons -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 collapsible-control">
+                        <div class="flex items-center gap-6">
+                            <span class="text-sm font-semibold text-gray-700">Match Results:</span>
+
+                            <!-- Home/Away has no meaning in Double-Legged Tie mode (a two-legged tie has no single home venue) - hidden via JS when that mode is active -->
+                            <div class="flex items-center gap-6" id="matchFinderHomeAwayContainer">
+                                <label class="flex items-center cursor-pointer">
+                                    <div id="matchFinderHomeCheckbox" class="checkbox checked"></div>
+                                    <span class="icon-home mr-1"></span>
+                                    <span class="text-sm font-medium">Home</span>
+                                </label>
+
+                                <label class="flex items-center cursor-pointer">
+                                    <div id="matchFinderAwayCheckbox" class="checkbox checked"></div>
+                                    <span class="icon-plane mr-1"></span>
+                                    <span class="text-sm font-medium">Away</span>
+                                </label>
+                            </div>
+
+                            <label class="flex items-center cursor-pointer">
+                                <div id="matchFinderPenaltyCheckbox" class="checkbox"></div>
+                                <span class="mr-1">⚽</span>
+                                <span class="text-sm font-medium">Penalty Shootouts Only</span>
+                            </label>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button id="matchFinderResetBtn" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- Exclude Options -->
+                    <div class="flex items-center gap-6 mt-4 mb-8 collapsible-control">
+                        <span class="text-sm font-semibold text-gray-700">Exclude:</span>
+
+                        <label class="flex items-center cursor-pointer">
+                            <div id="matchFinderExcludeQualifiersCheckbox" class="checkbox"></div>
+                            <span class="text-sm font-medium">Exclude Qualifiers</span>
+                        </label>
+
+                        <label class="flex items-center cursor-pointer">
+                            <div id="matchFinderExcludeMainStageCheckbox" class="checkbox"></div>
+                            <span class="text-sm font-medium">Exclude Main Stage</span>
+                        </label>
+                    </div>
+
+                    <!-- Category selector (only shown once Team 1 is selected) -->
+                    <div id="matchFinderCategoryContainer" class="mb-8 collapsible-control hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">Category:</label>
+                        <div class="league-buttons" id="matchFinderCategoryButtons">
+                            <!-- Category buttons populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="matchFinderResults" class="hidden">
+                        <!-- Single Match mode: one flat sortable table -->
+                        <div class="league-table" id="matchFinderSingleMatchCard">
+                            <div class="text-center py-4 bg-white border-b">
+                                <h2 class="text-xl font-semibold text-gray-700 mb-1" id="matchFinderTableCaption">Biggest Victories</h2>
+                                <p class="text-sm text-gray-600" id="matchFinderTableTitle"></p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr id="matchFinderTableHeader">
+                                        <!-- Headers will be populated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="matchFinderTableBody">
+                                    <!-- Rows will be populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Double-Legged Tie mode: one flat sortable table, same shape as
+                             Single Match mode - each tie contributes 1 row (single-leg) or 2
+                             rows (two legs), with the aggregate Value cell rowspan-merged
+                             across both leg rows so sorting never separates a tie's legs. -->
+                        <div class="league-table" id="matchFinderTieResultsCard">
+                            <div class="text-center py-4 bg-white border-b">
+                                <h2 class="text-xl font-semibold text-gray-700 mb-1" id="matchFinderTieResultsCaption">Biggest Aggregate Victories</h2>
+                                <p class="text-sm text-gray-600" id="matchFinderTieResultsTitle"></p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr id="matchFinderTieTableHeader">
+                                        <!-- Headers will be populated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="matchFinderTieTableBody">
+                                    <!-- Rows will be populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="matchFinderResultCount" class="text-center text-sm text-gray-600 mt-3"></p>
+                    </div>
                 </div>
 
                 <!-- Team Seasons Tab Content -->
@@ -1052,7 +1272,28 @@
             // Shareable filter state (separate from the Team Dashboard's
             // ?team= lock scheme above - a shared filter link never locks
             // anything, it just reopens the same editable view).
-            pendingShareableState: null
+            pendingShareableState: null,
+
+            // Match Finder state - its own team selection/cache slot, same
+            // reasoning as Last Time When/Team Streaks above.
+            matchFinderTeam1: '',
+            matchFinderTeam2: '',
+            matchFinderSeason: '',
+            matchFinderDateFrom: '',
+            matchFinderDateTo: '',
+            matchFinderDayOfWeek: '',
+            matchFinderStage: '',
+            matchFinderHomeFilter: true,
+            matchFinderAwayFilter: true,
+            matchFinderPenaltyOnlyFilter: false,
+            matchFinderExcludeQualifiers: false,
+            matchFinderExcludeMainStage: false,
+            matchFinderCategory: 'victories',
+            matchFinderSortConfig: { key: null, direction: null },
+            matchFinderTieSortConfig: { key: null, direction: null },
+            matchFinderApiCache: null,
+            matchFinderApiCacheKey: null,
+            matchFinderApiLoading: false
         };
 
         // Team Dashboard: read ?team= from the URL before anything else runs
@@ -2281,6 +2522,21 @@
                     (streaksTeam1Value ? countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('') : '');
                 elements.teamStreaksTeam2Select.value = currentValue;
             }
+
+            if (matchFinderTeam2Combobox) {
+                matchFinderTeam2Combobox.setOptions([
+                    { value: '', text: 'No Team' },
+                    ...leagueTeams.map(team => ({ value: team, text: team })),
+                    ...(state.matchFinderTeam1 ? countryOpts : [])
+                ]);
+            }
+            if (elements.matchFinderTeam2Select) {
+                const currentValue = elements.matchFinderTeam2Select.value;
+                elements.matchFinderTeam2Select.innerHTML = '<option value="">No Team</option>' +
+                    leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('') +
+                    (state.matchFinderTeam1 ? countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('') : '');
+                elements.matchFinderTeam2Select.value = currentValue;
+            }
         }
 
         // Build a URL that reopens the current tab with its current filters.
@@ -2327,6 +2583,24 @@
                 if (location && location !== 'both') params.set('loc', location);
                 if (streakType && streakType !== 'winning') params.set('type', streakType);
                 if (state.teamStreaksStage) params.set('stage', state.teamStreaksStage);
+            } else if (view === 'match-finder') {
+                if (state.matchFinderTeam1) params.set('t1', state.matchFinderTeam1);
+                if (state.matchFinderTeam2) params.set('t2', state.matchFinderTeam2);
+                if (state.matchFinderMode === 'tie') params.set('mode', 'tie');
+                if (state.matchFinderSeason) {
+                    params.set('season', state.matchFinderSeason);
+                } else {
+                    if (state.matchFinderDateFrom) params.set('from', state.matchFinderDateFrom);
+                    if (state.matchFinderDateTo) params.set('to', state.matchFinderDateTo);
+                }
+                if (state.matchFinderStage) params.set('stage', state.matchFinderStage);
+                if (state.matchFinderDayOfWeek) params.set('day', state.matchFinderDayOfWeek);
+                if (!state.matchFinderHomeFilter) params.set('home', '0');
+                if (!state.matchFinderAwayFilter) params.set('away', '0');
+                if (state.matchFinderPenaltyOnlyFilter) params.set('pso', '1');
+                if (state.matchFinderExcludeQualifiers) params.set('exQ', '1');
+                if (state.matchFinderExcludeMainStage) params.set('exM', '1');
+                if (state.matchFinderCategory) params.set('cat', state.matchFinderCategory);
             }
 
             return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -2465,6 +2739,65 @@
                 if (stage) {
                     elements.teamStreaksStageSelect.value = stage;
                     elements.teamStreaksStageSelect.dispatchEvent(new Event('change'));
+                }
+            } else if (view === 'match-finder') {
+                const t1 = params.get('t1');
+                const t2 = params.get('t2');
+                const mode = params.get('mode');
+                if (mode === 'tie' && MATCH_FINDER_MODES.some(m => m.key === mode)) {
+                    state.matchFinderMode = 'tie';
+                    elements.matchFinderHomeAwayContainer.classList.add('hidden');
+                    renderMatchFinderModeButtons();
+                    calculateMatchFinder();
+                }
+                const season = params.get('season');
+                if (season) {
+                    elements.matchFinderSeasonSelect.value = season;
+                    handleMatchFinderSeasonChange(season);
+                } else {
+                    const from = params.get('from');
+                    const to = params.get('to');
+                    if (from) {
+                        elements.matchFinderDateFrom.value = from;
+                        elements.matchFinderDateFrom.dispatchEvent(new Event('change'));
+                    }
+                    if (to) {
+                        elements.matchFinderDateTo.value = to;
+                        elements.matchFinderDateTo.dispatchEvent(new Event('change'));
+                    }
+                }
+                const stage = params.get('stage');
+                if (stage) {
+                    elements.matchFinderStageSelect.value = stage;
+                    elements.matchFinderStageSelect.dispatchEvent(new Event('change'));
+                }
+                const day = params.get('day');
+                if (day) {
+                    elements.matchFinderDayOfWeekSelect.value = day;
+                    elements.matchFinderDayOfWeekSelect.dispatchEvent(new Event('change'));
+                }
+                if (params.get('home') === '0' && state.matchFinderHomeFilter) {
+                    elements.matchFinderHomeCheckbox.click();
+                }
+                if (params.get('away') === '0' && state.matchFinderAwayFilter) {
+                    elements.matchFinderAwayCheckbox.click();
+                }
+                if (params.get('pso') === '1' && !state.matchFinderPenaltyOnlyFilter) {
+                    elements.matchFinderPenaltyCheckbox.click();
+                }
+                if (params.get('exQ') === '1' && !state.matchFinderExcludeQualifiers) {
+                    elements.matchFinderExcludeQualifiersCheckbox.click();
+                }
+                if (params.get('exM') === '1' && !state.matchFinderExcludeMainStage) {
+                    elements.matchFinderExcludeMainStageCheckbox.click();
+                }
+                if (t1) matchFinderTeam1Combobox.selectOption(t1, t1);
+                if (t2) matchFinderTeam2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
+                const cat = params.get('cat');
+                if (cat && MATCH_FINDER_CATEGORIES.some(c => c.key === cat)) {
+                    state.matchFinderCategory = cat;
+                    renderMatchFinderCategoryButtons();
+                    calculateMatchFinder();
                 }
             }
 
@@ -2663,6 +2996,7 @@
             copyLinkBtnTeamSeasons: document.getElementById('copyLinkBtnTeamSeasons'),
             copyLinkBtnLastTimeWhen: document.getElementById('copyLinkBtnLastTimeWhen'),
             copyLinkBtnTeamStreaks: document.getElementById('copyLinkBtnTeamStreaks'),
+            copyLinkBtnMatchFinder: document.getElementById('copyLinkBtnMatchFinder'),
             retryBtn: document.getElementById('retryBtn'),
             matchHistorySection: document.getElementById('matchHistorySection'),
             matchHistoryHomeCheckbox: document.getElementById('matchHistoryHomeCheckbox'),
@@ -2748,7 +3082,45 @@
             teamStreaksTypeSelect: document.getElementById('teamStreaksTypeSelect'),
             teamStreaksTeam1Select: document.getElementById('teamStreaksTeam1Select'),
             teamStreaksTeam2Select: document.getElementById('teamStreaksTeam2Select'),
-            teamStreaksResults: document.getElementById('teamStreaksResults')
+            teamStreaksResults: document.getElementById('teamStreaksResults'),
+            // Match Finder elements
+            matchFinderLeagueButtons: document.getElementById('matchFinderLeagueButtons'),
+            matchFinderModeButtons: document.getElementById('matchFinderModeButtons'),
+            matchFinderHomeAwayContainer: document.getElementById('matchFinderHomeAwayContainer'),
+            matchFinderSeasonSelect: document.getElementById('matchFinderSeasonSelect'),
+            matchFinderStageContainer: document.getElementById('matchFinderStageContainer'),
+            matchFinderStageSelect: document.getElementById('matchFinderStageSelect'),
+            matchFinderDateFrom: document.getElementById('matchFinderDateFrom'),
+            matchFinderDateTo: document.getElementById('matchFinderDateTo'),
+            matchFinderDayOfWeekSelect: document.getElementById('matchFinderDayOfWeekSelect'),
+            matchFinderTeam1ComboboxContainer: document.getElementById('matchFinderTeam1ComboboxContainer'),
+            matchFinderTeam1ComboboxInput: document.getElementById('matchFinderTeam1ComboboxInput'),
+            matchFinderTeam1ComboboxDropdown: document.getElementById('matchFinderTeam1ComboboxDropdown'),
+            matchFinderTeam2ComboboxContainer: document.getElementById('matchFinderTeam2ComboboxContainer'),
+            matchFinderTeam2ComboboxInput: document.getElementById('matchFinderTeam2ComboboxInput'),
+            matchFinderTeam2ComboboxDropdown: document.getElementById('matchFinderTeam2ComboboxDropdown'),
+            matchFinderTeam1Select: document.getElementById('matchFinderTeam1Select'),
+            matchFinderTeam2Select: document.getElementById('matchFinderTeam2Select'),
+            matchFinderHomeCheckbox: document.getElementById('matchFinderHomeCheckbox'),
+            matchFinderAwayCheckbox: document.getElementById('matchFinderAwayCheckbox'),
+            matchFinderPenaltyCheckbox: document.getElementById('matchFinderPenaltyCheckbox'),
+            matchFinderExcludeQualifiersCheckbox: document.getElementById('matchFinderExcludeQualifiersCheckbox'),
+            matchFinderExcludeMainStageCheckbox: document.getElementById('matchFinderExcludeMainStageCheckbox'),
+            matchFinderResetBtn: document.getElementById('matchFinderResetBtn'),
+            matchFinderCategoryContainer: document.getElementById('matchFinderCategoryContainer'),
+            matchFinderCategoryButtons: document.getElementById('matchFinderCategoryButtons'),
+            matchFinderResults: document.getElementById('matchFinderResults'),
+            matchFinderTableCaption: document.getElementById('matchFinderTableCaption'),
+            matchFinderTableTitle: document.getElementById('matchFinderTableTitle'),
+            matchFinderTableHeader: document.getElementById('matchFinderTableHeader'),
+            matchFinderTableBody: document.getElementById('matchFinderTableBody'),
+            matchFinderResultCount: document.getElementById('matchFinderResultCount'),
+            matchFinderSingleMatchCard: document.getElementById('matchFinderSingleMatchCard'),
+            matchFinderTieResultsCard: document.getElementById('matchFinderTieResultsCard'),
+            matchFinderTieResultsCaption: document.getElementById('matchFinderTieResultsCaption'),
+            matchFinderTieResultsTitle: document.getElementById('matchFinderTieResultsTitle'),
+            matchFinderTieTableHeader: document.getElementById('matchFinderTieTableHeader'),
+            matchFinderTieTableBody: document.getElementById('matchFinderTieTableBody')
         };
 
         // Create Team Streaks league buttons
@@ -3677,6 +4049,7 @@
             
             elements.leagueButtons.innerHTML = leagueButtonsHTML;
             elements.lastTimeLeagueButtons.innerHTML = leagueButtonsHTML;
+            if (elements.matchFinderLeagueButtons) elements.matchFinderLeagueButtons.innerHTML = leagueButtonsHTML;
         }
 
         // Populate Recent H2H dropdown options
@@ -4416,6 +4789,7 @@
         // Switch tabs
         const TEAM_DASHBOARD_TAB_BUTTON_IDS = {
             'league-filters': 'leagueFiltersTab',
+            'match-finder': 'matchFinderTab',
             'team-seasons': 'teamSeasonsTab',
             'last-time-when': 'lastTimeWhenTab',
             'team-streaks': 'teamStreaksTab'
@@ -4471,7 +4845,15 @@
                 elements.lastTimeLocationSelect.value = '';
                 elements.lastTimeStageSelect.value = '';
                 elements.lastTimeResults.classList.add('hidden');
-                
+
+                // Reset Match Finder state when switching away
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderTeam1Select.value = '';
+                elements.matchFinderTeam2Select.value = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+
                 // Show league table and related sections
                 elements.tableContainer.classList.remove('hidden');
                 elements.h2hSection.classList.remove('hidden');
@@ -4506,6 +4888,14 @@
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
                 elements.lastTimeStageSelect.value = '';
+
+                // Reset Match Finder state when switching away
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderTeam1Select.value = '';
+                elements.matchFinderTeam2Select.value = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
 
                 // Hide other tab sections
                 elements.tableContainer.classList.add('hidden');
@@ -4582,14 +4972,22 @@
                 elements.team2Select.value = '';
                 elements.seasonSelect.value = '';
                 elements.dayOfWeekSelect.value = '';
-                
+
+                // Reset Match Finder state when switching away
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderTeam1Select.value = '';
+                elements.matchFinderTeam2Select.value = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+
                 // Hide league table and related sections
                 elements.tableContainer.classList.add('hidden');
                 elements.matchHistorySection.classList.add('hidden');
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
-                
+
                 // Update league buttons and team selects for Last Time When
                 createLeagueButtons(); // This will update the league buttons with correct selection
                 updateTeamSelects();
@@ -4631,7 +5029,15 @@
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
                 elements.lastTimeStageSelect.value = '';
-                
+
+                // Reset Match Finder state when switching away
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderTeam1Select.value = '';
+                elements.matchFinderTeam2Select.value = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+
                 // Hide other tab sections
                 elements.tableContainer.classList.add('hidden');
                 elements.matchHistorySection.classList.add('hidden');
@@ -4652,6 +5058,67 @@
                 // Initialize Team Streaks controls with correct league selected
                 createTeamStreaksLeagueButtons();
                 updateTeamStreaksSelects();
+
+            } else if (tabName === 'match-finder') {
+                document.getElementById('matchFinderTab').classList.add('active');
+                document.getElementById('matchFinderContent').classList.add('active');
+
+                // Simple approach: just set the league and update
+                state.selectedLeague = preservedLeague;
+
+                // Reset Team Seasons state when switching away
+                state.teamSeasonsSelectedTeam = '';
+                state.teamSeasonsSelectedSeason = '';
+                state.teamSeasonsSelectedPosition = '';
+                state.includeBetterResults = false;
+                state.firstOccurrenceOnly = false;
+                updateFirstOccurrenceOnlyToggleButton();
+                if (elements.firstOccurrenceOnlyContainer) {
+                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                }
+
+                // Reset League Filters state
+                state.selectedTeam1 = '';
+                state.selectedTeam2 = '';
+                state.selectedSeason = '';
+                state.selectedDayOfWeek = '';
+                elements.team1Select.value = '';
+                elements.team2Select.value = '';
+                elements.seasonSelect.value = '';
+                elements.dayOfWeekSelect.value = '';
+
+                // Reset Last Time When state
+                state.lastTimeTeam1 = '';
+                state.lastTimeTeam2 = '';
+                state.lastTimeDayOfWeek = '';
+                state.lastTimeLocation = '';
+                state.lastTimeStage = '';
+                elements.lastTimeTeam1Select.value = '';
+                elements.lastTimeTeam2Select.value = '';
+                elements.lastTimeDayOfWeekSelect.value = '';
+                elements.lastTimeLocationSelect.value = '';
+                elements.lastTimeStageSelect.value = '';
+                elements.lastTimeResults.classList.add('hidden');
+
+                // Reset Team Streaks state
+                state.teamStreaksStage = '';
+                elements.teamStreaksResults.classList.add('hidden');
+                elements.teamStreaksTeam1Select.value = '';
+                elements.teamStreaksTeam2Select.value = '';
+
+                // Hide other tab sections
+                elements.tableContainer.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
+                elements.h2hSection.classList.add('hidden');
+                elements.h2hMatchesTable.classList.add('hidden');
+                elements.tableInfo.classList.add('hidden');
+
+                // Update league buttons and team selects for Match Finder
+                createLeagueButtons();
+                updateTeamSelects();
+                renderMatchFinderModeButtons();
+                renderMatchFinderCategoryButtons();
+                calculateMatchFinder();
             }
 
             // Team Dashboard: keep the locked team applied on whichever tab
@@ -4666,6 +5133,7 @@
         function setupEventListeners() {
             // Tab switching
             document.getElementById('leagueFiltersTab').addEventListener('click', () => switchTab('league-filters'));
+            document.getElementById('matchFinderTab').addEventListener('click', () => switchTab('match-finder'));
             document.getElementById('teamSeasonsTab').addEventListener('click', () => switchTab('team-seasons'));
             document.getElementById('lastTimeWhenTab').addEventListener('click', () => switchTab('last-time-when'));
             document.getElementById('teamStreaksTab').addEventListener('click', () => switchTab('team-streaks'));
@@ -4680,6 +5148,14 @@
             
             // Last Time When league selection
             elements.lastTimeLeagueButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('.league-button');
+                if (button) {
+                    handleLeagueChange(button.dataset.league);
+                }
+            });
+
+            // Match Finder league selection
+            elements.matchFinderLeagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
                 if (button) {
                     handleLeagueChange(button.dataset.league);
@@ -4828,7 +5304,8 @@
             elements.copyLinkBtnTeamSeasons.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnLastTimeWhen.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamStreaks.addEventListener('click', copyShareableLink);
-            
+            elements.copyLinkBtnMatchFinder.addEventListener('click', copyShareableLink);
+
             // Last Time When controls
             elements.lastTimeTeam1Select.addEventListener('change', (e) => {
                 state.lastTimeTeam1 = e.target.value;
@@ -5105,6 +5582,89 @@
             elements.teamStreaksTeam2Select.addEventListener('change', (e) => {
                 handleTeamStreaksTeam2Change(e.target.value);
             });
+
+            // Match Finder controls
+            elements.matchFinderSeasonSelect.addEventListener('change', (e) => handleMatchFinderSeasonChange(e.target.value));
+            elements.matchFinderStageSelect.addEventListener('change', (e) => {
+                state.matchFinderStage = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderDateFrom.addEventListener('change', (e) => {
+                state.matchFinderDateFrom = e.target.value;
+                state.matchFinderSeason = '';
+                elements.matchFinderSeasonSelect.value = '';
+                calculateMatchFinder();
+            });
+            elements.matchFinderDateTo.addEventListener('change', (e) => {
+                state.matchFinderDateTo = e.target.value;
+                state.matchFinderSeason = '';
+                elements.matchFinderSeasonSelect.value = '';
+                calculateMatchFinder();
+            });
+            elements.matchFinderDayOfWeekSelect.addEventListener('change', (e) => {
+                state.matchFinderDayOfWeek = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderTeam1Select.addEventListener('change', (e) => {
+                state.matchFinderTeam1 = e.target.value;
+                refreshTeam2CountryOptions();
+                calculateMatchFinder();
+            });
+            elements.matchFinderTeam2Select.addEventListener('change', (e) => {
+                state.matchFinderTeam2 = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderHomeCheckbox.addEventListener('click', () => {
+                state.matchFinderHomeFilter = !state.matchFinderHomeFilter;
+                elements.matchFinderHomeCheckbox.className = `checkbox ${state.matchFinderHomeFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayCheckbox.addEventListener('click', () => {
+                state.matchFinderAwayFilter = !state.matchFinderAwayFilter;
+                elements.matchFinderAwayCheckbox.className = `checkbox ${state.matchFinderAwayFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderPenaltyCheckbox.addEventListener('click', () => {
+                state.matchFinderPenaltyOnlyFilter = !state.matchFinderPenaltyOnlyFilter;
+                elements.matchFinderPenaltyCheckbox.className = `checkbox ${state.matchFinderPenaltyOnlyFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderExcludeQualifiersCheckbox.addEventListener('click', () => {
+                state.matchFinderExcludeQualifiers = !state.matchFinderExcludeQualifiers;
+                elements.matchFinderExcludeQualifiersCheckbox.className = `checkbox ${state.matchFinderExcludeQualifiers ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderExcludeMainStageCheckbox.addEventListener('click', () => {
+                state.matchFinderExcludeMainStage = !state.matchFinderExcludeMainStage;
+                elements.matchFinderExcludeMainStageCheckbox.className = `checkbox ${state.matchFinderExcludeMainStage ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderResetBtn.addEventListener('click', clearMatchFinderFilters);
+            elements.matchFinderCategoryButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('.league-button');
+                if (button) {
+                    state.matchFinderCategory = button.dataset.category;
+                    state.matchFinderSortConfig = { key: null, direction: null };
+                    state.matchFinderTieSortConfig = { key: null, direction: null };
+                    renderMatchFinderCategoryButtons();
+                    calculateMatchFinder();
+                }
+            });
+            elements.matchFinderModeButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('.league-button');
+                if (button && button.dataset.mode !== state.matchFinderMode) {
+                    state.matchFinderMode = button.dataset.mode;
+                    // Home/Away has no meaning for a two-legged tie (no single home venue)
+                    if (state.matchFinderMode === 'tie') {
+                        elements.matchFinderHomeAwayContainer.classList.add('hidden');
+                    } else {
+                        elements.matchFinderHomeAwayContainer.classList.remove('hidden');
+                    }
+                    renderMatchFinderModeButtons();
+                    renderMatchFinderCategoryButtons();
+                    calculateMatchFinder();
+                }
+            });
         }
 
         // Intelligent point deductions logic based on team selection
@@ -5142,7 +5702,15 @@
             // Hide Last Time When results
             if (elements.lastTimeResults) elements.lastTimeResults.classList.add('hidden');
             hideAllLastTimeSections();
-            
+
+            // Reset Match Finder state
+            state.matchFinderTeam1 = '';
+            state.matchFinderTeam2 = '';
+            if (elements.matchFinderTeam1Select) elements.matchFinderTeam1Select.value = '';
+            if (elements.matchFinderTeam2Select) elements.matchFinderTeam2Select.value = '';
+            if (elements.matchFinderResults) elements.matchFinderResults.classList.add('hidden');
+            if (elements.matchFinderCategoryContainer) elements.matchFinderCategoryContainer.classList.add('hidden');
+
             createLeagueButtons();
             updateTeamSelects();
             updateTeamSeasonsTeamSelect();
@@ -5501,7 +6069,7 @@
         }
 
         // Initialize comboboxes
-        let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox;
+        let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox, matchFinderTeam1Combobox, matchFinderTeam2Combobox;
 
         // Update team selects
         function updateTeamSelects() {
@@ -5621,6 +6189,33 @@
                 );
             }
 
+            // Initialize Match Finder comboboxes
+            if (!matchFinderTeam1Combobox) {
+                matchFinderTeam1Combobox = new Combobox(
+                    'matchFinderTeam1ComboboxContainer',
+                    'matchFinderTeam1ComboboxInput',
+                    'matchFinderTeam1ComboboxDropdown',
+                    'Select Team 1',
+                    (value, text) => {
+                        elements.matchFinderTeam1Select.value = value;
+                        elements.matchFinderTeam1Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
+            if (!matchFinderTeam2Combobox) {
+                matchFinderTeam2Combobox = new Combobox(
+                    'matchFinderTeam2ComboboxContainer',
+                    'matchFinderTeam2ComboboxInput',
+                    'matchFinderTeam2ComboboxDropdown',
+                    'No Team',
+                    (value, text) => {
+                        elements.matchFinderTeam2Select.value = value;
+                        elements.matchFinderTeam2Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
             // Populate all combobox options
             const team1ComboOptions = [
                 { value: '', text: 'All Teams' },
@@ -5650,6 +6245,14 @@
                 { value: '', text: 'Select Team 2' },
                 ...leagueTeams.map(team => ({ value: team, text: team }))
             ];
+            const matchFinderTeam1ComboOptions = [
+                { value: '', text: 'Select Team 1' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            const matchFinderTeam2ComboOptions = [
+                { value: '', text: 'No Team' },
+                ...leagueTeams.map(team => ({ value: team, text: team }))
+            ];
 
             team1Combobox.setOptions(team1ComboOptions);
             team2Combobox.setOptions(team2ComboOptions);
@@ -5658,6 +6261,8 @@
             lastTimeTeam2Combobox.setOptions(lastTimeTeam2ComboOptions);
             teamStreaksTeam1Combobox.setOptions(teamStreaksTeam1ComboOptions);
             teamStreaksTeam2Combobox.setOptions(teamStreaksTeam2ComboOptions);
+            matchFinderTeam1Combobox.setOptions(matchFinderTeam1ComboOptions);
+            matchFinderTeam2Combobox.setOptions(matchFinderTeam2ComboOptions);
 
             // Team Dashboard: consume a pending team lock from the URL (once)
             if (state.pendingTeamLock) {
@@ -5703,9 +6308,836 @@
             teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
             teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
 
+            // Also populate Match Finder team selects and set default combobox values
+            const matchFinderTeam1Options = '<option value="">Select Team 1</option>' +
+                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+            const matchFinderTeam2Options = '<option value="">No Team</option>' +
+                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+            elements.matchFinderTeam1Select.innerHTML = matchFinderTeam1Options;
+            elements.matchFinderTeam2Select.innerHTML = matchFinderTeam2Options;
+            matchFinderTeam1Combobox.setValue('', 'Select Team 1');
+            matchFinderTeam2Combobox.setValue('', 'No Team');
+
             // Shareable filter state: consume a pending shared-link state
             // now that every tab's comboboxes exist (once)
             consumePendingShareableState();
+        }
+
+        // ============================================================
+        // Match Finder
+        // ============================================================
+
+        const MATCH_FINDER_CATEGORIES = [
+            { key: 'victories', label: 'Biggest Victories' },
+            { key: 'defeats', label: 'Biggest Defeats' },
+            { key: 'draws', label: 'Highest-Scoring Draws' },
+            { key: 'totalGoals', label: 'Most Total Goals' }
+        ];
+
+        // Double-Legged Tie mode display labels for the same 4 category
+        // keys - underlying classification logic is identical, only the
+        // label changes (see calculateMatchFinderTieMode).
+        const MATCH_FINDER_TIE_CATEGORY_LABELS = {
+            victories: 'Biggest Aggregate Victories',
+            defeats: 'Biggest Aggregate Defeats',
+            draws: 'Highest-Scoring Aggregate Ties',
+            totalGoals: 'Most Total Aggregate Goals'
+        };
+
+        const MATCH_FINDER_MODES = [
+            { key: 'single', label: 'Single Match' },
+            { key: 'tie', label: 'Double-Legged Tie' }
+        ];
+
+        function renderMatchFinderModeButtons() {
+            elements.matchFinderModeButtons.innerHTML = MATCH_FINDER_MODES.map(mode => `
+                <label class="league-button ${state.matchFinderMode === mode.key ? 'active' : ''}" data-mode="${mode.key}">
+                    <div class="radio-dot ${state.matchFinderMode === mode.key ? 'active' : ''}"></div>
+                    <span class="text-sm font-medium ${state.matchFinderMode === mode.key ? 'text-green-700' : 'text-gray-700'}">
+                        ${mode.label}
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        function renderMatchFinderCategoryButtons() {
+            const isTieMode = state.matchFinderMode === 'tie';
+            elements.matchFinderCategoryButtons.innerHTML = MATCH_FINDER_CATEGORIES.map(cat => `
+                <label class="league-button ${state.matchFinderCategory === cat.key ? 'active' : ''}" data-category="${cat.key}">
+                    <div class="radio-dot ${state.matchFinderCategory === cat.key ? 'active' : ''}"></div>
+                    <span class="text-sm font-medium ${state.matchFinderCategory === cat.key ? 'text-green-700' : 'text-gray-700'}">
+                        ${isTieMode ? MATCH_FINDER_TIE_CATEGORY_LABELS[cat.key] : cat.label}
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        function handleMatchFinderSeasonChange(seasonKey) {
+            state.matchFinderSeason = seasonKey;
+            const seasonData = getSeasonDateRange(seasonKey);
+            state.matchFinderDateFrom = seasonData ? seasonData.start : '';
+            state.matchFinderDateTo = seasonData ? seasonData.end : '';
+            elements.matchFinderDateFrom.value = state.matchFinderDateFrom;
+            elements.matchFinderDateTo.value = state.matchFinderDateTo;
+            calculateMatchFinder();
+        }
+
+        function clearMatchFinderFilters() {
+            state.matchFinderTeam1 = '';
+            state.matchFinderTeam2 = '';
+            state.matchFinderMode = 'single';
+            state.matchFinderSeason = '';
+            state.matchFinderDateFrom = '';
+            state.matchFinderDateTo = '';
+            state.matchFinderDayOfWeek = '';
+            state.matchFinderStage = '';
+            state.matchFinderHomeFilter = true;
+            state.matchFinderAwayFilter = true;
+            state.matchFinderPenaltyOnlyFilter = false;
+            state.matchFinderExcludeQualifiers = false;
+            state.matchFinderExcludeMainStage = false;
+            state.matchFinderCategory = 'victories';
+            state.matchFinderSortConfig = { key: null, direction: null };
+            state.matchFinderTieSortConfig = { key: null, direction: null };
+
+            elements.matchFinderTeam1Select.value = '';
+            elements.matchFinderTeam2Select.value = '';
+            if (matchFinderTeam1Combobox) matchFinderTeam1Combobox.setValue('', 'Select Team 1');
+            if (matchFinderTeam2Combobox) matchFinderTeam2Combobox.setValue('', 'No Team');
+            refreshTeam2CountryOptions();
+            elements.matchFinderSeasonSelect.value = '';
+            elements.matchFinderStageSelect.value = '';
+            elements.matchFinderDateFrom.value = '';
+            elements.matchFinderDateTo.value = '';
+            elements.matchFinderDayOfWeekSelect.value = '';
+            elements.matchFinderHomeCheckbox.className = 'checkbox checked';
+            elements.matchFinderAwayCheckbox.className = 'checkbox checked';
+            elements.matchFinderPenaltyCheckbox.className = 'checkbox';
+            elements.matchFinderExcludeQualifiersCheckbox.className = 'checkbox';
+            elements.matchFinderExcludeMainStageCheckbox.className = 'checkbox';
+            elements.matchFinderHomeAwayContainer.classList.remove('hidden');
+            renderMatchFinderModeButtons();
+            renderMatchFinderCategoryButtons();
+
+            calculateMatchFinder();
+        }
+
+        // Match Finder's own team-scoped match cache, same reasoning as
+        // teamHistoryApiCache/lastTimeApiCache/teamStreaksApiCache above -
+        // this tab can have a different team selected at the same time as
+        // the others, so it needs its own cache slot.
+        async function ensureMatchFinderDataLoaded(team1, opponents, div) {
+            const cacheKey = opponents
+                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
+                : `${div}::${team1}::__all__`;
+            if (state.matchFinderApiCacheKey === cacheKey) return;
+            if (state.matchFinderApiLoading) return;
+
+            state.matchFinderApiLoading = true;
+            try {
+                const url = opponents
+                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
+                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Match Finder data request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.matchFinderApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals,
+                    CompetitionPhase: m.competitionPhase,
+                    isQualifier: m.isQualifier,
+                    AdditionalInfo: m.additionalInfo
+                }));
+                state.matchFinderApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load Match Finder data from API:', err);
+                state.matchFinderApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.matchFinderApiLoading = false;
+            }
+
+            calculateMatchFinder();
+        }
+
+        // Team 1's result/margin/total-goals for a single match. A match
+        // decided by a penalty shootout is a Draw for classification
+        // purposes - FTHG/FTAG already hold the regulation/extra-time score
+        // (that's precisely why a shootout was needed), so reading them
+        // directly already gives the right classification.
+        function classifyMatchForTeam1(match, team1) {
+            const isHome = match.HomeTeam === team1;
+            const team1Goals = parseInt(isHome ? match.FTHG : match.FTAG) || 0;
+            const opponentGoals = parseInt(isHome ? match.FTAG : match.FTHG) || 0;
+            const margin = team1Goals - opponentGoals;
+            const totalGoals = team1Goals + opponentGoals;
+            const isPso = !!(match.AdditionalInfo && match.AdditionalInfo.toLowerCase().includes('pso'));
+
+            let result;
+            if (margin > 0) result = 'win';
+            else if (margin < 0) result = 'loss';
+            else result = 'draw';
+
+            return { isHome, team1Goals, opponentGoals, margin, totalGoals, isPso, result };
+        }
+
+        function calculateMatchFinder() {
+            if (!state.matchFinderTeam1) {
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+                return;
+            }
+
+            elements.matchFinderCategoryContainer.classList.remove('hidden');
+
+            const leagueMapping = {
+                'champions-league': 'C1',
+                'europa-league': 'E1',
+                'conference-league': 'C2'
+            };
+            const div = leagueMapping[state.selectedLeague];
+
+            const opponents = isCountryOpponentValue(state.matchFinderTeam2)
+                ? getCountryOpponents(countryFromOpponentValue(state.matchFinderTeam2), state.matchFinderTeam1)
+                : state.matchFinderTeam2 ? [state.matchFinderTeam2] : null;
+
+            if (div) {
+                ensureMatchFinderDataLoaded(state.matchFinderTeam1, opponents, div);
+            }
+
+            let matches = [...(state.matchFinderApiCache || [])];
+
+            // Narrow to the specific opponent(s) when Team 2 is set (H2H
+            // scope). ensureMatchFinderDataLoaded already fetches only
+            // Team1-vs-opponents matches once its cache key catches up, so
+            // this is mainly a safety net for the render that happens
+            // between a Team 2 change and that refetch landing.
+            if (opponents) {
+                matches = matches.filter(row =>
+                    (row.HomeTeam === state.matchFinderTeam1 && opponents.includes(row.AwayTeam)) ||
+                    (row.AwayTeam === state.matchFinderTeam1 && opponents.includes(row.HomeTeam))
+                );
+            }
+
+            if (state.matchFinderExcludeQualifiers) {
+                matches = matches.filter(row => !row.isQualifier);
+            }
+            if (state.matchFinderExcludeMainStage) {
+                matches = matches.filter(row => row.isQualifier);
+            }
+
+            if (state.matchFinderMode === 'tie') {
+                calculateMatchFinderTieMode(matches);
+                return;
+            }
+
+            if (state.matchFinderDayOfWeek !== '') {
+                matches = matches.filter(row => row.dateObj.getDay().toString() === state.matchFinderDayOfWeek);
+            }
+            if (state.matchFinderStage !== '') {
+                const knockoutPhases = [
+                    'Round Of 16', 'Round of 16', 'Quarter-Finals', 'Semi-Finals', 'Final',
+                    'Play-Offs', '1. Round', '2. Round'
+                ];
+                if (state.matchFinderStage === 'group-stage') {
+                    matches = matches.filter(row => !knockoutPhases.includes(row.CompetitionPhase || ''));
+                } else if (state.matchFinderStage === 'knockout-stage') {
+                    matches = matches.filter(row => knockoutPhases.includes(row.CompetitionPhase || ''));
+                } else {
+                    matches = matches.filter(row => matchesStageCategory(row.CompetitionPhase, state.matchFinderStage));
+                }
+            }
+            if (state.matchFinderDateFrom) {
+                const from = new Date(state.matchFinderDateFrom);
+                matches = matches.filter(row => row.dateObj >= from);
+            }
+            if (state.matchFinderDateTo) {
+                const to = new Date(state.matchFinderDateTo);
+                matches = matches.filter(row => row.dateObj <= to);
+            }
+            if (state.matchFinderPenaltyOnlyFilter) {
+                matches = matches.filter(row => row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('pso'));
+            }
+
+            // Home/Away, relative to Team 1's side
+            if (state.matchFinderHomeFilter && !state.matchFinderAwayFilter) {
+                matches = matches.filter(row => row.HomeTeam === state.matchFinderTeam1);
+            } else if (state.matchFinderAwayFilter && !state.matchFinderHomeFilter) {
+                matches = matches.filter(row => row.AwayTeam === state.matchFinderTeam1);
+            } else if (!state.matchFinderHomeFilter && !state.matchFinderAwayFilter) {
+                matches = [];
+            }
+
+            // Classify relative to Team 1 and bucket into the active category
+            let classified = matches.map(match => ({
+                match,
+                ...classifyMatchForTeam1(match, state.matchFinderTeam1)
+            }));
+
+            if (state.matchFinderCategory === 'victories') {
+                classified = classified.filter(m => m.result === 'win');
+                classified.sort((a, b) => b.margin - a.margin || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'defeats') {
+                classified = classified.filter(m => m.result === 'loss');
+                classified.sort((a, b) => a.margin - b.margin || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'draws') {
+                classified = classified.filter(m => m.result === 'draw');
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'totalGoals') {
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
+            }
+
+            updateMatchFinderTable(classified);
+        }
+
+        function matchFinderSubtitle(count) {
+            const team1 = state.matchFinderTeam1;
+            let text = team1;
+            if (state.matchFinderTeam2) {
+                text += ` vs ${getOpponentDisplayLabel(state.matchFinderTeam2)}`;
+            }
+            text += ` (${count} match${count === 1 ? '' : 'es'})`;
+            return text;
+        }
+
+        function matchFinderTieSubtitle(count) {
+            const team1 = state.matchFinderTeam1;
+            let text = team1;
+            if (state.matchFinderTeam2) {
+                text += ` vs ${getOpponentDisplayLabel(state.matchFinderTeam2)}`;
+            }
+            text += ` (${count} tie${count === 1 ? '' : 's'})`;
+            return text;
+        }
+
+        // Break down a two-legged (or single-leg, e.g. a Final) knockout
+        // tie into its aggregate result. Takes the flat array of 1-2
+        // match objects that make up ONE specific tie (already grouped -
+        // see calculateMatchFinderTieMode's season-aware grouping key).
+        // Ported from the knockout-bracket-view branch's computeTieBreakdown()
+        // (verified self-contained there - only isAwayGoalsRuleActive()/
+        // getTeamColor(), both now on this file too).
+        function computeTieBreakdown(matches) {
+            if (!matches || matches.length === 0) return null;
+
+            const sorted = [...matches].sort((a, b) => a.dateObj - b.dateObj);
+            const teamSet = new Set();
+            sorted.forEach(m => { teamSet.add(m.HomeTeam); teamSet.add(m.AwayTeam); });
+            const [teamA, teamB] = [...teamSet].sort();
+
+            const legs = sorted.map(m => ({
+                [teamA]: m.HomeTeam === teamA ? (parseInt(m.FTHG) || 0) : (parseInt(m.FTAG) || 0),
+                [teamB]: m.HomeTeam === teamB ? (parseInt(m.FTHG) || 0) : (parseInt(m.FTAG) || 0),
+            }));
+
+            const aggregate = {
+                [teamA]: legs.reduce((sum, leg) => sum + leg[teamA], 0),
+                [teamB]: legs.reduce((sum, leg) => sum + leg[teamB], 0),
+            };
+
+            // Only meaningful for an actual two-legged tie - a single
+            // match (isSingleLeg below) has no "goals scored away from
+            // home over both legs" to compare.
+            const awayGoals = { [teamA]: 0, [teamB]: 0 };
+            sorted.forEach(m => {
+                const awayTeamGoals = parseInt(m.FTAG) || 0;
+                if (m.AwayTeam === teamA) awayGoals[teamA] += awayTeamGoals;
+                else if (m.AwayTeam === teamB) awayGoals[teamB] += awayTeamGoals;
+            });
+
+            let penalties = null;
+            let hasAet = false;
+            sorted.forEach(m => {
+                if (!m.AdditionalInfo) return;
+                if (m.AdditionalInfo.includes('aet')) hasAet = true;
+                if (!m.AdditionalInfo.includes('pso')) return;
+                const psoMatch = m.AdditionalInfo.match(/pso\s*(\d+):(\d+)/i);
+                if (!psoMatch) return;
+                const homePenalties = parseInt(psoMatch[1]) || 0;
+                const awayPenalties = parseInt(psoMatch[2]) || 0;
+                penalties = {
+                    [teamA]: m.HomeTeam === teamA ? homePenalties : awayPenalties,
+                    [teamB]: m.HomeTeam === teamB ? homePenalties : awayPenalties,
+                };
+            });
+
+            let winner, loser;
+            let decidedByAwayGoals = false;
+            if (aggregate[teamA] > aggregate[teamB]) {
+                winner = teamA; loser = teamB;
+            } else if (aggregate[teamB] > aggregate[teamA]) {
+                winner = teamB; loser = teamA;
+            } else if (legs.length === 2 && isAwayGoalsRuleActive(sorted[sorted.length - 1].dateObj) && awayGoals[teamA] !== awayGoals[teamB]) {
+                winner = awayGoals[teamA] > awayGoals[teamB] ? teamA : teamB;
+                loser = winner === teamA ? teamB : teamA;
+                decidedByAwayGoals = true;
+            } else if (penalties) {
+                winner = penalties[teamA] > penalties[teamB] ? teamA : teamB;
+                loser = winner === teamA ? teamB : teamA;
+            } else {
+                // Aggregate tied and no shootout recorded - shouldn't
+                // happen for a completed real tie, but don't fabricate
+                // a winner if the data has a gap.
+                winner = 'TIE';
+                loser = `${teamA} & ${teamB}`;
+            }
+
+            const winnerColor = winner !== 'TIE' ? (getTeamColor(winner, state.selectedLeague) || '#059669') : '#9ca3af';
+
+            return { teamA, teamB, legs, aggregate, penalties, hasAet, decidedByAwayGoals, winner, loser, winnerColor, isSingleLeg: legs.length === 1 };
+        }
+
+        // Double-Legged Tie mode: group a team's knockout-phase matches
+        // into ties, compute each tie's aggregate result, and bucket/sort
+        // exactly like calculateMatchFinder does for single matches - just
+        // relative to the tie's aggregate score instead of one match's score.
+        //
+        // `matches` here has already had opponent-narrowing and
+        // Exclude-Qualifiers/Exclude-Main-Stage applied by the caller
+        // (calculateMatchFinder) - both are safe to apply before pairing
+        // since they're qualifier/opponent based, not date/leg based.
+        // Date range, day-of-week, and Penalty-Shootouts-Only are NOT
+        // applied here to individual legs before pairing (that risks
+        // silently dropping one leg of a real tie and corrupting the
+        // pairing) - instead they're applied to the resulting LIST OF TIES
+        // below, keyed off the later leg's date.
+        function calculateMatchFinderTieMode(matches) {
+            const knockoutPhases = [
+                'Round Of 16', 'Round of 16', 'Quarter-Finals', 'Semi-Finals', 'Final',
+                'Play-Offs', '1. Round', '2. Round'
+            ];
+
+            // Ties only exist in knockout rounds - group-stage matches are
+            // round-robin and can legitimately feature the same two teams
+            // twice in one season without that being an aggregate "tie".
+            let tieEligible = matches.filter(row => knockoutPhases.includes(row.CompetitionPhase || ''));
+
+            // Stage filter is safe to apply per-leg before pairing here -
+            // both legs of a real tie always share the same CompetitionPhase.
+            if (state.matchFinderStage !== '') {
+                if (state.matchFinderStage === 'group-stage') {
+                    tieEligible = []; // group stage can't have two-legged ties
+                } else if (state.matchFinderStage !== 'knockout-stage') {
+                    // 'knockout-stage' is a no-op here - tieEligible is already knockout-only
+                    tieEligible = tieEligible.filter(row => matchesStageCategory(row.CompetitionPhase, state.matchFinderStage));
+                }
+            }
+
+            // Group into ties. Season is part of the key because the same
+            // two teams can meet in the same round in different years -
+            // without a season component those would wrongly merge into
+            // one fake multi-leg "tie".
+            const tieGroups = {};
+            tieEligible.forEach(row => {
+                const seasonKey = europeanSeasonStartYear(row.dateObj);
+                const pairKey = [row.HomeTeam, row.AwayTeam].sort().join(' vs ');
+                const key = `${seasonKey}::${row.CompetitionPhase}::${pairKey}`;
+                if (!tieGroups[key]) tieGroups[key] = [];
+                tieGroups[key].push(row);
+            });
+
+            let ties = Object.values(tieGroups)
+                .map(legMatches => {
+                    const sortedLegs = [...legMatches].sort((a, b) => a.dateObj - b.dateObj);
+                    const breakdown = computeTieBreakdown(sortedLegs);
+                    return breakdown ? { legMatches: sortedLegs, breakdown, lastLegDate: sortedLegs[sortedLegs.length - 1].dateObj } : null;
+                })
+                .filter(Boolean);
+
+            // Date range / day-of-week / Penalty-Shootouts-Only, applied to
+            // the tie as a whole (keyed off the later leg's date) rather
+            // than to individual legs.
+            if (state.matchFinderDateFrom) {
+                const from = new Date(state.matchFinderDateFrom);
+                ties = ties.filter(t => t.lastLegDate >= from);
+            }
+            if (state.matchFinderDateTo) {
+                const to = new Date(state.matchFinderDateTo);
+                ties = ties.filter(t => t.lastLegDate <= to);
+            }
+            if (state.matchFinderDayOfWeek !== '') {
+                ties = ties.filter(t => t.lastLegDate.getDay().toString() === state.matchFinderDayOfWeek);
+            }
+            if (state.matchFinderPenaltyOnlyFilter) {
+                ties = ties.filter(t => !!t.breakdown.penalties);
+            }
+
+            // Classify each tie relative to Team 1 - computeTieBreakdown's
+            // teamA/teamB are alphabetical, not team1/opponent, so map
+            // them back first.
+            const team1 = state.matchFinderTeam1;
+            let classified = ties.map(t => {
+                const b = t.breakdown;
+                const isTeam1A = b.teamA === team1;
+                const team1Goals = isTeam1A ? b.aggregate[b.teamA] : b.aggregate[b.teamB];
+                const opponentGoals = isTeam1A ? b.aggregate[b.teamB] : b.aggregate[b.teamA];
+                const margin = team1Goals - opponentGoals;
+                const totalGoals = team1Goals + opponentGoals;
+
+                let result;
+                if (b.winner === 'TIE') result = 'draw';
+                else if (b.winner === team1) result = 'win';
+                else result = 'loss';
+
+                return { ...t, team1Goals, opponentGoals, margin, totalGoals, result };
+            });
+
+            if (state.matchFinderCategory === 'victories') {
+                classified = classified.filter(t => t.result === 'win');
+                classified.sort((a, b) => b.margin - a.margin || b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'defeats') {
+                classified = classified.filter(t => t.result === 'loss');
+                classified.sort((a, b) => a.margin - b.margin || b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'draws') {
+                classified = classified.filter(t => t.result === 'draw');
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'totalGoals') {
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || b.lastLegDate - a.lastLegDate);
+            }
+
+            updateMatchFinderTieResults(classified);
+        }
+
+        // Same mobile convention as updateMatchFinderTable: hidden team-name
+        // text (logo-only identification), a combined "H:A" score cell, and
+        // abbreviated stage labels. One sortable "tie row" per tie - Date/
+        // Stage/Home/Away come from the first leg (both legs share the same
+        // Stage; Home/Away flips leg to leg, so the first leg's arrangement
+        // is what's shown and sorted on). The Value column is always the
+        // tie's aggregate, never a per-leg number, rendered once per tie via
+        // a rowspan-merged cell so a tie's legs can never be sorted apart.
+        function updateMatchFinderTieResults(classified) {
+            elements.matchFinderResults.classList.remove('hidden');
+            elements.matchFinderSingleMatchCard.classList.add('hidden');
+            elements.matchFinderTieResultsCard.classList.remove('hidden');
+
+            elements.matchFinderTieResultsCaption.textContent = MATCH_FINDER_TIE_CATEGORY_LABELS[state.matchFinderCategory];
+            elements.matchFinderTieResultsTitle.textContent = matchFinderTieSubtitle(classified.length);
+            elements.matchFinderResultCount.textContent = classified.length === 0 ? 'No ties found for the current filters.' : '';
+
+            const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
+            const valueLabel = isMarginCategory ? 'Agg. Margin' : 'Agg. Goals';
+
+            elements.matchFinderTieTableHeader.innerHTML = `
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderTieSort('date')">Date</th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderTieSort('stage')">Stage</th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderTieSort('homeTeam')">Home</th>
+                <th class="text-center" style="white-space: nowrap;">
+                    <span onclick="handleMatchFinderTieSort('homeScore')" style="cursor:pointer;" title="Sort by Home Score">H</span>:<span onclick="handleMatchFinderTieSort('awayScore')" style="cursor:pointer;" title="Sort by Away Score">A</span>
+                </th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderTieSort('awayTeam')">Away</th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderTieSort('value')">${valueLabel}</th>
+            `;
+
+            let tieRows = classified.map(t => {
+                const firstLeg = t.legMatches[0];
+
+                let valueClass, valueText, valueSort;
+                if (isMarginCategory) {
+                    valueClass = t.margin > 0 ? 'win-score' : t.margin < 0 ? 'text-red-600' : 'text-gray-400';
+                    valueText = `${t.margin > 0 ? '+' : ''}${t.margin}`;
+                    valueSort = t.margin;
+                } else {
+                    valueClass = t.result === 'win' ? 'win-score' : t.result === 'loss' ? 'text-red-600' : 'text-gray-400';
+                    valueText = `${t.totalGoals}`;
+                    valueSort = t.totalGoals;
+                }
+
+                let annotation = '';
+                if (t.breakdown.decidedByAwayGoals) annotation = 'away goals';
+                else if (t.breakdown.penalties) annotation = 'pens';
+                else if (t.breakdown.hasAet) annotation = 'aet';
+
+                return {
+                    dateObj: firstLeg.dateObj,
+                    date: firstLeg.dateObj.toLocaleDateString(),
+                    stage: firstLeg.CompetitionPhase || '',
+                    homeTeam: firstLeg.HomeTeam,
+                    awayTeam: firstLeg.AwayTeam,
+                    homeScore: parseInt(firstLeg.FTHG) || 0,
+                    awayScore: parseInt(firstLeg.FTAG) || 0,
+                    valueClass, valueText, valueSort, annotation,
+                    tie: t
+                };
+            });
+
+            if (state.matchFinderTieSortConfig.key && state.matchFinderTieSortConfig.direction) {
+                const sortKey = state.matchFinderTieSortConfig.key;
+                const sortDirection = state.matchFinderTieSortConfig.direction;
+
+                tieRows.sort((a, b) => {
+                    let valueA, valueB;
+                    switch (sortKey) {
+                        case 'date': valueA = a.dateObj; valueB = b.dateObj; break;
+                        case 'stage': valueA = a.stage.toLowerCase(); valueB = b.stage.toLowerCase(); break;
+                        case 'homeTeam': valueA = a.homeTeam.toLowerCase(); valueB = b.homeTeam.toLowerCase(); break;
+                        case 'homeScore': valueA = a.homeScore; valueB = b.homeScore; break;
+                        case 'awayTeam': valueA = a.awayTeam.toLowerCase(); valueB = b.awayTeam.toLowerCase(); break;
+                        case 'awayScore': valueA = a.awayScore; valueB = b.awayScore; break;
+                        case 'value': valueA = a.valueSort; valueB = b.valueSort; break;
+                        default: return 0;
+                    }
+                    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+                    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            elements.matchFinderTieTableBody.innerHTML = tieRows.map((row, index) => {
+                const legs = row.tie.legMatches;
+                const rowBackgroundClass = tieRows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+
+                return legs.map((leg, legIndex) => {
+                    const homeTeamColor = getTeamColor(leg.HomeTeam, state.selectedLeague);
+                    const awayTeamColor = getTeamColor(leg.AwayTeam, state.selectedLeague);
+                    const homeTeamStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
+                    const awayTeamStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
+
+                    const homeLogoUrl = getTeamLogoUrl(leg.HomeTeam, state.selectedLeague);
+                    const awayLogoUrl = getTeamLogoUrl(leg.AwayTeam, state.selectedLeague);
+
+                    const homeScore = parseInt(leg.FTHG) || 0;
+                    const awayScore = parseInt(leg.FTAG) || 0;
+                    let homeScoreClass, awayScoreClass;
+                    if (homeScore > awayScore) {
+                        homeScoreClass = 'font-bold win-score';
+                        awayScoreClass = 'text-red-600 font-bold';
+                    } else if (awayScore > homeScore) {
+                        homeScoreClass = 'text-red-600 font-bold';
+                        awayScoreClass = 'font-bold win-score';
+                    } else {
+                        homeScoreClass = 'text-gray-400 font-bold draw-score';
+                        awayScoreClass = 'text-gray-400 font-bold draw-score';
+                    }
+
+                    const valueCell = legIndex === 0
+                        ? `<td rowspan="${legs.length}" class="text-center text-lg font-bold ${row.valueClass}" style="vertical-align: middle;">
+                               ${row.valueText}
+                               ${row.annotation ? `<div class="text-xs font-normal text-gray-500">(${row.annotation})</div>` : ''}
+                           </td>`
+                        : '';
+
+                    return `
+                        <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
+                            <td class="text-center text-sm">${leg.dateObj.toLocaleDateString()}</td>
+                            <td class="text-center text-sm">${abbreviateProgression(leg.CompetitionPhase || '')}</td>
+                            <td class="text-center">
+                                <div class="flex items-center justify-center">
+                                    ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${leg.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                    <span style="${homeTeamStyle}; display: none;">${leg.HomeTeam}</span>
+                                </div>
+                            </td>
+                            <td class="text-center text-lg" style="white-space: nowrap;"><span class="${homeScoreClass}">${homeScore}</span>:<span class="${awayScoreClass}">${awayScore}</span></td>
+                            <td class="text-center">
+                                <div class="flex items-center justify-center">
+                                    ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${leg.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                    <span style="${awayTeamStyle}; display: none;">${leg.AwayTeam}</span>
+                                </div>
+                            </td>
+                            ${valueCell}
+                        </tr>
+                    `;
+                }).join('');
+            }).join('');
+        }
+
+        function handleMatchFinderTieSort(key) {
+            let defaultDirection = 'desc';
+            if (key === 'homeTeam' || key === 'awayTeam' || key === 'stage') {
+                defaultDirection = 'asc';
+            }
+
+            if (state.matchFinderTieSortConfig.key === key) {
+                if (state.matchFinderTieSortConfig.direction === 'desc') {
+                    state.matchFinderTieSortConfig.direction = 'asc';
+                } else if (state.matchFinderTieSortConfig.direction === 'asc') {
+                    state.matchFinderTieSortConfig.key = null;
+                    state.matchFinderTieSortConfig.direction = null;
+                } else {
+                    state.matchFinderTieSortConfig.direction = defaultDirection;
+                }
+            } else {
+                state.matchFinderTieSortConfig.key = key;
+                state.matchFinderTieSortConfig.direction = defaultDirection;
+            }
+
+            calculateMatchFinder();
+        }
+
+        // Results table follows the same mobile convention as
+        // createMatchTableRow/updateMatchHistoryTable: hidden team-name
+        // text (identification is via logo only), a combined "H:A" score
+        // cell instead of separate Home Score/Away Score columns, and
+        // abbreviated stage labels via abbreviateProgression() - NOT
+        // desktop's wide 7-column layout with visible team names.
+        function updateMatchFinderTable(classified) {
+            elements.matchFinderResults.classList.remove('hidden');
+
+            const cat = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
+            elements.matchFinderTableCaption.textContent = cat.label;
+            elements.matchFinderTableTitle.textContent = matchFinderSubtitle(classified.length);
+            elements.matchFinderResultCount.textContent = classified.length === 0 ? 'No matches found for the current filters.' : '';
+
+            const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
+            const valueLabel = isMarginCategory ? 'Margin' : 'Goals';
+
+            elements.matchFinderTableHeader.innerHTML = `
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('date')">Date</th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('stage')">Stage</th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('homeTeam')">Home</th>
+                <th class="text-center" style="white-space: nowrap;">
+                    <span onclick="handleMatchFinderSort('homeScore')" style="cursor:pointer;" title="Sort by Home Score">H</span>:<span onclick="handleMatchFinderSort('awayScore')" style="cursor:pointer;" title="Sort by Away Score">A</span>
+                </th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('awayTeam')">Away</th>
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('value')">${valueLabel}</th>
+            `;
+
+            let rows = classified.map(entry => {
+                const match = entry.match;
+                const homeScore = parseInt(match.FTHG) || 0;
+                const awayScore = parseInt(match.FTAG) || 0;
+
+                let homeScoreClass, awayScoreClass;
+                if (homeScore > awayScore) {
+                    homeScoreClass = 'font-bold win-score';
+                    awayScoreClass = 'text-red-600 font-bold';
+                } else if (awayScore > homeScore) {
+                    homeScoreClass = 'text-red-600 font-bold';
+                    awayScoreClass = 'font-bold win-score';
+                } else {
+                    homeScoreClass = 'text-gray-400 font-bold draw-score';
+                    awayScoreClass = 'text-gray-400 font-bold draw-score';
+                }
+
+                let valueClass, valueText, valueSort;
+                if (isMarginCategory) {
+                    valueClass = entry.margin > 0 ? 'win-score' : entry.margin < 0 ? 'text-red-600' : 'text-gray-400';
+                    valueText = `${entry.margin > 0 ? '+' : ''}${entry.margin}`;
+                    valueSort = entry.margin;
+                } else {
+                    valueClass = entry.result === 'win' ? 'win-score' : entry.result === 'loss' ? 'text-red-600' : 'text-gray-400';
+                    valueText = `${entry.totalGoals}`;
+                    valueSort = entry.totalGoals;
+                }
+
+                let penaltyInfo = '';
+                if (entry.isPso) {
+                    const psoMatch = match.AdditionalInfo.match(/pso\s+(\d+):(\d+)/i);
+                    if (psoMatch) {
+                        const homePenalties = psoMatch[1];
+                        const awayPenalties = psoMatch[2];
+                        const psoWinner = parseInt(homePenalties) > parseInt(awayPenalties) ? match.HomeTeam : match.AwayTeam;
+                        const psoLoser = psoWinner === match.HomeTeam ? match.AwayTeam : match.HomeTeam;
+                        penaltyInfo = `${psoWinner} def. ${psoLoser} (Penalty Shootout ${homePenalties}-${awayPenalties})`;
+                    }
+                }
+
+                return {
+                    dateObj: match.dateObj,
+                    date: match.dateObj.toLocaleDateString(),
+                    stage: match.CompetitionPhase || '',
+                    homeTeam: match.HomeTeam,
+                    homeScore, homeScoreClass,
+                    awayTeam: match.AwayTeam,
+                    awayScore, awayScoreClass,
+                    valueClass, valueText, valueSort,
+                    penaltyInfo
+                };
+            });
+
+            if (state.matchFinderSortConfig.key && state.matchFinderSortConfig.direction) {
+                const sortKey = state.matchFinderSortConfig.key;
+                const sortDirection = state.matchFinderSortConfig.direction;
+
+                rows.sort((a, b) => {
+                    let valueA, valueB;
+                    switch (sortKey) {
+                        case 'date': valueA = a.dateObj; valueB = b.dateObj; break;
+                        case 'stage': valueA = a.stage.toLowerCase(); valueB = b.stage.toLowerCase(); break;
+                        case 'homeTeam': valueA = a.homeTeam.toLowerCase(); valueB = b.homeTeam.toLowerCase(); break;
+                        case 'homeScore': valueA = a.homeScore; valueB = b.homeScore; break;
+                        case 'awayTeam': valueA = a.awayTeam.toLowerCase(); valueB = b.awayTeam.toLowerCase(); break;
+                        case 'awayScore': valueA = a.awayScore; valueB = b.awayScore; break;
+                        case 'value': valueA = a.valueSort; valueB = b.valueSort; break;
+                        default: return 0;
+                    }
+                    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+                    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            elements.matchFinderTableBody.innerHTML = rows.map((row, index) => {
+                const homeTeamColor = getTeamColor(row.homeTeam, state.selectedLeague);
+                const awayTeamColor = getTeamColor(row.awayTeam, state.selectedLeague);
+                const homeTeamStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
+                const awayTeamStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
+
+                const homeLogoUrl = getTeamLogoUrl(row.homeTeam, state.selectedLeague);
+                const awayLogoUrl = getTeamLogoUrl(row.awayTeam, state.selectedLeague);
+
+                const rowBackgroundClass = rows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+
+                let rowHTML = `
+                    <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
+                        <td class="text-center text-sm">${row.date}</td>
+                        <td class="text-center text-sm">${abbreviateProgression(row.stage)}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${row.homeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span style="${homeTeamStyle}; display: none;">${row.homeTeam}</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-lg" style="white-space: nowrap;"><span class="${row.homeScoreClass}">${row.homeScore}</span>:<span class="${row.awayScoreClass}">${row.awayScore}</span></td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${row.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span style="${awayTeamStyle}; display: none;">${row.awayTeam}</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-lg font-bold ${row.valueClass}">${row.valueText}</td>
+                    </tr>
+                `;
+
+                if (row.penaltyInfo) {
+                    rowHTML += `
+                        <tr class="border-b bg-gray-50">
+                            <td colspan="6" class="text-center py-2 font-semibold text-gray-700 text-sm">
+                                ${row.penaltyInfo}
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                return rowHTML;
+            }).join('');
+        }
+
+        function handleMatchFinderSort(key) {
+            let defaultDirection = 'desc';
+            if (key === 'homeTeam' || key === 'awayTeam' || key === 'stage') {
+                defaultDirection = 'asc';
+            }
+
+            if (state.matchFinderSortConfig.key === key) {
+                if (state.matchFinderSortConfig.direction === 'desc') {
+                    state.matchFinderSortConfig.direction = 'asc';
+                } else if (state.matchFinderSortConfig.direction === 'asc') {
+                    state.matchFinderSortConfig.key = null;
+                    state.matchFinderSortConfig.direction = null;
+                } else {
+                    state.matchFinderSortConfig.direction = defaultDirection;
+                }
+            } else {
+                state.matchFinderSortConfig.key = key;
+                state.matchFinderSortConfig.direction = defaultDirection;
+            }
+
+            calculateMatchFinder();
         }
 
         // Helper function to hide all Last Time sections
@@ -6311,6 +7743,10 @@
             
             elements.seasonSelect.innerHTML = options;
             elements.seasonSelect.value = state.selectedSeason;
+            if (elements.matchFinderSeasonSelect) {
+                elements.matchFinderSeasonSelect.innerHTML = options;
+                elements.matchFinderSeasonSelect.value = state.matchFinderSeason;
+            }
         }
 
         // Get available seasons
@@ -8429,6 +9865,9 @@
                 } else if (tabName === 'team-streaks' && teamStreaksTeam1Combobox) {
                     teamStreaksTeam1Combobox.selectOption(team, team);
                     lockComboboxUI('teamStreaksTeam1ComboboxContainer', 'teamStreaksTeam1ComboboxInput');
+                } else if (tabName === 'match-finder' && matchFinderTeam1Combobox) {
+                    matchFinderTeam1Combobox.selectOption(team, team);
+                    lockComboboxUI('matchFinderTeam1ComboboxContainer', 'matchFinderTeam1ComboboxInput');
                 }
             } finally {
                 applyingTeamDashboardLock = false;
