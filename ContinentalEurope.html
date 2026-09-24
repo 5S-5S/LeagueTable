@@ -479,6 +479,21 @@
                                 <span class="mr-1">⚽</span>
                                 <span class="text-sm font-medium">Penalty Shootouts Only</span>
                             </label>
+
+                            <label class="flex items-center cursor-pointer">
+                                <div id="matchFinderExtraTimeCheckbox" class="checkbox"></div>
+                                <span class="mr-1">⏱️</span>
+                                <span class="text-sm font-medium">Extra Time Only</span>
+                            </label>
+
+                            <!-- Away goals has no meaning for a single match (only a
+                                 two-legged tie can be "decided by away goals") - hidden
+                                 via JS outside Double-Legged Tie mode -->
+                            <label class="flex items-center cursor-pointer hidden" id="matchFinderAwayGoalsOnlyContainer">
+                                <div id="matchFinderAwayGoalsCheckbox" class="checkbox"></div>
+                                <span class="icon-plane mr-1"></span>
+                                <span class="text-sm font-medium">Away Goals Only</span>
+                            </label>
                         </div>
 
                         <div class="flex gap-3">
@@ -1314,6 +1329,8 @@
             matchFinderHomeFilter: true,
             matchFinderAwayFilter: true,
             matchFinderPenaltyOnlyFilter: false,
+            matchFinderExtraTimeOnlyFilter: false,
+            matchFinderAwayGoalsOnlyFilter: false,
             matchFinderExcludeQualifiers: false,
             matchFinderExcludeMainStage: false,
             matchFinderCategory: 'victories', // 'victories' | 'defeats' | 'draws' | 'totalGoals'
@@ -2657,6 +2674,8 @@
                 if (!state.matchFinderHomeFilter) params.set('home', '0');
                 if (!state.matchFinderAwayFilter) params.set('away', '0');
                 if (state.matchFinderPenaltyOnlyFilter) params.set('pso', '1');
+                if (state.matchFinderExtraTimeOnlyFilter) params.set('aet', '1');
+                if (state.matchFinderAwayGoalsOnlyFilter) params.set('ag', '1');
                 if (state.matchFinderExcludeQualifiers) params.set('exQ', '1');
                 if (state.matchFinderExcludeMainStage) params.set('exM', '1');
                 if (state.matchFinderCategory !== 'victories') params.set('cat', state.matchFinderCategory);
@@ -2808,6 +2827,7 @@
                 if (mode === 'tie' && MATCH_FINDER_MODES.some(m => m.key === mode)) {
                     state.matchFinderMode = 'tie';
                     elements.matchFinderHomeAwayContainer.classList.add('hidden');
+                    elements.matchFinderAwayGoalsOnlyContainer.classList.remove('hidden');
                     renderMatchFinderModeButtons();
                     // Team 1/2 selection above already fired its own
                     // calculateMatchFinder() while mode was still 'single'
@@ -2853,6 +2873,12 @@
                 }
                 if (params.get('pso') === '1' && !state.matchFinderPenaltyOnlyFilter) {
                     elements.matchFinderPenaltyCheckbox.click();
+                }
+                if (params.get('aet') === '1' && !state.matchFinderExtraTimeOnlyFilter) {
+                    elements.matchFinderExtraTimeCheckbox.click();
+                }
+                if (params.get('ag') === '1' && !state.matchFinderAwayGoalsOnlyFilter) {
+                    elements.matchFinderAwayGoalsCheckbox.click();
                 }
                 if (params.get('exQ') === '1' && !state.matchFinderExcludeQualifiers) {
                     elements.matchFinderExcludeQualifiersCheckbox.click();
@@ -3170,6 +3196,9 @@
             matchFinderHomeCheckbox: document.getElementById('matchFinderHomeCheckbox'),
             matchFinderAwayCheckbox: document.getElementById('matchFinderAwayCheckbox'),
             matchFinderPenaltyCheckbox: document.getElementById('matchFinderPenaltyCheckbox'),
+            matchFinderExtraTimeCheckbox: document.getElementById('matchFinderExtraTimeCheckbox'),
+            matchFinderAwayGoalsOnlyContainer: document.getElementById('matchFinderAwayGoalsOnlyContainer'),
+            matchFinderAwayGoalsCheckbox: document.getElementById('matchFinderAwayGoalsCheckbox'),
             matchFinderExcludeQualifiersCheckbox: document.getElementById('matchFinderExcludeQualifiersCheckbox'),
             matchFinderExcludeMainStageCheckbox: document.getElementById('matchFinderExcludeMainStageCheckbox'),
             matchFinderResetBtn: document.getElementById('matchFinderResetBtn'),
@@ -5466,6 +5495,16 @@
                 elements.matchFinderPenaltyCheckbox.className = `checkbox ${state.matchFinderPenaltyOnlyFilter ? 'checked' : ''}`;
                 calculateMatchFinder();
             });
+            elements.matchFinderExtraTimeCheckbox.addEventListener('click', () => {
+                state.matchFinderExtraTimeOnlyFilter = !state.matchFinderExtraTimeOnlyFilter;
+                elements.matchFinderExtraTimeCheckbox.className = `checkbox ${state.matchFinderExtraTimeOnlyFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayGoalsCheckbox.addEventListener('click', () => {
+                state.matchFinderAwayGoalsOnlyFilter = !state.matchFinderAwayGoalsOnlyFilter;
+                elements.matchFinderAwayGoalsCheckbox.className = `checkbox ${state.matchFinderAwayGoalsOnlyFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
             elements.matchFinderExcludeQualifiersCheckbox.addEventListener('click', () => {
                 state.matchFinderExcludeQualifiers = !state.matchFinderExcludeQualifiers;
                 elements.matchFinderExcludeQualifiersCheckbox.className = `checkbox ${state.matchFinderExcludeQualifiers ? 'checked' : ''}`;
@@ -5490,11 +5529,15 @@
                 const button = e.target.closest('.league-button');
                 if (button && button.dataset.mode !== state.matchFinderMode) {
                     state.matchFinderMode = button.dataset.mode;
-                    // Home/Away has no meaning for a two-legged tie (no single home venue)
+                    // Home/Away has no meaning for a two-legged tie (no single home venue);
+                    // Away Goals Only is the opposite - it has no meaning for a single match
+                    // (only a two-legged tie can be "decided by away goals").
                     if (state.matchFinderMode === 'tie') {
                         elements.matchFinderHomeAwayContainer.classList.add('hidden');
+                        elements.matchFinderAwayGoalsOnlyContainer.classList.remove('hidden');
                     } else {
                         elements.matchFinderHomeAwayContainer.classList.remove('hidden');
+                        elements.matchFinderAwayGoalsOnlyContainer.classList.add('hidden');
                     }
                     renderMatchFinderModeButtons();
                     renderMatchFinderCategoryButtons();
@@ -6500,6 +6543,8 @@
             state.matchFinderHomeFilter = true;
             state.matchFinderAwayFilter = true;
             state.matchFinderPenaltyOnlyFilter = false;
+            state.matchFinderExtraTimeOnlyFilter = false;
+            state.matchFinderAwayGoalsOnlyFilter = false;
             state.matchFinderExcludeQualifiers = false;
             state.matchFinderExcludeMainStage = false;
             state.matchFinderCategory = 'victories';
@@ -6518,9 +6563,12 @@
             elements.matchFinderHomeCheckbox.className = 'checkbox checked';
             elements.matchFinderAwayCheckbox.className = 'checkbox checked';
             elements.matchFinderPenaltyCheckbox.className = 'checkbox';
+            elements.matchFinderExtraTimeCheckbox.className = 'checkbox';
+            elements.matchFinderAwayGoalsCheckbox.className = 'checkbox';
             elements.matchFinderExcludeQualifiersCheckbox.className = 'checkbox';
             elements.matchFinderExcludeMainStageCheckbox.className = 'checkbox';
             elements.matchFinderHomeAwayContainer.classList.remove('hidden');
+            elements.matchFinderAwayGoalsOnlyContainer.classList.add('hidden');
             renderMatchFinderModeButtons();
             renderMatchFinderCategoryButtons();
 
@@ -6755,6 +6803,12 @@
             if (state.matchFinderPenaltyOnlyFilter) {
                 matches = matches.filter(row => row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('pso'));
             }
+            if (state.matchFinderExtraTimeOnlyFilter) {
+                matches = matches.filter(row => row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('aet'));
+            }
+            // Away Goals Only has no meaning for a single match (only a
+            // two-legged tie can be "decided by away goals") - its
+            // checkbox is hidden outside tie mode, so no filter here.
 
             // Home/Away, relative to Team 1's side
             if (state.matchFinderHomeFilter && !state.matchFinderAwayFilter) {
@@ -6900,6 +6954,12 @@
             }
             if (state.matchFinderPenaltyOnlyFilter) {
                 ties = ties.filter(t => !!t.breakdown.penalties);
+            }
+            if (state.matchFinderExtraTimeOnlyFilter) {
+                ties = ties.filter(t => !!t.breakdown.hasAet);
+            }
+            if (state.matchFinderAwayGoalsOnlyFilter) {
+                ties = ties.filter(t => !!t.breakdown.decidedByAwayGoals);
             }
 
             // Classify each tie relative to Team 1 - computeTieBreakdown's
