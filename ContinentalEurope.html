@@ -535,7 +535,6 @@
                          narrow controls, so it reads as consistent with the rest of
                          the filter panel instead of a cramped one-off mini-form. -->
                     <div id="matchFinderScorelineContainer" class="mb-8 collapsible-control hidden">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Scoreline:</label>
                         <div class="grid grid-cols-2 gap-4" id="matchFinderScorelineSingleControls">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Home Score</label>
@@ -1160,6 +1159,11 @@
                                 <!-- H2H rows will be populated -->
                             </tbody>
                         </table>
+                        <div id="h2hPaginationControls" class="flex items-center justify-center gap-4 py-4 hidden">
+                            <button id="h2hPrevPageBtn" class="btn btn-secondary">Previous</button>
+                            <span id="h2hPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                            <button id="h2hNextPageBtn" class="btn btn-secondary">Next</button>
+                        </div>
                     </div>
                 </div>
 
@@ -1229,6 +1233,11 @@
                                     <!-- Rows will be populated -->
                                 </tbody>
                             </table>
+                            <div id="matchHistoryPaginationControls" class="flex items-center justify-center gap-4 py-4 hidden">
+                                <button id="matchHistoryPrevPageBtn" class="btn btn-secondary">Previous</button>
+                                <span id="matchHistoryPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                                <button id="matchHistoryNextPageBtn" class="btn btn-secondary">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1268,6 +1277,7 @@
             matchHistoryPenaltyFilter: false,
             recentMatchesCount: 'All',
             matchHistorySortConfig: { key: null, direction: null },
+            matchHistoryPage: 1,
 
             // Match History's data now comes from the team-history API
             // instead of the full in-memory gist dataset (see
@@ -1358,7 +1368,8 @@
             
             // H2H sort config
             h2hSortConfig: { key: 'date', direction: 'desc' },
-            
+            h2hPage: 1,
+
             // Last Time When state
             lastTimeTeam1: '',
             lastTimeTeam2: '',
@@ -3229,6 +3240,10 @@
             matchHistoryTableTitle: document.getElementById('matchHistoryTableTitle'),
             matchHistoryTableHeader: document.getElementById('matchHistoryTableHeader'),
             matchHistoryTableBody: document.getElementById('matchHistoryTableBody'),
+            matchHistoryPaginationControls: document.getElementById('matchHistoryPaginationControls'),
+            matchHistoryPrevPageBtn: document.getElementById('matchHistoryPrevPageBtn'),
+            matchHistoryPageInfo: document.getElementById('matchHistoryPageInfo'),
+            matchHistoryNextPageBtn: document.getElementById('matchHistoryNextPageBtn'),
             recentMatchesSelect: document.getElementById('recentMatchesSelect'),
             matchHistoryVisualizations: document.getElementById('matchHistoryVisualizations'),
             h2hSection: document.getElementById('h2hSection'),
@@ -3243,6 +3258,10 @@
             h2hTableTitle: document.getElementById('h2hTableTitle'),
             h2hTableHeader: document.getElementById('h2hTableHeader'),
             h2hTableBody: document.getElementById('h2hTableBody'),
+            h2hPaginationControls: document.getElementById('h2hPaginationControls'),
+            h2hPrevPageBtn: document.getElementById('h2hPrevPageBtn'),
+            h2hPageInfo: document.getElementById('h2hPageInfo'),
+            h2hNextPageBtn: document.getElementById('h2hNextPageBtn'),
             lastTimeLeagueButtons: document.getElementById('lastTimeLeagueButtons'),
             lastTimeDayOfWeekSelect: document.getElementById('lastTimeDayOfWeekSelect'),
             lastTimeLocationSelect: document.getElementById('lastTimeLocationSelect'),
@@ -5915,7 +5934,24 @@
                     updateH2HMatchesTable(h2hResult);
                 }
             });
-            
+
+            elements.matchHistoryPrevPageBtn.addEventListener('click', () => {
+                state.matchHistoryPage -= 1;
+                updateTable(true);
+            });
+            elements.matchHistoryNextPageBtn.addEventListener('click', () => {
+                state.matchHistoryPage += 1;
+                updateTable(true);
+            });
+            elements.h2hPrevPageBtn.addEventListener('click', () => {
+                state.h2hPage -= 1;
+                updateTable(true);
+            });
+            elements.h2hNextPageBtn.addEventListener('click', () => {
+                state.h2hPage += 1;
+                updateTable(true);
+            });
+
             elements.matchHistoryStageSelect.addEventListener('change', (e) => {
                 console.log('Match History Stage dropdown changed to:', e.target.value);
                 state.matchHistoryStage = e.target.value;
@@ -10188,6 +10224,63 @@
             elements.matchHistoryVisualizations.innerHTML = visualizationHTML;
         }
 
+        // Shared page size for Match History and Head-to-Head Match History -
+        // a long-tenured club's full match history (or, on mobile, even a
+        // more modest few hundred rows) is expensive to build as DOM in one
+        // shot, the same issue Match Finder's results table had before it
+        // was paginated. These two tables get the same treatment for
+        // consistency, even though Head-to-Head's row counts are usually
+        // much smaller on their own.
+        const HISTORY_PAGE_SIZE = 20;
+
+        // Slices an already-sorted array down to the current Match History
+        // page and updates the Previous/Next controls to match. The caller
+        // only ever builds DOM for the returned subset, not the full result
+        // set.
+        function paginateMatchHistoryResults(items) {
+            const totalResults = items.length;
+            const totalPages = Math.max(1, Math.ceil(totalResults / HISTORY_PAGE_SIZE));
+            if (state.matchHistoryPage > totalPages) state.matchHistoryPage = totalPages;
+            if (state.matchHistoryPage < 1) state.matchHistoryPage = 1;
+
+            const pageStart = (state.matchHistoryPage - 1) * HISTORY_PAGE_SIZE;
+            const pageItems = items.slice(pageStart, pageStart + HISTORY_PAGE_SIZE);
+
+            if (totalPages > 1) {
+                elements.matchHistoryPaginationControls.classList.remove('hidden');
+                elements.matchHistoryPageInfo.textContent = `Page ${state.matchHistoryPage} of ${totalPages}`;
+                elements.matchHistoryPrevPageBtn.disabled = state.matchHistoryPage <= 1;
+                elements.matchHistoryNextPageBtn.disabled = state.matchHistoryPage >= totalPages;
+            } else {
+                elements.matchHistoryPaginationControls.classList.add('hidden');
+            }
+
+            return pageItems;
+        }
+
+        // Same as paginateMatchHistoryResults() but for the Head-to-Head
+        // Match History table's own page state/controls.
+        function paginateH2HResults(items) {
+            const totalResults = items.length;
+            const totalPages = Math.max(1, Math.ceil(totalResults / HISTORY_PAGE_SIZE));
+            if (state.h2hPage > totalPages) state.h2hPage = totalPages;
+            if (state.h2hPage < 1) state.h2hPage = 1;
+
+            const pageStart = (state.h2hPage - 1) * HISTORY_PAGE_SIZE;
+            const pageItems = items.slice(pageStart, pageStart + HISTORY_PAGE_SIZE);
+
+            if (totalPages > 1) {
+                elements.h2hPaginationControls.classList.remove('hidden');
+                elements.h2hPageInfo.textContent = `Page ${state.h2hPage} of ${totalPages}`;
+                elements.h2hPrevPageBtn.disabled = state.h2hPage <= 1;
+                elements.h2hNextPageBtn.disabled = state.h2hPage >= totalPages;
+            } else {
+                elements.h2hPaginationControls.classList.add('hidden');
+            }
+
+            return pageItems;
+        }
+
         function updateMatchHistoryDisplay(matchHistoryResult) {
             if (matchHistoryResult && state.selectedTeam1 && !state.selectedTeam2) {
                 elements.matchHistorySection.classList.remove('hidden');
@@ -10377,11 +10470,12 @@
             }
 
             // Create table body
-            const tableHTML = matchesData.map((match, index) => {
+            const pageMatchesData = paginateMatchHistoryResults(matchesData);
+            const tableHTML = pageMatchesData.map((match, index) => {
                 // Get team logos
                 const homeLogoUrl = getTeamLogoUrl(match.homeTeam, state.selectedLeague);
                 const awayLogoUrl = getTeamLogoUrl(match.awayTeam, state.selectedLeague);
-                
+
                 // Get winner logo for result column (if not a draw) - same as H2H table
                 const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
                 
@@ -10405,7 +10499,7 @@
                 // just far more noticeable now that dark mode's own
                 // --bg-white/--bg-gray-50 are an obvious #222 vs #333
                 // instead of barely-different near-whites.
-                const rowBackgroundClass = matchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = pageMatchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
                 let rowHTML = `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
@@ -10479,8 +10573,16 @@
             updateTable();
         }
 
-        // Update table and all related UI
-        function updateTable() {
+        // Update table and all related UI. preservePage keeps the current
+        // Match History/H2H pagination position - every other call site
+        // (filter/sort/team changes) omits it, resetting both back to page 1
+        // since the underlying result set may have changed; only the
+        // Previous/Next pagination buttons pass true.
+        function updateTable(preservePage) {
+            if (!preservePage) {
+                state.matchHistoryPage = 1;
+                state.h2hPage = 1;
+            }
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
             const matchHistoryResult = calculateMatchHistory();
@@ -11995,14 +12097,15 @@
             `).join('');
 
             // Update table body
-            const tableHTML = matchesData.map((match, index) => {
+            const pageMatchesData = paginateH2HResults(matchesData);
+            const tableHTML = pageMatchesData.map((match, index) => {
                 const isTeam1Home = match.homeTeam === state.selectedTeam1;
                 const isTeam1Away = match.awayTeam === state.selectedTeam1;
-                
+
                 // Get team logos
                 const homeLogoUrl = getTeamLogoUrl(match.homeTeam, state.selectedLeague);
                 const awayLogoUrl = getTeamLogoUrl(match.awayTeam, state.selectedLeague);
-                
+
                 // Get winner logo for result column (if not a draw)
                 const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
 
@@ -12012,7 +12115,7 @@
                 // just far more noticeable now that dark mode's own
                 // --bg-white/--bg-gray-50 are an obvious #222 vs #333
                 // instead of barely-different near-whites.
-                const rowBackgroundClass = matchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = pageMatchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
                 let rowHTML = `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
