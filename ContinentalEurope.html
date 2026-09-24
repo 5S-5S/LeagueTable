@@ -2321,24 +2321,49 @@
             return _teamColorsCache;
         }
 
-        // Get team color for H2H visualization
-        function getTeamColor(teamName, league) {
+        // Continental's "champions-league" list alone is 480 teams, and a
+        // lookup for it also falls back through 5 more leagues (up to ~810
+        // entries) - getTeamColor()/getTeamLogoNumber()/getTeamCountry()
+        // used to .find() (linear scan) through that on every single call,
+        // and renderOptions() calls one of them once per dropdown option -
+        // easily thousands of comparisons to populate one combobox. Built
+        // once, memoized, keyed by "league::teamName" so a repeat lookup is
+        // an O(1) Map hit instead of a re-scan. First occurrence within a
+        // league wins, matching .find()'s own behavior.
+        let _teamLookupIndexCache = null;
+        function getTeamLookupIndex() {
+            if (_teamLookupIndexCache) return _teamLookupIndexCache;
             const teamColors = getTeamColors();
-            
-            // For Champions League, search across all leagues
+            _teamLookupIndexCache = new Map();
+            for (const league of Object.keys(teamColors)) {
+                teamColors[league].forEach(entry => {
+                    const key = `${league}::${entry[0]}`;
+                    if (!_teamLookupIndexCache.has(key)) _teamLookupIndexCache.set(key, entry);
+                });
+            }
+            return _teamLookupIndexCache;
+        }
+
+        // Shared by getTeamColor()/getTeamLogoNumber()/getTeamCountry() -
+        // same "champions-league searches every league" fallback order
+        // they each used to implement separately via .find().
+        function findTeamEntry(teamName, league) {
+            const index = getTeamLookupIndex();
             if (league === 'champions-league') {
                 const allLeagues = ['champions-league', 'premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'];
                 for (const searchLeague of allLeagues) {
-                    const leagueColors = teamColors[searchLeague] || [];
-                    const teamColorEntry = leagueColors.find(([name, color]) => name === teamName);
-                    if (teamColorEntry) return teamColorEntry[1];
+                    const entry = index.get(`${searchLeague}::${teamName}`);
+                    if (entry) return entry;
                 }
                 return null;
             }
-            
-            const leagueColors = teamColors[league] || [];
-            const teamColorEntry = leagueColors.find(([name, color]) => name === teamName);
-            return teamColorEntry ? teamColorEntry[1] : null;
+            return index.get(`${league}::${teamName}`) || null;
+        }
+
+        // Get team color for H2H visualization
+        function getTeamColor(teamName, league) {
+            const entry = findTeamEntry(teamName, league);
+            return entry ? entry[1] : null;
         }
 
         // WCAG relative luminance / contrast ratio, and a hex<->rgb pair -
@@ -2426,22 +2451,8 @@
 
         // Get team logo number
         function getTeamLogoNumber(teamName, league) {
-            const teamColors = getTeamColors();
-            
-            // For Champions League, search across all leagues
-            if (league === 'champions-league') {
-                const allLeagues = ['champions-league', 'premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'];
-                for (const searchLeague of allLeagues) {
-                    const leagueColors = teamColors[searchLeague] || [];
-                    const teamColorEntry = leagueColors.find(([name, color, logoNum]) => name === teamName);
-                    if (teamColorEntry) return teamColorEntry[2];
-                }
-                return null;
-            }
-            
-            const leagueColors = teamColors[league] || [];
-            const teamColorEntry = leagueColors.find(([name, color, logoNum]) => name === teamName);
-            return teamColorEntry ? teamColorEntry[2] : null;
+            const entry = findTeamEntry(teamName, league);
+            return entry ? entry[2] : null;
         }
 
         // Get team logo URL
@@ -2454,22 +2465,8 @@
         // Lets a team's performance be compared against all teams from
         // another country, not just a single club/league.
         function getTeamCountry(teamName, league) {
-            const teamColors = getTeamColors();
-
-            // For Champions League, search across all leagues
-            if (league === 'champions-league') {
-                const allLeagues = ['champions-league', 'premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'];
-                for (const searchLeague of allLeagues) {
-                    const leagueColors = teamColors[searchLeague] || [];
-                    const teamColorEntry = leagueColors.find(([name]) => name === teamName);
-                    if (teamColorEntry) return teamColorEntry[3] || null;
-                }
-                return null;
-            }
-
-            const leagueColors = teamColors[league] || [];
-            const teamColorEntry = leagueColors.find(([name]) => name === teamName);
-            return teamColorEntry ? (teamColorEntry[3] || null) : null;
+            const entry = findTeamEntry(teamName, league);
+            return entry ? (entry[3] || null) : null;
         }
 
         // Team 2 can be a specific team, OR a 'COUNTRY:<name>' sentinel meaning

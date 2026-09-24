@@ -2147,13 +2147,37 @@
             return _teamColorsCache;
         }
 
+        // Each domestic league has 58-77 teams and getTeamColor()/
+        // getTeamLogoNumber() used to .find() (linear scan) through that on
+        // every single call - renderOptions() calls one of them once per
+        // dropdown option, so populating one combobox re-scanned the whole
+        // league's list once per team in it. Built once, memoized, keyed by
+        // "league::teamName" so a repeat lookup is an O(1) Map hit instead
+        // of a re-scan. First occurrence within a league wins, matching
+        // .find()'s own behavior.
+        let _teamLookupIndexCache = null;
+        function getTeamLookupIndex() {
+            if (_teamLookupIndexCache) return _teamLookupIndexCache;
+            const teamColors = getTeamColors();
+            _teamLookupIndexCache = new Map();
+            for (const league of Object.keys(teamColors)) {
+                teamColors[league].forEach(entry => {
+                    const key = `${league}::${entry[0]}`;
+                    if (!_teamLookupIndexCache.has(key)) _teamLookupIndexCache.set(key, entry);
+                });
+            }
+            return _teamLookupIndexCache;
+        }
+
+        // Shared by getTeamColor()/getTeamLogoNumber()
+        function findTeamEntry(teamName, league) {
+            return getTeamLookupIndex().get(`${league}::${teamName}`) || null;
+        }
+
         // Get team color for H2H visualization
         function getTeamColor(teamName, league) {
-            const teamColors = getTeamColors();
-            const leagueColors = teamColors[league] || [];
-
-            const teamColorEntry = leagueColors.find(([name, color]) => name === teamName);
-            return teamColorEntry ? teamColorEntry[1] : null;
+            const entry = findTeamEntry(teamName, league);
+            return entry ? entry[1] : null;
         }
 
         // WCAG relative luminance / contrast ratio, and a hex<->rgb pair -
@@ -2241,11 +2265,8 @@
 
         // Get team logo number
         function getTeamLogoNumber(teamName, league) {
-            const teamColors = getTeamColors();
-            const leagueColors = teamColors[league] || [];
-            
-            const teamColorEntry = leagueColors.find(([name, color, logoNum]) => name === teamName);
-            return teamColorEntry ? teamColorEntry[2] : null;
+            const entry = findTeamEntry(teamName, league);
+            return entry ? entry[2] : null;
         }
 
         // Get team logo URL
