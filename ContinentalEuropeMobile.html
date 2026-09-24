@@ -6746,26 +6746,46 @@
                 }
             }
 
-            // Group into ties. Season is part of the key because the same
-            // two teams can meet in the same round in different years -
-            // without a season component those would wrongly merge into
-            // one fake multi-leg "tie".
-            const tieGroups = {};
+            // Group into (round, opponent) buckets - NOT by season. A
+            // single tie's two legs can straddle a naive calendar-season
+            // boundary: 2019-20 UEFA competitions' Round of 16 was
+            // suspended by COVID between legs - Chelsea 0-3 Bayern on
+            // 2/25/2020, then the second leg on 8/8/2020, five and a half
+            // months later. europeanSeasonStartYear() (month >= July = new
+            // season) puts those two dates in different inferred seasons,
+            // which wrongly split one real tie into two fake single-leg
+            // ones when season was part of the grouping key.
+            const roundGroups = {};
             tieEligible.forEach(row => {
-                const seasonKey = europeanSeasonStartYear(row.dateObj);
                 const pairKey = [row.HomeTeam, row.AwayTeam].sort().join(' vs ');
-                const key = `${seasonKey}::${row.CompetitionPhase}::${pairKey}`;
-                if (!tieGroups[key]) tieGroups[key] = [];
-                tieGroups[key].push(row);
+                const key = `${row.CompetitionPhase}::${pairKey}`;
+                if (!roundGroups[key]) roundGroups[key] = [];
+                roundGroups[key].push(row);
             });
 
-            let ties = Object.values(tieGroups)
-                .map(legMatches => {
-                    const sortedLegs = [...legMatches].sort((a, b) => a.dateObj - b.dateObj);
-                    const breakdown = computeTieBreakdown(sortedLegs);
-                    return breakdown ? { legMatches: sortedLegs, breakdown, lastLegDate: sortedLegs[sortedLegs.length - 1].dateObj } : null;
-                })
-                .filter(Boolean);
+            // Within each (round, opponent) bucket, pair chronologically
+            // adjacent matches into ties instead. Two legs of a real tie
+            // are always close together in time, even across a mid-tie
+            // postponement like COVID's ~5.5-month gap - separate years'
+            // meetings between the same two teams in the same round are
+            // always much further apart (the next season's edition, about
+            // a year later), so a generous gap cutoff tells them apart
+            // reliably without depending on a calendar-season boundary.
+            const MAX_TIE_GAP_DAYS = 300;
+            let ties = [];
+            Object.values(roundGroups).forEach(matches => {
+                const sorted = [...matches].sort((a, b) => a.dateObj - b.dateObj);
+                let i = 0;
+                while (i < sorted.length) {
+                    const gapDays = (i + 1 < sorted.length)
+                        ? (sorted[i + 1].dateObj - sorted[i].dateObj) / (1000 * 60 * 60 * 24)
+                        : Infinity;
+                    const legMatches = gapDays <= MAX_TIE_GAP_DAYS ? [sorted[i], sorted[i + 1]] : [sorted[i]];
+                    const breakdown = computeTieBreakdown(legMatches);
+                    if (breakdown) ties.push({ legMatches, breakdown, lastLegDate: legMatches[legMatches.length - 1].dateObj });
+                    i += legMatches.length;
+                }
+            });
 
             // Date range / day-of-week / Penalty-Shootouts-Only, applied to
             // the tie as a whole (keyed off the later leg's date) rather
