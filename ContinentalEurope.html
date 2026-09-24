@@ -1021,6 +1021,7 @@
                             <option value="winless">Winless Streak (Draws + Losses)</option>
                             <option value="losing">Losing Streak (Losses Only)</option>
                             <option value="clean-sheet">Clean Sheet Streak (0 Goals Allowed)</option>
+                            <option value="goals-conceded">Goals Conceded Streak (1+ Goals Allowed)</option>
                             <option value="scoring">Scoring Streak (1+ Goals Scored)</option>
                             <option value="no-score">Failed to Score Streak (0 Goals Scored)</option>
                         </select>
@@ -3981,6 +3982,8 @@
                     return result === 'loss';
                 case 'clean-sheet':
                     return opponentScore === 0;
+                case 'goals-conceded':
+                    return opponentScore >= 1;
                 case 'scoring':
                     return teamScore >= 1;
                 case 'no-score':
@@ -4172,6 +4175,8 @@
                     return result === 'draw' || result === 'win'; // Non-loss
                 case 'clean-sheet':
                     return opponentScore >= 1; // Conceded
+                case 'goals-conceded':
+                    return opponentScore === 0; // Clean sheet
                 case 'scoring':
                     return teamScore === 0; // Failed to score
                 case 'no-score':
@@ -4190,6 +4195,7 @@
                 case 'winless': return 'Win';
                 case 'losing': return 'Non-Loss (Draw/Win)';
                 case 'clean-sheet': return 'Conceded a Goal';
+                case 'goals-conceded': return 'Clean Sheet';
                 case 'scoring': return 'Failed to Score';
                 case 'no-score': return 'Scored a Goal';
                 default: return 'Opposite';
@@ -4205,6 +4211,7 @@
                 case 'winless': return 'Winless Streak';
                 case 'losing': return 'Losing Streak';
                 case 'clean-sheet': return 'Clean Sheet Streak';
+                case 'goals-conceded': return 'Goals Conceded Streak';
                 case 'scoring': return 'Scoring Streak';
                 case 'no-score': return 'Failed to Score Streak';
                 default: return 'Streak';
