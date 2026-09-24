@@ -2849,12 +2849,28 @@
         // Update Team Streaks team dropdowns
         function updateTeamStreaksSelects() {
             const leagueTeams = getLeagueTeams(state.selectedLeague);
-            
+
             const teamOptions = ['<option value="">Select Team</option>']
                 .concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`))
                 .join('');
-            
+
             elements.teamStreaksTeam1Select.innerHTML = teamOptions;
+
+            // Keep the visible Combobox widget in sync - it's a separate
+            // rendering layer from the native <select> above (which exists
+            // only to drive Combobox.setValue()/dispatchEvent('change')),
+            // so refreshing one doesn't refresh the other. Without this, the
+            // Team Streaks tab's own league buttons (distinct from the main
+            // League Tables league selector) updated the hidden <select>
+            // but left the visible dropdown showing the previous league's
+            // teams.
+            if (teamStreaksTeam1Combobox) {
+                teamStreaksTeam1Combobox.setOptions([
+                    { value: '', text: 'Select Team 1' },
+                    ...leagueTeams.map(team => ({ value: team, text: team }))
+                ]);
+            }
+
             updateTeamStreaksTeam2Options();
         }
 
@@ -2865,6 +2881,8 @@
             // Reset Team Streaks state when changing leagues
             elements.teamStreaksTeam1Select.value = '';
             elements.teamStreaksTeam2Select.value = '';
+            if (teamStreaksTeam1Combobox) teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
+            if (teamStreaksTeam2Combobox) teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
             elements.teamStreaksStatusSelect.value = 'active';
             elements.teamStreaksLocationSelect.value = 'both';
             elements.teamStreaksTypeSelect.value = 'winning';
@@ -2924,7 +2942,8 @@
             let team2Options = ['<option value="">Select Team 2</option>'];
 
             // Add Big 6 option if Team 1 is selected and we're in Premier League
-            if (elements.teamStreaksTeam1Select.value && state.selectedLeague === 'premier-league') {
+            const showBig6 = elements.teamStreaksTeam1Select.value && state.selectedLeague === 'premier-league';
+            if (showBig6) {
                 team2Options.push('<option value="BIG_6">Big 6</option>');
             }
 
@@ -2936,6 +2955,17 @@
             // Restore the current selection if it's still valid
             if (currentTeam2) {
                 elements.teamStreaksTeam2Select.value = currentTeam2;
+            }
+
+            // Keep the visible Combobox widget in sync too (see comment in
+            // updateTeamStreaksSelects()).
+            if (teamStreaksTeam2Combobox) {
+                let team2ComboOptions = [{ value: '', text: 'Select Team 2' }];
+                if (showBig6) {
+                    team2ComboOptions.push({ value: 'BIG_6', text: 'Big 6' });
+                }
+                team2ComboOptions = team2ComboOptions.concat(leagueTeams.map(team => ({ value: team, text: team })));
+                teamStreaksTeam2Combobox.setOptions(team2ComboOptions);
             }
         }
 

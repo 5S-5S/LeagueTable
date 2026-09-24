@@ -3347,14 +3347,29 @@
         // Update Team Streaks team dropdowns
         function updateTeamStreaksSelects() {
             const leagueTeams = getLeagueTeams(state.selectedLeague);
-            
+
             const teamOptions = ['<option value="">Select Team</option>']
                 .concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`))
                 .join('');
-            
+
             elements.teamStreaksTeam1Select.innerHTML = teamOptions;
-            elements.teamStreaksTeam2Select.innerHTML = '<option value="">Select Team 2 (Optional)</option>' + 
-                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+
+            // Keep the visible Combobox widgets in sync - they're a separate
+            // rendering layer from the native <select>s above (which exist
+            // only to drive Combobox.setValue()/dispatchEvent('change')), so
+            // refreshing the <select>s doesn't refresh them. Without this,
+            // the Team Streaks tab's own league buttons (distinct from the
+            // main League Tables league selector) updated the hidden
+            // <select>s but left the visible dropdowns showing the previous
+            // league's teams. Team 2's combobox also needs the country
+            // options refreshTeam2CountryOptions() adds, not just plain teams.
+            if (teamStreaksTeam1Combobox) {
+                teamStreaksTeam1Combobox.setOptions([
+                    { value: '', text: 'Select Team 1' },
+                    ...leagueTeams.map(team => ({ value: team, text: team }))
+                ]);
+            }
+            refreshTeam2CountryOptions();
         }
 
         // Handle Team Streaks league change
@@ -3364,6 +3379,8 @@
             // Reset Team Streaks state when changing leagues
             elements.teamStreaksTeam1Select.value = '';
             elements.teamStreaksTeam2Select.value = '';
+            if (teamStreaksTeam1Combobox) teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
+            if (teamStreaksTeam2Combobox) teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
             elements.teamStreaksStageSelect.value = '';
             elements.teamStreaksStatusSelect.value = 'active';
             elements.teamStreaksLocationSelect.value = 'both';
