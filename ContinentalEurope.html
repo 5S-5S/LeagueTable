@@ -6987,12 +6987,37 @@
                 }
 
                 // Small annotation under the aggregate value when the plain
-                // scoreline alone wouldn't explain the outcome - same idea as
-                // single-match mode's penalty-shootout info row.
+                // scoreline alone wouldn't explain the outcome. Penalties get
+                // their own full explanatory row instead (below, matching
+                // Match History/H2H Match History's format exactly), since
+                // that's a direct parallel to a single match's own shootout
+                // row - away goals has no such parallel (it only applies to
+                // a two-leg aggregate, never a single match), so it stays a
+                // compact annotation here.
                 let annotation = '';
                 if (t.breakdown.decidedByAwayGoals) annotation = 'away goals';
-                else if (t.breakdown.penalties) annotation = 'pens';
-                else if (t.breakdown.hasAet) annotation = 'aet';
+                else if (t.breakdown.hasAet && !t.breakdown.penalties) annotation = 'aet';
+
+                // Same PSO row Match History/H2H Match History already show
+                // for a single shootout-decided match - find whichever leg
+                // actually went to penalties (only one leg of a tie ever
+                // can) and parse it exactly like updateMatchFinderTable()'s
+                // single-match penaltyInfo does, including the home-away
+                // (not winner-loser) score order that format uses.
+                let penaltyInfo = '';
+                if (t.breakdown.penalties) {
+                    const psoLeg = t.legMatches.find(leg => leg.AdditionalInfo && leg.AdditionalInfo.toLowerCase().includes('pso'));
+                    if (psoLeg) {
+                        const psoMatch = psoLeg.AdditionalInfo.match(/pso\s+(\d+):(\d+)/i);
+                        if (psoMatch) {
+                            const homePenalties = psoMatch[1];
+                            const awayPenalties = psoMatch[2];
+                            const psoWinner = parseInt(homePenalties) > parseInt(awayPenalties) ? psoLeg.HomeTeam : psoLeg.AwayTeam;
+                            const psoLoser = psoWinner === psoLeg.HomeTeam ? psoLeg.AwayTeam : psoLeg.HomeTeam;
+                            penaltyInfo = `${psoWinner} def. ${psoLoser} (Penalty Shootout ${homePenalties}-${awayPenalties})`;
+                        }
+                    }
+                }
 
                 return {
                     dateObj: firstLeg.dateObj,
@@ -7002,7 +7027,7 @@
                     awayTeam: firstLeg.AwayTeam,
                     homeScore: parseInt(firstLeg.FTHG) || 0,
                     awayScore: parseInt(firstLeg.FTAG) || 0,
-                    valueClass, valueText, valueSort, annotation,
+                    valueClass, valueText, valueSort, annotation, penaltyInfo,
                     tie: t
                 };
             });
@@ -7033,7 +7058,7 @@
                 const legs = row.tie.legMatches;
                 const rowBackgroundClass = tieRows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
-                return legs.map((leg, legIndex) => {
+                let rowsHTML = legs.map((leg, legIndex) => {
                     const homeTeamColor = getTeamColor(leg.HomeTeam, state.selectedLeague);
                     const awayTeamColor = getTeamColor(leg.AwayTeam, state.selectedLeague);
                     const homeTeamClass = leg.HomeTeam === state.matchFinderTeam1 ? 'team1-highlight' :
@@ -7089,6 +7114,18 @@
                         </tr>
                     `;
                 }).join('');
+
+                if (row.penaltyInfo) {
+                    rowsHTML += `
+                        <tr class="border-b bg-gray-50">
+                            <td colspan="7" class="text-center py-2 font-semibold text-gray-700 text-sm">
+                                ${row.penaltyInfo}
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                return rowsHTML;
             }).join('');
         }
 
