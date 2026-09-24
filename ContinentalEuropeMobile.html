@@ -6393,17 +6393,19 @@
             { key: 'victories', label: 'Biggest Victories' },
             { key: 'defeats', label: 'Biggest Defeats' },
             { key: 'draws', label: 'Highest-Scoring Draws' },
-            { key: 'totalGoals', label: 'Most Total Goals' }
+            { key: 'totalGoals', label: 'Most Total Goals' },
+            { key: 'leastGoals', label: 'Least Total Goals' }
         ];
 
-        // Double-Legged Tie mode display labels for the same 4 category
+        // Double-Legged Tie mode display labels for the same 5 category
         // keys - underlying classification logic is identical, only the
         // label changes (see calculateMatchFinderTieMode).
         const MATCH_FINDER_TIE_CATEGORY_LABELS = {
             victories: 'Biggest Aggregate Victories',
             defeats: 'Biggest Aggregate Defeats',
             draws: 'Highest-Scoring Aggregate Ties',
-            totalGoals: 'Most Total Aggregate Goals'
+            totalGoals: 'Most Total Aggregate Goals',
+            leastGoals: 'Fewest Aggregate Goals'
         };
 
         const MATCH_FINDER_MODES = [
@@ -6662,6 +6664,8 @@
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
             } else if (state.matchFinderCategory === 'totalGoals') {
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'leastGoals') {
+                classified.sort((a, b) => a.totalGoals - b.totalGoals || b.match.dateObj - a.match.dateObj);
             }
 
             updateMatchFinderTable(classified);
@@ -6908,6 +6912,8 @@
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'totalGoals') {
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'leastGoals') {
+                classified.sort((a, b) => a.totalGoals - b.totalGoals || b.lastLegDate - a.lastLegDate);
             }
 
             updateMatchFinderTieResults(classified);

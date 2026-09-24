@@ -6131,7 +6131,8 @@
             { key: 'victories', label: 'Biggest Victories' },
             { key: 'defeats', label: 'Biggest Defeats' },
             { key: 'draws', label: 'Highest-Scoring Draws' },
-            { key: 'totalGoals', label: 'Most Total Goals' }
+            { key: 'totalGoals', label: 'Most Total Goals' },
+            { key: 'leastGoals', label: 'Least Total Goals' }
         ];
 
         function renderMatchFinderCategoryButtons() {
@@ -6343,6 +6344,8 @@
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
             } else if (state.matchFinderCategory === 'totalGoals') {
                 classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'leastGoals') {
+                classified.sort((a, b) => a.totalGoals - b.totalGoals || b.match.dateObj - a.match.dateObj);
             }
 
             updateMatchFinderTable(classified);
