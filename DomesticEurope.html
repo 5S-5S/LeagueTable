@@ -10442,7 +10442,43 @@
                     localStorage.setItem('theme', 'light');
                     handlePositionColors();
                 }
+                refreshTeamColorsForTheme();
             });
+        }
+
+        // pickTeamTextColor() computes a team's text color once, at the
+        // moment a row is built, and bakes it into that element's own
+        // inline style - a literal hex value, not a live var() reference,
+        // so it does NOT update on its own when the theme toggles (unlike
+        // handlePositionColors() above, which only resets its own narrower
+        // set of League Table/Team History <td> cells). Toggling the theme
+        // while looking at an already-rendered Match History/Team Streaks/
+        // Last Time When/Match Finder/Team History table left every team-
+        // colored name stuck at whichever color it was computed for, until
+        // something else re-rendered that section. Re-running whichever
+        // tab's own (side-effect-free) recalculation function is currently
+        // active fixes this by rebuilding those elements' colors against
+        // the new theme, the same as any other state change already does.
+        function refreshTeamColorsForTheme() {
+            const activeTab = getActiveDashboardTabName();
+            if (activeTab === 'league-filters') {
+                updateTable();
+            } else if (activeTab === 'match-finder') {
+                calculateMatchFinder();
+            } else if (activeTab === 'last-time-when') {
+                calculateLastTimeWhen();
+            } else if (activeTab === 'team-streaks') {
+                calculateTeamStreaks();
+            } else if (activeTab === 'team-seasons' && state.teamSeasonsSelectedTeam) {
+                // Single-team view only - re-showing here can hide the
+                // "back to League Filters" arrow if that team was reached
+                // by clicking through from there, a narrow and purely
+                // cosmetic gap not worth the extra state bookkeeping to
+                // close. The all-teams "everyone who finished 2nd"-style
+                // position view has no safe, argument-free re-render entry
+                // point and isn't covered here.
+                showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+            }
         }
         
         // Handle table colors by specific column headers
