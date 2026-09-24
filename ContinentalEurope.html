@@ -6914,8 +6914,20 @@
                 const margin = team1Goals - opponentGoals;
                 const totalGoals = team1Goals + opponentGoals;
 
+                // A penalty shootout only happens when the aggregate (and
+                // any away-goals tally) is still level after both legs -
+                // same reasoning as a single match decided by penalties
+                // being classified as a Draw elsewhere in Match Finder
+                // (regulation/AET score, not the shootout, decides the
+                // category): penalties are a tiebreak mechanism, not goals
+                // scored, so a tie level on aggregate stays an aggregate
+                // draw even though penalties eventually decided who
+                // advances. Away goals is different - it's real goals
+                // scored (just venue-weighted) and is historically recorded
+                // as a genuine win, so it stays classified as win/loss.
                 let result;
                 if (b.winner === 'TIE') result = 'draw';
+                else if (team1Goals === opponentGoals && !b.decidedByAwayGoals) result = 'draw';
                 else if (b.winner === team1) result = 'win';
                 else result = 'loss';
 
