@@ -5527,7 +5527,15 @@
             setOptions(options) {
                 this.options = options;
                 this.filteredOptions = [...options];
-                this.renderOptions();
+                // Dropdown is closed here in every real call site (this
+                // runs right after a league/team-list refresh, never while
+                // a user has it open) - rendering now built one <div> +
+                // one addEventListener per team that stayed invisible
+                // until the user actually opened it. open()/filterOptions()
+                // already call renderOptions() themselves, so the dropdown
+                // is still always correct by the time it's actually shown -
+                // this just stops paying that cost while it's hidden.
+                if (this.isOpen) this.renderOptions();
             }
 
             filterOptions(query) {
