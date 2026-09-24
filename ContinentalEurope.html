@@ -1467,9 +1467,22 @@
             return finalResult;
         }
 
-        // Team colors for head-to-head visualizations
+        // Team colors for head-to-head visualizations. Pure static data -
+        // memoized because this literal is ~800 lines/hundreds of team
+        // entries, and getTeamColor()/getTeamLogoNumber()/getTeamCountry()
+        // all call it fresh on every lookup (getTeamLogoNumber() for
+        // Continental teams linearly searches up to 6 leagues' worth of
+        // this per call). Combobox.renderOptions() calls getTeamLogoUrl()
+        // once per dropdown option, so populating a single ~30-team
+        // Continental combobox rebuilt and re-searched this whole object
+        // ~30 times; updateTeamSelects() does that across 9 comboboxes.
+        // Caching it turns each of those lookups back into what they
+        // should always have been: a few cheap array scans against data
+        // that was already computed.
+        let _teamColorsCache = null;
         function getTeamColors() {
-            return {
+            if (_teamColorsCache) return _teamColorsCache;
+            _teamColorsCache = {
                 // Premier League
                 'premier-league': [
                     ['Liverpool FC', '#D10022', 1226, 'England'],                    
@@ -2305,6 +2318,7 @@
                     ['N.E.C.', '#E63027', 1347, 'Netherlands']
                 ]
             };
+            return _teamColorsCache;
         }
 
         // Get team color for H2H visualization
