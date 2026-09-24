@@ -615,6 +615,11 @@
                             </table>
                         </div>
                         <p id="matchFinderResultCount" class="text-center text-sm text-gray-600 mt-3"></p>
+                        <div id="matchFinderPaginationControls" class="flex items-center justify-center gap-4 mt-4 hidden">
+                            <button id="matchFinderPrevPageBtn" class="btn btn-secondary">Previous</button>
+                            <span id="matchFinderPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                            <button id="matchFinderNextPageBtn" class="btn btn-secondary">Next</button>
+                        </div>
                     </div>
                 </div>
 
@@ -1396,6 +1401,7 @@
             matchFinderOpponentScoreOp: 'at-least',
             matchFinderOpponentScoreValue: '',
             matchFinderCategory: 'victories', // 'victories' | 'defeats' | 'draws' | 'totalGoals' | 'leastGoals' | 'scoreline'
+            matchFinderPage: 1,
             matchFinderSortConfig: { key: null, direction: null },
             matchFinderTieSortConfig: { key: null, direction: null },
             matchFinderApiCache: null,
@@ -3336,6 +3342,10 @@
             matchFinderTableHeader: document.getElementById('matchFinderTableHeader'),
             matchFinderTableBody: document.getElementById('matchFinderTableBody'),
             matchFinderResultCount: document.getElementById('matchFinderResultCount'),
+            matchFinderPaginationControls: document.getElementById('matchFinderPaginationControls'),
+            matchFinderPrevPageBtn: document.getElementById('matchFinderPrevPageBtn'),
+            matchFinderPageInfo: document.getElementById('matchFinderPageInfo'),
+            matchFinderNextPageBtn: document.getElementById('matchFinderNextPageBtn'),
             matchFinderSingleMatchCard: document.getElementById('matchFinderSingleMatchCard'),
             matchFinderTieResultsCard: document.getElementById('matchFinderTieResultsCard'),
             matchFinderTieResultsCaption: document.getElementById('matchFinderTieResultsCaption'),
@@ -5676,6 +5686,14 @@
             });
             elements.matchFinderResetBtn.addEventListener('click', clearMatchFinderFilters);
             elements.copyLinkBtnMatchFinder.addEventListener('click', copyShareableLink);
+            elements.matchFinderPrevPageBtn.addEventListener('click', () => {
+                state.matchFinderPage -= 1;
+                calculateMatchFinder(true);
+            });
+            elements.matchFinderNextPageBtn.addEventListener('click', () => {
+                state.matchFinderPage += 1;
+                calculateMatchFinder(true);
+            });
             elements.matchFinderCategoryButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
                 if (button) {
@@ -6648,6 +6666,15 @@
 
         // --- Match Finder ---
 
+        // A long-tenured club's unfiltered history (Most/Least Total Goals -
+        // no result-type filter) can run into thousands of matches. The data
+        // lookups (getTeamColor/getTeamLogoUrl) are cheap even at that scale,
+        // but building and inserting that many DOM rows in one shot measured
+        // over a second in practice - paginating means only ever building
+        // this many rows' worth of DOM at once, regardless of how large the
+        // full result set is.
+        const MATCH_FINDER_PAGE_SIZE = 20;
+
         const MATCH_FINDER_CATEGORIES = [
             { key: 'victories', label: 'Biggest Victories' },
             { key: 'defeats', label: 'Biggest Defeats' },
@@ -6753,6 +6780,7 @@
             state.matchFinderCategory = 'victories';
             state.matchFinderSortConfig = { key: null, direction: null };
             state.matchFinderTieSortConfig = { key: null, direction: null };
+            state.matchFinderPage = 1;
 
             elements.matchFinderTeam1Select.value = '';
             elements.matchFinderTeam2Select.value = '';
@@ -6939,7 +6967,44 @@
             return { teamA, teamB, legs, aggregate, awayGoals, penalties, hasAet, decidedByAwayGoals, winner, loser, winnerColor, isSingleLeg: legs.length === 1 };
         }
 
-        function calculateMatchFinder() {
+        // Shared by updateMatchFinderTable()/updateMatchFinderTieResults() -
+        // slices an already-sorted array down to the current page and
+        // updates the Previous/Next controls + result count text to match.
+        // Callers only ever build DOM for the returned subset, not the full
+        // result set - a long-tenured club's unfiltered history can run into
+        // thousands of matches, and building that many rows' worth of DOM in
+        // one shot measured over a second in practice even though the data
+        // lookups behind each row are cheap.
+        function paginateMatchFinderResults(items, noun) {
+            const totalResults = items.length;
+            const totalPages = Math.max(1, Math.ceil(totalResults / MATCH_FINDER_PAGE_SIZE));
+            if (state.matchFinderPage > totalPages) state.matchFinderPage = totalPages;
+            if (state.matchFinderPage < 1) state.matchFinderPage = 1;
+
+            const pageStart = (state.matchFinderPage - 1) * MATCH_FINDER_PAGE_SIZE;
+            const pageItems = items.slice(pageStart, pageStart + MATCH_FINDER_PAGE_SIZE);
+
+            if (totalResults === 0) {
+                elements.matchFinderResultCount.textContent = `No ${noun} found for the current filters.`;
+            } else {
+                const rangeEnd = Math.min(pageStart + MATCH_FINDER_PAGE_SIZE, totalResults);
+                elements.matchFinderResultCount.textContent = `Showing ${pageStart + 1}-${rangeEnd} of ${totalResults} ${noun}`;
+            }
+
+            if (totalPages > 1) {
+                elements.matchFinderPaginationControls.classList.remove('hidden');
+                elements.matchFinderPageInfo.textContent = `Page ${state.matchFinderPage} of ${totalPages}`;
+                elements.matchFinderPrevPageBtn.disabled = state.matchFinderPage <= 1;
+                elements.matchFinderNextPageBtn.disabled = state.matchFinderPage >= totalPages;
+            } else {
+                elements.matchFinderPaginationControls.classList.add('hidden');
+            }
+
+            return pageItems;
+        }
+
+        function calculateMatchFinder(preservePage) {
+            if (!preservePage) state.matchFinderPage = 1;
             if (!state.matchFinderTeam1) {
                 elements.matchFinderResults.classList.add('hidden');
                 elements.matchFinderCategoryContainer.classList.add('hidden');
@@ -7277,7 +7342,6 @@
 
             elements.matchFinderTieResultsCaption.textContent = MATCH_FINDER_TIE_CATEGORY_LABELS[state.matchFinderCategory];
             elements.matchFinderTieResultsTitle.textContent = matchFinderTieSubtitle(classified.length);
-            elements.matchFinderResultCount.textContent = classified.length === 0 ? 'No ties found for the current filters.' : '';
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
             const valueLabel = isMarginCategory ? 'Aggregate Margin' : 'Aggregate Goals';
@@ -7408,9 +7472,11 @@
                 });
             }
 
-            elements.matchFinderTieTableBody.innerHTML = tieRows.map((row, index) => {
+            const pageTieRows = paginateMatchFinderResults(tieRows, 'ties');
+
+            elements.matchFinderTieTableBody.innerHTML = pageTieRows.map((row, index) => {
                 const legs = row.tie.legMatches;
-                const rowBackgroundClass = tieRows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = pageTieRows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
                 let rowsHTML = legs.map((leg, legIndex) => {
                     const homeTeamColor = getTeamColor(leg.HomeTeam, state.selectedLeague);
@@ -7519,7 +7585,6 @@
             const cat = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
             elements.matchFinderTableCaption.textContent = cat.label;
             elements.matchFinderTableTitle.textContent = matchFinderSubtitle(classified.length);
-            elements.matchFinderResultCount.textContent = classified.length === 0 ? 'No matches found for the current filters.' : '';
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
             const valueLabel = isMarginCategory ? 'Margin' : 'Total Goals';
@@ -7616,7 +7681,9 @@
                 });
             }
 
-            elements.matchFinderTableBody.innerHTML = rows.map((row, index) => {
+            const pageRows = paginateMatchFinderResults(rows, 'matches');
+
+            elements.matchFinderTableBody.innerHTML = pageRows.map((row, index) => {
                 const homeTeamColor = getTeamColor(row.homeTeam, state.selectedLeague);
                 const awayTeamColor = getTeamColor(row.awayTeam, state.selectedLeague);
                 const homeTeamClass = row.homeTeam === state.matchFinderTeam1 ? 'team1-highlight' :
@@ -7629,7 +7696,7 @@
                 const homeLogoUrl = getTeamLogoUrl(row.homeTeam, state.selectedLeague);
                 const awayLogoUrl = getTeamLogoUrl(row.awayTeam, state.selectedLeague);
 
-                const rowBackgroundClass = rows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = pageRows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
                 let rowHTML = `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
