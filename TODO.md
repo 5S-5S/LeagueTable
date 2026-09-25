@@ -113,6 +113,41 @@ Feature ideas, not yet scheduled.
   desktop and mobile - plus sorting and light/dark mode. The
   active-streak view doesn't show aggregates yet (open item above).
 
+- ~~Mobile layout fixes (after Match Finder shipped)~~ — done
+  (2026-09-24); the first two confirmed on a real iPhone against the
+  live site:
+  - Match Finder's "Match Results" checkboxes (Penalty Shootouts Only,
+    Extra Time Only) ran off-screen on Continental mobile - the row had
+    no ID, so the wrap rules League Tables' row uses never applied.
+    Gave it (and its Exclude row) IDs and added them to those rules
+    (`17cbf45`).
+  - Start/End Date boxes overflowed their column on iOS Safari on every
+    mobile page/tab with a date pair - Safari's native date input keeps
+    an intrinsic minimum width that ignores `width: 100%`. Dropped the
+    native appearance and let the input and its grid cell shrink
+    (`e3ab60c`). Not reproducible in desktop Chrome.
+  - Match Finder tie mode's hierarchy was flipped on mobile (aggregate
+    scoreline big, ranked margin small) - the generic mobile table-cell
+    font rule shrank the margin. Restored big margin / smaller scoreline
+    to match desktop (`dc75b1e`).
+
+- ~~Goals Conceded Streak~~ — done (2026-09-24, `57154d1`): new Team
+  Streaks type "Goals Conceded Streak (1+ Goals Allowed)", listed
+  directly under Clean Sheet Streak, in all 4 files. Works for both
+  active and historic modes; the active view's "opposite result" panel
+  shows the team's last clean sheet.
+
+- ~~Team Streaks stale team list after switching league~~ — fixed
+  (2026-09-24, `194f9d7`): Team Streaks' own league-change handler was
+  the only one that didn't refresh its team comboboxes, so after
+  switching league it still offered the previous league's teams. Every
+  other tab was already correct.
+
+- ~~Paginate Match History / Head-to-Head Match History~~ — done
+  (2026-09-24, `7e28eab`): both tables now paginate like Match Finder's
+  results, for consistency and so long histories don't render hundreds
+  of rows at once on mobile.
+
 - ~~Biggest Win / Biggest Loss / Closest Match finders~~ — done as the
   **Match Finder** tab (2026-09-24, merged to main in `657af7b`; full
   spec in `MATCH_FINDER.md`). Resolved the open team-scoped vs
