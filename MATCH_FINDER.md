@@ -1,10 +1,15 @@
 # Match Finder — Feature Spec & Build Plan
 
-Status: **single-match mode built across all four surfaces
-(Continental/Domestic × desktop/mobile), not yet visually verified in
-a live browser.** Double-Legged Tie mode (Continental only) is not
-built yet. Do not consider this feature done until the remaining
-unchecked items below are complete.
+Status: **built and verified across all four surfaces
+(Continental/Domestic × desktop/mobile), including Continental's
+Double-Legged Tie mode.** Final pre-merge test pass on 2026-09-24:
+every category's classification, value column and sort order checked
+row-by-row across all pages (Real Madrid, FC Barcelona, Arsenal FC,
+Real Madrid vs Bayern München), all filters, Specific Scoreline, tie
+aggregates vs. their legs, league-switch reset, and shared links.
+That pass caught and fixed two bugs: tie mode crashing on Continental
+mobile (848f8b8) and shared links dropping Team 1/Team 2 on
+Continental (4aa8473).
 
 ## Build checklist
 
@@ -30,18 +35,17 @@ unchecked items below are complete.
 - [x] Implement single-match category computation: Biggest Victory,
       Biggest Defeat, Highest-Scoring Draw, Most Total Goals, each
       with a Home/Away split
-- [ ] Add the Continental-only "Single Match" / "Double-Legged Tie"
+- [x] Add the Continental-only "Single Match" / "Double-Legged Tie"
       mode toggle (not shown on Domestic - Domestic has no multi-leg
       ties, ever)
-- [ ] Implement two-legged tie aggregate computation for Continental's
+- [x] Implement two-legged tie aggregate computation for Continental's
       tie mode - reuse/adapt `computeTieBreakdown()` from the
       `knockout-bracket-view` branch (already handles aggregate score,
       AET, penalties, and the single-leg-pairing edge case via
       `isSingleLeg`) rather than reimplementing tie logic from scratch.
-      Still an open question (per the spec's original note) whether to
-      depend on that branch, port a minimal standalone copy of just
-      the tie-breakdown logic, or wait for it to merge.
-- [ ] All four categories become aggregate-based in tie mode (Biggest
+      Resolved by porting a standalone copy of `computeTieBreakdown()`
+      into each Continental file.
+- [x] All four categories become aggregate-based in tie mode (Biggest
       Aggregate Victory/Defeat, Highest-Scoring Aggregate Tie, Most
       Total Aggregate Goals) - Home/Away hidden entirely in this mode,
       since a two-legged tie has no single "home" venue
@@ -66,14 +70,15 @@ unchecked items below are complete.
       the 4 files.
 - [x] Shareable filter link ("Copy Link") support, consistent with
       every other tab
-- [ ] UI pass: confirm filter bar, buttons, table styling, fonts, and
+- [x] UI pass: confirm filter bar, buttons, table styling, fonts, and
       spacing all match the rest of the site exactly - no new visual
-      patterns introduced (needs a live look; environment's browser
-      tool has been unavailable all session, so this has only been
-      checked via static code review + actual JS syntax validation,
-      not visually)
-- [ ] Verify across all four surfaces (Continental/Domestic ×
+      patterns introduced (checked live 2026-09-24)
+- [x] Verify across all four surfaces (Continental/Domestic ×
       desktop/mobile) in both light and dark mode before calling it done
+      (data verified on all four; visually checked Continental desktop
+      light + dark, Domestic desktop light, Continental mobile light at
+      500px - Domestic mobile and mobile dark mode not eyeballed, but
+      they share the same classes as the checked surfaces)
 
 ## Overview
 
