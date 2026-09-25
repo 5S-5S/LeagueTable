@@ -3053,11 +3053,63 @@
 
             // Filter streaks to only include those with 3+ games
             const significantStreaks = allStreaks.filter(streak => streak.count >= 3);
+            significantStreaks.forEach(streak => Object.assign(streak, computeStreakAggregates(streak.matches)));
 
             // Display results
             displayHistoricStreaksResults(significantStreaks, team1, team2, streakType, location);
         }
         
+        // Aggregate stat columns for the Historic streaks table, per
+        // streak type - each type only shows the stats that actually
+        // vary for it (e.g. GD is always 0 on a Draw Streak, GA always 0
+        // on a Clean Sheet Streak, PPG constant on Winning/Draw/Losing).
+        const HISTORIC_STREAK_AGGREGATE_COLUMNS = {
+            'winning': ['gf', 'ga', 'gd', 'cleanSheets'],
+            'unbeaten': ['gf', 'ga', 'gd', 'cleanSheets', 'ppg'],
+            'draw': ['gf', 'ga', 'cleanSheets'],
+            'winless': ['gf', 'ga', 'gd', 'failedToScore', 'ppg'],
+            'losing': ['gf', 'ga', 'gd', 'failedToScore'],
+            'clean-sheet': ['gf', 'ppg'],
+            'goals-conceded': ['gf', 'ga', 'gd', 'ppg'],
+            'scoring': ['gf', 'ga', 'gd', 'ppg'],
+            'no-score': ['ga', 'ppg']
+        };
+
+        const HISTORIC_STREAK_AGGREGATE_LABELS = {
+            gf: { full: 'GF', short: 'GF', title: 'Goals For' },
+            ga: { full: 'GA', short: 'GA', title: 'Goals Against' },
+            gd: { full: 'GD', short: 'GD', title: 'Goal Difference' },
+            cleanSheets: { full: 'Clean Sheets', short: 'CS', title: 'Clean Sheets' },
+            failedToScore: { full: 'Failed to Score', short: 'FTS', title: 'Failed to Score' },
+            ppg: { full: 'PPG', short: 'PPG', title: 'Points Per Game' }
+        };
+
+        // Totals across one streak's matches, from Team 1's perspective.
+        // Uses the same full-time score/result the streak itself was
+        // built from (a shootout-decided match counts as its full-time
+        // draw), with 3 points for a win and 1 for a draw.
+        function computeStreakAggregates(matches) {
+            let gf = 0, ga = 0, cleanSheets = 0, failedToScore = 0, points = 0;
+            matches.forEach(match => {
+                gf += match.teamScore;
+                ga += match.opponentScore;
+                if (match.opponentScore === 0) cleanSheets++;
+                if (match.teamScore === 0) failedToScore++;
+                if (match.result === 'win') points += 3;
+                else if (match.result === 'draw') points += 1;
+            });
+            return {
+                gf, ga, gd: gf - ga, cleanSheets, failedToScore,
+                ppg: matches.length ? points / matches.length : 0
+            };
+        }
+
+        function formatStreakAggregate(key, value) {
+            if (key === 'gd') return value > 0 ? `+${value}` : `${value}`;
+            if (key === 'ppg') return value.toFixed(2);
+            return `${value}`;
+        }
+
         // Find all historic streaks throughout the data
         function findAllHistoricStreaks(matches, team, streakType) {
             if (matches.length === 0) return [];
@@ -3207,6 +3259,16 @@
                 title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName}s${locationText}`;
             }
 
+            // Aggregate stat columns for this streak type (see
+            // HISTORIC_STREAK_AGGREGATE_COLUMNS), appended after Count/Days
+            const aggregateKeys = HISTORIC_STREAK_AGGREGATE_COLUMNS[streakType] || [];
+            const aggregateHeaders = aggregateKeys.map(key =>
+                `<th class="text-center cursor-pointer streak-aggregate-cell" onclick="handleHistoricStreaksSort('${key}')" title="${HISTORIC_STREAK_AGGREGATE_LABELS[key].title}">${HISTORIC_STREAK_AGGREGATE_LABELS[key].short}</th>`
+            ).join('');
+            const aggregateCells = streak => aggregateKeys.map(key =>
+                `<td class="text-center streak-aggregate-cell">${formatStreakAggregate(key, streak[key])}</td>`
+            ).join('');
+
             // Sub-sortable "Start → End" merged date-range header
             const thSort = (key, label) =>
                 `<span onclick="handleHistoricStreaksSort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
@@ -3216,6 +3278,7 @@
                 </th>
                 <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count</th>
                 <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Days</th>
+                ${aggregateHeaders}
             `;
 
             // Create table headers based on mode (single team vs head-to-head)
@@ -3272,6 +3335,7 @@
                             <td class="text-center date-range-cell">${startDateStr}<br>→ ${endDateStr}</td>
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
+                            ${aggregateCells(streak)}
                         </tr>
                     `;
                 } else {
@@ -3291,6 +3355,7 @@
                             <td class="text-center date-range-cell">${startDateStr}<br>→ ${endDateStr}</td>
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
+                            ${aggregateCells(streak)}
                         </tr>
                     `;
                 }

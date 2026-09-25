@@ -2539,6 +2539,90 @@ body {
         min-width: 78px !important;
     }
 
+    /* Aggregate stat columns (GF/GA/GD/CS/FTS/PPG - which ones
+       depends on the streak type) push the historic table past the
+       card's width. Scroll it sideways instead of squeezing every
+       column (the Start -> End dates were being clipped), with the
+       team column(s) pinned - same pattern as Team Seasons/League
+       Table above. Under table-layout: fixed a table grows past 100%
+       once its column widths add up to more than that, so every
+       column here gets an explicit width (min-width alone is ignored
+       by fixed layout). Pinned cells need their own background, since
+       table rows have none - --bg-white follows the theme. */
+    #teamStreaksResults .historic-streaks-table {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* The title/subtitle block sits inside the same scrolling card -
+       keep it in place instead of sliding off with the table. */
+    #teamStreaksResults .historic-streaks-table > div:first-child {
+        position: sticky !important;
+        left: 0 !important;
+    }
+
+    #teamStreaksResults .historic-single-mode th:nth-child(2),
+    #teamStreaksResults .historic-single-mode td:nth-child(2),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(3),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(3) {
+        width: 78px !important;
+    }
+
+    #teamStreaksResults .historic-h2h-mode th:nth-child(4),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(4),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(5),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(5) {
+        width: 34px !important;
+    }
+
+    #teamStreaksResults .historic-streaks-table .streak-aggregate-cell {
+        width: 34px !important;
+        min-width: 34px !important;
+    }
+
+    #teamStreaksResults .historic-single-mode th:nth-child(1),
+    #teamStreaksResults .historic-single-mode td:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(2),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2) {
+        position: sticky !important;
+        z-index: 2 !important;
+        transform: translateZ(0) !important;
+        -webkit-transform: translateZ(0) !important;
+    }
+
+    #teamStreaksResults .historic-single-mode th:nth-child(1),
+    #teamStreaksResults .historic-single-mode td:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(1) {
+        left: 0 !important;
+    }
+
+    #teamStreaksResults .historic-h2h-mode th:nth-child(2),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2) {
+        left: 46px !important;
+    }
+
+    #teamStreaksResults .historic-single-mode td:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2) {
+        background: var(--bg-white) !important;
+    }
+
+    #teamStreaksResults .historic-single-mode th:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(2) {
+        background: linear-gradient(to right, #374151, #1f2937) !important;
+    }
+
+    #teamStreaksResults .historic-single-mode td:nth-child(1),
+    #teamStreaksResults .historic-single-mode th:nth-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-child(2),
+    #teamStreaksResults .historic-h2h-mode th:nth-child(2) {
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08) !important;
+    }
+
     /* Title/subtitle above each table, and gap between consecutive
        tables (main streak table + opposite-result table) */
     #teamStreaksResults h2 {

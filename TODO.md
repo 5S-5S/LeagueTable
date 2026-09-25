@@ -2,6 +2,19 @@
 
 Feature ideas, not yet scheduled.
 
+- To do: **Update the Match Finder tab description** — noted 2026-09-24.
+  The description box (same text on all 4 pages) still reads "Find a
+  team's standout individual matches - biggest wins, biggest losses,
+  highest-scoring draws, and highest-scoring matches overall...", which
+  predates Least Total Goals, Specific Scoreline, and Continental's
+  Double-Legged Tie mode. Wording not decided yet. Draft suggestion:
+  "Find a team's standout matches - biggest wins and losses,
+  highest-scoring draws, most or fewest total goals, or a specific
+  scoreline. Select Team 1 to begin; add Team 2 to narrow to
+  head-to-head matches only." - plus, on Continental only, something
+  like "Switch to Double-Legged Tie to rank knockout ties by
+  aggregate."
+
 - On hold: **Multi-team table filter / mini-league** — scoped out
   (2026-09-04), paused while other ideas are explored. Turned out to be a
   genuine fork, not a simple Team 2 extension:
@@ -62,25 +75,40 @@ Feature ideas, not yet scheduled.
   position per season) on the Team Dashboard for Domestic and Continental,
   possibly with a second team overlaid for comparison.
 
-- Maybe: **Aggregate stat column for Streaks** — suggested 2026-09-24,
-  alongside adding Goals Conceded Streak. A streak's match table shows each
-  match's own result, but not the running total for the streak's own
-  metric — e.g. a Goals Conceded Streak currently shows which matches
-  conceded, not how many goals were conceded in total across the streak.
-  Add that as its own column (or a summary line above the table). Only
-  meaningful for streak types where the per-match value varies -
-  Goals Conceded (total goals allowed) and Scoring (total goals scored)
-  are the obvious fits; Clean Sheet/Failed to Score are always 0 by
-  definition, so an aggregate there is redundant with the streak length
-  itself. Winning/Unbeaten/Draw/Winless/Losing could take goals scored,
-  goal difference, or points as their aggregate - undecided which (or
-  whether to skip result-based streaks entirely and scope this to just
-  the goals-based ones). Would touch `displayStreakResults()`/
-  `displayHistoricStreaksResults()`/`createStreakTableRow()` in all 4
-  files, plus whatever `checkStreakContinuation()`-adjacent helper sums
-  the metric across `streak.matches`.
+- Maybe: **Aggregate stats for the active streak** — follow-up to the
+  Historic streaks aggregate columns (see Done). The active-streak view
+  (the current streak's match table) deliberately doesn't show them yet;
+  likely shape is a one-line summary under its match table, next to
+  "This streak started: N days ago", using the same per-type columns
+  (e.g. "GF 7 · GA 6 · GD +1 · PPG 1.75"). A running-total column in the
+  match table was the alternative considered - more detail, but wider,
+  which is tight on mobile.
 
 ## Done
+
+- ~~Aggregate stat columns for Streaks~~ — done (2026-09-25): the
+  Historic streaks table now shows sortable per-streak totals, with each
+  streak type getting only the stats that actually vary for it (picked
+  type by type):
+  - Winning: GF, GA, GD, Clean Sheets
+  - Unbeaten: GF, GA, GD, Clean Sheets, PPG
+  - Draw: GF, GA, Clean Sheets
+  - Winless: GF, GA, GD, Failed to Score, PPG
+  - Losing: GF, GA, GD, Failed to Score
+  - Clean Sheet: GF, PPG
+  - Goals Conceded / Scoring: GF, GA, GD, PPG
+  - Failed to Score: GA, PPG
+  Config lives in `HISTORIC_STREAK_AGGREGATE_COLUMNS` (all 4 files);
+  totals come from the same full-time score/result the streak itself was
+  built from (a shootout counts as its full-time draw), PPG = 3/win,
+  1/draw. Default order is still longest streak first. Mobile uses short
+  labels (CS/FTS, full name on hover) and scrolls the historic table
+  sideways with the team column(s) and title pinned, instead of
+  squeezing it (the Start -> End dates were being clipped). Verified
+  every row against an independent recomputation for all 9 types -
+  Real Madrid (single + vs Bayern) and Arsenal (single + vs Big 6),
+  desktop and mobile - plus sorting and light/dark mode. The
+  active-streak view doesn't show aggregates yet (open item above).
 
 - ~~Biggest Win / Biggest Loss / Closest Match finders~~ — done as the
   **Match Finder** tab (2026-09-24, merged to main in `657af7b`; full
