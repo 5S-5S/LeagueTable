@@ -3872,7 +3872,7 @@
             }
 
             // Aggregate stat columns for this streak type (see
-            // HISTORIC_STREAK_AGGREGATE_COLUMNS), appended after Count/Days
+            // HISTORIC_STREAK_AGGREGATE_COLUMNS), placed before Count/Days
             const aggregateKeys = HISTORIC_STREAK_AGGREGATE_COLUMNS[streakType] || [];
             const aggregateHeaders = aggregateKeys.map(key =>
                 `<th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('${key}')" title="${HISTORIC_STREAK_AGGREGATE_LABELS[key].title}">${HISTORIC_STREAK_AGGREGATE_LABELS[key].full} ${getSortIcon(key)}</th>`
@@ -3890,9 +3890,9 @@
                     <th class="text-center">Team 2</th>
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('startDate')">Start Date ${getSortIcon('startDate')}</th>
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('endDate')">End Date ${getSortIcon('endDate')}</th>
+                    ${aggregateHeaders}
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count ${getSortIcon('count')}</th>
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Length (Days) ${getSortIcon('lengthInDays')}</th>
-                    ${aggregateHeaders}
                 `;
             } else {
                 // Single team mode - adjust header based on location
@@ -3909,9 +3909,9 @@
                     <th class="text-center">${teamColumnHeader}</th>
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('startDate')">Start Date ${getSortIcon('startDate')}</th>
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('endDate')">End Date ${getSortIcon('endDate')}</th>
+                    ${aggregateHeaders}
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count ${getSortIcon('count')}</th>
                     <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Length (Days) ${getSortIcon('lengthInDays')}</th>
-                    ${aggregateHeaders}
                 `;
             }
 
@@ -3941,9 +3941,9 @@
                             </td>
                             <td class="text-center">${startDateStr}</td>
                             <td class="text-center">${endDateStr}</td>
+                            ${aggregateCells(streak)}
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
-                            ${aggregateCells(streak)}
                         </tr>
                     `;
                 } else {
@@ -3962,9 +3962,9 @@
                             </td>
                             <td class="text-center">${startDateStr}</td>
                             <td class="text-center">${endDateStr}</td>
+                            ${aggregateCells(streak)}
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
-                            ${aggregateCells(streak)}
                         </tr>
                     `;
                 }
