@@ -1704,6 +1704,19 @@ body {
         white-space: nowrap !important;
     }
 
+    /* Match Finder tie mode: the generic mobile ".league-table td"
+       font-size rule shrank the ranked value (e.g. "+6") to 0.65rem
+       while the aggregate breakdown under it kept its inline 1.125rem,
+       flipping desktop's hierarchy (big ranked value, smaller
+       breakdown). Restore it at mobile-sized scale. */
+    #matchFinderTieTableBody td.match-finder-tie-value {
+        font-size: 1.25rem !important;
+    }
+
+    #matchFinderTieTableBody .match-finder-tie-breakdown {
+        font-size: 0.75rem !important;
+    }
+
     /* "Champions League - All Results (X matches) - Y teams" banner
        was wrapping to two lines at the default text-lg size */
     #tableInfoText {
