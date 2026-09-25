@@ -2495,7 +2495,8 @@ body {
         line-height: 1.25 !important;
     }
 
-    /* Single-team mode: Team, Start->End, Count, Days */
+    /* Single-team mode: Team, Start->End, [aggregate stats], Count, Days
+       (Count/Days are always the last two, so target them from the end) */
     #teamStreaksResults .historic-single-mode th:nth-child(1),
     #teamStreaksResults .historic-single-mode td:nth-child(1) {
         width: 62px !important;
@@ -2509,15 +2510,15 @@ body {
         min-width: 78px !important;
     }
 
-    #teamStreaksResults .historic-single-mode th:nth-child(3),
-    #teamStreaksResults .historic-single-mode td:nth-child(3),
-    #teamStreaksResults .historic-single-mode th:nth-child(4),
-    #teamStreaksResults .historic-single-mode td:nth-child(4) {
+    #teamStreaksResults .historic-single-mode th:nth-last-child(2),
+    #teamStreaksResults .historic-single-mode td:nth-last-child(2),
+    #teamStreaksResults .historic-single-mode th:nth-last-child(1),
+    #teamStreaksResults .historic-single-mode td:nth-last-child(1) {
         width: 34px !important;
         min-width: 34px !important;
     }
 
-    /* Head-to-head mode: Team1, Team2, Start->End, Count, Days */
+    /* Head-to-head mode: Team1, Team2, Start->End, [aggregate stats], Count, Days */
     #teamStreaksResults .historic-h2h-mode th:nth-child(1),
     #teamStreaksResults .historic-h2h-mode td:nth-child(1),
     #teamStreaksResults .historic-h2h-mode th:nth-child(2),
@@ -2568,10 +2569,10 @@ body {
         width: 78px !important;
     }
 
-    #teamStreaksResults .historic-h2h-mode th:nth-child(4),
-    #teamStreaksResults .historic-h2h-mode td:nth-child(4),
-    #teamStreaksResults .historic-h2h-mode th:nth-child(5),
-    #teamStreaksResults .historic-h2h-mode td:nth-child(5) {
+    #teamStreaksResults .historic-h2h-mode th:nth-last-child(2),
+    #teamStreaksResults .historic-h2h-mode td:nth-last-child(2),
+    #teamStreaksResults .historic-h2h-mode th:nth-last-child(1),
+    #teamStreaksResults .historic-h2h-mode td:nth-last-child(1) {
         width: 34px !important;
     }
 

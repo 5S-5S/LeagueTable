@@ -3800,7 +3800,7 @@
             }
 
             // Aggregate stat columns for this streak type (see
-            // HISTORIC_STREAK_AGGREGATE_COLUMNS), appended after Count/Days
+            // HISTORIC_STREAK_AGGREGATE_COLUMNS), placed before Count/Days
             const aggregateKeys = HISTORIC_STREAK_AGGREGATE_COLUMNS[streakType] || [];
             const aggregateHeaders = aggregateKeys.map(key =>
                 `<th class="text-center cursor-pointer streak-aggregate-cell" onclick="handleHistoricStreaksSort('${key}')" title="${HISTORIC_STREAK_AGGREGATE_LABELS[key].title}">${HISTORIC_STREAK_AGGREGATE_LABELS[key].short}</th>`
@@ -3816,9 +3816,9 @@
                 <th class="text-center" style="white-space: nowrap;">
                     ${thSort('startDate', 'Start')} → ${thSort('endDate', 'End')}
                 </th>
+                ${aggregateHeaders}
                 <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('count')">Count</th>
                 <th class="text-center cursor-pointer" onclick="handleHistoricStreaksSort('lengthInDays')">Days</th>
-                ${aggregateHeaders}
             `;
 
             // Create table headers based on mode (single team vs head-to-head)
@@ -3872,9 +3872,9 @@
                                 </div>
                             </td>
                             <td class="text-center date-range-cell">${startDateStr}<br>→ ${endDateStr}</td>
+                            ${aggregateCells(streak)}
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
-                            ${aggregateCells(streak)}
                         </tr>
                     `;
                 } else {
@@ -3892,9 +3892,9 @@
                                 </div>
                             </td>
                             <td class="text-center date-range-cell">${startDateStr}<br>→ ${endDateStr}</td>
+                            ${aggregateCells(streak)}
                             <td class="text-center font-bold">${streak.count}</td>
                             <td class="text-center">${streak.lengthInDays}</td>
-                            ${aggregateCells(streak)}
                         </tr>
                     `;
                 }
