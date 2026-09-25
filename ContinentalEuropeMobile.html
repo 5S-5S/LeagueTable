@@ -6628,9 +6628,8 @@
             matchFinderTeam1Combobox.setValue('', 'Select Team 1');
             matchFinderTeam2Combobox.setValue('', 'No Team');
 
-            // Shareable filter state: consume a pending shared-link state
-            // now that every tab's comboboxes exist (once)
-            consumePendingShareableState();
+            // Shareable filter state is consumed at the end of
+            // ensureTeamsLoaded() instead - see the note there.
         }
 
         // ============================================================
@@ -8321,6 +8320,15 @@
             updateTeamStreaksSelects();
             updateTeamSeasonsTeamSelect();
             refreshTeam2CountryOptions();
+
+            // Shareable filter state: consume a pending shared-link state
+            // (once) only now that every tab's team dropdowns hold the
+            // loaded roster - restoring it any earlier silently drops the
+            // link's Team 1/Team 2, since selecting a team that isn't an
+            // option yet leaves the underlying <select> empty. A failed
+            // load still lands here (with []), so the link's other filters
+            // are still applied.
+            consumePendingShareableState();
         }
 
         // Update season options
