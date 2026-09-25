@@ -2,24 +2,6 @@
 
 Feature ideas, not yet scheduled.
 
-- On hold: **Biggest Win / Biggest Loss / Closest Match finders** — shelved
-  (2026-09-23), same reason as the mini-league item below: one open question
-  before starting. "Arsenal's biggest ever win" (team-scoped) and "closest
-  1-goal games this season" (league-wide, no team implied) are two different
-  features wearing one description:
-  - **Team-scoped** is cheap - it's `calculateLastTimeWhen()`'s exact shape
-    with the sort key swapped (max/min `|homeGoals - awayGoals|` instead of
-    max date), reusing the same team-scoped match cache, day-of-week/
-    location filters, and one-card-per-category rendering. Fits as a new
-    mode inside The Last Time When... tab.
-  - **League-wide** ("closest games this season," no team required) doesn't
-    fit there at all - that tab hard-requires Team 1 before it loads
-    anything. Needs a different data source (a full division/season scan,
-    closer to League Table's no-team-selected view) and probably a ranked
-    top-N list UI instead of single-card-per-category.
-  - Decide which (or both) before starting - team-only is the cheap path,
-    league-wide is a real second feature bolted onto the same name.
-
 - On hold: **Multi-team table filter / mini-league** — scoped out
   (2026-09-04), paused while other ideas are explored. Turned out to be a
   genuine fork, not a simple Team 2 extension:
@@ -80,7 +62,53 @@ Feature ideas, not yet scheduled.
   position per season) on the Team Dashboard for Domestic and Continental,
   possibly with a second team overlaid for comparison.
 
+- Maybe: **Aggregate stat column for Streaks** — suggested 2026-09-24,
+  alongside adding Goals Conceded Streak. A streak's match table shows each
+  match's own result, but not the running total for the streak's own
+  metric — e.g. a Goals Conceded Streak currently shows which matches
+  conceded, not how many goals were conceded in total across the streak.
+  Add that as its own column (or a summary line above the table). Only
+  meaningful for streak types where the per-match value varies -
+  Goals Conceded (total goals allowed) and Scoring (total goals scored)
+  are the obvious fits; Clean Sheet/Failed to Score are always 0 by
+  definition, so an aggregate there is redundant with the streak length
+  itself. Winning/Unbeaten/Draw/Winless/Losing could take goals scored,
+  goal difference, or points as their aggregate - undecided which (or
+  whether to skip result-based streaks entirely and scope this to just
+  the goals-based ones). Would touch `displayStreakResults()`/
+  `displayHistoricStreaksResults()`/`createStreakTableRow()` in all 4
+  files, plus whatever `checkStreakContinuation()`-adjacent helper sums
+  the metric across `streak.matches`.
+
 ## Done
+
+- ~~Biggest Win / Biggest Loss / Closest Match finders~~ — done as the
+  **Match Finder** tab (2026-09-24, merged to main in `657af7b`; full
+  spec in `MATCH_FINDER.md`). Resolved the open team-scoped vs
+  league-wide question by making Team 1 required (Team 2 optional for
+  head-to-head), so it reuses the existing team-scoped match caches with
+  no new backend work - the league-wide "closest games this season, no
+  team" variant is deliberately out of scope. Second tab on all four
+  pages. Categories: Biggest Victories/Defeats, Highest-Scoring Draws,
+  Most/Least Total Goals, and Specific Scoreline (At Least/At Most/
+  Exactly per side); no dedicated "Closest Match" (1-goal margin)
+  category. Continental adds a Double-Legged Tie mode ranking two-legged
+  knockout ties by aggregate (penalty-decided ties count as aggregate
+  draws; away-goals-decided ties stay wins/losses at a 0 margin, by
+  design). Paginated, sortable, Copy Link support.
+  Final pre-merge test pass: every category's classification, value and
+  sort order checked row-by-row across all pages for several teams and
+  a head-to-head, plus all filters, tie aggregates vs. their legs,
+  league-switch reset, and shared links on all four surfaces. It caught
+  two bugs, both fixed before merging:
+  - Tie mode crashed on Continental mobile (`848f8b8`) - the ported
+    `computeTieBreakdown()` needed `isAwayGoalsRuleActive()`, which the
+    away-goals fix further down had only ever added to the desktop file.
+  - Shared links silently dropped Team 1/Team 2 on Continental, on every
+    tab, and had been live on main since the team rosters moved to
+    `/api/teams` (`4aa8473`) - the link was applied before the async
+    roster load finished. Now applied at the end of `ensureTeamsLoaded()`.
+    Domestic was never affected (its rosters load synchronously).
 
 - ~~Dark mode audit + redesigned color scheme (Continental + Domestic,
   desktop and mobile)~~ — done (2026-09-23): a full contrast audit (WCAG ratio scan
@@ -331,6 +359,21 @@ Feature ideas, not yet scheduled.
   Continental uses; confirmed Continental has zero `bg-gray-100`
   instances anywhere, so nothing needed changing there. Same
   browser-tool outage as the rest of this session; not live-verified.
+
+  A follow-up report (H2H Match History's and Match History's own
+  title-strip boxes still looked like slightly different grays)
+  turned out not to be a bug: user-side DevTools check found both
+  compute to the identical `rgb(68, 68, 68)` in dark mode (and the
+  identical light-mode value beforehand too), so the CSS is correct -
+  the perceived difference is a simultaneous-contrast illusion from
+  the more saturated red/blue content directly above the H2H box,
+  not a rendering discrepancy. No code change.
+
+  Committed and pushed to origin/main (2026-09-23, commit `887da6b`).
+  Still no full independent browser re-verification of the whole
+  suite (the tool outage never resolved this session) - only this
+  specific title-box question got a real empirical check, via the
+  user's own DevTools, not mine.
 
 - ~~Away-goals tiebreaker missing from two-legged tie results (List View)~~
   — done (2026-09-22): a two-legged Continental tie level on aggregate
