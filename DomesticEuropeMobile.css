@@ -1833,6 +1833,39 @@ body {
 }
 
 /* ============================================================
+   Mobile fix: date inputs overflowing their 2-column grid cell on
+   iOS Safari (every page/tab with a Start/End Date pair). Safari
+   gives a native date input an intrinsic minimum width that ignores
+   width: 100%, and a grid item won't shrink below its content by
+   default - so the End Date box ran off the right edge of the card.
+   Dropping the native appearance makes Safari honor the width, and
+   min-width: 0 on both the input and its grid cell lets them shrink
+   to the column. An empty date input's value box can also collapse
+   (and Safari centers the value), so pin its height/alignment.
+   Background is left alone - the base/dark-mode .form-input rules
+   still set it.
+   ============================================================ */
+@media (max-width: 640px) {
+    .grid > div:has(> input[type="date"]) {
+        min-width: 0 !important;
+    }
+
+    input[type="date"].form-input {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        display: block !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    input[type="date"].form-input::-webkit-date-and-time-value {
+        text-align: left !important;
+        min-height: 1.5em !important;
+    }
+}
+
+/* ============================================================
    Mobile redesign: Team Seasons table (same concepts as the
    League Table above) - horizontal scroll + sticky identity
    columns, W-D-L/GF:GA merged into sortable sub-columns, no
