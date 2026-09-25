@@ -7055,6 +7055,29 @@
             return text;
         }
 
+        // UEFA's away-goals rule: from the 1966-67 season through 2020-21
+        // (its last season before being abolished), a two-legged tie level
+        // on aggregate was decided by whichever team scored more goals
+        // away from home, without going to extra time or a shootout - so
+        // "no penalty info recorded" doesn't mean the data has a gap for
+        // these seasons, it means away goals settled it. Worked out from
+        // each leg's own date rather than a separate season lookup, same
+        // as the rest of this tie logic already does.
+        const AWAY_GOALS_RULE_FIRST_SEASON_START_YEAR = 1966;
+        const AWAY_GOALS_RULE_LAST_SEASON_START_YEAR = 2020;
+
+        function europeanSeasonStartYear(dateObj) {
+            // The season runs roughly July through the following June, so
+            // a match before July belongs to the season that started the
+            // previous calendar year.
+            return dateObj.getMonth() >= 6 ? dateObj.getFullYear() : dateObj.getFullYear() - 1;
+        }
+
+        function isAwayGoalsRuleActive(dateObj) {
+            const seasonStart = europeanSeasonStartYear(dateObj);
+            return seasonStart >= AWAY_GOALS_RULE_FIRST_SEASON_START_YEAR && seasonStart <= AWAY_GOALS_RULE_LAST_SEASON_START_YEAR;
+        }
+
         // Break down a two-legged (or single-leg, e.g. a Final) knockout
         // tie into its aggregate result. Takes the flat array of 1-2
         // match objects that make up ONE specific tie (already grouped -
