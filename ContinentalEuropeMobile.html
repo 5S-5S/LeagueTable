@@ -409,7 +409,7 @@
 
                     <!-- Match Type and Action Buttons -->
                     <div class="flex flex-wrap items-center justify-between gap-4 collapsible-control">
-                        <div class="flex items-center gap-6">
+                        <div id="matchFinderCheckboxGroup" class="flex items-center gap-6">
                             <span class="text-sm font-semibold text-gray-700">Match Results:</span>
 
                             <!-- Home/Away has no meaning in Double-Legged Tie mode (a two-legged tie has no single home venue) - hidden via JS when that mode is active -->
@@ -455,7 +455,7 @@
                     </div>
 
                     <!-- Exclude Options -->
-                    <div class="flex items-center gap-6 mt-4 mb-8 collapsible-control">
+                    <div id="matchFinderExcludeOptionsGroup" class="flex items-center gap-6 mt-4 mb-8 collapsible-control">
                         <span class="text-sm font-semibold text-gray-700">Exclude:</span>
 
                         <label class="flex items-center cursor-pointer">
