@@ -1663,8 +1663,12 @@ body {
 
     /* Match Results: Home/Away/Point Deductions/3 Points checkboxes
        were each forced onto their own line by a legacy div:has() rule
-       that over-matches this wrapper. Override via its own ID. */
-    div#matchResultsCheckboxGroup {
+       that over-matches this wrapper. Override via its own ID. Match
+       Finder's row (and its nested Home/Away wrapper) had the same
+       problem - Penalty Shootouts Only/Extra Time Only ran off-screen. */
+    div#matchResultsCheckboxGroup,
+    div#matchFinderCheckboxGroup,
+    div#matchFinderHomeAwayContainer {
         flex-direction: row !important;
         flex-wrap: wrap !important;
         align-items: center !important;
@@ -1673,11 +1677,14 @@ body {
 
     #matchResultsCheckboxGroup .icon-home,
     #matchResultsCheckboxGroup .icon-plane,
-    #matchResultsCheckboxGroup .icon-alert {
+    #matchResultsCheckboxGroup .icon-alert,
+    #matchFinderCheckboxGroup .icon-home,
+    #matchFinderCheckboxGroup .icon-plane {
         display: none !important;
     }
 
-    #matchResultsCheckboxGroup span {
+    #matchResultsCheckboxGroup span,
+    #matchFinderCheckboxGroup span {
         font-size: 0.72rem !important;
     }
 
@@ -1685,12 +1692,14 @@ body {
        flex-wrap, so instead of the whole row wrapping to a new line,
        each 2-word label was forced to wrap internally within its own
        squeezed-narrow flex slot - looking huge even at normal font size. */
-    #excludeOptionsGroup {
+    #excludeOptionsGroup,
+    #matchFinderExcludeOptionsGroup {
         flex-wrap: wrap !important;
         gap: 0.5rem 0.85rem !important;
     }
 
-    #excludeOptionsGroup label span {
+    #excludeOptionsGroup label span,
+    #matchFinderExcludeOptionsGroup label span {
         font-size: 0.72rem !important;
         white-space: nowrap !important;
     }
