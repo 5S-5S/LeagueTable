@@ -164,6 +164,7 @@
                 <!-- Tab Container -->
                 <div class="tab-container">
                     <button class="tab-button active" id="leagueFiltersTab" data-mobile-text="Tables & H2H">League Tables & Head to Head Stats</button>
+                    <button class="tab-button" id="matchFinderTab" data-mobile-text="Match Finder">Match Finder</button>
                     <button class="tab-button" id="teamSeasonsTab" data-mobile-text="Team Seasons">Team Seasons</button>
                     <button class="tab-button" id="lastTimeWhenTab" data-mobile-text="Last Time">The Last Time When...</button>
                     <button class="tab-button" id="teamStreaksTab" data-mobile-text="Streaks">Team Streaks</button>
@@ -296,6 +297,191 @@
                         <button id="resetBtn" class="btn btn-secondary">Reset</button>
                     </div>
                 </div>
+                </div>
+
+                <!-- Match Finder Tab Content -->
+                <div id="matchFinderContent" class="tab-content">
+                    <!-- Description -->
+                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex items-start justify-between gap-4">
+                        <p class="text-gray-700 text-sm leading-relaxed">
+                            Find a team's standout individual matches - biggest wins, biggest losses, highest-scoring draws, and highest-scoring matches overall. Select Team 1 to begin; add Team 2 to narrow to head-to-head matches only.
+                        </p>
+                        <button id="copyLinkBtnMatchFinder" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                    </div>
+
+                    <!-- League Selection -->
+                    <div class="mb-8 collapsible-control">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">Select League:</label>
+                        <div class="league-buttons" id="matchFinderLeagueButtons">
+                            <!-- League buttons will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 collapsible-control">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-search mr-2"></span>Season
+                                </label>
+                                <select id="matchFinderSeasonSelect" class="form-input">
+                                    <option value="">Select Season</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-calendar mr-2"></span>Day of Week
+                                </label>
+                                <select id="matchFinderDayOfWeekSelect" class="form-input">
+                                    <option value="">All Days</option>
+                                    <option value="0">Sunday</option>
+                                    <option value="1">Monday</option>
+                                    <option value="2">Tuesday</option>
+                                    <option value="3">Wednesday</option>
+                                    <option value="4">Thursday</option>
+                                    <option value="5">Friday</option>
+                                    <option value="6">Saturday</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
+                                </label>
+                                <input type="date" id="matchFinderDateFrom" class="form-input">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
+                                </label>
+                                <input type="date" id="matchFinderDateTo" class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-search mr-2"></span>Team 1
+                                </label>
+                                <div class="combobox-container" id="matchFinderTeam1ComboboxContainer">
+                                    <input type="text" id="matchFinderTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="matchFinderTeam1ComboboxDropdown"></div>
+                                </div>
+                                <select id="matchFinderTeam1Select" class="form-input" style="display: none;">
+                                    <option value="">Select Team 1</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    <span class="icon-search mr-2"></span>Team 2
+                                </label>
+                                <div class="combobox-container" id="matchFinderTeam2ComboboxContainer">
+                                    <input type="text" id="matchFinderTeam2ComboboxInput" class="combobox-input" placeholder="No Team" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="matchFinderTeam2ComboboxDropdown"></div>
+                                </div>
+                                <select id="matchFinderTeam2Select" class="form-input" style="display: none;">
+                                    <option value="">No Team</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Match Type and Action Buttons -->
+                    <div class="flex flex-wrap items-center justify-between gap-4 collapsible-control">
+                        <div class="flex items-center gap-6">
+                            <span class="text-sm font-semibold text-gray-700">Match Results:</span>
+
+                            <label class="flex items-center cursor-pointer">
+                                <div id="matchFinderHomeCheckbox" class="checkbox checked"></div>
+                                <span class="icon-home mr-1"></span>
+                                <span class="text-sm font-medium">Home</span>
+                            </label>
+
+                            <label class="flex items-center cursor-pointer">
+                                <div id="matchFinderAwayCheckbox" class="checkbox checked"></div>
+                                <span class="icon-plane mr-1"></span>
+                                <span class="text-sm font-medium">Away</span>
+                            </label>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button id="matchFinderResetBtn" class="btn btn-secondary">Reset</button>
+                        </div>
+                    </div>
+
+                    <!-- Category selector (only shown once Team 1 is selected) -->
+                    <div id="matchFinderCategoryContainer" class="mb-8 mt-4 collapsible-control hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-4">Category:</label>
+                        <div class="league-buttons" id="matchFinderCategoryButtons">
+                            <!-- Category buttons populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Specific Scoreline inputs - only shown when that category is
+                         active. Laid out as a label-above/full-width grid (matching
+                         Team 1/Team 2 and Start/End Date above) rather than a compact
+                         inline row of narrow controls, so it reads as consistent with
+                         the rest of the filter panel instead of a cramped one-off
+                         mini-form. -->
+                    <div id="matchFinderScorelineContainer" class="mb-8 collapsible-control hidden">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Home Score</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderHomeScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderHomeScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Away Score</label>
+                                <div class="flex items-center gap-2">
+                                    <select id="matchFinderAwayScoreOpSelect" class="form-input" style="flex: 1;">
+                                        <option value="at-least">At Least</option>
+                                        <option value="at-most">At Most</option>
+                                        <option value="exactly">Exactly</option>
+                                    </select>
+                                    <input type="number" id="matchFinderAwayScoreValueInput" class="form-input" style="width: 6rem; flex: none;" min="0" placeholder="Any">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="matchFinderResults" class="hidden">
+                        <div class="league-table">
+                            <div class="text-center py-4 bg-white border-b">
+                                <h2 class="text-xl font-semibold text-gray-700 mb-1" id="matchFinderTableCaption">Biggest Victories</h2>
+                                <p class="text-sm text-gray-600" id="matchFinderTableTitle"></p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr id="matchFinderTableHeader">
+                                        <!-- Headers will be populated -->
+                                    </tr>
+                                </thead>
+                                <tbody id="matchFinderTableBody">
+                                    <!-- Rows will be populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="matchFinderResultCount" class="text-center text-sm text-gray-600 mt-3"></p>
+                        <div id="matchFinderPaginationControls" class="flex items-center justify-center gap-4 mt-4 hidden">
+                            <button id="matchFinderPrevPageBtn" class="btn btn-secondary">Previous</button>
+                            <span id="matchFinderPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                            <button id="matchFinderNextPageBtn" class="btn btn-secondary">Next</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Team Seasons Tab Content -->
@@ -653,6 +839,7 @@
                             <option value="winless">Winless Streak (Draws + Losses)</option>
                             <option value="losing">Losing Streak (Losses Only)</option>
                             <option value="clean-sheet">Clean Sheet Streak (0 Goals Allowed)</option>
+                            <option value="goals-conceded">Goals Conceded Streak (1+ Goals Allowed)</option>
                             <option value="scoring">Scoring Streak (1+ Goals Scored)</option>
                             <option value="no-score">Failed to Score Streak (0 Goals Scored)</option>
                         </select>
@@ -773,6 +960,11 @@
                                 <!-- H2H rows will be populated -->
                             </tbody>
                         </table>
+                        <div id="h2hPaginationControls" class="flex items-center justify-center gap-4 py-4 hidden">
+                            <button id="h2hPrevPageBtn" class="btn btn-secondary">Previous</button>
+                            <span id="h2hPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                            <button id="h2hNextPageBtn" class="btn btn-secondary">Next</button>
+                        </div>
                     </div>
                 </div>
 
@@ -844,6 +1036,11 @@
                                     <!-- Rows will be populated -->
                                 </tbody>
                             </table>
+                            <div id="matchHistoryPaginationControls" class="flex items-center justify-center gap-4 py-4 hidden">
+                                <button id="matchHistoryPrevPageBtn" class="btn btn-secondary">Previous</button>
+                                <span id="matchHistoryPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                                <button id="matchHistoryNextPageBtn" class="btn btn-secondary">Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -876,7 +1073,8 @@
             
             // H2H sort config
             h2hSortConfig: { key: 'date', direction: 'desc' },
-            
+            h2hPage: 1,
+
             // Last Time When state
             lastTimeTeam1: '',
             lastTimeTeam2: '',
@@ -905,6 +1103,7 @@
             matchHistoryAwayFilter: true,
             recentMatchesCount: 'All',
             matchHistorySortConfig: { key: null, direction: null },
+            matchHistoryPage: 1,
 
             // Match History's data now comes from the team-history API
             // instead of the full in-memory gist dataset (see
@@ -932,6 +1131,30 @@
             lastTimeApiCache: null,
             lastTimeApiCacheKey: null,
             lastTimeApiLoading: false,
+
+            // Match Finder state - fully independent of League Filters/Last
+            // Time When/Team Streaks (own team selection, own filters), same
+            // reasoning as those tabs' own state slots above: this tab can
+            // have a different team/filters active at the same time.
+            matchFinderTeam1: '',
+            matchFinderTeam2: '',
+            matchFinderBig6Opponents: null,
+            matchFinderSeason: '',
+            matchFinderDateFrom: '',
+            matchFinderDateTo: '',
+            matchFinderDayOfWeek: '',
+            matchFinderHomeFilter: true,
+            matchFinderAwayFilter: true,
+            matchFinderHomeScoreOp: 'at-least',
+            matchFinderHomeScoreValue: '',
+            matchFinderAwayScoreOp: 'at-least',
+            matchFinderAwayScoreValue: '',
+            matchFinderCategory: 'victories', // 'victories' | 'defeats' | 'draws' | 'totalGoals' | 'leastGoals' | 'scoreline'
+            matchFinderPage: 1,
+            matchFinderSortConfig: { key: null, direction: null },
+            matchFinderApiCache: null,
+            matchFinderApiCacheKey: null,
+            matchFinderApiLoading: false,
 
             // League Table (no team selected) comes from the standings API
             // - it's the one view that legitimately needs many teams' data
@@ -1605,9 +1828,20 @@
             return finalResult;
         }
 
-        // Team colors for head-to-head visualizations
+        // Team colors for head-to-head visualizations. Pure static data -
+        // memoized because this literal is hundreds of team entries, and
+        // getTeamColor()/getTeamLogoNumber()/getTeamCountry() all call it
+        // fresh on every lookup. Combobox.renderOptions() calls
+        // getTeamLogoUrl() once per dropdown option, so populating a single
+        // combobox rebuilt this whole object once per team in it;
+        // updateTeamSelects() does that across every combobox on the page.
+        // Caching it turns each of those lookups back into what they
+        // should always have been: a few cheap array scans against data
+        // that was already computed.
+        let _teamColorsCache = null;
         function getTeamColors() {
-            return {
+            if (_teamColorsCache) return _teamColorsCache;
+            _teamColorsCache = {
                 // Premier League
                 'premier-league': [
                     ['Liverpool FC', '#D10022', 1226],                    
@@ -1966,15 +2200,40 @@
                     ['Hyères FC', '#9C824A', 17597]
                 ]
             };
+            return _teamColorsCache;
+        }
+
+        // Each domestic league has 58-77 teams and getTeamColor()/
+        // getTeamLogoNumber() used to .find() (linear scan) through that on
+        // every single call - renderOptions() calls one of them once per
+        // dropdown option, so populating one combobox re-scanned the whole
+        // league's list once per team in it. Built once, memoized, keyed by
+        // "league::teamName" so a repeat lookup is an O(1) Map hit instead
+        // of a re-scan. First occurrence within a league wins, matching
+        // .find()'s own behavior.
+        let _teamLookupIndexCache = null;
+        function getTeamLookupIndex() {
+            if (_teamLookupIndexCache) return _teamLookupIndexCache;
+            const teamColors = getTeamColors();
+            _teamLookupIndexCache = new Map();
+            for (const league of Object.keys(teamColors)) {
+                teamColors[league].forEach(entry => {
+                    const key = `${league}::${entry[0]}`;
+                    if (!_teamLookupIndexCache.has(key)) _teamLookupIndexCache.set(key, entry);
+                });
+            }
+            return _teamLookupIndexCache;
+        }
+
+        // Shared by getTeamColor()/getTeamLogoNumber()
+        function findTeamEntry(teamName, league) {
+            return getTeamLookupIndex().get(`${league}::${teamName}`) || null;
         }
 
         // Get team color for H2H visualization
         function getTeamColor(teamName, league) {
-            const teamColors = getTeamColors();
-            const leagueColors = teamColors[league] || [];
-
-            const teamColorEntry = leagueColors.find(([name, color]) => name === teamName);
-            return teamColorEntry ? teamColorEntry[1] : null;
+            const entry = findTeamEntry(teamName, league);
+            return entry ? entry[1] : null;
         }
 
         // WCAG relative luminance / contrast ratio, and a hex<->rgb pair -
@@ -2062,11 +2321,8 @@
 
         // Get team logo number
         function getTeamLogoNumber(teamName, league) {
-            const teamColors = getTeamColors();
-            const leagueColors = teamColors[league] || [];
-            
-            const teamColorEntry = leagueColors.find(([name, color, logoNum]) => name === teamName);
-            return teamColorEntry ? teamColorEntry[2] : null;
+            const entry = findTeamEntry(teamName, league);
+            return entry ? entry[2] : null;
         }
 
         // Get team logo URL
@@ -2358,6 +2614,10 @@
             h2hTableTitle: document.getElementById('h2hTableTitle'),
             h2hTableHeader: document.getElementById('h2hTableHeader'),
             h2hTableBody: document.getElementById('h2hTableBody'),
+            h2hPaginationControls: document.getElementById('h2hPaginationControls'),
+            h2hPrevPageBtn: document.getElementById('h2hPrevPageBtn'),
+            h2hPageInfo: document.getElementById('h2hPageInfo'),
+            h2hNextPageBtn: document.getElementById('h2hNextPageBtn'),
             matchHistorySection: document.getElementById('matchHistorySection'),
             matchHistoryHomeCheckbox: document.getElementById('matchHistoryHomeCheckbox'),
             matchHistoryAwayCheckbox: document.getElementById('matchHistoryAwayCheckbox'),
@@ -2370,6 +2630,10 @@
             matchHistoryTableTitle: document.getElementById('matchHistoryTableTitle'),
             matchHistoryTableHeader: document.getElementById('matchHistoryTableHeader'),
             matchHistoryTableBody: document.getElementById('matchHistoryTableBody'),
+            matchHistoryPaginationControls: document.getElementById('matchHistoryPaginationControls'),
+            matchHistoryPrevPageBtn: document.getElementById('matchHistoryPrevPageBtn'),
+            matchHistoryPageInfo: document.getElementById('matchHistoryPageInfo'),
+            matchHistoryNextPageBtn: document.getElementById('matchHistoryNextPageBtn'),
             recentMatchesSelect: document.getElementById('recentMatchesSelect'),
             matchHistoryVisualizations: document.getElementById('matchHistoryVisualizations'),
             lastTimeLeagueButtons: document.getElementById('lastTimeLeagueButtons'),
@@ -2432,7 +2696,42 @@
             teamStreaksTypeSelect: document.getElementById('teamStreaksTypeSelect'),
             teamStreaksTeam1Select: document.getElementById('teamStreaksTeam1Select'),
             teamStreaksTeam2Select: document.getElementById('teamStreaksTeam2Select'),
-            teamStreaksResults: document.getElementById('teamStreaksResults')
+            teamStreaksResults: document.getElementById('teamStreaksResults'),
+            // Match Finder elements
+            matchFinderLeagueButtons: document.getElementById('matchFinderLeagueButtons'),
+            matchFinderSeasonSelect: document.getElementById('matchFinderSeasonSelect'),
+            matchFinderDateFrom: document.getElementById('matchFinderDateFrom'),
+            matchFinderDateTo: document.getElementById('matchFinderDateTo'),
+            matchFinderDayOfWeekSelect: document.getElementById('matchFinderDayOfWeekSelect'),
+            matchFinderTeam1ComboboxContainer: document.getElementById('matchFinderTeam1ComboboxContainer'),
+            matchFinderTeam1ComboboxInput: document.getElementById('matchFinderTeam1ComboboxInput'),
+            matchFinderTeam1ComboboxDropdown: document.getElementById('matchFinderTeam1ComboboxDropdown'),
+            matchFinderTeam2ComboboxContainer: document.getElementById('matchFinderTeam2ComboboxContainer'),
+            matchFinderTeam2ComboboxInput: document.getElementById('matchFinderTeam2ComboboxInput'),
+            matchFinderTeam2ComboboxDropdown: document.getElementById('matchFinderTeam2ComboboxDropdown'),
+            matchFinderTeam1Select: document.getElementById('matchFinderTeam1Select'),
+            matchFinderTeam2Select: document.getElementById('matchFinderTeam2Select'),
+            matchFinderHomeCheckbox: document.getElementById('matchFinderHomeCheckbox'),
+            matchFinderAwayCheckbox: document.getElementById('matchFinderAwayCheckbox'),
+            matchFinderResetBtn: document.getElementById('matchFinderResetBtn'),
+            copyLinkBtnMatchFinder: document.getElementById('copyLinkBtnMatchFinder'),
+            matchFinderCategoryContainer: document.getElementById('matchFinderCategoryContainer'),
+            matchFinderCategoryButtons: document.getElementById('matchFinderCategoryButtons'),
+            matchFinderScorelineContainer: document.getElementById('matchFinderScorelineContainer'),
+            matchFinderHomeScoreOpSelect: document.getElementById('matchFinderHomeScoreOpSelect'),
+            matchFinderHomeScoreValueInput: document.getElementById('matchFinderHomeScoreValueInput'),
+            matchFinderAwayScoreOpSelect: document.getElementById('matchFinderAwayScoreOpSelect'),
+            matchFinderAwayScoreValueInput: document.getElementById('matchFinderAwayScoreValueInput'),
+            matchFinderResults: document.getElementById('matchFinderResults'),
+            matchFinderTableCaption: document.getElementById('matchFinderTableCaption'),
+            matchFinderTableTitle: document.getElementById('matchFinderTableTitle'),
+            matchFinderTableHeader: document.getElementById('matchFinderTableHeader'),
+            matchFinderTableBody: document.getElementById('matchFinderTableBody'),
+            matchFinderResultCount: document.getElementById('matchFinderResultCount'),
+            matchFinderPaginationControls: document.getElementById('matchFinderPaginationControls'),
+            matchFinderPrevPageBtn: document.getElementById('matchFinderPrevPageBtn'),
+            matchFinderPageInfo: document.getElementById('matchFinderPageInfo'),
+            matchFinderNextPageBtn: document.getElementById('matchFinderNextPageBtn')
         };
 
         // Historic Seasons Data Structure
@@ -2551,12 +2850,28 @@
         // Update Team Streaks team dropdowns
         function updateTeamStreaksSelects() {
             const leagueTeams = getLeagueTeams(state.selectedLeague);
-            
+
             const teamOptions = ['<option value="">Select Team</option>']
                 .concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`))
                 .join('');
-            
+
             elements.teamStreaksTeam1Select.innerHTML = teamOptions;
+
+            // Keep the visible Combobox widget in sync - it's a separate
+            // rendering layer from the native <select> above (which exists
+            // only to drive Combobox.setValue()/dispatchEvent('change')),
+            // so refreshing one doesn't refresh the other. Without this, the
+            // Team Streaks tab's own league buttons (distinct from the main
+            // League Tables league selector) updated the hidden <select>
+            // but left the visible dropdown showing the previous league's
+            // teams.
+            if (teamStreaksTeam1Combobox) {
+                teamStreaksTeam1Combobox.setOptions([
+                    { value: '', text: 'Select Team 1' },
+                    ...leagueTeams.map(team => ({ value: team, text: team }))
+                ]);
+            }
+
             updateTeamStreaksTeam2Options();
         }
 
@@ -2567,6 +2882,8 @@
             // Reset Team Streaks state when changing leagues
             elements.teamStreaksTeam1Select.value = '';
             elements.teamStreaksTeam2Select.value = '';
+            if (teamStreaksTeam1Combobox) teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
+            if (teamStreaksTeam2Combobox) teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
             elements.teamStreaksStatusSelect.value = 'active';
             elements.teamStreaksLocationSelect.value = 'both';
             elements.teamStreaksTypeSelect.value = 'winning';
@@ -2626,7 +2943,8 @@
             let team2Options = ['<option value="">Select Team 2</option>'];
 
             // Add Big 6 option if Team 1 is selected and we're in Premier League
-            if (elements.teamStreaksTeam1Select.value && state.selectedLeague === 'premier-league') {
+            const showBig6 = elements.teamStreaksTeam1Select.value && state.selectedLeague === 'premier-league';
+            if (showBig6) {
                 team2Options.push('<option value="BIG_6">Big 6</option>');
             }
 
@@ -2638,6 +2956,17 @@
             // Restore the current selection if it's still valid
             if (currentTeam2) {
                 elements.teamStreaksTeam2Select.value = currentTeam2;
+            }
+
+            // Keep the visible Combobox widget in sync too (see comment in
+            // updateTeamStreaksSelects()).
+            if (teamStreaksTeam2Combobox) {
+                let team2ComboOptions = [{ value: '', text: 'Select Team 2' }];
+                if (showBig6) {
+                    team2ComboOptions.push({ value: 'BIG_6', text: 'Big 6' });
+                }
+                team2ComboOptions = team2ComboOptions.concat(leagueTeams.map(team => ({ value: team, text: team })));
+                teamStreaksTeam2Combobox.setOptions(team2ComboOptions);
             }
         }
 
@@ -3108,6 +3437,8 @@
                     return result === 'loss';
                 case 'clean-sheet':
                     return opponentScore === 0;
+                case 'goals-conceded':
+                    return opponentScore >= 1;
                 case 'scoring':
                     return teamScore >= 1;
                 case 'no-score':
@@ -3290,6 +3621,8 @@
                     return result === 'draw' || result === 'win'; // Non-loss
                 case 'clean-sheet':
                     return opponentScore >= 1; // Conceded
+                case 'goals-conceded':
+                    return opponentScore === 0; // Clean sheet
                 case 'scoring':
                     return teamScore === 0; // Failed to score
                 case 'no-score':
@@ -3308,6 +3641,7 @@
                 case 'winless': return 'Win';
                 case 'losing': return 'Non-Loss (Draw/Win)';
                 case 'clean-sheet': return 'Conceded a Goal';
+                case 'goals-conceded': return 'Clean Sheet';
                 case 'scoring': return 'Failed to Score';
                 case 'no-score': return 'Scored a Goal';
                 default: return 'Opposite';
@@ -3323,6 +3657,7 @@
                 case 'winless': return 'Winless Streak';
                 case 'losing': return 'Losing Streak';
                 case 'clean-sheet': return 'Clean Sheet Streak';
+                case 'goals-conceded': return 'Goals Conceded Streak';
                 case 'scoring': return 'Scoring Streak';
                 case 'no-score': return 'Failed to Score Streak';
                 default: return 'Streak';
@@ -3487,6 +3822,7 @@
             
             elements.leagueButtons.innerHTML = leagueButtonsHTML;
             elements.lastTimeLeagueButtons.innerHTML = leagueButtonsHTML;
+            elements.matchFinderLeagueButtons.innerHTML = leagueButtonsHTML;
         }
 
         // Set Recent H2H input value
@@ -4307,6 +4643,7 @@
         // Switch tabs
         const TEAM_DASHBOARD_TAB_BUTTON_IDS = {
             'league-filters': 'leagueFiltersTab',
+            'match-finder': 'matchFinderTab',
             'team-seasons': 'teamSeasonsTab',
             'last-time-when': 'lastTimeWhenTab',
             'team-streaks': 'teamStreaksTab'
@@ -4369,15 +4706,95 @@
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
                 elements.lastTimeResults.classList.add('hidden');
-                
+
+                // Reset Match Finder state
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+
                 // Show league table and related sections
                 elements.tableContainer.classList.remove('hidden');
                 elements.h2hSection.classList.remove('hidden');
-                
+
                 // Update league buttons and table
                 createLeagueButtons();
                 updateTable();
-                
+
+            } else if (tabName === 'match-finder') {
+                document.getElementById('matchFinderTab').classList.add('active');
+                document.getElementById('matchFinderContent').classList.add('active');
+
+                // Simple approach: just set the league and update
+                state.selectedLeague = preservedLeague;
+
+                // Reset Team Seasons state when switching away
+                state.teamSeasonsSelectedTeam = '';
+                state.teamSeasonsSelectedSeason = '';
+                state.teamSeasonsSelectedPosition = '';
+                state.includeBetterResults = false;
+                state.includeHistoricSeasons = false;
+                state.firstOccurrenceOnly = false;
+                updateHistoricSeasonsToggleButton();
+                updateFirstOccurrenceOnlyToggleButton();
+                if (elements.historicSeasonsContainer) {
+                    elements.historicSeasonsContainer.classList.add('hidden');
+                }
+                if (elements.firstOccurrenceOnlyContainer) {
+                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
+                }
+
+                // Reset League Filters state
+                state.selectedTeam1 = '';
+                state.selectedTeam2 = '';
+                state.selectedSeason = '';
+                state.selectedDayOfWeek = '';
+                elements.team1Select.value = '';
+                elements.team2Select.value = '';
+                elements.seasonSelect.value = '';
+                elements.dayOfWeekSelect.value = '';
+
+                // Reset Last Time When state
+                state.lastTimeTeam1 = '';
+                state.lastTimeTeam2 = '';
+                state.lastTimeDayOfWeek = '';
+                state.lastTimeLocation = '';
+                elements.lastTimeTeam1Select.value = '';
+                elements.lastTimeTeam2Select.value = '';
+                elements.lastTimeDayOfWeekSelect.value = '';
+                elements.lastTimeLocationSelect.value = '';
+                elements.lastTimeResults.classList.add('hidden');
+
+                // Reset Team Streaks state
+                elements.teamStreaksResults.classList.add('hidden');
+
+                // Hide other tabs' sections
+                elements.tableContainer.classList.add('hidden');
+                elements.matchHistorySection.classList.add('hidden');
+                elements.h2hSection.classList.add('hidden');
+                elements.h2hMatchesTable.classList.add('hidden');
+                elements.tableInfo.classList.add('hidden');
+
+                // Clear Team Seasons visual elements when switching away
+                elements.teamHistoryTable.classList.add('hidden');
+                elements.teamSeasonsPositionInfo.textContent = '';
+                elements.teamSeasonsTeamSelect.value = '';
+                elements.teamSeasonsSeasonSelect.value = '';
+                elements.teamSeasonsPositionSelect.value = '';
+                if (elements.includeBetterResultsContainer) {
+                    elements.includeBetterResultsContainer.classList.add('hidden');
+                    elements.includeBetterResultsContainer.style.display = 'none';
+                }
+                if (elements.includeBetterResultsCheckbox) {
+                    elements.includeBetterResultsCheckbox.className = 'checkbox';
+                }
+
+                // Update league buttons and team selects for Match Finder
+                createLeagueButtons();
+                updateTeamSelects();
+                renderMatchFinderCategoryButtons();
+                calculateMatchFinder();
+
             } else if (tabName === 'team-seasons') {
                 document.getElementById('teamSeasonsTab').classList.add('active');
                 document.getElementById('teamSeasonsContent').classList.add('active');
@@ -4401,6 +4818,12 @@
                 elements.lastTimeTeam2Select.value = '';
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
+
+                // Reset Match Finder state
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
 
                 // Hide other tab sections
                 elements.tableContainer.classList.add('hidden');
@@ -4482,7 +4905,13 @@
                 elements.team2Select.value = '';
                 elements.seasonSelect.value = '';
                 elements.dayOfWeekSelect.value = '';
-                
+
+                // Reset Match Finder state
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+
                 // Hide league table and related sections
                 elements.tableContainer.classList.add('hidden');
                 elements.h2hSection.classList.add('hidden');
@@ -4514,7 +4943,7 @@
                 // Update league buttons and team selects for Last Time When
                 createLeagueButtons(); // This will update the league buttons with correct selection
                 updateTeamSelects();
-                
+
             } else if (tabName === 'team-streaks') {
                 document.getElementById('teamStreaksTab').classList.add('active');
                 document.getElementById('teamStreaksContent').classList.add('active');
@@ -4538,6 +4967,12 @@
                 elements.lastTimeTeam2Select.value = '';
                 elements.lastTimeDayOfWeekSelect.value = '';
                 elements.lastTimeLocationSelect.value = '';
+
+                // Reset Match Finder state
+                state.matchFinderTeam1 = '';
+                state.matchFinderTeam2 = '';
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
 
                 // Hide other tab sections
                 elements.tableContainer.classList.add('hidden');
@@ -4593,6 +5028,7 @@
         function setupEventListeners() {
             // Tab switching
             document.getElementById('leagueFiltersTab').addEventListener('click', () => switchTab('league-filters'));
+            document.getElementById('matchFinderTab').addEventListener('click', () => switchTab('match-finder'));
             document.getElementById('teamSeasonsTab').addEventListener('click', () => switchTab('team-seasons'));
             document.getElementById('lastTimeWhenTab').addEventListener('click', () => switchTab('last-time-when'));
             document.getElementById('teamStreaksTab').addEventListener('click', () => switchTab('team-streaks'));
@@ -4607,6 +5043,14 @@
             
             // Last Time When league selection
             elements.lastTimeLeagueButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('.league-button');
+                if (button) {
+                    handleLeagueChange(button.dataset.league);
+                }
+            });
+
+            // Match Finder league selection
+            elements.matchFinderLeagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
                 if (button) {
                     handleLeagueChange(button.dataset.league);
@@ -4829,6 +5273,94 @@
             elements.copyLinkBtnTeamSeasons.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnLastTimeWhen.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamStreaks.addEventListener('click', copyShareableLink);
+
+            // Match Finder controls
+            elements.matchFinderSeasonSelect.addEventListener('change', (e) => handleMatchFinderSeasonChange(e.target.value));
+            elements.matchFinderDateFrom.addEventListener('change', (e) => {
+                state.matchFinderDateFrom = e.target.value;
+                state.matchFinderSeason = '';
+                elements.matchFinderSeasonSelect.value = '';
+                calculateMatchFinder();
+            });
+            elements.matchFinderDateTo.addEventListener('change', (e) => {
+                state.matchFinderDateTo = e.target.value;
+                state.matchFinderSeason = '';
+                elements.matchFinderSeasonSelect.value = '';
+                calculateMatchFinder();
+            });
+            elements.matchFinderDayOfWeekSelect.addEventListener('change', (e) => {
+                state.matchFinderDayOfWeek = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderTeam1Select.addEventListener('change', (e) => {
+                state.matchFinderTeam1 = e.target.value;
+
+                if (state.matchFinderTeam2 === 'BIG_6') {
+                    state.matchFinderBig6Opponents = getBig6Opponents(state.matchFinderTeam1);
+                    updateMatchFinderTeam2Options();
+                } else {
+                    state.matchFinderTeam2 = '';
+                    elements.matchFinderTeam2Select.value = '';
+                    updateMatchFinderTeam2Options();
+                }
+
+                calculateMatchFinder();
+            });
+            elements.matchFinderTeam2Select.addEventListener('change', (e) => {
+                if (e.target.value === 'BIG_6') {
+                    state.matchFinderTeam2 = 'BIG_6';
+                    state.matchFinderBig6Opponents = getBig6Opponents(state.matchFinderTeam1);
+                } else {
+                    state.matchFinderTeam2 = e.target.value;
+                    state.matchFinderBig6Opponents = null;
+                }
+                calculateMatchFinder();
+            });
+            elements.matchFinderHomeCheckbox.addEventListener('click', () => {
+                state.matchFinderHomeFilter = !state.matchFinderHomeFilter;
+                elements.matchFinderHomeCheckbox.className = `checkbox ${state.matchFinderHomeFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayCheckbox.addEventListener('click', () => {
+                state.matchFinderAwayFilter = !state.matchFinderAwayFilter;
+                elements.matchFinderAwayCheckbox.className = `checkbox ${state.matchFinderAwayFilter ? 'checked' : ''}`;
+                calculateMatchFinder();
+            });
+            elements.matchFinderHomeScoreOpSelect.addEventListener('change', (e) => {
+                state.matchFinderHomeScoreOp = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderHomeScoreValueInput.addEventListener('input', (e) => {
+                state.matchFinderHomeScoreValue = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayScoreOpSelect.addEventListener('change', (e) => {
+                state.matchFinderAwayScoreOp = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderAwayScoreValueInput.addEventListener('input', (e) => {
+                state.matchFinderAwayScoreValue = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderResetBtn.addEventListener('click', clearMatchFinderFilters);
+            elements.copyLinkBtnMatchFinder.addEventListener('click', copyShareableLink);
+            elements.matchFinderPrevPageBtn.addEventListener('click', () => {
+                state.matchFinderPage -= 1;
+                calculateMatchFinder(true);
+            });
+            elements.matchFinderNextPageBtn.addEventListener('click', () => {
+                state.matchFinderPage += 1;
+                calculateMatchFinder(true);
+            });
+            elements.matchFinderCategoryButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('.league-button');
+                if (button) {
+                    state.matchFinderCategory = button.dataset.category;
+                    renderMatchFinderCategoryButtons();
+                    updateMatchFinderScorelineVisibility();
+                    calculateMatchFinder();
+                }
+            });
             
             // Last Time When controls
             elements.lastTimeTeam1Select.addEventListener('change', (e) => {
@@ -4911,7 +5443,24 @@
                     updateTable();
                 }
             });
-            
+
+            elements.matchHistoryPrevPageBtn.addEventListener('click', () => {
+                state.matchHistoryPage -= 1;
+                updateTable(true);
+            });
+            elements.matchHistoryNextPageBtn.addEventListener('click', () => {
+                state.matchHistoryPage += 1;
+                updateTable(true);
+            });
+            elements.h2hPrevPageBtn.addEventListener('click', () => {
+                state.h2hPage -= 1;
+                updateTable(true);
+            });
+            elements.h2hNextPageBtn.addEventListener('click', () => {
+                state.h2hPage += 1;
+                updateTable(true);
+            });
+
             // Team Seasons controls
             elements.teamSeasonsLeagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -5039,12 +5588,20 @@
             // Hide Last Time When results
             if (elements.lastTimeResults) elements.lastTimeResults.classList.add('hidden');
             hideAllLastTimeSections();
-            
+
+            // Reset Match Finder state
+            state.matchFinderTeam1 = '';
+            state.matchFinderTeam2 = '';
+            if (elements.matchFinderTeam1Select) elements.matchFinderTeam1Select.value = '';
+            if (elements.matchFinderTeam2Select) elements.matchFinderTeam2Select.value = '';
+            if (elements.matchFinderResults) elements.matchFinderResults.classList.add('hidden');
+            if (elements.matchFinderCategoryContainer) elements.matchFinderCategoryContainer.classList.add('hidden');
+
             createLeagueButtons();
             updateTeamSelects();
             updateTeamSeasonsTeamSelect();
             updateSeasonOptions();
-            
+
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1', 
@@ -5230,7 +5787,15 @@
             setOptions(options) {
                 this.options = options;
                 this.filteredOptions = [...options];
-                this.renderOptions();
+                // Dropdown is closed here in every real call site (this
+                // runs right after a league/team-list refresh, never while
+                // a user has it open) - rendering now built one <div> +
+                // one addEventListener per team that stayed invisible
+                // until the user actually opened it. open()/filterOptions()
+                // already call renderOptions() themselves, so the dropdown
+                // is still always correct by the time it's actually shown -
+                // this just stops paying that cost while it's hidden.
+                if (this.isOpen) this.renderOptions();
             }
 
             filterOptions(query) {
@@ -5356,7 +5921,7 @@
         }
 
         // Initialize comboboxes
-        let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox;
+        let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox, matchFinderTeam1Combobox, matchFinderTeam2Combobox;
 
         // Update team selects
         function updateTeamSelects() {
@@ -5570,6 +6135,55 @@
                 );
             }
 
+            // Initialize Match Finder comboboxes
+            if (!matchFinderTeam1Combobox) {
+                matchFinderTeam1Combobox = new Combobox(
+                    'matchFinderTeam1ComboboxContainer',
+                    'matchFinderTeam1ComboboxInput',
+                    'matchFinderTeam1ComboboxDropdown',
+                    'Select Team 1',
+                    (value, text) => {
+                        // If Team 2 is currently Big 6, update the Big 6 opponents for the new Team 1
+                        // but DON'T reset the combobox selection
+                        if (state.matchFinderTeam2 === 'BIG_6') {
+                            state.matchFinderBig6Opponents = getBig6Opponents(value);
+                        }
+
+                        elements.matchFinderTeam1Select.value = value;
+                        elements.matchFinderTeam1Select.dispatchEvent(new Event('change'));
+
+                        // Update Team 2 combobox options to show/hide Big 6
+                        let updatedTeam2Options = [
+                            { value: '', text: 'No Team' }
+                        ];
+                        if (value && state.selectedLeague === 'premier-league') {
+                            updatedTeam2Options.push({ value: 'BIG_6', text: 'Big 6' });
+                        }
+                        const leagueTeams = getLeagueTeams(state.selectedLeague);
+                        updatedTeam2Options = updatedTeam2Options.concat(leagueTeams.map(team => ({ value: team, text: team })));
+                        matchFinderTeam2Combobox.setOptions(updatedTeam2Options);
+
+                        // If Team 2 was Big 6, restore the selection in the combobox
+                        if (state.matchFinderTeam2 === 'BIG_6') {
+                            matchFinderTeam2Combobox.setValue('BIG_6', 'Big 6');
+                        }
+                    }
+                );
+            }
+
+            if (!matchFinderTeam2Combobox) {
+                matchFinderTeam2Combobox = new Combobox(
+                    'matchFinderTeam2ComboboxContainer',
+                    'matchFinderTeam2ComboboxInput',
+                    'matchFinderTeam2ComboboxDropdown',
+                    'No Team',
+                    (value, text) => {
+                        elements.matchFinderTeam2Select.value = value;
+                        elements.matchFinderTeam2Select.dispatchEvent(new Event('change'));
+                    }
+                );
+            }
+
             // Populate all combobox options
             const currentLeagueTeams = getLeagueTeams(state.selectedLeague);
             const teamSeasonsLeagueTeams = getLeagueTeams(state.teamSeasonsSelectedLeague || state.selectedLeague);
@@ -5608,11 +6222,25 @@
             // Add all other teams
             teamStreaksTeam2ComboOptions = teamStreaksTeam2ComboOptions.concat(currentLeagueTeams.map(team => ({ value: team, text: team })));
 
+            const matchFinderTeam1ComboOptions = [
+                { value: '', text: 'Select Team 1' },
+                ...currentLeagueTeams.map(team => ({ value: team, text: team }))
+            ];
+            let matchFinderTeam2ComboOptions = [
+                { value: '', text: 'No Team' }
+            ];
+            if (state.matchFinderTeam1 && state.selectedLeague === 'premier-league') {
+                matchFinderTeam2ComboOptions.push({ value: 'BIG_6', text: 'Big 6' });
+            }
+            matchFinderTeam2ComboOptions = matchFinderTeam2ComboOptions.concat(currentLeagueTeams.map(team => ({ value: team, text: team })));
+
             teamSeasonsCombobox.setOptions(teamComboOptions);
             lastTimeTeam1Combobox.setOptions(lastTimeTeam1ComboOptions);
             lastTimeTeam2Combobox.setOptions(lastTimeTeam2ComboOptions);
             teamStreaksTeam1Combobox.setOptions(teamStreaksTeam1ComboOptions);
             teamStreaksTeam2Combobox.setOptions(teamStreaksTeam2ComboOptions);
+            matchFinderTeam1Combobox.setOptions(matchFinderTeam1ComboOptions);
+            matchFinderTeam2Combobox.setOptions(matchFinderTeam2ComboOptions);
 
             // Also populate Last Time When team selects (for backward compatibility)
             const lastTimeTeam1Options = '<option value="">Select Team 1</option>' +
@@ -5620,6 +6248,15 @@
 
             elements.lastTimeTeam1Select.innerHTML = lastTimeTeam1Options;
             updateLastTimeTeam2Options();
+
+            // Also populate Match Finder team selects - the Combobox above
+            // only drives these via .value/dispatchEvent('change'), which
+            // silently no-ops on a <select> with no matching <option>.
+            const matchFinderTeam1Options = '<option value="">Select Team 1</option>' +
+                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
+
+            elements.matchFinderTeam1Select.innerHTML = matchFinderTeam1Options;
+            updateMatchFinderTeam2Options();
 
             elements.team1Select.value = state.selectedTeam1;
             elements.team2Select.value = state.selectedTeam2;
@@ -5639,10 +6276,492 @@
             lastTimeTeam2Combobox.setValue('', 'Select Team 2');
             teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
             teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
+            matchFinderTeam1Combobox.setValue('', 'Select Team 1');
+            matchFinderTeam2Combobox.setValue('', 'No Team');
 
             // Shareable filter state: consume a pending shared-link state
             // now that every tab's comboboxes exist (once)
             consumePendingShareableState();
+        }
+
+        // --- Match Finder ---
+
+        // A long-tenured club's unfiltered history (Most/Least Total Goals -
+        // no result-type filter) can run into thousands of matches. The data
+        // lookups (getTeamColor/getTeamLogoUrl) are cheap even at that scale,
+        // but building and inserting that many DOM rows in one shot measured
+        // over a second in practice - paginating means only ever building
+        // this many rows' worth of DOM at once, regardless of how large the
+        // full result set is.
+        const MATCH_FINDER_PAGE_SIZE = 20;
+
+        const MATCH_FINDER_CATEGORIES = [
+            { key: 'victories', label: 'Biggest Victories' },
+            { key: 'defeats', label: 'Biggest Defeats' },
+            { key: 'draws', label: 'Highest-Scoring Draws' },
+            { key: 'totalGoals', label: 'Most Total Goals' },
+            { key: 'leastGoals', label: 'Least Total Goals' },
+            { key: 'scoreline', label: 'Specific Scoreline' }
+        ];
+
+        function renderMatchFinderCategoryButtons() {
+            elements.matchFinderCategoryButtons.innerHTML = MATCH_FINDER_CATEGORIES.map(cat => `
+                <label class="league-button ${state.matchFinderCategory === cat.key ? 'active' : ''}" data-category="${cat.key}">
+                    <div class="radio-dot ${state.matchFinderCategory === cat.key ? 'active' : ''}"></div>
+                    <span class="text-sm font-medium ${state.matchFinderCategory === cat.key ? 'text-green-700' : 'text-gray-700'}">
+                        ${cat.label}
+                    </span>
+                </label>
+            `).join('');
+        }
+
+        // Specific Scoreline's own Home/Away score inputs - only shown when
+        // that category is active. No Double-Legged Tie mode here (Domestic
+        // has no multi-leg ties), so unlike Continental this is a plain
+        // category-only toggle with no mode branching.
+        function updateMatchFinderScorelineVisibility() {
+            if (state.matchFinderCategory === 'scoreline') {
+                elements.matchFinderScorelineContainer.classList.remove('hidden');
+            } else {
+                elements.matchFinderScorelineContainer.classList.add('hidden');
+            }
+        }
+
+        // Mirrors updateLastTimeTeam2Options() - Big 6 is only offered as a
+        // Team 2 option once Team 1 is set and the active league is the
+        // Premier League (the only domestic league this site models a
+        // "traditional rivals" aggregate for).
+        function updateMatchFinderTeam2Options() {
+            const leagueTeams = getLeagueTeams(state.selectedLeague);
+            let team2Options = ['<option value="">No Team</option>'];
+
+            if (state.matchFinderTeam1 && state.selectedLeague === 'premier-league') {
+                team2Options.push('<option value="BIG_6">Big 6</option>');
+            }
+
+            team2Options = team2Options.concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`));
+
+            elements.matchFinderTeam2Select.innerHTML = team2Options.join('');
+
+            if (state.matchFinderTeam2) {
+                elements.matchFinderTeam2Select.value = state.matchFinderTeam2;
+            }
+        }
+
+        function clearMatchFinderFilters() {
+            state.matchFinderTeam1 = '';
+            state.matchFinderTeam2 = '';
+            state.matchFinderBig6Opponents = null;
+            state.matchFinderSeason = '';
+            state.matchFinderDateFrom = '';
+            state.matchFinderDateTo = '';
+            state.matchFinderDayOfWeek = '';
+            state.matchFinderHomeFilter = true;
+            state.matchFinderAwayFilter = true;
+            state.matchFinderHomeScoreOp = 'at-least';
+            state.matchFinderHomeScoreValue = '';
+            state.matchFinderAwayScoreOp = 'at-least';
+            state.matchFinderAwayScoreValue = '';
+            state.matchFinderCategory = 'victories';
+            state.matchFinderSortConfig = { key: null, direction: null };
+            state.matchFinderPage = 1;
+
+            elements.matchFinderTeam1Select.value = '';
+            elements.matchFinderTeam2Select.value = '';
+            matchFinderTeam1Combobox.setValue('', 'Select Team 1');
+            matchFinderTeam2Combobox.setValue('', 'No Team');
+            updateMatchFinderTeam2Options();
+            elements.matchFinderSeasonSelect.value = '';
+            elements.matchFinderDateFrom.value = '';
+            elements.matchFinderDateTo.value = '';
+            elements.matchFinderDayOfWeekSelect.value = '';
+            elements.matchFinderHomeCheckbox.className = 'checkbox checked';
+            elements.matchFinderAwayCheckbox.className = 'checkbox checked';
+            elements.matchFinderHomeScoreOpSelect.value = 'at-least';
+            elements.matchFinderHomeScoreValueInput.value = '';
+            elements.matchFinderAwayScoreOpSelect.value = 'at-least';
+            elements.matchFinderAwayScoreValueInput.value = '';
+            updateMatchFinderScorelineVisibility();
+            renderMatchFinderCategoryButtons();
+
+            calculateMatchFinder();
+        }
+
+        function handleMatchFinderSeasonChange(seasonKey) {
+            state.matchFinderSeason = seasonKey;
+            const seasonData = getSeasonDateRange(seasonKey);
+            state.matchFinderDateFrom = seasonData ? seasonData.start : '';
+            state.matchFinderDateTo = seasonData ? seasonData.end : '';
+            elements.matchFinderDateFrom.value = state.matchFinderDateFrom;
+            elements.matchFinderDateTo.value = state.matchFinderDateTo;
+            calculateMatchFinder();
+        }
+
+        // Match Finder's own team-scoped match cache, same reasoning as
+        // teamHistoryApiCache/lastTimeApiCache/teamStreaksApiCache above -
+        // this tab can have a different team selected at the same time as
+        // the others, so it needs its own cache slot. Domestic league
+        // matches carry no CompetitionPhase/isQualifier/AdditionalInfo -
+        // there are no stages, qualifiers, or penalty shootouts in a
+        // round-robin domestic league - so unlike Continental's version this
+        // only needs the bare score fields.
+        async function ensureMatchFinderDataLoaded(team1, opponents, div) {
+            const cacheKey = opponents
+                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
+                : `${div}::${team1}::__all__`;
+            if (state.matchFinderApiCacheKey === cacheKey) return;
+            if (state.matchFinderApiLoading) return;
+
+            state.matchFinderApiLoading = true;
+            try {
+                const url = opponents
+                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
+                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Match Finder data request failed: ${res.status}`);
+                const data = await res.json();
+
+                state.matchFinderApiCache = data.matches.map(m => ({
+                    Div: div,
+                    dateObj: isoDateToLocalDateObj(m.date),
+                    HomeTeam: m.homeTeam,
+                    AwayTeam: m.awayTeam,
+                    FTHG: m.homeGoals,
+                    FTAG: m.awayGoals
+                }));
+                state.matchFinderApiCacheKey = cacheKey;
+            } catch (err) {
+                console.error('Failed to load Match Finder data from API:', err);
+                state.matchFinderApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
+            } finally {
+                state.matchFinderApiLoading = false;
+            }
+
+            calculateMatchFinder();
+        }
+
+        // Team 1's result/margin/total-goals for a single match, relative
+        // to Team 1's side.
+        function classifyMatchForTeam1(match, team1) {
+            const isHome = match.HomeTeam === team1;
+            const team1Goals = parseInt(isHome ? match.FTHG : match.FTAG) || 0;
+            const opponentGoals = parseInt(isHome ? match.FTAG : match.FTHG) || 0;
+            const margin = team1Goals - opponentGoals;
+            const totalGoals = team1Goals + opponentGoals;
+
+            let result;
+            if (margin > 0) result = 'win';
+            else if (margin < 0) result = 'loss';
+            else result = 'draw';
+
+            return { isHome, team1Goals, opponentGoals, margin, totalGoals, result };
+        }
+
+        // Shared by updateMatchFinderTable() - slices an already-sorted
+        // array down to the current page and updates the Previous/Next
+        // controls + result count text to match. The caller only ever
+        // builds DOM for the returned subset, not the full result set - a
+        // long-tenured club's unfiltered history can run into thousands of
+        // matches, and building that many rows' worth of DOM in one shot
+        // measured over a second in practice even though the data lookups
+        // behind each row are cheap.
+        function paginateMatchFinderResults(items, noun) {
+            const totalResults = items.length;
+            const totalPages = Math.max(1, Math.ceil(totalResults / MATCH_FINDER_PAGE_SIZE));
+            if (state.matchFinderPage > totalPages) state.matchFinderPage = totalPages;
+            if (state.matchFinderPage < 1) state.matchFinderPage = 1;
+
+            const pageStart = (state.matchFinderPage - 1) * MATCH_FINDER_PAGE_SIZE;
+            const pageItems = items.slice(pageStart, pageStart + MATCH_FINDER_PAGE_SIZE);
+
+            if (totalResults === 0) {
+                elements.matchFinderResultCount.textContent = `No ${noun} found for the current filters.`;
+            } else {
+                const rangeEnd = Math.min(pageStart + MATCH_FINDER_PAGE_SIZE, totalResults);
+                elements.matchFinderResultCount.textContent = `Showing ${pageStart + 1}-${rangeEnd} of ${totalResults} ${noun}`;
+            }
+
+            if (totalPages > 1) {
+                elements.matchFinderPaginationControls.classList.remove('hidden');
+                elements.matchFinderPageInfo.textContent = `Page ${state.matchFinderPage} of ${totalPages}`;
+                elements.matchFinderPrevPageBtn.disabled = state.matchFinderPage <= 1;
+                elements.matchFinderNextPageBtn.disabled = state.matchFinderPage >= totalPages;
+            } else {
+                elements.matchFinderPaginationControls.classList.add('hidden');
+            }
+
+            return pageItems;
+        }
+
+        function calculateMatchFinder(preservePage) {
+            if (!preservePage) state.matchFinderPage = 1;
+            if (!state.matchFinderTeam1) {
+                elements.matchFinderResults.classList.add('hidden');
+                elements.matchFinderCategoryContainer.classList.add('hidden');
+                return;
+            }
+
+            elements.matchFinderCategoryContainer.classList.remove('hidden');
+
+            const leagueMapping = {
+                'premier-league': 'E0',
+                'la-liga': 'SP1',
+                'serie-a': 'I1',
+                'bundesliga': 'D1',
+                'ligue-1': 'F1'
+            };
+            const div = leagueMapping[state.selectedLeague];
+
+            const opponents = (state.matchFinderTeam2 === 'BIG_6' && state.matchFinderBig6Opponents)
+                ? state.matchFinderBig6Opponents
+                : state.matchFinderTeam2 ? [state.matchFinderTeam2] : null;
+
+            if (div) {
+                ensureMatchFinderDataLoaded(state.matchFinderTeam1, opponents, div);
+            }
+
+            let matches = [...(state.matchFinderApiCache || [])];
+
+            // Narrow to the specific opponent(s) when Team 2 is set (H2H
+            // scope). ensureMatchFinderDataLoaded already fetches only
+            // Team1-vs-opponents matches once its cache key catches up, so
+            // this is mainly a safety net for the render that happens
+            // between a Team 2 change and that refetch landing.
+            if (opponents) {
+                matches = matches.filter(row =>
+                    (row.HomeTeam === state.matchFinderTeam1 && opponents.includes(row.AwayTeam)) ||
+                    (row.AwayTeam === state.matchFinderTeam1 && opponents.includes(row.HomeTeam))
+                );
+            }
+
+            if (state.matchFinderDayOfWeek !== '') {
+                matches = matches.filter(row => row.dateObj.getDay().toString() === state.matchFinderDayOfWeek);
+            }
+            if (state.matchFinderDateFrom) {
+                const from = new Date(state.matchFinderDateFrom);
+                matches = matches.filter(row => row.dateObj >= from);
+            }
+            if (state.matchFinderDateTo) {
+                const to = new Date(state.matchFinderDateTo);
+                matches = matches.filter(row => row.dateObj <= to);
+            }
+
+            // Home/Away, relative to Team 1's side
+            if (state.matchFinderHomeFilter && !state.matchFinderAwayFilter) {
+                matches = matches.filter(row => row.HomeTeam === state.matchFinderTeam1);
+            } else if (state.matchFinderAwayFilter && !state.matchFinderHomeFilter) {
+                matches = matches.filter(row => row.AwayTeam === state.matchFinderTeam1);
+            } else if (!state.matchFinderHomeFilter && !state.matchFinderAwayFilter) {
+                matches = [];
+            }
+
+            // Classify relative to Team 1 and bucket into the active category
+            let classified = matches.map(match => ({
+                match,
+                ...classifyMatchForTeam1(match, state.matchFinderTeam1)
+            }));
+
+            if (state.matchFinderCategory === 'victories') {
+                classified = classified.filter(m => m.result === 'win');
+                classified.sort((a, b) => b.margin - a.margin || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'defeats') {
+                classified = classified.filter(m => m.result === 'loss');
+                classified.sort((a, b) => a.margin - b.margin || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'draws') {
+                classified = classified.filter(m => m.result === 'draw');
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'totalGoals') {
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'leastGoals') {
+                classified.sort((a, b) => a.totalGoals - b.totalGoals || b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'scoreline') {
+                if (state.matchFinderHomeScoreValue !== '') {
+                    const val = parseInt(state.matchFinderHomeScoreValue);
+                    classified = classified.filter(entry => {
+                        const homeScore = parseInt(entry.match.FTHG) || 0;
+                        if (state.matchFinderHomeScoreOp === 'at-least') return homeScore >= val;
+                        if (state.matchFinderHomeScoreOp === 'at-most') return homeScore <= val;
+                        return homeScore === val;
+                    });
+                }
+                if (state.matchFinderAwayScoreValue !== '') {
+                    const val = parseInt(state.matchFinderAwayScoreValue);
+                    classified = classified.filter(entry => {
+                        const awayScore = parseInt(entry.match.FTAG) || 0;
+                        if (state.matchFinderAwayScoreOp === 'at-least') return awayScore >= val;
+                        if (state.matchFinderAwayScoreOp === 'at-most') return awayScore <= val;
+                        return awayScore === val;
+                    });
+                }
+                classified.sort((a, b) => b.match.dateObj - a.match.dateObj);
+            }
+
+            updateMatchFinderTable(classified);
+        }
+
+        function matchFinderSubtitle(count) {
+            const team1 = state.matchFinderTeam1;
+            let text = team1;
+            if (state.matchFinderTeam2) {
+                text += ` vs ${getTeamDisplayName(state.matchFinderTeam2)}`;
+            }
+            text += ` (${count} match${count === 1 ? '' : 'es'})`;
+            return text;
+        }
+
+        function updateMatchFinderTable(classified) {
+            elements.matchFinderResults.classList.remove('hidden');
+
+            const cat = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
+            elements.matchFinderTableCaption.textContent = cat.label;
+            elements.matchFinderTableTitle.textContent = matchFinderSubtitle(classified.length);
+
+            const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
+            const valueLabel = isMarginCategory ? 'Margin' : 'Total Goals';
+
+            const headers = [
+                { key: 'date', label: 'Date' },
+                { key: 'homeTeam', label: 'Home Team' },
+                { key: 'homeScore', label: 'Home Score' },
+                { key: 'awayTeam', label: 'Away Team' },
+                { key: 'awayScore', label: 'Away Score' },
+                { key: 'value', label: valueLabel }
+            ];
+
+            elements.matchFinderTableHeader.innerHTML = headers.map(header => `
+                <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('${header.key}')">
+                    ${header.label}${getMatchFinderSortIndicator(header.key)}
+                </th>
+            `).join('');
+
+            let rows = classified.map(entry => {
+                const match = entry.match;
+                const homeScore = parseInt(match.FTHG) || 0;
+                const awayScore = parseInt(match.FTAG) || 0;
+
+                let homeScoreClass, awayScoreClass;
+                if (homeScore > awayScore) {
+                    homeScoreClass = 'font-bold win-score';
+                    awayScoreClass = 'text-red-600 font-bold';
+                } else if (awayScore > homeScore) {
+                    homeScoreClass = 'text-red-600 font-bold';
+                    awayScoreClass = 'font-bold win-score';
+                } else {
+                    homeScoreClass = 'text-gray-400 font-bold draw-score';
+                    awayScoreClass = 'text-gray-400 font-bold draw-score';
+                }
+
+                let valueClass, valueText, valueSort;
+                if (isMarginCategory) {
+                    valueClass = entry.margin > 0 ? 'win-score' : entry.margin < 0 ? 'text-red-600' : 'text-gray-400';
+                    valueText = `${entry.margin > 0 ? '+' : ''}${entry.margin}`;
+                    valueSort = entry.margin;
+                } else {
+                    valueClass = entry.result === 'win' ? 'win-score' : entry.result === 'loss' ? 'text-red-600' : 'text-gray-400';
+                    valueText = `${entry.totalGoals}`;
+                    valueSort = entry.totalGoals;
+                }
+
+                return {
+                    dateObj: match.dateObj,
+                    date: match.dateObj.toLocaleDateString(),
+                    homeTeam: match.HomeTeam,
+                    homeScore, homeScoreClass,
+                    awayTeam: match.AwayTeam,
+                    awayScore, awayScoreClass,
+                    valueClass, valueText, valueSort
+                };
+            });
+
+            if (state.matchFinderSortConfig.key && state.matchFinderSortConfig.direction) {
+                const sortKey = state.matchFinderSortConfig.key;
+                const sortDirection = state.matchFinderSortConfig.direction;
+
+                rows.sort((a, b) => {
+                    let valueA, valueB;
+                    switch (sortKey) {
+                        case 'date': valueA = a.dateObj; valueB = b.dateObj; break;
+                        case 'homeTeam': valueA = a.homeTeam.toLowerCase(); valueB = b.homeTeam.toLowerCase(); break;
+                        case 'homeScore': valueA = a.homeScore; valueB = b.homeScore; break;
+                        case 'awayTeam': valueA = a.awayTeam.toLowerCase(); valueB = b.awayTeam.toLowerCase(); break;
+                        case 'awayScore': valueA = a.awayScore; valueB = b.awayScore; break;
+                        case 'value': valueA = a.valueSort; valueB = b.valueSort; break;
+                        default: return 0;
+                    }
+                    if (valueA < valueB) return sortDirection === 'asc' ? -1 : 1;
+                    if (valueA > valueB) return sortDirection === 'asc' ? 1 : -1;
+                    return 0;
+                });
+            }
+
+            const pageRows = paginateMatchFinderResults(rows, 'matches');
+
+            elements.matchFinderTableBody.innerHTML = pageRows.map((row, index) => {
+                const homeTeamColor = getTeamColor(row.homeTeam, state.selectedLeague);
+                const awayTeamColor = getTeamColor(row.awayTeam, state.selectedLeague);
+                const isHomeTeam1 = row.homeTeam === state.matchFinderTeam1;
+                const isHomeTeam2 = state.matchFinderTeam2 && row.homeTeam === state.matchFinderTeam2;
+                const isAwayTeam1 = row.awayTeam === state.matchFinderTeam1;
+                const isAwayTeam2 = state.matchFinderTeam2 && row.awayTeam === state.matchFinderTeam2;
+                const homeTeamClass = isHomeTeam1 ? 'team1-highlight' : isHomeTeam2 ? 'team2-highlight' : 'team-transparent-highlight';
+                const awayTeamClass = isAwayTeam1 ? 'team1-highlight' : isAwayTeam2 ? 'team2-highlight' : 'team-transparent-highlight';
+                const homeTeamStyle = homeTeamColor ? `color: ${pickTeamTextColor(homeTeamColor, homeTeamClass)} !important; font-weight: bold;` : 'font-weight: bold;';
+                const awayTeamStyle = awayTeamColor ? `color: ${pickTeamTextColor(awayTeamColor, awayTeamClass)} !important; font-weight: bold;` : 'font-weight: bold;';
+
+                const homeLogoUrl = getTeamLogoUrl(row.homeTeam, state.selectedLeague);
+                const awayLogoUrl = getTeamLogoUrl(row.awayTeam, state.selectedLeague);
+
+                const rowBackgroundClass = pageRows.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+
+                return `
+                    <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
+                        <td class="text-center text-sm">${row.date}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${row.homeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span class="${homeTeamClass}" style="${homeTeamStyle}">${row.homeTeam}</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-lg ${row.homeScoreClass}">${row.homeScore}</td>
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${row.awayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <span class="${awayTeamClass}" style="${awayTeamStyle}">${row.awayTeam}</span>
+                            </div>
+                        </td>
+                        <td class="text-center text-lg ${row.awayScoreClass}">${row.awayScore}</td>
+                        <td class="text-center text-lg font-bold ${row.valueClass}">${row.valueText}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function handleMatchFinderSort(key) {
+            let defaultDirection = 'desc';
+            if (key === 'homeTeam' || key === 'awayTeam') {
+                defaultDirection = 'asc';
+            }
+
+            if (state.matchFinderSortConfig.key === key) {
+                if (state.matchFinderSortConfig.direction === 'desc') {
+                    state.matchFinderSortConfig.direction = 'asc';
+                } else if (state.matchFinderSortConfig.direction === 'asc') {
+                    state.matchFinderSortConfig.key = null;
+                    state.matchFinderSortConfig.direction = null;
+                } else {
+                    state.matchFinderSortConfig.direction = defaultDirection;
+                }
+            } else {
+                state.matchFinderSortConfig.key = key;
+                state.matchFinderSortConfig.direction = defaultDirection;
+            }
+
+            calculateMatchFinder();
+        }
+
+        function getMatchFinderSortIndicator(key) {
+            if (state.matchFinderSortConfig.key !== key) return ' ↕️';
+            return state.matchFinderSortConfig.direction === 'asc' ? ' ↑' : ' ↓';
         }
 
         // Helper function to hide all Last Time sections
@@ -6192,6 +7311,9 @@
             
             elements.seasonSelect.innerHTML = options;
             elements.seasonSelect.value = state.selectedSeason;
+
+            elements.matchFinderSeasonSelect.innerHTML = options;
+            elements.matchFinderSeasonSelect.value = state.matchFinderSeason;
         }
 
         // Get available seasons
@@ -6975,6 +8097,29 @@
                 if (status && status !== 'active') params.set('status', status);
                 if (location && location !== 'both') params.set('loc', location);
                 if (streakType && streakType !== 'winning') params.set('type', streakType);
+            } else if (view === 'match-finder') {
+                if (state.matchFinderTeam1) params.set('t1', state.matchFinderTeam1);
+                if (state.matchFinderTeam2) params.set('t2', state.matchFinderTeam2);
+                if (state.matchFinderSeason) {
+                    params.set('season', state.matchFinderSeason);
+                } else {
+                    if (state.matchFinderDateFrom) params.set('from', state.matchFinderDateFrom);
+                    if (state.matchFinderDateTo) params.set('to', state.matchFinderDateTo);
+                }
+                if (state.matchFinderDayOfWeek) params.set('day', state.matchFinderDayOfWeek);
+                if (!state.matchFinderHomeFilter) params.set('home', '0');
+                if (!state.matchFinderAwayFilter) params.set('away', '0');
+                if (state.matchFinderCategory !== 'victories') params.set('cat', state.matchFinderCategory);
+                if (state.matchFinderCategory === 'scoreline') {
+                    if (state.matchFinderHomeScoreValue !== '') {
+                        params.set('hsOp', state.matchFinderHomeScoreOp);
+                        params.set('hsVal', state.matchFinderHomeScoreValue);
+                    }
+                    if (state.matchFinderAwayScoreValue !== '') {
+                        params.set('asOp', state.matchFinderAwayScoreOp);
+                        params.set('asVal', state.matchFinderAwayScoreValue);
+                    }
+                }
             }
 
             return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
@@ -7088,13 +8233,76 @@
                     elements.teamStreaksTypeSelect.value = type;
                     elements.teamStreaksTypeSelect.dispatchEvent(new Event('change'));
                 }
+            } else if (view === 'match-finder') {
+                const t1 = params.get('t1');
+                const t2 = params.get('t2');
+                if (t1) matchFinderTeam1Combobox.selectOption(t1, t1);
+                if (t2) matchFinderTeam2Combobox.selectOption(t2, getTeamDisplayName(t2));
+                const season = params.get('season');
+                if (season) {
+                    elements.matchFinderSeasonSelect.value = season;
+                    handleMatchFinderSeasonChange(season);
+                } else {
+                    const from = params.get('from');
+                    const to = params.get('to');
+                    if (from) {
+                        elements.matchFinderDateFrom.value = from;
+                        elements.matchFinderDateFrom.dispatchEvent(new Event('change'));
+                    }
+                    if (to) {
+                        elements.matchFinderDateTo.value = to;
+                        elements.matchFinderDateTo.dispatchEvent(new Event('change'));
+                    }
+                }
+                const day = params.get('day');
+                if (day) {
+                    elements.matchFinderDayOfWeekSelect.value = day;
+                    elements.matchFinderDayOfWeekSelect.dispatchEvent(new Event('change'));
+                }
+                if (params.get('home') === '0' && state.matchFinderHomeFilter) {
+                    elements.matchFinderHomeCheckbox.click();
+                }
+                if (params.get('away') === '0' && state.matchFinderAwayFilter) {
+                    elements.matchFinderAwayCheckbox.click();
+                }
+                const cat = params.get('cat');
+                if (cat && MATCH_FINDER_CATEGORIES.some(c => c.key === cat)) {
+                    state.matchFinderCategory = cat;
+                    if (cat === 'scoreline') {
+                        const hsOp = params.get('hsOp'), hsVal = params.get('hsVal');
+                        if (hsVal !== null) {
+                            state.matchFinderHomeScoreOp = hsOp || 'at-least';
+                            state.matchFinderHomeScoreValue = hsVal;
+                            elements.matchFinderHomeScoreOpSelect.value = state.matchFinderHomeScoreOp;
+                            elements.matchFinderHomeScoreValueInput.value = hsVal;
+                        }
+                        const asOp = params.get('asOp'), asVal = params.get('asVal');
+                        if (asVal !== null) {
+                            state.matchFinderAwayScoreOp = asOp || 'at-least';
+                            state.matchFinderAwayScoreValue = asVal;
+                            elements.matchFinderAwayScoreOpSelect.value = state.matchFinderAwayScoreOp;
+                            elements.matchFinderAwayScoreValueInput.value = asVal;
+                        }
+                    }
+                    renderMatchFinderCategoryButtons();
+                    updateMatchFinderScorelineVisibility();
+                    calculateMatchFinder();
+                }
             }
 
             history.replaceState(null, '', window.location.pathname);
         }
 
-        // Update table and all related UI
-        function updateTable() {
+        // Update table and all related UI. preservePage keeps the current
+        // Match History/H2H pagination position - every other call site
+        // (filter/sort/team changes) omits it, resetting both back to page 1
+        // since the underlying result set may have changed; only the
+        // Previous/Next pagination buttons pass true.
+        function updateTable(preservePage) {
+            if (!preservePage) {
+                state.matchHistoryPage = 1;
+                state.h2hPage = 1;
+            }
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
             const matchHistoryResult = calculateMatchHistory();
@@ -7174,6 +8382,9 @@
                 } else if (tabName === 'team-streaks' && teamStreaksTeam1Combobox) {
                     teamStreaksTeam1Combobox.selectOption(team, team);
                     lockComboboxUI('teamStreaksTeam1ComboboxContainer', 'teamStreaksTeam1ComboboxInput');
+                } else if (tabName === 'match-finder' && matchFinderTeam1Combobox) {
+                    matchFinderTeam1Combobox.selectOption(team, team);
+                    lockComboboxUI('matchFinderTeam1ComboboxContainer', 'matchFinderTeam1ComboboxInput');
                 }
             } finally {
                 applyingTeamDashboardLock = false;
@@ -7677,6 +8888,63 @@
             };
         }
 
+        // Shared page size for Match History and Head-to-Head Match History -
+        // a long-tenured club's full match history (or, on mobile, even a
+        // more modest few hundred rows) is expensive to build as DOM in one
+        // shot, the same issue Match Finder's results table had before it
+        // was paginated. These two tables get the same treatment for
+        // consistency, even though Head-to-Head's row counts are usually
+        // much smaller on their own.
+        const HISTORY_PAGE_SIZE = 20;
+
+        // Slices an already-sorted array down to the current Match History
+        // page and updates the Previous/Next controls to match. The caller
+        // only ever builds DOM for the returned subset, not the full result
+        // set.
+        function paginateMatchHistoryResults(items) {
+            const totalResults = items.length;
+            const totalPages = Math.max(1, Math.ceil(totalResults / HISTORY_PAGE_SIZE));
+            if (state.matchHistoryPage > totalPages) state.matchHistoryPage = totalPages;
+            if (state.matchHistoryPage < 1) state.matchHistoryPage = 1;
+
+            const pageStart = (state.matchHistoryPage - 1) * HISTORY_PAGE_SIZE;
+            const pageItems = items.slice(pageStart, pageStart + HISTORY_PAGE_SIZE);
+
+            if (totalPages > 1) {
+                elements.matchHistoryPaginationControls.classList.remove('hidden');
+                elements.matchHistoryPageInfo.textContent = `Page ${state.matchHistoryPage} of ${totalPages}`;
+                elements.matchHistoryPrevPageBtn.disabled = state.matchHistoryPage <= 1;
+                elements.matchHistoryNextPageBtn.disabled = state.matchHistoryPage >= totalPages;
+            } else {
+                elements.matchHistoryPaginationControls.classList.add('hidden');
+            }
+
+            return pageItems;
+        }
+
+        // Same as paginateMatchHistoryResults() but for the Head-to-Head
+        // Match History table's own page state/controls.
+        function paginateH2HResults(items) {
+            const totalResults = items.length;
+            const totalPages = Math.max(1, Math.ceil(totalResults / HISTORY_PAGE_SIZE));
+            if (state.h2hPage > totalPages) state.h2hPage = totalPages;
+            if (state.h2hPage < 1) state.h2hPage = 1;
+
+            const pageStart = (state.h2hPage - 1) * HISTORY_PAGE_SIZE;
+            const pageItems = items.slice(pageStart, pageStart + HISTORY_PAGE_SIZE);
+
+            if (totalPages > 1) {
+                elements.h2hPaginationControls.classList.remove('hidden');
+                elements.h2hPageInfo.textContent = `Page ${state.h2hPage} of ${totalPages}`;
+                elements.h2hPrevPageBtn.disabled = state.h2hPage <= 1;
+                elements.h2hNextPageBtn.disabled = state.h2hPage >= totalPages;
+            } else {
+                elements.h2hPaginationControls.classList.add('hidden');
+            }
+
+            return pageItems;
+        }
+
         // Update match history display
         function updateMatchHistoryDisplay(matchHistoryResult) {
             if (matchHistoryResult && state.selectedTeam1 && !state.selectedTeam2) {
@@ -7896,7 +9164,8 @@
             }
 
             // Generate table rows with H2H-style formatting
-            elements.matchHistoryTableBody.innerHTML = matchesData.map((match, index) => {
+            const pageMatchesData = paginateMatchHistoryResults(matchesData);
+            elements.matchHistoryTableBody.innerHTML = pageMatchesData.map((match, index) => {
                 const isSelectedTeamHome = match.homeTeam === state.selectedTeam1;
                 const isSelectedTeamAway = match.awayTeam === state.selectedTeam1;
 
@@ -7914,7 +9183,7 @@
                 // just far more noticeable now that dark mode's own
                 // --bg-white/--bg-gray-50 are an obvious #222 vs #333
                 // instead of barely-different near-whites.
-                const rowBackgroundClass = matchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = pageMatchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
@@ -8439,14 +9708,15 @@
             }
 
             // Update table body
-            elements.h2hTableBody.innerHTML = matchesData.map((match, index) => {
+            const pageMatchesData = paginateH2HResults(matchesData);
+            elements.h2hTableBody.innerHTML = pageMatchesData.map((match, index) => {
                 const isTeam1Home = match.homeTeam === state.selectedTeam1;
                 const isTeam1Away = match.awayTeam === state.selectedTeam1;
-                
+
                 // Get team logos
                 const homeLogoUrl = getTeamLogoUrl(match.homeTeam, state.selectedLeague);
                 const awayLogoUrl = getTeamLogoUrl(match.awayTeam, state.selectedLeague);
-                
+
                 // Get winner logo for result column (if not a draw)
                 const winnerLogoUrl = match.result !== 'Draw' ? getTeamLogoUrl(match.result, state.selectedLeague) : null;
 
@@ -8456,7 +9726,7 @@
                 // just far more noticeable now that dark mode's own
                 // --bg-white/--bg-gray-50 are an obvious #222 vs #333
                 // instead of barely-different near-whites.
-                const rowBackgroundClass = matchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+                const rowBackgroundClass = pageMatchesData.length >= 3 && index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
 
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
@@ -9295,6 +10565,12 @@
 
         // Match history sorting functions
         function handleMatchHistorySort(key) {
+            // This bypasses updateTable() (calls updateMatchHistoryDisplay()
+            // directly below), so the page reset updateTable() normally does
+            // has to happen here instead - any sort change should land back
+            // on page 1 of the newly-ordered results.
+            state.matchHistoryPage = 1;
+
             // Determine if this is a numerical column
             const numericalColumns = ['homeScore', 'awayScore'];
             const isNumerical = numericalColumns.includes(key);
@@ -9559,7 +10835,43 @@
                     localStorage.setItem('theme', 'light');
                     handlePositionColors();
                 }
+                refreshTeamColorsForTheme();
             });
+        }
+
+        // pickTeamTextColor() computes a team's text color once, at the
+        // moment a row is built, and bakes it into that element's own
+        // inline style - a literal hex value, not a live var() reference,
+        // so it does NOT update on its own when the theme toggles (unlike
+        // handlePositionColors() above, which only resets its own narrower
+        // set of League Table/Team History <td> cells). Toggling the theme
+        // while looking at an already-rendered Match History/Team Streaks/
+        // Last Time When/Match Finder/Team History table left every team-
+        // colored name stuck at whichever color it was computed for, until
+        // something else re-rendered that section. Re-running whichever
+        // tab's own (side-effect-free) recalculation function is currently
+        // active fixes this by rebuilding those elements' colors against
+        // the new theme, the same as any other state change already does.
+        function refreshTeamColorsForTheme() {
+            const activeTab = getActiveDashboardTabName();
+            if (activeTab === 'league-filters') {
+                updateTable();
+            } else if (activeTab === 'match-finder') {
+                calculateMatchFinder();
+            } else if (activeTab === 'last-time-when') {
+                calculateLastTimeWhen();
+            } else if (activeTab === 'team-streaks') {
+                calculateTeamStreaks();
+            } else if (activeTab === 'team-seasons' && state.teamSeasonsSelectedTeam) {
+                // Single-team view only - re-showing here can hide the
+                // "back to League Filters" arrow if that team was reached
+                // by clicking through from there, a narrow and purely
+                // cosmetic gap not worth the extra state bookkeeping to
+                // close. The all-teams "everyone who finished 2nd"-style
+                // position view has no safe, argument-free re-render entry
+                // point and isn't covered here.
+                showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
+            }
         }
         
         // Handle table colors by specific column headers
