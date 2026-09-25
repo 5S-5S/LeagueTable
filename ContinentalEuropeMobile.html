@@ -3799,19 +3799,30 @@
                 title = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1}</span>'s Historic ${streakName}s${locationText}`;
             }
 
-            // Aggregate stat columns for this streak type (see
-            // HISTORIC_STREAK_AGGREGATE_COLUMNS), placed before Count/Days
-            const aggregateKeys = HISTORIC_STREAK_AGGREGATE_COLUMNS[streakType] || [];
-            const aggregateHeaders = aggregateKeys.map(key =>
-                `<th class="text-center cursor-pointer streak-aggregate-cell" onclick="handleHistoricStreaksSort('${key}')" title="${HISTORIC_STREAK_AGGREGATE_LABELS[key].title}">${HISTORIC_STREAK_AGGREGATE_LABELS[key].short}</th>`
-            ).join('');
-            const aggregateCells = streak => aggregateKeys.map(key =>
-                `<td class="text-center streak-aggregate-cell">${formatStreakAggregate(key, streak[key])}</td>`
-            ).join('');
-
-            // Sub-sortable "Start → End" merged date-range header
+            // Sub-sortable header label - used by the merged "Start → End"
+            // and "GF:GA" headers, where each half sorts independently
             const thSort = (key, label) =>
                 `<span onclick="handleHistoricStreaksSort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
+
+            // Aggregate stat columns for this streak type (see
+            // HISTORIC_STREAK_AGGREGATE_COLUMNS), placed before Count/Days.
+            // When a type has both GF and GA, they share one "GF:GA"
+            // column here (same merge as the League Table on mobile).
+            const aggregateKeys = HISTORIC_STREAK_AGGREGATE_COLUMNS[streakType] || [];
+            const mergeGoals = aggregateKeys.includes('gf') && aggregateKeys.includes('ga');
+            const aggregateColumns = mergeGoals
+                ? ['gf:ga', ...aggregateKeys.filter(key => key !== 'gf' && key !== 'ga')]
+                : aggregateKeys;
+            const aggregateHeaders = aggregateColumns.map(key => key === 'gf:ga'
+                ? `<th class="text-center streak-aggregate-cell streak-goals-cell">${thSort('gf', 'GF')}:${thSort('ga', 'GA')}</th>`
+                : `<th class="text-center cursor-pointer streak-aggregate-cell" onclick="handleHistoricStreaksSort('${key}')" title="${HISTORIC_STREAK_AGGREGATE_LABELS[key].title}">${HISTORIC_STREAK_AGGREGATE_LABELS[key].short}</th>`
+            ).join('');
+            const aggregateCells = streak => aggregateColumns.map(key => key === 'gf:ga'
+                ? `<td class="text-center streak-aggregate-cell streak-goals-cell">${streak.gf}:${streak.ga}</td>`
+                : `<td class="text-center streak-aggregate-cell">${formatStreakAggregate(key, streak[key])}</td>`
+            ).join('');
+
+            // Merged "Start → End" date-range header
             const dateRangeHeader = `
                 <th class="text-center" style="white-space: nowrap;">
                     ${thSort('startDate', 'Start')} → ${thSort('endDate', 'End')}
@@ -3826,23 +3837,14 @@
             if (team2) {
                 // Head-to-head mode
                 tableHeaders = `
-                    <th class="text-center">Team 1</th>
-                    <th class="text-center">Team 2</th>
+                    <th class="text-center"></th>
+                    <th class="text-center"></th>
                     ${dateRangeHeader}
                 `;
             } else {
-                // Single team mode - adjust header based on location
-                let teamColumnHeader;
-                if (location === 'home') {
-                    teamColumnHeader = 'Home Team';
-                } else if (location === 'away') {
-                    teamColumnHeader = 'Away Team';
-                } else {
-                    teamColumnHeader = 'Team';
-                }
-
+                // Single team mode - logo-only Team column (header left blank)
                 tableHeaders = `
-                    <th class="text-center">${teamColumnHeader}</th>
+                    <th class="text-center"></th>
                     ${dateRangeHeader}
                 `;
             }
