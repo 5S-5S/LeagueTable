@@ -101,10 +101,13 @@ Feature ideas, not yet scheduled.
   Config lives in `HISTORIC_STREAK_AGGREGATE_COLUMNS` (all 4 files);
   totals come from the same full-time score/result the streak itself was
   built from (a shootout counts as its full-time draw), PPG = 3/win,
-  1/draw. Default order is still longest streak first. Mobile uses short
-  labels (CS/FTS, full name on hover) and scrolls the historic table
-  sideways with the team column(s) and title pinned, instead of
-  squeezing it (the Start -> End dates were being clipped). Verified
+  1/draw. Default order is still longest streak first; Count and Length
+  (Days) are always the last two columns. Mobile compacts the table:
+  short labels (CS/FTS, full name on hover), GF and GA merged into one
+  sub-sortable "GF:GA" column (as on the League Table), and logo-only
+  team columns with blank headers - so single-team mode fits a 390px
+  screen for every type; anything wider (head-to-head Unbeaten/Winless)
+  scrolls sideways with the team logo(s) and title pinned. Verified
   every row against an independent recomputation for all 9 types -
   Real Madrid (single + vs Bayern) and Arsenal (single + vs Big 6),
   desktop and mobile - plus sorting and light/dark mode. The
