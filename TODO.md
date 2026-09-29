@@ -40,6 +40,18 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
+- Later: **Team Seasons "No seasons found" info line with team + position**
+  — noted 2026-09-29. Opening a Team Seasons link with both a team and a
+  position (e.g. La Liga, FC Barcelona, position 2) shows 28 rows, but the
+  info line above them says "No seasons found where FC Barcelona finished
+  2nd". `main` does the same, so it predates the season match lists. Likely
+  cause: displayTeamHistory() writes the info line on the first render,
+  before the season standings have loaded, and its setTimeout re-check only
+  restores the text when the line is empty - so the stale "No seasons
+  found" message is never replaced once the data arrives. Check whether it
+  also happens when picking team then position by hand, not just from a
+  link.
+
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
@@ -62,6 +74,18 @@ Feature ideas, not yet scheduled.
   which is tight on mobile.
 
 ## Done
+
+- ~~Team Seasons: per-season match lists and individual seasons~~ — done
+  (2026-09-29): every Team Seasons row has a chevron that expands that
+  team's matches for the season (Match History layout, newest first; several
+  can be open at once). Works in every view - one team, all teams at a
+  position/progression, and a new single-season view: the Season dropdown
+  now lists every individual season after the eras, and picking one on its
+  own shows that season's final standings (Continental: ranked by
+  progression) while hiding the position/progression filter. Revoked titles
+  (Marseille 1992-93, Juventus 2004-05) show "NR" in those tables. All four
+  pages. Shipped alongside: Everton's missing second 2023-24 deduction (-2)
+  and Bielefeld's strippedChampions league code (E1 -> D1).
 
 - ~~Continental dark mode starts 100ms late~~ — done (2026-09-28): both
   Continental pages now call `initDarkMode()` immediately at start-up, as
