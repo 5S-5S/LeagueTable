@@ -3279,6 +3279,99 @@
         }
         
         // Display historic streaks results in table format
+        // Historic streaks: each streak row's chevron expands that streak's
+        // matches underneath it, in the Match History row layout (newest
+        // first, Team 1 highlighted). The streak already holds its own
+        // matches, so nothing extra is fetched. Added to the rendered table
+        // afterwards (decorateHistoricStreakRows), so it works with each
+        // page's own column layout.
+        let expandedStreaks = new Set(); // open streaks, as `${start day}|${count}`
+        let expandedStreaksFor = ''; // the team/opponent/location/type they belong to
+        let currentHistoricStreaks = null; // { byKey, team1 } for the click handler
+
+        function historicStreakKey(streak) {
+            return `${localDateKey(streak.startDate)}|${streak.count}`;
+        }
+
+        function renderStreakMatchesRow(streak, team1, colspan) {
+            const rows = [...streak.matches]
+                .sort((a, b) => b.dateObj - a.dateObj)
+                .map(match => buildMatchHistoryRowData(match, team1, state.selectedLeague));
+            return `
+                <tr class="season-matches-row streak-matches-row" data-streak="${historicStreakKey(streak)}">
+                    <td colspan="${colspan}">
+                        <div class="league-table season-matches">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Date</th>
+                                <th class="text-center">Home Team</th>
+                                <th class="text-center">Home Score</th>
+                                <th class="text-center">Away Team</th>
+                                <th class="text-center">Away Score</th>
+                                <th class="text-center">Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="team1-selected">
+                                    ${rows.map((row, index) => renderMatchHistoryRow(row, index, rows.length, team1, state.selectedLeague)).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // `streaks` is in the same order as the table's rows
+        function decorateHistoricStreakRows(streaks, team1) {
+            if (expandedStreaksFor !== state.lastHistoricStreaksParams) {
+                expandedStreaks = new Set();
+                expandedStreaksFor = state.lastHistoricStreaksParams;
+            }
+            const table = elements.teamStreaksResults.querySelector('table');
+            if (!table) return;
+            const colspan = table.querySelectorAll('thead th').length;
+            const rows = [...table.tBodies[0].rows];
+            currentHistoricStreaks = { byKey: new Map(), team1 };
+
+            streaks.forEach((streak, index) => {
+                const row = rows[index];
+                if (!row) return;
+                const key = historicStreakKey(streak);
+                currentHistoricStreaks.byKey.set(key, streak);
+                const isExpanded = expandedStreaks.has(key);
+                // inside the cell's logo+name flex row, if it has one, so it sits beside the logo
+                const cell = row.firstElementChild;
+                (cell.querySelector('div.flex') || cell).insertAdjacentHTML('afterbegin',
+                    `<button type="button" class="season-expand-btn streak-expand-btn${isExpanded ? ' expanded' : ''}" data-streak="${key}" aria-expanded="${isExpanded}" title="Show this streak's matches">▸</button>`);
+                cell.classList.add('streak-expand-cell');
+                if (isExpanded) row.insertAdjacentHTML('afterend', renderStreakMatchesRow(streak, team1, colspan));
+            });
+            elements.teamStreaksResults.onclick = handleStreakExpandClick;
+        }
+
+        function handleStreakExpandClick(event) {
+            const button = event.target.closest('.streak-expand-btn');
+            if (!button || !currentHistoricStreaks) return;
+            const key = button.dataset.streak;
+            const streak = currentHistoricStreaks.byKey.get(key);
+            if (!streak) return;
+
+            const streakRow = button.closest('tr');
+            const next = streakRow.nextElementSibling;
+            if (expandedStreaks.has(key)) {
+                expandedStreaks.delete(key);
+                if (next && next.classList.contains('streak-matches-row')) next.remove();
+            } else {
+                expandedStreaks.add(key);
+                const colspan = streakRow.closest('table').querySelectorAll('thead th').length;
+                streakRow.insertAdjacentHTML('afterend', renderStreakMatchesRow(streak, currentHistoricStreaks.team1, colspan));
+            }
+            const isExpanded = expandedStreaks.has(key);
+            button.classList.toggle('expanded', isExpanded);
+            button.setAttribute('aria-expanded', String(isExpanded));
+        }
+
         function displayHistoricStreaksResults(streaks, team1, team2, streakType, location) {
             if (streaks.length === 0) {
                 elements.teamStreaksResults.innerHTML = `
@@ -3454,6 +3547,7 @@
             `;
 
             elements.teamStreaksResults.innerHTML = tableHTML;
+            decorateHistoricStreakRows(streaks, team1);
             elements.teamStreaksResults.classList.remove('hidden');
         }
 
