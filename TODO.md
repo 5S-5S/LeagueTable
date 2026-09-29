@@ -40,6 +40,35 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
+- Later: **Upcoming matches dashboard** — noted 2026-09-29. A dashboard of
+  upcoming fixtures, where each match shows the context for that meeting:
+  - all-time head-to-head record between the two teams
+  - any active streak in that head-to-head (e.g. "unbeaten in 6 vs them")
+  - each team's own active streaks regardless of opponent (winning,
+    unbeaten, scoring, clean sheets...)
+
+  Data source confirmed: the football-data.org key the score scripts
+  already use returns future fixtures - `/v4/competitions/{code}/matches`
+  with `status=SCHEDULED` and a future date range (tested on the Premier
+  League 2026-09-29: 38 fixtures over the next month, all with fixed
+  kick-off times, `SCHEDULED` also returns `TIMED`). Each fixture has a
+  stable match `id`, `utcDate`, `matchday`, `stage` and API team names that
+  the scripts' existing team mappings already handle. Free tier covers all
+  five leagues and the Champions League (not CL qualifiers), ~10
+  requests/min - one call per competition per day is plenty.
+
+  Open design points:
+  - Storage: fixtures have no score and get rescheduled, so keep them out
+    of the results `matches` table - a separate D1 table (keyed by the API
+    match id, replaced on each refresh) or a small JSON file.
+  - Refresh: a daily job alongside the existing score updates, replacing
+    fixtures rather than appending, and dropping ones that have been played.
+  - Where it lives: its own page/tab, the landing page, or per team on the
+    Team Dashboard (or several).
+  - The H2H record and streaks can reuse the existing head-to-head and
+    streak logic (/api/head-to-head, calculateActiveStreaks) rather than
+    new backend endpoints.
+
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
