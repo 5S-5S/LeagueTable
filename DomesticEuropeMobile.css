@@ -931,6 +931,27 @@ body {
     border-color: #10b981;
 }
 
+/* Selected team's logo inside a closed combobox (see updateSelectedLogo()) */
+.combobox-selected-logo {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    object-fit: contain;
+    pointer-events: none;
+    display: none;
+}
+
+.combobox-container.has-logo .combobox-selected-logo {
+    display: block;
+}
+
+.combobox-container.has-logo .combobox-input {
+    padding-left: 2.5rem;
+}
+
 /* Extra Team 2 slots ("+ Add team") under a Team 2 combobox */
 .team2-extra-row {
     display: flex;
@@ -1723,6 +1744,16 @@ body {
     .combobox-input {
         font-size: 0.8rem !important;
         padding: 0.6rem 2rem 0.6rem 0.75rem !important;
+    }
+
+    .combobox-selected-logo {
+        left: 0.625rem;
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .combobox-container.has-logo .combobox-input {
+        padding-left: 2rem !important;
     }
 
     /* Match Results: Home/Away/Point Deductions/3 Points checkboxes were

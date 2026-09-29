@@ -5715,6 +5715,16 @@
             }
 
             init() {
+                // Selected team's logo, shown inside the input once closed
+                this.selectedLogo = document.createElement('img');
+                this.selectedLogo.className = 'combobox-selected-logo';
+                this.selectedLogo.alt = '';
+                this.selectedLogo.addEventListener('error', () => {
+                    this.failedLogoUrl = this.selectedLogo.getAttribute('src');
+                    this.container.classList.remove('has-logo');
+                });
+                this.container.appendChild(this.selectedLogo);
+
                 // Input events
                 this.input.addEventListener('focus', () => {
                     // Clear the field on focus instead of leaving the current
@@ -5815,17 +5825,7 @@
                 this.dropdown.innerHTML = this.filteredOptions.map((option, index) => {
                     // Get team logo if this is a team option (not empty option)
                     const logoHtml = option.value && option.value !== '' ? (() => {
-                        // Determine which league to use based on the combobox container
-                        let leagueToUse = state.selectedLeague;
-                        if (this.containerId === 'teamSeasonsComboboxContainer') {
-                            leagueToUse = state.teamSeasonsSelectedLeague || state.selectedLeague;
-                        } else if (this.containerId === 'lastTimeTeam1ComboboxContainer' || this.containerId === 'lastTimeTeam2ComboboxContainer') {
-                            leagueToUse = state.selectedLeague;
-                        } else if (this.containerId === 'teamStreaksTeam1ComboboxContainer' || this.containerId === 'teamStreaksTeam2ComboboxContainer') {
-                            leagueToUse = state.selectedLeague;
-                        }
-
-                        const logoUrl = getTeamLogoUrl(option.value, leagueToUse);
+                        const logoUrl = getTeamLogoUrl(option.value, this.getLogoLeague());
                         return logoUrl ? `<img src="${logoUrl}" alt="${option.value} logo" class="combobox-team-logo" onerror="this.style.display='none'">` : '';
                     })() : '';
 
@@ -5892,18 +5892,44 @@
                 this.isOpen = true;
                 this.container.classList.add('open');
                 this.renderOptions();
+                this.updateSelectedLogo();
             }
 
             close() {
                 this.isOpen = false;
                 this.container.classList.remove('open');
                 this.selectedIndex = -1;
+                this.updateSelectedLogo();
             }
 
             setValue(value, text) {
                 this.currentValue = value;
                 this.currentText = text || this.placeholder;
                 this.input.value = this.currentText;
+                this.updateSelectedLogo();
+            }
+
+            // Team Seasons has its own league picker; every other combobox
+            // follows the page's selected league.
+            getLogoLeague() {
+                if (this.containerId === 'teamSeasonsComboboxContainer') {
+                    return state.teamSeasonsSelectedLeague || state.selectedLeague;
+                }
+                return state.selectedLeague;
+            }
+
+            // Show the selected team's logo inside the closed combobox (the
+            // dropdown options already show one) - hidden while open, since
+            // the field is cleared for typing then. Big 6/country/"All Teams"
+            // values have no logo, so nothing shows for those.
+            updateSelectedLogo() {
+                const logoUrl = !this.isOpen && this.currentValue
+                    ? getTeamLogoUrl(this.currentValue, this.getLogoLeague())
+                    : null;
+                if (logoUrl && this.selectedLogo.getAttribute('src') !== logoUrl) {
+                    this.selectedLogo.src = logoUrl;
+                }
+                this.container.classList.toggle('has-logo', !!logoUrl && logoUrl !== this.failedLogoUrl);
             }
         }
 
