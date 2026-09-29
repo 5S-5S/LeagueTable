@@ -4430,7 +4430,10 @@
                                 const deductionEnd = new Date(deduction.endDate);
 
                                 const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
-                                if (hasOverlap && state.pointDeductionsEnabled) {
+                                // Season finishes are full-season tables, so deductions always
+                                // count here - not tied to League Tables' Point Deductions box,
+                                // which switches off whenever a team is picked there.
+                                if (hasOverlap) {
                                     teamPoints -= deduction.points;
                                 }
                             }
@@ -6218,6 +6221,9 @@
                         updateTeamSelects(); // This will refresh Team 2 options with/without Big 6
 
                         // Trigger same logic as original dropdown
+                        // Same rule the hidden <select> handlers apply: team
+                        // tables default to no point deductions.
+                        checkAndDisablePointDeductions();
                         updateTable();
                     }
                 );
@@ -6241,6 +6247,9 @@
                         state.extraTeam2s = state.extraTeam2s.filter(team => team !== value);
                         elements.team2Select.value = value;
                         // Trigger same logic as original dropdown
+                        // Same rule the hidden <select> handlers apply: team
+                        // tables default to no point deductions.
+                        checkAndDisablePointDeductions();
                         updateTable();
                     }
                 );
@@ -8703,13 +8712,18 @@
             const savedTeam1 = state.selectedTeam1;
             const savedTeam2 = state.selectedTeam2;
             const savedBig6 = state.big6Opponents;
+            const savedDeductions = state.pointDeductionsEnabled;
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
             state.big6Opponents = null;
+            // The full league table always counts deductions, as it does
+            // with no team selected (checkAndDisablePointDeductions())
+            state.pointDeductionsEnabled = true;
             const standings = calculateTable().tableData;
             state.selectedTeam1 = savedTeam1;
             state.selectedTeam2 = savedTeam2;
             state.big6Opponents = savedBig6;
+            state.pointDeductionsEnabled = savedDeductions;
 
             const standing = standings.find(row => row.team === teamName);
             if (!standing) return null;
@@ -10413,7 +10427,10 @@
 
                             const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
 
-                            if (hasOverlap && state.pointDeductionsEnabled) {
+                            // Season finishes are full-season tables, so deductions always
+                            // count here - not tied to League Tables' Point Deductions box,
+                            // which switches off whenever a team is picked there.
+                            if (hasOverlap) {
                                 points -= deduction.points;
                             }
                         }
@@ -10436,7 +10453,10 @@
 
                                 const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
 
-                                if (hasOverlap && state.pointDeductionsEnabled) {
+                                // Season finishes are full-season tables, so deductions always
+                                // count here - not tied to League Tables' Point Deductions box,
+                                // which switches off whenever a team is picked there.
+                                if (hasOverlap) {
                                     teamPoints -= deduction.points;
                                 }
                             }
