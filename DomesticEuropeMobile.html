@@ -5019,6 +5019,13 @@
                 updateTeamSeasonsTeamSelect();
                 updateTeamSeasonsSeasonSelect();
 
+                // Drop a season/era left over from another league (e.g. the
+                // Premier League's default "All English Seasons" era after the
+                // league was switched to Serie A) before applying defaults
+                if (state.teamSeasonsSelectedSeason && !getAvailableSeasons(preservedLeague).includes(state.teamSeasonsSelectedSeason)) {
+                    state.teamSeasonsSelectedSeason = '';
+                }
+
                 // Ensure default season is set for leagues that support season filtering
                 if (preservedLeague === 'premier-league' && !state.teamSeasonsSelectedSeason) {
                     state.teamSeasonsSelectedSeason = 'all-english-seasons-1888-2025';
@@ -8415,10 +8422,23 @@
                 // one comma-joined value, so team names never need escaping.
                 activeExtraTeam2s(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)
                     .forEach(team => params.append('t2', team));
+                // Filters the League Tables view also applies (day, home/away,
+                // points rules) and the H2H/Match History boxes below it
+                if (state.selectedDayOfWeek !== '') params.set('day', state.selectedDayOfWeek);
+                if (!state.homeFilter) params.set('home', '0');
+                if (!state.awayFilter) params.set('away', '0');
+                // Always written: their defaults depend on the season and teams
+                params.set('ded', state.pointDeductionsEnabled ? '1' : '0');
+                params.set('p3', state.threePointSystem ? '1' : '0');
+                if (state.recentH2HCount !== 'All') params.set('h2hN', state.recentH2HCount);
+                if (state.recentMatchesCount !== 'All') params.set('mhN', state.recentMatchesCount);
             } else if (view === 'team-seasons') {
                 if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
                 if (state.teamSeasonsSelectedSeason) params.set('season', state.teamSeasonsSelectedSeason);
                 if (state.teamSeasonsSelectedPosition) params.set('pos', state.teamSeasonsSelectedPosition);
+                if (state.teamSeasonsSelectedPosition && state.includeBetterResults) params.set('better', '1');
+                if (state.firstOccurrenceOnly) params.set('first', '1');
+                if (state.includeHistoricSeasons) params.set('hist', '1');
             } else if (view === 'last-time-when') {
                 if (state.lastTimeTeam1) params.set('t1', state.lastTimeTeam1);
                 if (state.lastTimeTeam2) params.set('t2', state.lastTimeTeam2);
@@ -8527,6 +8547,29 @@
                 // Set before Team 2 so its selectOption() renders them in the same pass
                 state.extraTeam2s = getSharedExtraTeam2s(extraT2s);
                 if (t2) team2Combobox.selectOption(t2, getTeamDisplayName(t2));
+                // Applied after the season and teams, which reset some of
+                // these (deductions, 3 points) automatically
+                const day = params.get('day');
+                if (day !== null) {
+                    elements.dayOfWeekSelect.value = day;
+                    elements.dayOfWeekSelect.dispatchEvent(new Event('change'));
+                }
+                if (params.get('home') === '0' && state.homeFilter) elements.homeCheckbox.click();
+                if (params.get('away') === '0' && state.awayFilter) elements.awayCheckbox.click();
+                const ded = params.get('ded');
+                if (ded !== null && (ded === '1') !== state.pointDeductionsEnabled) elements.deductionsCheckbox.click();
+                const p3 = params.get('p3');
+                if (p3 !== null && (p3 === '1') !== state.threePointSystem) elements.threePointCheckbox.click();
+                const h2hN = params.get('h2hN');
+                if (h2hN) {
+                    elements.recentH2HSelect.value = h2hN;
+                    elements.recentH2HSelect.dispatchEvent(new Event('input'));
+                }
+                const mhN = params.get('mhN');
+                if (mhN) {
+                    elements.recentMatchesSelect.value = mhN;
+                    elements.recentMatchesSelect.dispatchEvent(new Event('input'));
+                }
             } else if (view === 'team-seasons') {
                 const t1 = params.get('t1');
                 const season = params.get('season');
@@ -8540,6 +8583,10 @@
                     elements.teamSeasonsPositionSelect.value = pos;
                     handleTeamSeasonsPositionChange(pos);
                 }
+                // After the position, whose change resets these toggles
+                if (params.get('hist') === '1' && !state.includeHistoricSeasons) elements.historicSeasonsToggle.click();
+                if (params.get('better') === '1' && !state.includeBetterResults) elements.includeBetterResultsCheckbox.click();
+                if (params.get('first') === '1' && !state.firstOccurrenceOnly) elements.firstOccurrenceOnlyToggle.click();
             } else if (view === 'last-time-when') {
                 const t1 = params.get('t1');
                 const t2 = params.get('t2');
