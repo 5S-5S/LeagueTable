@@ -75,6 +75,18 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Team Seasons: per-season match lists and individual seasons~~ — done
+  (2026-09-29): every Team Seasons row has a chevron that expands that
+  team's matches for the season (Match History layout, newest first; several
+  can be open at once). Works in every view - one team, all teams at a
+  position/progression, and a new single-season view: the Season dropdown
+  now lists every individual season after the eras, and picking one on its
+  own shows that season's final standings (Continental: ranked by
+  progression) while hiding the position/progression filter. Revoked titles
+  (Marseille 1992-93, Juventus 2004-05) show "NR" in those tables. All four
+  pages. Shipped alongside: Everton's missing second 2023-24 deduction (-2)
+  and Bielefeld's strippedChampions league code (E1 -> D1).
+
 - ~~Continental dark mode starts 100ms late~~ — done (2026-09-28): both
   Continental pages now call `initDarkMode()` immediately at start-up, as
   Domestic does, instead of `setTimeout(initDarkMode, 100)`. Anything
