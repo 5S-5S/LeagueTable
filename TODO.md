@@ -75,6 +75,13 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Historic streak match lists~~ — done (2026-09-29): each historic
+  streak row in Team Streaks has a chevron that expands the streak's
+  matches underneath (newest first, Match History layout and highlighting;
+  stage and penalty lines on Continental). Works for single team,
+  head-to-head, Big 6 and Continental; open rows survive sorting. All four
+  pages.
+
 - ~~Team Seasons: per-season match lists and individual seasons~~ — done
   (2026-09-29): every Team Seasons row has a chevron that expands that
   team's matches for the season (Match History layout, newest first; several
