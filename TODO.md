@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-- To do: **Update the Match Finder tab description** — noted 2026-09-24.
+- On hold: **Update the Match Finder tab description** — noted 2026-09-24.
   The description box (same text on all 4 pages) still reads "Find a
   team's standout individual matches - biggest wins, biggest losses,
   highest-scoring draws, and highest-scoring matches overall...", which
@@ -15,28 +15,25 @@ Feature ideas, not yet scheduled.
   like "Switch to Double-Legged Tie to rank knockout ties by
   aggregate."
 
-- On hold: **Multi-team table filter / mini-league** — scoped out
-  (2026-09-04), paused while other ideas are explored. Turned out to be a
-  genuine fork, not a simple Team 2 extension:
-  - **Not** "Team 1 vs a custom group" (which would've been a third flavor
-    of the existing Big 6/Country pattern - one aggregated row, reusing
-    `filterMatchesByOpponent`/`teamsToShow`).
-  - **Is** a mini-league: pick 3+ teams, filter the match data down to only
-    games where *both* home and away teams are in the selected group, then
-    run the existing standings computation on that subset. No Team 1/Team 2
-    pairing, no aggregated row, no phantom-sentinel trick - each selected
-    team gets its own real row, computed normally, just from a smaller match
-    set. E.g. if Arsenal played 15 total matches but only 5 each vs Chelsea/
-    Spurs/West Ham (the other selected teams), Arsenal's mini-league row
-    shows 15 GP (5+5+5), not its real season total.
-  - Open questions before starting: (1) League Table only, or also extend to
-    Last Time When/Team Streaks? (a "mini-league" doesn't map onto those the
-    same way Big 6/Country did, since a streak or "last time" is inherently
-    two-team, not group-standings). (2) Minimum team count (3+, since 2 is
-    already H2H) and any practical max. (3) The multi-select UI itself is
-    genuinely new - no multi-pick control exists anywhere in the app today
-    (every team picker is single-select); likely shape is a new "add
-    team"/chip control, separate from the existing Team 1/Team 2 comboboxes.
+- In progress: **Multi-team Team 2 ("+ Add team")** — on the
+  `multi-team-2` branch (started 2026-09-28). Re-scoped from the original
+  round-robin "mini-league" idea: Team 1 stays single, but Team 2 can be
+  several teams. Only Team 1's matches against those teams count (Spurs vs
+  Chelsea doesn't), and each Team 2 keeps its own League Table row, e.g.
+  Arsenal (T1) vs Chelsea + Spurs → Arsenal 20 GP, Chelsea 10, Spurs 10.
+  Big 6 now works the same way - each Big 6 club gets its own row instead
+  of the old Team-1-only table. No backend change - `/api/head-to-head`
+  already takes a comma-separated `team2` list.
+  - UI: "+ Add team" under Team 2 adds removable Team 2 slots, 3-10 teams
+    total. Hidden when Team 2 is Big 6 (already a group).
+  - Covers League Tables & H2H and Match Finder. Share links use repeated
+    `t2=` params.
+  - [x] `DomesticEurope.html`
+  - [x] `DomesticEuropeMobile.html`
+  - [x] `ContinentalEurope.html` - also works in the grouped-by-phase
+        single-season table. Team 2 = Country now gets one row per club too,
+        like Big 6.
+  - [x] `ContinentalEuropeMobile.html`
 
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
