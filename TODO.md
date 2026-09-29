@@ -40,18 +40,6 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
-- Later: **Team Seasons "No seasons found" info line with team + position**
-  — noted 2026-09-29. Opening a Team Seasons link with both a team and a
-  position (e.g. La Liga, FC Barcelona, position 2) shows 28 rows, but the
-  info line above them says "No seasons found where FC Barcelona finished
-  2nd". `main` does the same, so it predates the season match lists. Likely
-  cause: displayTeamHistory() writes the info line on the first render,
-  before the season standings have loaded, and its setTimeout re-check only
-  restores the text when the line is empty - so the stale "No seasons
-  found" message is never replaced once the data arrives. Check whether it
-  also happens when picking team then position by hand, not just from a
-  link.
-
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
@@ -74,6 +62,15 @@ Feature ideas, not yet scheduled.
   which is tight on mobile.
 
 ## Done
+
+- ~~Team Seasons "No seasons found" info line with team + position~~ —
+  fixed (2026-09-29): displayTeamHistory() ends with switchTab(), which
+  clears the info line, and a 100ms timer put it back only if still empty,
+  each timer using its own copy of the text. A link renders twice in quick
+  succession (before and after the season data loads), so the first
+  render's stale "No seasons found" won. The timer now restores the latest
+  render's text (pendingTeamSeasonsPositionInfo), and other Team Seasons
+  views/resets cancel it. All four pages.
 
 - ~~Historic streak match lists~~ — done (2026-09-29): each historic
   streak row in Team Streaks has a chevron that expands the streak's

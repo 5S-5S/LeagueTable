@@ -4137,6 +4137,7 @@
             // Clear the table and reset UI
             elements.teamHistoryTable.classList.add('hidden');
             elements.teamSeasonsPositionInfo.textContent = '';
+            pendingTeamSeasonsPositionInfo = '';
 
             // Reset dropdown values
             elements.teamSeasonsTeamSelect.value = '';
@@ -4404,6 +4405,7 @@
             } else {
                 elements.teamHistoryTable.classList.add('hidden');
                 window.currentSeasonStandingsView = null;
+            pendingTeamSeasonsPositionInfo = '';
             }
         }
 
@@ -4465,6 +4467,7 @@
                 // Clear the table if no filters are selected
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
+                pendingTeamSeasonsPositionInfo = '';
 
                 // Hide Historic Seasons toggle when no position selected
                 updateHistoricSeasonsVisibility();
@@ -4730,6 +4733,7 @@
         // Render position-only table without recalculating data (for sorting)
         function renderPositionOnlyTable(allPositionData, selectedPos, league) {
             window.currentSeasonStandingsView = null;
+            pendingTeamSeasonsPositionInfo = '';
             if (!allPositionData || allPositionData.length === 0) {
                 elements.teamHistoryTable.classList.add('hidden');
                 return;
@@ -4852,6 +4856,7 @@
                 elements.teamSeasonsPositionSelect.value = '';
                 elements.teamHistoryTable.classList.add('hidden');
                 elements.teamSeasonsPositionInfo.textContent = '';
+                pendingTeamSeasonsPositionInfo = '';
                 elements.teamHistoryTitle.textContent = '';
                 elements.includeBetterResultsContainer.classList.add('hidden');
                 elements.includeBetterResultsContainer.style.display = 'none';
@@ -10928,6 +10933,7 @@
             window.currentTeamHistoryName = null;
             window.currentSeasonStandingsView = { seasonKey, league, divCode, rows };
             elements.teamSeasonsPositionInfo.textContent = '';
+            pendingTeamSeasonsPositionInfo = '';
             renderSeasonStandingsTable();
         }
 
@@ -11013,9 +11019,18 @@
             }).join('');
         }
 
+        // The info line text the latest single-team render wants shown.
+        // displayTeamHistory() ends with switchTab(), which clears the line,
+        // and a short timer puts it back - that timer must use the latest
+        // render's text, not its own copy: opening a link renders twice in
+        // quick succession (before and after the season data loads), and
+        // the first render's stale "No seasons found" used to win.
+        let pendingTeamSeasonsPositionInfo = '';
+
         // Display team history table
         function displayTeamHistory(teamName, historyData, leagueToUse) {
             window.currentSeasonStandingsView = null;
+            pendingTeamSeasonsPositionInfo = '';
             // displayTeamHistory called
             // History data processed
             
@@ -11102,9 +11117,11 @@
             elements.teamSeasonsPositionInfo.style.display = 'block';
 
             // Double-check and force the text to stay after a brief delay
+            pendingTeamSeasonsPositionInfo = positionInfo;
             setTimeout(() => {
-                if (positionInfo && positionInfo.trim() && (!elements.teamSeasonsPositionInfo.textContent || elements.teamSeasonsPositionInfo.textContent.trim() === '')) {
-                    elements.teamSeasonsPositionInfo.innerHTML = positionInfo;
+                const text = pendingTeamSeasonsPositionInfo;
+                if (text && text.trim() && (!elements.teamSeasonsPositionInfo.textContent || elements.teamSeasonsPositionInfo.textContent.trim() === '')) {
+                    elements.teamSeasonsPositionInfo.innerHTML = text;
                 }
             }, 100);
             
