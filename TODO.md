@@ -40,6 +40,18 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
+- Later: **Team Seasons "No seasons found" info line with team + position**
+  — noted 2026-09-29. Opening a Team Seasons link with both a team and a
+  position (e.g. La Liga, FC Barcelona, position 2) shows 28 rows, but the
+  info line above them says "No seasons found where FC Barcelona finished
+  2nd". `main` does the same, so it predates the season match lists. Likely
+  cause: displayTeamHistory() writes the info line on the first render,
+  before the season standings have loaded, and its setTimeout re-check only
+  restores the text when the line is empty - so the stale "No seasons
+  found" message is never replaced once the data arrives. Check whether it
+  also happens when picking team then position by hand, not just from a
+  link.
+
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
