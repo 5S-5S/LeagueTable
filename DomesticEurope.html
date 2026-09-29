@@ -640,28 +640,30 @@
                             </select>
                         </div>
                         
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1</label>
-                            <div class="combobox-container" id="lastTimeTeam1ComboboxContainer">
-                                <input type="text" id="lastTimeTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
-                                <span class="combobox-arrow">▼</span>
-                                <div class="combobox-dropdown" id="lastTimeTeam1ComboboxDropdown"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1</label>
+                                <div class="combobox-container" id="lastTimeTeam1ComboboxContainer">
+                                    <input type="text" id="lastTimeTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="lastTimeTeam1ComboboxDropdown"></div>
+                                </div>
+                                <select id="lastTimeTeam1Select" class="form-input" style="display: none;">
+                                    <option value="">Select Team 1</option>
+                                </select>
                             </div>
-                            <select id="lastTimeTeam1Select" class="form-input" style="display: none;">
-                                <option value="">Select Team 1</option>
-                            </select>
-                        </div>
 
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2</label>
-                            <div class="combobox-container" id="lastTimeTeam2ComboboxContainer">
-                                <input type="text" id="lastTimeTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
-                                <span class="combobox-arrow">▼</span>
-                                <div class="combobox-dropdown" id="lastTimeTeam2ComboboxDropdown"></div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2</label>
+                                <div class="combobox-container" id="lastTimeTeam2ComboboxContainer">
+                                    <input type="text" id="lastTimeTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="lastTimeTeam2ComboboxDropdown"></div>
+                                </div>
+                                <select id="lastTimeTeam2Select" class="form-input" style="display: none;">
+                                    <option value="">Select Team 2</option>
+                                </select>
                             </div>
-                            <select id="lastTimeTeam2Select" class="form-input" style="display: none;">
-                                <option value="">Select Team 2</option>
-                            </select>
                         </div>
                     </div>
                     
@@ -850,7 +852,7 @@
                     </div>
 
                     <!-- Team Selection -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 collapsible-control">
+                    <div class="grid grid-cols-2 gap-4 mb-8 collapsible-control">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1:</label>
                             <div class="combobox-container" id="teamStreaksTeam1ComboboxContainer">
