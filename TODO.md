@@ -15,26 +15,6 @@ Feature ideas, not yet scheduled.
   like "Switch to Double-Legged Tie to rank knockout ties by
   aggregate."
 
-- In progress: **Multi-team Team 2 ("+ Add team")** — on the
-  `multi-team-2` branch (started 2026-09-28). Re-scoped from the original
-  round-robin "mini-league" idea: Team 1 stays single, but Team 2 can be
-  several teams. Only Team 1's matches against those teams count (Spurs vs
-  Chelsea doesn't), and each Team 2 keeps its own League Table row, e.g.
-  Arsenal (T1) vs Chelsea + Spurs → Arsenal 20 GP, Chelsea 10, Spurs 10.
-  Big 6 now works the same way - each Big 6 club gets its own row instead
-  of the old Team-1-only table. No backend change - `/api/head-to-head`
-  already takes a comma-separated `team2` list.
-  - UI: "+ Add team" under Team 2 adds removable Team 2 slots, 3-10 teams
-    total. Hidden when Team 2 is Big 6 (already a group).
-  - Covers League Tables & H2H and Match Finder. Share links use repeated
-    `t2=` params.
-  - [x] `DomesticEurope.html`
-  - [x] `DomesticEuropeMobile.html`
-  - [x] `ContinentalEurope.html` - also works in the grouped-by-phase
-        single-season table. Team 2 = Country now gets one row per club too,
-        like Big 6.
-  - [x] `ContinentalEuropeMobile.html`
-
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
   needed before it's release-worthy. Adds a List View/Bracket View
@@ -94,6 +74,26 @@ Feature ideas, not yet scheduled.
   which is tight on mobile.
 
 ## Done
+
+- ~~Multi-team Team 2 ("+ Add team")~~ — done (2026-09-28): Team 1 stays
+  single, but Team 2 can be several teams (3-10 total via "+ Add team";
+  hidden while Team 2 is Big 6/Country). Only Team 1's matches against
+  those teams count, and each Team 2 gets its own League Table row, e.g.
+  Arsenal vs Chelsea + Spurs → Arsenal 357 GP, Chelsea 179, Spurs 178.
+  Big 6 (Domestic) and Country (Continental) now split into per-club rows
+  the same way. Covers League Tables & H2H (including Continental's
+  grouped single-season table) and Match Finder (including Double-Legged
+  Tie); share links use repeated `t2=` params. No backend change -
+  `/api/head-to-head` already took a team2 list. Re-scoped from the
+  original round-robin "mini-league" idea. All four pages. Shipped
+  alongside:
+  - Team 1/Team 2 side by side in Last Time When and Team Streaks
+  - Selected team's logo stays visible in team comboboxes
+  - Mobile League Table team names lightened for dark mode
+  - Point Deductions now switches off when teams are picked from the
+    search boxes (it never did - the check only ran on the hidden
+    selects); Team Seasons and the Team Dashboard header always count
+    deductions
 
 - ~~Aggregate stat columns for Streaks~~ — done (2026-09-25): the
   Historic streaks table now shows sortable per-streak totals, with each
