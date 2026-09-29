@@ -60,6 +60,18 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
+- Later: **Continental dark mode starts 100ms late** — noted 2026-09-28.
+  Both Continental pages run `setTimeout(initDarkMode, 100)` at start-up
+  (there since the original upload); both Domestic pages call
+  `initDarkMode()` immediately. Team-name colors are computed once, when a
+  row is drawn, so anything drawn in that first 100ms keeps light-mode
+  colors until it's redrawn - seen once on mobile with a link straight
+  into the 2019-20 grouped table. Also likely a brief light flash on load
+  for dark-mode users. The "ensure DOM is ready" comment doesn't hold up:
+  the call already sits at the end of the page, same as Domestic.
+  Suggested fix: call `initDarkMode()` immediately on both Continental
+  pages, then check a dark-mode page load.
+
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
