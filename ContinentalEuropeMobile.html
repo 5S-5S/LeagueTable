@@ -13512,8 +13512,10 @@
         init();
         initHamburgerMenu();
 
-        // Initialize dark mode with small delay to ensure DOM is ready
-        setTimeout(initDarkMode, 100);
+        // Apply the saved theme straight away, as Domestic does - the
+        // toggle is already in the DOM here, and a delay let anything
+        // rendered in the meantime bake in light-mode team colors.
+        initDarkMode();
 
         updateTabText();
 
