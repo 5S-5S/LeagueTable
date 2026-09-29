@@ -232,6 +232,8 @@
                             <select id="team2Select" class="form-input" style="display: none;">
                                 <option value="">No Team</option>
                             </select>
+                            <div id="team2ExtraList"></div>
+                            <button type="button" id="team2AddBtn" class="team2-add-btn hidden">+ Add team</button>
                         </div>
                     </div>
                 </div>
@@ -403,6 +405,8 @@
                                 <select id="matchFinderTeam2Select" class="form-input" style="display: none;">
                                     <option value="">No Team</option>
                                 </select>
+                                <div id="matchFinderTeam2ExtraList"></div>
+                                <button type="button" id="matchFinderTeam2AddBtn" class="team2-add-btn hidden">+ Add team</button>
                             </div>
                         </div>
                     </div>
@@ -754,28 +758,30 @@
                             </select>
                         </div>
                         
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1</label>
-                            <div class="combobox-container" id="lastTimeTeam1ComboboxContainer">
-                                <input type="text" id="lastTimeTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
-                                <span class="combobox-arrow">▼</span>
-                                <div class="combobox-dropdown" id="lastTimeTeam1ComboboxDropdown"></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1</label>
+                                <div class="combobox-container" id="lastTimeTeam1ComboboxContainer">
+                                    <input type="text" id="lastTimeTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="lastTimeTeam1ComboboxDropdown"></div>
+                                </div>
+                                <select id="lastTimeTeam1Select" class="form-input" style="display: none;">
+                                    <option value="">Select Team 1</option>
+                                </select>
                             </div>
-                            <select id="lastTimeTeam1Select" class="form-input" style="display: none;">
-                                <option value="">Select Team 1</option>
-                            </select>
-                        </div>
 
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2</label>
-                            <div class="combobox-container" id="lastTimeTeam2ComboboxContainer">
-                                <input type="text" id="lastTimeTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
-                                <span class="combobox-arrow">▼</span>
-                                <div class="combobox-dropdown" id="lastTimeTeam2ComboboxDropdown"></div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2</label>
+                                <div class="combobox-container" id="lastTimeTeam2ComboboxContainer">
+                                    <input type="text" id="lastTimeTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
+                                    <span class="combobox-arrow">▼</span>
+                                    <div class="combobox-dropdown" id="lastTimeTeam2ComboboxDropdown"></div>
+                                </div>
+                                <select id="lastTimeTeam2Select" class="form-input" style="display: none;">
+                                    <option value="">Select Team 2</option>
+                                </select>
                             </div>
-                            <select id="lastTimeTeam2Select" class="form-input" style="display: none;">
-                                <option value="">Select Team 2</option>
-                            </select>
                         </div>
                     </div>
                     
@@ -975,7 +981,7 @@
                     </div>
 
                     <!-- Team Selection -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 collapsible-control">
+                    <div class="grid grid-cols-2 gap-4 mb-8 collapsible-control">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1:</label>
                             <div class="combobox-container" id="teamStreaksTeam1ComboboxContainer">
@@ -1213,6 +1219,7 @@
             selectedDayOfWeek: '',
             selectedTeam1: '',
             selectedTeam2: '',
+            extraTeam2s: [], // extra Team 2s from "+ Add team" ('' = slot added but not picked yet)
             selectedSeason: '',
             competitionStage: '',
             homeFilter: true,
@@ -1372,6 +1379,7 @@
             // reasoning as Last Time When/Team Streaks above.
             matchFinderTeam1: '',
             matchFinderTeam2: '',
+            matchFinderExtraTeam2s: [],
             matchFinderSeason: '',
             matchFinderDateFrom: '',
             matchFinderDateTo: '',
@@ -2546,20 +2554,62 @@
             );
         }
 
+        // Multi-team Team 2 ("+ Add team"): Team 1 vs a hand-picked group
+        // of opponents. Like a country, each opponent keeps its own identity -
+        // its own League Table row (built only from its matches against
+        // Team 1) and its own Team 2 highlight. The first Team 2 stays in
+        // the existing selectedTeam2/matchFinderTeam2 combobox; only the
+        // extra slots live in extraTeam2s/matchFinderExtraTeam2s.
+        const MAX_MULTI_TEAMS = 10; // Team 1 + up to 9 Team 2s
+
+        // Extras only count while Team 1 and a plain (non-country) Team 2
+        // are both set - otherwise there's no match-up for them to extend.
+        function activeExtraTeam2s(team1, team2, extras) {
+            if (!team1 || !team2 || isCountryOpponentValue(team2)) return [];
+            return extras.filter(Boolean);
+        }
+
+        // Every Team 2 opponent: a single team, each club from a country,
+        // or each picked team.
+        function getOpponentList(team1, team2, extras = []) {
+            if (isCountryOpponentValue(team2)) return getCountryOpponents(countryFromOpponentValue(team2), team1);
+            if (!team2) return [];
+            return [team2, ...activeExtraTeam2s(team1, team2, extras)];
+        }
+
+        function getTeam2Label(team1, team2, extras) {
+            const extraTeams = activeExtraTeam2s(team1, team2, extras);
+            return extraTeams.length > 0 ? [team2, ...extraTeams].join(', ') : getOpponentDisplayLabel(team2);
+        }
+
+        function getLeagueTeam2Opponents() {
+            return getOpponentList(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s);
+        }
+
+        // Team 2 is a group (a country or several picked teams), not one team.
+        function isLeagueTeam2Group() {
+            return isCountryOpponentValue(state.selectedTeam2) ||
+                activeExtraTeam2s(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s).length > 0;
+        }
+
+        // Extra Team 2s from a shared link's repeated t2 params - known
+        // teams only, capped at the same limit "+ Add team" enforces.
+        function getSharedExtraTeam2s(teams) {
+            const leagueTeams = getLeagueTeams();
+            return [...new Set(teams)]
+                .filter(team => leagueTeams.includes(team))
+                .slice(0, MAX_MULTI_TEAMS - 2);
+        }
+
         // Shared match filter for team1 vs team2, where team2 may be a specific
-        // team, a country aggregate, or empty (all of team1's matches).
-        function filterMatchesByOpponent(matches, team1, team2) {
-            if (isCountryOpponentValue(team2)) {
-                const opponents = getCountryOpponents(countryFromOpponentValue(team2), team1);
+        // team (plus any extra Team 2s), a country aggregate, or empty (all of
+        // team1's matches).
+        function filterMatchesByOpponent(matches, team1, team2, extras = []) {
+            if (team2) {
+                const opponents = getOpponentList(team1, team2, extras);
                 return matches.filter(row =>
                     (row.HomeTeam === team1 && opponents.includes(row.AwayTeam)) ||
                     (row.AwayTeam === team1 && opponents.includes(row.HomeTeam))
-                );
-            }
-            if (team2) {
-                return matches.filter(row =>
-                    (row.HomeTeam === team1 && row.AwayTeam === team2) ||
-                    (row.HomeTeam === team2 && row.AwayTeam === team1)
                 );
             }
             return matches.filter(row => row.HomeTeam === team1 || row.AwayTeam === team1);
@@ -2569,10 +2619,10 @@
         // team1/team2's current values? Used for highlight classes - in country
         // mode every non-Team-1 side counts, since by construction (after
         // filterMatchesByOpponent) it's always a member of the selected country.
-        function isOpponentSide(sideTeam, team1, team2) {
+        function isOpponentSide(sideTeam, team1, team2, extras = []) {
             if (!team2 || sideTeam === team1) return false;
             if (isCountryOpponentValue(team2)) return true;
-            return sideTeam === team2;
+            return sideTeam === team2 || activeExtraTeam2s(team1, team2, extras).includes(sideTeam);
         }
 
         // Human-readable label for a team2 value: a real team name is returned
@@ -2675,6 +2725,10 @@
                 if (state.excludeMainStage) params.set('exM', '1');
                 if (state.selectedTeam1) params.set('t1', state.selectedTeam1);
                 if (state.selectedTeam2) params.set('t2', state.selectedTeam2);
+                // Extra Team 2s as repeated t2 params (?t2=A&t2=B) rather than
+                // one comma-joined value, so team names never need escaping.
+                activeExtraTeam2s(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)
+                    .forEach(team => params.append('t2', team));
             } else if (view === 'team-seasons') {
                 if (state.teamSeasonsSelectedLeague) params.set('league', state.teamSeasonsSelectedLeague);
                 if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
@@ -2701,6 +2755,8 @@
             } else if (view === 'match-finder') {
                 if (state.matchFinderTeam1) params.set('t1', state.matchFinderTeam1);
                 if (state.matchFinderTeam2) params.set('t2', state.matchFinderTeam2);
+                activeExtraTeam2s(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)
+                    .forEach(team => params.append('t2', team));
                 if (state.matchFinderMode === 'tie') params.set('mode', 'tie');
                 if (state.matchFinderSeason) {
                     params.set('season', state.matchFinderSeason);
@@ -2810,8 +2866,10 @@
                     elements.excludeMainStageCheckbox.click();
                 }
                 const t1 = params.get('t1');
-                const t2 = params.get('t2');
+                const [t2, ...extraT2s] = params.getAll('t2');
                 if (t1) team1Combobox.selectOption(t1, t1);
+                // Set before Team 2 so its selectOption() renders them in the same pass
+                state.extraTeam2s = getSharedExtraTeam2s(extraT2s);
                 if (t2) team2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
             } else if (view === 'team-seasons') {
                 const league = params.get('league');
@@ -2877,7 +2935,7 @@
                 }
             } else if (view === 'match-finder') {
                 const t1 = params.get('t1');
-                const t2 = params.get('t2');
+                const [t2, ...extraT2s] = params.getAll('t2');
                 const mode = params.get('mode');
                 if (mode === 'tie' && MATCH_FINDER_MODES.some(m => m.key === mode)) {
                     state.matchFinderMode = 'tie';
@@ -2934,6 +2992,7 @@
                     elements.matchFinderExcludeMainStageCheckbox.click();
                 }
                 if (t1) matchFinderTeam1Combobox.selectOption(t1, t1);
+                state.matchFinderExtraTeam2s = getSharedExtraTeam2s(extraT2s);
                 if (t2) matchFinderTeam2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
                 const cat = params.get('cat');
                 if (cat && MATCH_FINDER_CATEGORIES.some(c => c.key === cat)) {
@@ -5141,6 +5200,7 @@
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
                 state.matchFinderTeam2 = '';
+                state.matchFinderExtraTeam2s = [];
                 elements.matchFinderTeam1Select.value = '';
                 elements.matchFinderTeam2Select.value = '';
                 elements.matchFinderResults.classList.add('hidden');
@@ -5164,6 +5224,7 @@
                 // Reset both other tab states
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
+                state.extraTeam2s = [];
                 state.selectedSeason = '';
                 state.competitionStage = '';
                 state.selectedDayOfWeek = '';
@@ -5184,6 +5245,7 @@
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
                 state.matchFinderTeam2 = '';
+                state.matchFinderExtraTeam2s = [];
                 elements.matchFinderTeam1Select.value = '';
                 elements.matchFinderTeam2Select.value = '';
                 elements.matchFinderResults.classList.add('hidden');
@@ -5258,6 +5320,7 @@
                 // Reset League Filters state
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
+                state.extraTeam2s = [];
                 state.selectedSeason = '';
                 state.selectedDayOfWeek = '';
                 elements.team1Select.value = '';
@@ -5268,6 +5331,7 @@
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
                 state.matchFinderTeam2 = '';
+                state.matchFinderExtraTeam2s = [];
                 elements.matchFinderTeam1Select.value = '';
                 elements.matchFinderTeam2Select.value = '';
                 elements.matchFinderResults.classList.add('hidden');
@@ -5305,6 +5369,7 @@
                 // Reset other tab states
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
+                state.extraTeam2s = [];
                 state.selectedSeason = '';
                 state.competitionStage = '';
                 state.selectedDayOfWeek = '';
@@ -5325,6 +5390,7 @@
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
                 state.matchFinderTeam2 = '';
+                state.matchFinderExtraTeam2s = [];
                 elements.matchFinderTeam1Select.value = '';
                 elements.matchFinderTeam2Select.value = '';
                 elements.matchFinderResults.classList.add('hidden');
@@ -5372,6 +5438,7 @@
                 // Reset League Filters state
                 state.selectedTeam1 = '';
                 state.selectedTeam2 = '';
+                state.extraTeam2s = [];
                 state.selectedSeason = '';
                 state.selectedDayOfWeek = '';
                 elements.team1Select.value = '';
@@ -5922,6 +5989,7 @@
             });
             elements.matchFinderTeam2Select.addEventListener('change', (e) => {
                 state.matchFinderTeam2 = e.target.value;
+                state.matchFinderExtraTeam2s = state.matchFinderExtraTeam2s.filter(team => team !== e.target.value);
                 updateMatchFinderScorelineLabels();
                 calculateMatchFinder();
             });
@@ -6053,6 +6121,7 @@
             state.selectedLeague = newLeague;
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
+            state.extraTeam2s = [];
             state.selectedSeason = '';
 
             // Reset Last Time When state
@@ -6074,6 +6143,7 @@
             // Reset Match Finder state
             state.matchFinderTeam1 = '';
             state.matchFinderTeam2 = '';
+            state.matchFinderExtraTeam2s = [];
             if (elements.matchFinderTeam1Select) elements.matchFinderTeam1Select.value = '';
             if (elements.matchFinderTeam2Select) elements.matchFinderTeam2Select.value = '';
             if (elements.matchFinderResults) elements.matchFinderResults.classList.add('hidden');
@@ -6262,6 +6332,16 @@
             }
 
             init() {
+                // Selected team's logo, shown inside the input once closed
+                this.selectedLogo = document.createElement('img');
+                this.selectedLogo.className = 'combobox-selected-logo';
+                this.selectedLogo.alt = '';
+                this.selectedLogo.addEventListener('error', () => {
+                    this.failedLogoUrl = this.selectedLogo.getAttribute('src');
+                    this.container.classList.remove('has-logo');
+                });
+                this.container.appendChild(this.selectedLogo);
+
                 // Input events
                 this.input.addEventListener('focus', () => {
                     // Clear the field on focus instead of leaving the current
@@ -6363,7 +6443,7 @@
                 this.dropdown.innerHTML = this.filteredOptions.map((option, index) => {
                     // Get team logo if this is a team option (not empty option)
                     const logoHtml = option.value && option.value !== '' ? (() => {
-                        const logoUrl = getTeamLogoUrl(option.value, state.selectedLeague);
+                        const logoUrl = getTeamLogoUrl(option.value, this.getLogoLeague());
                         return logoUrl ? `<img src="${logoUrl}" alt="${option.value} logo" class="combobox-team-logo" onerror="this.style.display='none'">` : '';
                     })() : '';
 
@@ -6430,20 +6510,134 @@
                 this.isOpen = true;
                 this.container.classList.add('open');
                 this.renderOptions();
+                this.updateSelectedLogo();
             }
 
             close() {
                 this.isOpen = false;
                 this.container.classList.remove('open');
                 this.selectedIndex = -1;
+                this.updateSelectedLogo();
             }
 
             setValue(value, text) {
                 this.currentValue = value;
                 this.currentText = text || this.placeholder;
                 this.input.value = this.currentText;
+                this.updateSelectedLogo();
+            }
+
+            getLogoLeague() {
+                return state.selectedLeague;
+            }
+
+            // Show the selected team's logo inside the closed combobox (the
+            // dropdown options already show one) - hidden while open, since
+            // the field is cleared for typing then. Big 6/country/"All Teams"
+            // values have no logo, so nothing shows for those.
+            updateSelectedLogo() {
+                const logoUrl = !this.isOpen && this.currentValue
+                    ? getTeamLogoUrl(this.currentValue, this.getLogoLeague())
+                    : null;
+                if (logoUrl && this.selectedLogo.getAttribute('src') !== logoUrl) {
+                    this.selectedLogo.src = logoUrl;
+                }
+                this.container.classList.toggle('has-logo', !!logoUrl && logoUrl !== this.failedLogoUrl);
             }
         }
+
+        // The "+ Add team" button plus one removable combobox per extra
+        // Team 2 slot. render() is idempotent and cheap to call on every
+        // recalculation - it only rebuilds the slot comboboxes when the
+        // selection they depend on actually changed.
+        class ExtraTeam2Picker {
+            constructor({ prefix, stateKey, getTeam1, getTeam2, onChange }) {
+                this.prefix = prefix;
+                this.stateKey = stateKey;
+                this.getTeam1 = getTeam1;
+                this.getTeam2 = getTeam2;
+                this.onChange = onChange;
+                this.list = document.getElementById(`${prefix}ExtraList`);
+                this.addBtn = document.getElementById(`${prefix}AddBtn`);
+                this.renderedKey = null;
+
+                this.addBtn.addEventListener('click', () => {
+                    state[this.stateKey] = [...state[this.stateKey], ''];
+                    this.render();
+                    // Deferred so this same click doesn't reach the new
+                    // combobox's click-outside handler and close it again.
+                    setTimeout(() => {
+                        const inputs = this.list.querySelectorAll('.combobox-input');
+                        if (inputs.length > 0) inputs[inputs.length - 1].focus();
+                    }, 0);
+                });
+            }
+
+            render() {
+                const team1 = this.getTeam1();
+                const team2 = this.getTeam2();
+                const isActive = !!(team1 && team2 && !isCountryOpponentValue(team2));
+                if (!isActive) {
+                    state[this.stateKey] = [];
+                } else if (state[this.stateKey].includes(team1)) {
+                    // Team 1 was changed to a team already picked as a Team 2
+                    state[this.stateKey] = state[this.stateKey].filter(team => team !== team1);
+                }
+                const extras = state[this.stateKey];
+
+                const canAdd = isActive && !extras.includes('') && 2 + extras.length < MAX_MULTI_TEAMS;
+                this.addBtn.classList.toggle('hidden', !canAdd);
+
+                const renderKey = isActive ? JSON.stringify([state.selectedLeague, team1, team2, extras]) : '';
+                if (renderKey === this.renderedKey) return;
+                this.renderedKey = renderKey;
+                this.list.innerHTML = '';
+
+                const leagueTeams = getLeagueTeams(state.selectedLeague);
+                extras.forEach((team, index) => {
+                    const id = `${this.prefix}Extra${index}`;
+                    const row = document.createElement('div');
+                    row.className = 'team2-extra-row';
+                    row.innerHTML = `
+                        <div class="combobox-container" id="${id}ComboboxContainer">
+                            <input type="text" id="${id}ComboboxInput" class="combobox-input" placeholder="Add a team" autocomplete="off">
+                            <span class="combobox-arrow">▼</span>
+                            <div class="combobox-dropdown" id="${id}ComboboxDropdown"></div>
+                        </div>
+                        <button type="button" class="team2-extra-remove" title="Remove team" aria-label="Remove team">×</button>
+                    `;
+                    this.list.appendChild(row);
+
+                    const combobox = new Combobox(
+                        `${id}ComboboxContainer`,
+                        `${id}ComboboxInput`,
+                        `${id}ComboboxDropdown`,
+                        'Add a team',
+                        (value) => {
+                            if (value === state[this.stateKey][index]) return;
+                            const next = [...state[this.stateKey]];
+                            next[index] = value;
+                            state[this.stateKey] = next;
+                            this.onChange();
+                        }
+                    );
+                    // Each team can only appear once across Team 1 and all Team 2s.
+                    const taken = new Set([team1, team2, ...extras.filter((_, i) => i !== index)]);
+                    combobox.setOptions(leagueTeams
+                        .filter(t => !taken.has(t))
+                        .map(t => ({ value: t, text: t })));
+                    combobox.setValue(team, team);
+                    if (!team) combobox.input.value = ''; // show the placeholder, not it as typed text
+
+                    row.querySelector('.team2-extra-remove').addEventListener('click', () => {
+                        state[this.stateKey] = state[this.stateKey].filter((_, i) => i !== index);
+                        this.onChange();
+                    });
+                });
+            }
+        }
+
+        let leagueTeam2Picker, matchFinderTeam2Picker;
 
         // Initialize comboboxes
         let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox, matchFinderTeam1Combobox, matchFinderTeam2Combobox;
@@ -6473,6 +6667,9 @@
                         console.log('Team 1 selected:', value);
                         // Trigger same logic as original dropdown
                         refreshTeam2CountryOptions();
+                        // Same rule the hidden <select> handlers apply: team
+                        // tables default to no point deductions.
+                        checkAndDisablePointDeductions();
                         updateTable();
                     }
                 );
@@ -6486,9 +6683,13 @@
                     'No Team',
                     (value, text) => {
                         state.selectedTeam2 = value;
+                        state.extraTeam2s = state.extraTeam2s.filter(team => team !== value);
                         elements.team2Select.value = value;
                         console.log('Team 2 selected:', value);
                         // Trigger same logic as original dropdown
+                        // Same rule the hidden <select> handlers apply: team
+                        // tables default to no point deductions.
+                        checkAndDisablePointDeductions();
                         updateTable();
                     }
                 );
@@ -6593,6 +6794,26 @@
                 );
             }
 
+            if (!leagueTeam2Picker) {
+                leagueTeam2Picker = new ExtraTeam2Picker({
+                    prefix: 'team2',
+                    stateKey: 'extraTeam2s',
+                    getTeam1: () => state.selectedTeam1,
+                    getTeam2: () => state.selectedTeam2,
+                    onChange: () => updateTable()
+                });
+            }
+
+            if (!matchFinderTeam2Picker) {
+                matchFinderTeam2Picker = new ExtraTeam2Picker({
+                    prefix: 'matchFinderTeam2',
+                    stateKey: 'matchFinderExtraTeam2s',
+                    getTeam1: () => state.matchFinderTeam1,
+                    getTeam2: () => state.matchFinderTeam2,
+                    onChange: () => calculateMatchFinder()
+                });
+            }
+
             // Populate all combobox options
             const team1ComboOptions = [
                 { value: '', text: 'All Teams' },
@@ -6667,7 +6888,7 @@
 
             // Update combobox values
             const team1Text = state.selectedTeam1 || 'All Teams';
-            const team2Text = state.selectedTeam2 ? getOpponentDisplayLabel(state.selectedTeam2) : 'No Team';
+            const team2Text = state.selectedTeam2 ? getTeam2Label(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s) : 'No Team';
             team1Combobox.setValue(state.selectedTeam1, team1Text);
             team2Combobox.setValue(state.selectedTeam2, team2Text);
 
@@ -6787,7 +7008,7 @@
         // matchFinderSubtitle()).
         function updateMatchFinderScorelineLabels() {
             elements.matchFinderTeam1ScoreLabel.textContent = state.matchFinderTeam1 || 'Team 1';
-            elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? getOpponentDisplayLabel(state.matchFinderTeam2) : 'Opponent';
+            elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s) : 'Opponent';
         }
 
         function handleMatchFinderSeasonChange(seasonKey) {
@@ -6803,6 +7024,7 @@
         function clearMatchFinderFilters() {
             state.matchFinderTeam1 = '';
             state.matchFinderTeam2 = '';
+            state.matchFinderExtraTeam2s = [];
             state.matchFinderMode = 'single';
             state.matchFinderSeason = '';
             state.matchFinderDateFrom = '';
@@ -6965,6 +7187,7 @@
 
         function calculateMatchFinder(preservePage) {
             if (!preservePage) state.matchFinderPage = 1;
+            if (matchFinderTeam2Picker) matchFinderTeam2Picker.render();
             if (!state.matchFinderTeam1) {
                 elements.matchFinderResults.classList.add('hidden');
                 elements.matchFinderCategoryContainer.classList.add('hidden');
@@ -6980,9 +7203,9 @@
             };
             const div = leagueMapping[state.selectedLeague];
 
-            const opponents = isCountryOpponentValue(state.matchFinderTeam2)
-                ? getCountryOpponents(countryFromOpponentValue(state.matchFinderTeam2), state.matchFinderTeam1)
-                : state.matchFinderTeam2 ? [state.matchFinderTeam2] : null;
+            const opponents = state.matchFinderTeam2
+                ? getOpponentList(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)
+                : null;
 
             if (div) {
                 ensureMatchFinderDataLoaded(state.matchFinderTeam1, opponents, div);
@@ -7105,7 +7328,7 @@
             const team1 = state.matchFinderTeam1;
             let text = team1;
             if (state.matchFinderTeam2) {
-                text += ` vs ${getOpponentDisplayLabel(state.matchFinderTeam2)}`;
+                text += ` vs ${getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)}`;
             }
             text += ` (${count} match${count === 1 ? '' : 'es'})`;
             return text;
@@ -7115,7 +7338,7 @@
             const team1 = state.matchFinderTeam1;
             let text = team1;
             if (state.matchFinderTeam2) {
-                text += ` vs ${getOpponentDisplayLabel(state.matchFinderTeam2)}`;
+                text += ` vs ${getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)}`;
             }
             text += ` (${count} tie${count === 1 ? '' : 's'})`;
             return text;
@@ -8646,8 +8869,11 @@
                 }
             }
 
+            // One row per Team 2 opponent (a single team, each club from a
+            // country, or each picked team), each built only from its
+            // matches against Team 1.
             const teamsToShow = state.selectedTeam2
-                ? [state.selectedTeam1, state.selectedTeam2]
+                ? [state.selectedTeam1, ...getLeagueTeam2Opponents()]
                 : [state.selectedTeam1];
 
             const table = {};
@@ -8951,7 +9177,11 @@
             });
 
             if (!state.sortConfig.key) {
-                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+                // Overrides are full-season final positions - meaningless
+                // for a table built from only Team 1's matches vs a group.
+                if (!isLeagueTeam2Group()) {
+                    pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+                }
             } else {
                 pointsSortedArray.sort((a, b) => {
                     let aVal = a[state.sortConfig.key];
@@ -9139,7 +9369,7 @@
             
             if (state.selectedTeam1 && state.selectedTeam2) {
                 // First filter for H2H matches
-                filtered = filterMatchesByOpponent(filtered, state.selectedTeam1, state.selectedTeam2);
+                filtered = filterMatchesByOpponent(filtered, state.selectedTeam1, state.selectedTeam2, state.extraTeam2s);
 
                 // Apply home/away filtering based on state (same logic as calculateHeadToHead)
                 if (state.homeFilter && !state.awayFilter) {
@@ -9214,7 +9444,7 @@
             let teamsToShow;
             if (state.selectedTeam1 && state.selectedTeam2) {
                 // H2H mode: only show the two selected teams
-                teamsToShow = [state.selectedTeam1, state.selectedTeam2];
+                teamsToShow = [state.selectedTeam1, ...getLeagueTeam2Opponents()];
             } else if (state.selectedTeam1) {
                 // Single team mode: only show the selected team
                 teamsToShow = [state.selectedTeam1];
@@ -9340,7 +9570,11 @@
             
             // Apply ranking overrides for historic seasons to the points-sorted array
             if (!state.sortConfig.key) {
-                pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+                // Overrides are full-season final positions - meaningless
+                // for a table built from only Team 1's matches vs a group.
+                if (!isLeagueTeam2Group()) {
+                    pointsSortedArray = applyRankingOverrides(pointsSortedArray, state.selectedLeague, state.selectedSeason);
+                }
             } else {
                 // Apply custom sorting if requested - work with pointsSortedArray to preserve position logic
                 pointsSortedArray.sort((a, b) => {
@@ -9645,9 +9879,7 @@
             };
             const div = leagueMapping[state.selectedLeague];
 
-            const opponents = isCountryOpponentValue(state.selectedTeam2)
-                ? getCountryOpponents(countryFromOpponentValue(state.selectedTeam2), state.selectedTeam1)
-                : [state.selectedTeam2];
+            const opponents = getLeagueTeam2Opponents();
 
             // Served from the head-to-head API instead of the full
             // in-memory gist dataset - kicks off a fetch if this
@@ -10521,6 +10753,7 @@
                 state.matchHistoryPage = 1;
                 state.h2hPage = 1;
             }
+            if (leagueTeam2Picker) leagueTeam2Picker.render();
             const tableResult = calculateTable();
             const h2hResult = calculateHeadToHead();
             const matchHistoryResult = calculateMatchHistory();
@@ -10647,11 +10880,16 @@
 
             const savedTeam1 = state.selectedTeam1;
             const savedTeam2 = state.selectedTeam2;
+            const savedDeductions = state.pointDeductionsEnabled;
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
+            // The full league table always counts deductions, as it does
+            // with no team selected (checkAndDisablePointDeductions())
+            state.pointDeductionsEnabled = true;
             const tableResult = calculateTable();
             state.selectedTeam1 = savedTeam1;
             state.selectedTeam2 = savedTeam2;
+            state.pointDeductionsEnabled = savedDeductions;
 
             // A specific season delegates to calculateGroupedTable(), whose
             // result has no flat tableData - it's split per competition
@@ -10937,7 +11175,7 @@
                         <tbody>
                             ${phaseData.tableData.map((team, index) => {
                                 const isTeam1 = state.selectedTeam1 === team.team;
-                                const isTeam2 = isOpponentSide(team.team, state.selectedTeam1, state.selectedTeam2);
+                                const isTeam2 = isOpponentSide(team.team, state.selectedTeam1, state.selectedTeam2, state.extraTeam2s);
                                 // Only highlight when Team 1 is selected, or when both teams are selected
                                 const isHighlighted = state.selectedTeam1 && (isTeam1 || isTeam2);
 
@@ -10947,7 +11185,9 @@
                                 // Only apply team color when team is highlighted
                                 let teamColorStyle = '';
                                 if (isHighlighted) {
-                                    const teamColor = getTeamColor(team.team, state.selectedLeague);
+                                    // Plain text on the row here (no light pill as on desktop),
+                                    // so dark mode needs the lightened color.
+                                    const teamColor = pickTeamTextColor(getTeamColor(team.team, state.selectedLeague), '');
                                     teamColorStyle = teamColor ? `color: ${teamColor} !important;` : '';
                                 }
 
@@ -11531,7 +11771,7 @@
             if (tableResult.tableData && tableResult.tableData.length > 0) {
                 elements.tableBody.innerHTML = tableResult.tableData.map((team, index) => {
                     const isTeam1 = state.selectedTeam1 === team.team;
-                    const isTeam2 = isOpponentSide(team.team, state.selectedTeam1, state.selectedTeam2);
+                    const isTeam2 = isOpponentSide(team.team, state.selectedTeam1, state.selectedTeam2, state.extraTeam2s);
                     // Only highlight when Team 1 is selected, or when both teams are selected
                     const isHighlighted = state.selectedTeam1 && (isTeam1 || isTeam2);
 
@@ -11541,7 +11781,9 @@
                     // Only apply team color when team is highlighted
                     let teamColorStyle = '';
                     if (isHighlighted) {
-                        const teamColor = getTeamColor(team.team, state.selectedLeague);
+                        // Plain text on the row here (no light pill as on desktop),
+                        // so dark mode needs the lightened color.
+                        const teamColor = pickTeamTextColor(getTeamColor(team.team, state.selectedLeague), '');
                         teamColorStyle = teamColor ? `color: ${teamColor} !important;` : '';
                     }
 
@@ -11699,7 +11941,8 @@
                 
                 // Get team colors
                 const team1Color = getTeamColor(state.selectedTeam1, state.selectedLeague);
-                const team2Color = getTeamColor(state.selectedTeam2, state.selectedLeague);
+                // A country or several picked teams share one neutral color
+                const team2Color = isLeagueTeam2Group() ? null : getTeamColor(state.selectedTeam2, state.selectedLeague);
                 
                 // Default colors if no custom color found
                 const team1Style = team1Color ? `background: ${team1Color} !important; color: ${getContrastColor(team1Color)} !important;` : '';
@@ -11717,7 +11960,7 @@
                         visualizationHTML += `
                             <div class="mb-4">
                                 <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-semibold">${state.selectedTeam1} vs ${getOpponentDisplayLabel(state.selectedTeam2)} (Penalty Shootouts)</span>
+                                    <span class="text-sm font-semibold">${state.selectedTeam1} vs ${getTeam2Label(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)} (Penalty Shootouts)</span>
                                     <span class="text-sm text-gray-600">${penaltyStats.team1Wins}W - ${penaltyStats.team2Wins}W</span>
                                 </div>
                                 <div class="h2h-viz-bar">
@@ -11740,7 +11983,7 @@
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold">${state.selectedTeam1} vs ${getOpponentDisplayLabel(state.selectedTeam2)} (Overall)</span>
+                                <span class="text-sm font-semibold">${state.selectedTeam1} vs ${getTeam2Label(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)} (Overall)</span>
                             </div>
                             <div class="h2h-viz-bar">
                                 <div class="h2h-segment h2h-wins" style="width: ${(h2hResult.overallStats.team1Wins / h2hResult.overallStats.total) * 100}%; ${team1Style}">
@@ -11761,7 +12004,7 @@
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold">${state.selectedTeam1} (Home) vs ${getOpponentDisplayLabel(state.selectedTeam2)} (Away)</span>
+                                <span class="text-sm font-semibold">${state.selectedTeam1} (Home) vs ${getTeam2Label(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)} (Away)</span>
                             </div>
                             ${h2hResult.team1HomeStats.total > 0 ? `
                             <div class="h2h-viz-bar">
@@ -11784,7 +12027,7 @@
                     visualizationHTML += `
                         <div class="mb-4">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-semibold">${getOpponentDisplayLabel(state.selectedTeam2)} (Home) vs ${state.selectedTeam1} (Away)</span>
+                                <span class="text-sm font-semibold">${getTeam2Label(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)} (Home) vs ${state.selectedTeam1} (Away)</span>
                             </div>
                             ${h2hResult.team2HomeStats.total > 0 ? `
                             <div class="h2h-viz-bar">
@@ -11845,7 +12088,7 @@
             elements.h2hMatchesTable.classList.remove('hidden');
             
             // Update table title to show stage filter and match count
-            let titleText = `${state.selectedTeam1} vs ${getOpponentDisplayLabel(state.selectedTeam2)}`;
+            let titleText = `${state.selectedTeam1} vs ${getTeam2Label(state.selectedTeam1, state.selectedTeam2, state.extraTeam2s)}`;
             if (state.h2hStage !== '') {
                 titleText += ` - ${state.h2hStage}`;
             }
@@ -12201,6 +12444,7 @@
             state.selectedLeague = savedState.selectedLeague;
             state.selectedTeam1 = savedState.selectedTeam1;
             state.selectedTeam2 = savedState.selectedTeam2;
+            state.extraTeam2s = savedState.extraTeam2s || [];
             state.selectedSeason = savedState.selectedSeason;
             state.competitionStage = savedState.competitionStage;
             state.dateFrom = savedState.dateFrom;
@@ -12285,6 +12529,7 @@
                     selectedLeague: state.selectedLeague,
                     selectedTeam1: state.selectedTeam1,
                     selectedTeam2: state.selectedTeam2,
+                    extraTeam2s: state.extraTeam2s,
                     selectedSeason: state.selectedSeason,
                     competitionStage: state.competitionStage,
                     dateFrom: state.dateFrom,
@@ -12419,7 +12664,10 @@
 
                             const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
 
-                            if (hasOverlap && state.pointDeductionsEnabled) {
+                            // Season finishes are full-season tables, so deductions always
+                            // count here - not tied to League Tables' Point Deductions box,
+                            // which switches off whenever a team is picked there.
+                            if (hasOverlap) {
                                 points -= deduction.points;
                             }
                         }
@@ -12442,7 +12690,10 @@
 
                                 const hasOverlap = (seasonStart <= deductionEnd) && (seasonEnd >= deductionStart);
 
-                                if (hasOverlap && state.pointDeductionsEnabled) {
+                                // Season finishes are full-season tables, so deductions always
+                                // count here - not tied to League Tables' Point Deductions box,
+                                // which switches off whenever a team is picked there.
+                                if (hasOverlap) {
                                     teamPoints -= deduction.points;
                                 }
                             }
@@ -12938,6 +13189,7 @@
             
             state.selectedTeam1 = '';
             state.selectedTeam2 = '';
+            state.extraTeam2s = [];
             state.selectedSeason = '';
             state.selectedDayOfWeek = '';
             state.homeFilter = true;

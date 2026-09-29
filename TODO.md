@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-- To do: **Update the Match Finder tab description** — noted 2026-09-24.
+- On hold: **Update the Match Finder tab description** — noted 2026-09-24.
   The description box (same text on all 4 pages) still reads "Find a
   team's standout individual matches - biggest wins, biggest losses,
   highest-scoring draws, and highest-scoring matches overall...", which
@@ -14,29 +14,6 @@ Feature ideas, not yet scheduled.
   head-to-head matches only." - plus, on Continental only, something
   like "Switch to Double-Legged Tie to rank knockout ties by
   aggregate."
-
-- On hold: **Multi-team table filter / mini-league** — scoped out
-  (2026-09-04), paused while other ideas are explored. Turned out to be a
-  genuine fork, not a simple Team 2 extension:
-  - **Not** "Team 1 vs a custom group" (which would've been a third flavor
-    of the existing Big 6/Country pattern - one aggregated row, reusing
-    `filterMatchesByOpponent`/`teamsToShow`).
-  - **Is** a mini-league: pick 3+ teams, filter the match data down to only
-    games where *both* home and away teams are in the selected group, then
-    run the existing standings computation on that subset. No Team 1/Team 2
-    pairing, no aggregated row, no phantom-sentinel trick - each selected
-    team gets its own real row, computed normally, just from a smaller match
-    set. E.g. if Arsenal played 15 total matches but only 5 each vs Chelsea/
-    Spurs/West Ham (the other selected teams), Arsenal's mini-league row
-    shows 15 GP (5+5+5), not its real season total.
-  - Open questions before starting: (1) League Table only, or also extend to
-    Last Time When/Team Streaks? (a "mini-league" doesn't map onto those the
-    same way Big 6/Country did, since a streak or "last time" is inherently
-    two-team, not group-standings). (2) Minimum team count (3+, since 2 is
-    already H2H) and any practical max. (3) The multi-select UI itself is
-    genuinely new - no multi-pick control exists anywhere in the app today
-    (every team picker is single-select); likely shape is a new "add
-    team"/chip control, separate from the existing Team 1/Team 2 comboboxes.
 
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
@@ -63,6 +40,18 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
+- Later: **Continental dark mode starts 100ms late** — noted 2026-09-28.
+  Both Continental pages run `setTimeout(initDarkMode, 100)` at start-up
+  (there since the original upload); both Domestic pages call
+  `initDarkMode()` immediately. Team-name colors are computed once, when a
+  row is drawn, so anything drawn in that first 100ms keeps light-mode
+  colors until it's redrawn - seen once on mobile with a link straight
+  into the 2019-20 grouped table. Also likely a brief light flash on load
+  for dark-mode users. The "ensure DOM is ready" comment doesn't hold up:
+  the call already sits at the end of the page, same as Domestic.
+  Suggested fix: call `initDarkMode()` immediately on both Continental
+  pages, then check a dark-mode page load.
+
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
@@ -85,6 +74,26 @@ Feature ideas, not yet scheduled.
   which is tight on mobile.
 
 ## Done
+
+- ~~Multi-team Team 2 ("+ Add team")~~ — done (2026-09-28): Team 1 stays
+  single, but Team 2 can be several teams (3-10 total via "+ Add team";
+  hidden while Team 2 is Big 6/Country). Only Team 1's matches against
+  those teams count, and each Team 2 gets its own League Table row, e.g.
+  Arsenal vs Chelsea + Spurs → Arsenal 357 GP, Chelsea 179, Spurs 178.
+  Big 6 (Domestic) and Country (Continental) now split into per-club rows
+  the same way. Covers League Tables & H2H (including Continental's
+  grouped single-season table) and Match Finder (including Double-Legged
+  Tie); share links use repeated `t2=` params. No backend change -
+  `/api/head-to-head` already took a team2 list. Re-scoped from the
+  original round-robin "mini-league" idea. All four pages. Shipped
+  alongside:
+  - Team 1/Team 2 side by side in Last Time When and Team Streaks
+  - Selected team's logo stays visible in team comboboxes
+  - Mobile League Table team names lightened for dark mode
+  - Point Deductions now switches off when teams are picked from the
+    search boxes (it never did - the check only ran on the hidden
+    selects); Team Seasons and the Team Dashboard header always count
+    deductions
 
 - ~~Aggregate stat columns for Streaks~~ — done (2026-09-25): the
   Historic streaks table now shows sortable per-streak totals, with each
