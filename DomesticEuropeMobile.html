@@ -8833,6 +8833,8 @@
 
                 elements.tableBody.innerHTML = tableResult.tableData.map((team, index) => {
                     // Only highlight when Team 1 is selected, or when both teams are selected
+                    // Highlighted names are plain text on the row here (no light
+                    // pill as on desktop), so dark mode needs the lightened color.
                     const isHighlighted = state.selectedTeam1 && (
                         state.selectedTeam1 === team.team ||
                         isLeagueTeam2(team.team)
@@ -8862,7 +8864,7 @@
                                         const logoUrl = getTeamLogoUrl(team.team, state.selectedLeague);
                                         return logoUrl ? `<img src="${logoUrl}" alt="${team.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : '';
                                     })()}
-                                    <span class="hover:underline team-name-text" ${isHighlighted ? `style="color: ${getTeamColor(team.team, state.selectedLeague)} !important; font-weight: bold;"` : ''}>${team.team}</span>
+                                    <span class="hover:underline team-name-text" ${isHighlighted ? `style="color: ${pickTeamTextColor(getTeamColor(team.team, state.selectedLeague), '')} !important; font-weight: bold;"` : ''}>${team.team}</span>
                                 </div>
                             </td>
                             <td class="px-3 py-4 text-center">${team.played}</td>

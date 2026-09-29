@@ -11174,7 +11174,9 @@
                                 // Only apply team color when team is highlighted
                                 let teamColorStyle = '';
                                 if (isHighlighted) {
-                                    const teamColor = getTeamColor(team.team, state.selectedLeague);
+                                    // Plain text on the row here (no light pill as on desktop),
+                                    // so dark mode needs the lightened color.
+                                    const teamColor = pickTeamTextColor(getTeamColor(team.team, state.selectedLeague), '');
                                     teamColorStyle = teamColor ? `color: ${teamColor} !important;` : '';
                                 }
 
@@ -11768,7 +11770,9 @@
                     // Only apply team color when team is highlighted
                     let teamColorStyle = '';
                     if (isHighlighted) {
-                        const teamColor = getTeamColor(team.team, state.selectedLeague);
+                        // Plain text on the row here (no light pill as on desktop),
+                        // so dark mode needs the lightened color.
+                        const teamColor = pickTeamTextColor(getTeamColor(team.team, state.selectedLeague), '');
                         teamColorStyle = teamColor ? `color: ${teamColor} !important;` : '';
                     }
 
