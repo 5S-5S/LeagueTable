@@ -2360,7 +2360,7 @@
         const strippedChampions = [
             ["Juventus", "I1", "2004-05", 1],
             ["Olympique Marseille", "F1", "1992-93", 1],
-            ["Arminia Bielefeld", "E1", "1971-72", 18]
+            ["Arminia Bielefeld", "D1", "1971-72", 18]
 
             // Add more entries as needed: [teamName, leagueDiv, season, position]
         ];
@@ -10832,7 +10832,7 @@
 
             window.currentTeamHistoryData = null;
             window.currentTeamHistoryName = null;
-            window.currentSeasonStandingsView = { seasonKey, league, rows };
+            window.currentSeasonStandingsView = { seasonKey, league, divCode, rows };
             elements.teamSeasonsPositionInfo.textContent = '';
             renderSeasonStandingsTable();
         }
@@ -10840,7 +10840,7 @@
         // Render (or re-sort) the season standings from
         // window.currentSeasonStandingsView
         function renderSeasonStandingsTable() {
-            const { seasonKey, league, rows } = window.currentSeasonStandingsView;
+            const { seasonKey, league, divCode, rows } = window.currentSeasonStandingsView;
 
             let sortedRows = [...rows];
             const { key, direction } = state.teamHistorySortConfig;
@@ -10878,16 +10878,20 @@
             elements.teamHistoryBody.innerHTML = sortedRows.map((row, index) => {
                 const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
                 const logoUrl = getTeamLogoUrl(row.team, league);
+                // A stripped title (e.g. Marseille 1992-93) stays the top row, shown as not ranked
+                const titleRevoked = row.position === 1 &&
+                    strippedChampions.some(([team, div, season, pos]) => team === row.team && div === divCode && season === seasonKey && pos === 1);
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
-                        <td class="px-3 py-4 font-bold text-left" style="${
+                        <td class="px-3 py-4 font-bold text-left" ${titleRevoked ? 'title="Title revoked"' : ''} style="${
+                            titleRevoked ? 'color: #6b7280;' :
                             row.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
                             row.position === 2 ? 'color: #374151; background-color: #e5e7eb;' :
                             row.position === 3 ? 'color: #b45309; background-color: #fef7ed;' :
                             'color: #6b7280;'
                         }">
                             ${renderTeamSeasonExpandButton(row, league)}
-                            ${row.position}
+                            ${titleRevoked ? 'NR' : row.position}
                         </td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
