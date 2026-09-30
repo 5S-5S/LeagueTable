@@ -94,7 +94,8 @@ Feature ideas, not yet scheduled.
     moved on since the branch was cut (local-format dates on all four
     pages, the Continental Team Seasons qualifier fixes, the Main Stage /
     Qualifiers Competition Stage dropdowns with their Worker change, and
-    the Match History stage fix), so the branch's copies of those pages
+    the Match History stage fix, the all-teams Team Streaks lists and
+    streak pagination), so the branch's copies of those pages
     are stale until it's brought up to date. One `git merge main` on the
     branch brings all of it over - nothing needs reapplying by hand.
     (The Worker is already deployed with the stage change; the branch
@@ -113,6 +114,32 @@ Feature ideas, not yet scheduled.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Team Streaks for all teams~~ — done (2026-09-30), all four pages.
+  With no Team 1 picked, Team Streaks lists every team's streaks of the
+  chosen type, longest first (ties: most recent first):
+  - Historic: every streak of 3+ games in the league's history (e.g.
+    3,453 Premier League winning streaks - Liverpool and Man City 18 top
+    it; Arsenal's 49 heads unbeaten).
+  - Active: every team in the latest season on a streak of that type now
+    (clubs no longer in the league are left out - their "current" streak
+    is frozen at their last match); End Date is "Latest Match".
+  - Same columns/stats, sorting, chevron match lists (each row's own team
+    highlighted) and Home/Away filter as the one-team table; Continental
+    also applies Competition Stage and League Filters' Exclude Qualifiers
+    / Exclude Main Stage. Mobile uses its compact historic layout.
+  - Data: the division's full history from /api/season-matches (~400 KB
+    gzipped for the Premier League), fetched once per division on first
+    use; all streaks computed in ~70 ms and memoised per
+    status/location/type/filters.
+  - Streak Type now opens on "Select Streak" - nothing is calculated or
+    downloaded until a type is picked. Share links always carry `type`;
+    older links with a team but no type still mean Winning (the old
+    default). A no-team link opens the all-teams list.
+  - Pagination: historic tables (one team, two teams, all teams) show 20
+    per page with Previous/Next, as Match History / Match Finder - single
+    teams reach ~485 streaks (Everton, scoring). New list or new sort goes
+    back to page 1.
 
 - ~~Separate qualifying rounds from the main stage in Continental
   filters~~ — done (2026-09-30), both Continental pages. Qualifying rounds
