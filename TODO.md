@@ -84,23 +84,6 @@ Feature ideas, not yet scheduled.
   (2026-09-29) - fixtures table in schema.sql, scripts/update_fixtures.py,
   .github/workflows/update-fixtures.yml.
 
-- Later: **Show dates in the visitor's local format** — noted 2026-09-29.
-  Visitors in DD/MM/YYYY countries should see dates that way instead of
-  always MM/DD/YYYY. Current state is mixed:
-  - Domestic formats dates with a hardcoded `toLocaleDateString('en-US')`
-    (7 places desktop, 8 mobile), so it's always MM/DD/YYYY.
-  - Continental mostly uses `toLocaleDateString()` with no locale (8
-    places per page), which already follows the browser's locale, plus 3
-    hardcoded 'en-US' - so one page can show both formats today.
-  - The date filters are labelled "Start/End Date (MM/DD/YYYY)" (4 labels
-    per page), but native date inputs already display in the browser's own
-    format, so for DD/MM visitors the label is wrong already.
-  Likely fix: one shared formatter (browser locale, numeric day/month/year)
-  used everywhere a date is shown, and drop the format from the date input
-  labels. Check that nothing sorts or parses the displayed date strings
-  (sorting looks like it uses the Date objects). All four pages.
-  (The Upcoming Matches pages already use the browser's locale throughout.)
-
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter.
@@ -114,6 +97,17 @@ Feature ideas, not yet scheduled.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Show dates in the visitor's local format~~ — done (2026-09-30). Every
+  displayed date on the four pages now uses the browser's locale
+  (`toLocaleDateString()` with no locale): the 21 hard-coded 'en-US' calls
+  (Domestic match/streak tables, Match History, Match Finder, historic
+  streaks; Continental historic streaks; "Last Data Update" on all four)
+  were switched, and "(MM/DD/YYYY)" was dropped from the 16 Start/End Date
+  labels, since the native date pickers already show the visitor's own
+  format. Internal dates (filters, API params) stay ISO, and every date
+  sort uses the Date objects, never the displayed text. The Upcoming
+  Matches pages already used the locale.
 
 - ~~Update the League Tables, Team Seasons and Team Streaks tab
   descriptions~~ — done (2026-09-29), after multi-team Team 2, Team Seasons

@@ -220,14 +220,14 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
+                                <span class="icon-calendar mr-2"></span>Start Date
                             </label>
                             <input type="date" id="dateFrom" class="form-input">
                         </div>
 
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
+                                <span class="icon-calendar mr-2"></span>End Date
                             </label>
                             <input type="date" id="dateTo" class="form-input">
                         </div>
@@ -351,14 +351,14 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="icon-calendar mr-2"></span>Start Date (MM/DD/YYYY)
+                                    <span class="icon-calendar mr-2"></span>Start Date
                                 </label>
                                 <input type="date" id="matchFinderDateFrom" class="form-input">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                    <span class="icon-calendar mr-2"></span>End Date (MM/DD/YYYY)
+                                    <span class="icon-calendar mr-2"></span>End Date
                                 </label>
                                 <input type="date" id="matchFinderDateTo" class="form-input">
                             </div>
@@ -3473,8 +3473,8 @@
 
             // Create table rows
             const tableRows = streaks.map(streak => {
-                const startDateStr = streak.startDate.toLocaleDateString('en-US');
-                const endDateStr = streak.endDate.toLocaleDateString('en-US');
+                const startDateStr = streak.startDate.toLocaleDateString();
+                const endDateStr = streak.endDate.toLocaleDateString();
                 
                 if (team2) {
                     // Head-to-head mode
@@ -3910,7 +3910,7 @@
 
             return `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString('en-US')}</td>
+                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString()}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -7310,7 +7310,7 @@
             
             return `
                 <tr class="border-b hover:bg-gray-50">
-                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString('en-US')}</td>
+                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString()}</td>
                     <td class="text-center">
                         <div class="flex items-center justify-center">
                             ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -9567,7 +9567,7 @@
             const awayTeamFinalStyle = awayTeamColor ? `color: ${pickTeamTextColor(awayTeamColor, awayTeamClass)} !important; font-weight: bold;` : 'font-weight: bold;';
 
             return {
-                date: match.dateObj.toLocaleDateString('en-US'),
+                date: match.dateObj.toLocaleDateString(),
                 dateSort: match.dateObj,
                 homeTeam: match.HomeTeam,
                 homeTeamColor: homeTeamColor,
@@ -10165,7 +10165,7 @@
                 const awayTeamFinalStyle = awayTeamColor ? `color: ${pickTeamTextColor(awayTeamColor, awayTeamClass)} !important; font-weight: bold;` : 'font-weight: bold;';
 
                 return {
-                    date: match.dateObj.toLocaleDateString('en-US'),
+                    date: match.dateObj.toLocaleDateString(),
                     dateSort: match.dateObj,
                     homeTeam: match.HomeTeam,
                     homeTeamColor: homeTeamColor,
@@ -10336,9 +10336,9 @@
             const range = state.divDateRangeApiCache[divCode];
 
             if (range && range.end) {
-                // Format the date as "Month Day, Year"
+                // Long-form date in the visitor's own locale (e.g. "September 30, 2026" / "30 September 2026")
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                const formattedDate = isoDateToLocalDateObj(range.end).toLocaleDateString('en-US', options);
+                const formattedDate = isoDateToLocalDateObj(range.end).toLocaleDateString(undefined, options);
                 elements.lastDataUpdate.textContent = `Last Data Update: ${formattedDate}`;
             } else if (range) {
                 elements.lastDataUpdate.textContent = 'Last Data Update: Unknown';
