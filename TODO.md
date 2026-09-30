@@ -79,6 +79,18 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Update the League Tables, Team Seasons and Team Streaks tab
+  descriptions~~ — done (2026-09-29), after multi-team Team 2, Team Seasons
+  match lists/individual seasons and streak match lists. Team Streaks uses
+  the user's wording (active and historic streaks, all nine streak types;
+  Continental adds a Competition Stage line). Team Seasons uses the user's
+  wording with two edits: it now opens with picking a Season (the new
+  single-season view), and Continental says Progression finds teams "which
+  reached a particular stage"; Continental's outdated qualifier note is
+  gone. League Tables adds one sentence on picking one or several Team 2s
+  (Big 6 on Domestic, a whole country on Continental) and drops a stray "to
+  filter with" on Continental. Mobile matches desktop throughout.
+
 - ~~Update the Match Finder tab description~~ — done (2026-09-29), user's
   own wording. Domestic: "Select one or two teams and find standout matches
   that they played in. Biggest wins and defeats, highest-scoring draws, the
