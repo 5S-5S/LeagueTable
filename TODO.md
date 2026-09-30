@@ -114,6 +114,43 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Separate qualifying rounds from the main stage in Continental
+  filters~~ — done (2026-09-30), both Continental pages. Qualifying rounds
+  are "Qualification ..." in the data but were shown and filtered under
+  the same names as main-stage rounds ("Play-Offs", "2. Round").
+  - Team Seasons: a single season's standings list only teams that
+    reached the competition proper, counting only main-stage matches
+    (falls back to the League Filters settings with Exclude Main Stage on,
+    or before any main-stage match of a season). Qualifying exits are
+    labelled Play-Offs (Q), 3./2./1. Round (Q) and Preliminary Round (Q);
+    third qualifying round exits used to show as "Group Stage". Filter by
+    Progression is split into Main Stage / Qualifiers groups, (Q) rounds
+    rank below every main-stage finish for "include better results", and
+    Group Stage now ranks between Play-Offs and 2. Round.
+  - Competition Stage: every stage dropdown (League Tables, Match Finder,
+    Last Time When, Team Streaks, H2H and Match History panels) is split
+    into Main Stage / Qualifiers, adding All Qualifiers and the five (Q)
+    rounds. One rule for all of them - `matchesStageCategory()` +
+    `qualifierRoundLabel()` in the pages, with the same copy in the Worker
+    and backend/migration/standings-aggregate.mjs (keep in sync). Main
+    Stage options never match qualifying rounds (League/Group Stage and
+    Knock-Out Stage used to let some in); checked to split all 8,910
+    Champions League matches with no gaps or overlaps. Match Finder's
+    tie mode includes two-legged qualifying ties. Worker deployed
+    (version d26129b1) and cache-version bumped.
+  - Match History and the H2H panel now follow the League Tables
+    Competition Stage, like its other filters (they used to ignore it,
+    so the bars and match list didn't match the table).
+  - Stage names: desktop Stage columns show the (Q) labels instead of
+    "Qualification Play-Offs"; mobile abbreviates them P/R3/R2/R1/PR (Q),
+    and 1999-2003's Preliminary/Intermediate groups to GS/GS2.
+  - Share links needed no changes (new values round-trip; old
+    `stage=`/`pos=` links still open, with the corrected meanings).
+  - Worker deploys: Node 22 is installed per-user in ~/.local/node (the
+    Homebrew install belongs to another macOS account), so run
+    `PATH="$HOME/.local/node/bin:$PATH" npx wrangler deploy` from
+    backend/worker; wrangler is already logged in.
+
 - ~~Show dates in the visitor's local format~~ — done (2026-09-30). Every
   displayed date on the four pages now uses the browser's locale
   (`toLocaleDateString()` with no locale): the 21 hard-coded 'en-US' calls
