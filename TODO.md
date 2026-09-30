@@ -2,19 +2,6 @@
 
 Feature ideas, not yet scheduled.
 
-- On hold: **Update the Match Finder tab description** — noted 2026-09-24.
-  The description box (same text on all 4 pages) still reads "Find a
-  team's standout individual matches - biggest wins, biggest losses,
-  highest-scoring draws, and highest-scoring matches overall...", which
-  predates Least Total Goals, Specific Scoreline, and Continental's
-  Double-Legged Tie mode. Wording not decided yet. Draft suggestion:
-  "Find a team's standout matches - biggest wins and losses,
-  highest-scoring draws, most or fewest total goals, or a specific
-  scoreline. Select Team 1 to begin; add Team 2 to narrow to
-  head-to-head matches only." - plus, on Continental only, something
-  like "Switch to Double-Legged Tie to rank knockout ties by
-  aggregate."
-
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
   needed before it's release-worthy. Adds a List View/Bracket View
@@ -91,6 +78,13 @@ Feature ideas, not yet scheduled.
   which is tight on mobile.
 
 ## Done
+
+- ~~Update the Match Finder tab description~~ — done (2026-09-29), user's
+  own wording. Domestic: "Select one or two teams and find standout matches
+  that they played in. Biggest wins and defeats, highest-scoring draws, the
+  most or fewest total goals, or just a specific scoreline too."
+  Continental adds: "Switch to Double-Legged Tie to get the same information
+  for knock out matchups." Mobile uses the same text as desktop.
 
 - ~~Team Seasons "No seasons found" info line with team + position~~ —
   fixed (2026-09-29): displayTeamHistory() ends with switchTab(), which
