@@ -636,15 +636,24 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Filter by Progression:</label>
                         <select id="teamSeasonsPositionSelect" class="form-input w-full">
                             <option value="">All Progressions</option>
-                            <option value="Champions">Champions</option>
-                            <option value="Final">Final</option>
-                            <option value="Semi-Finals">Semi-Finals</option>
-                            <option value="Quarter-Finals">Quarter-Finals</option>
-                            <option value="Round Of 16">Round Of 16</option>
-                            <option value="Play-Offs">Play-Offs</option>
-                            <option value="Group Stage">Group Stage</option>
-                            <option value="2. Round">2. Round</option>
-                            <option value="1. Round">1. Round</option>
+                            <optgroup label="Main Stage">
+                                <option value="Champions">Champions</option>
+                                <option value="Final">Final</option>
+                                <option value="Semi-Finals">Semi-Finals</option>
+                                <option value="Quarter-Finals">Quarter-Finals</option>
+                                <option value="Round Of 16">Round Of 16</option>
+                                <option value="Play-Offs">Play-Offs</option>
+                                <option value="Group Stage">Group Stage</option>
+                                <option value="2. Round">2. Round</option>
+                                <option value="1. Round">1. Round</option>
+                            </optgroup>
+                            <optgroup label="Qualifiers">
+                                <option value="Play-Offs (Q)">Play-Offs (Q)</option>
+                                <option value="3. Round (Q)">3. Round (Q)</option>
+                                <option value="2. Round (Q)">2. Round (Q)</option>
+                                <option value="1. Round (Q)">1. Round (Q)</option>
+                                <option value="Preliminary Round (Q)">Preliminary Round (Q)</option>
+                            </optgroup>
                         </select>
                         
                         <!-- Include Better Results Checkbox -->
@@ -11674,7 +11683,18 @@
                 // Get the last match this team played
                 const lastMatch = sortedMatches[sortedMatches.length - 1];
                 const lastPhase = lastMatch.CompetitionPhase || '';
-                
+
+                // Knocked out in qualifying: those rounds share names with
+                // main-stage rounds ("Play-Offs", "2. Round"), so they're
+                // marked (Q). "Qualification Qual. 1./2. Round" is the
+                // preliminary round's semi-final and final.
+                if (lastPhase.startsWith('Qualification')) {
+                    if (lastPhase.includes('Play-Off')) return 'Play-Offs (Q)';
+                    if (lastPhase.includes('Qual.')) return 'Preliminary Round (Q)';
+                    const round = lastPhase.match(/(\d)\. Round/);
+                    return round ? `${round[1]}. Round (Q)` : 'Qualifiers';
+                }
+
                 // Map phase names to standardized stage names
                 let stageName = 'Group Stage';
                 if (lastPhase.includes('Quarter')) {
@@ -13037,8 +13057,15 @@
                 'Quarter-Finals',
                 'Round Of 16',
                 'Play-Offs',
+                'Group Stage',
                 '2. Round',
-                '1. Round'
+                '1. Round',
+                // Qualifying exits - below every main-stage finish
+                'Play-Offs (Q)',
+                '3. Round (Q)',
+                '2. Round (Q)',
+                '1. Round (Q)',
+                'Preliminary Round (Q)'
             ];
             
             const rank = progressionHierarchy.indexOf(progression);
@@ -13124,7 +13151,7 @@
             const isExpanded = expandedTeamSeasons.has(`${row.team}|${row.season}`);
             return `<button type="button" class="season-expand-btn${isExpanded ? ' expanded' : ''}" aria-expanded="${isExpanded}"
                 data-team="${row.team}" data-season="${row.season}" data-start="${row.seasonStart}" data-end="${row.seasonEnd}" data-league="${league}"
-                ${row.includeAllStages ? 'data-all-stages="1"' : ''} title="Show ${row.team} ${row.season} matches">▸</button>`;
+                ${row.includeAllStages ? 'data-all-stages="1"' : ''} ${row.mainStageOnly ? 'data-main-stage-only="1"' : ''} title="Show ${row.team} ${row.season} matches">▸</button>`;
         }
 
         // The expanded row after `row`, if it's open (for full re-renders)
@@ -13149,6 +13176,8 @@
                     const day = localDateKey(match.dateObj);
                     if (day < ref.start || day > ref.end) return false;
                     // Progression rows count every stage, whatever the filters say
+                    // Season standings rows count the competition proper only
+                    if (ref.mainStageOnly && match.isQualifier) return false;
                     if (!ref.allStages && state.excludeQualifiers && match.isQualifier) return false;
                     if (!ref.allStages && state.excludeMainStage && !match.isQualifier) return false;
                     return true;
@@ -13184,7 +13213,7 @@
         function renderTeamSeasonMatchesRow(ref, colspan) {
             ensureTeamSeasonMatchesLoaded(ref.team, ref.league);
             return `
-                <tr class="season-matches-row" data-team="${ref.team}" data-season="${ref.season}" data-start="${ref.start}" data-end="${ref.end}" data-league="${ref.league}" data-all-stages="${ref.allStages || ''}">
+                <tr class="season-matches-row" data-team="${ref.team}" data-season="${ref.season}" data-start="${ref.start}" data-end="${ref.end}" data-league="${ref.league}" data-all-stages="${ref.allStages || ''}" data-main-stage-only="${ref.mainStageOnly || ''}">
                     <td colspan="${colspan}">${renderTeamSeasonMatchesContent(ref)}</td>
                 </tr>
             `;
@@ -13231,10 +13260,32 @@
             const divCode = leagueMapping[league];
             if (!divCode) return;
 
-            // Re-invokes this once loaded (see ensureSeasonStandingsLoaded)
-            ensureSeasonStandingsLoaded(divCode, league, state.excludeQualifiers, state.excludeMainStage);
-            const bySeason = state.seasonStandingsApiCache[`${divCode}::${state.excludeQualifiers}::${state.excludeMainStage}`] || {};
-            const seasonStandings = bySeason[seasonKey];
+            // The competition proper only: teams that reached the league
+            // phase, group stage or knockouts, with only those matches in
+            // their totals (a team knocked out in qualifying isn't part of
+            // the season's standings, and qualifiers don't count towards
+            // them). Falls back to the League Filters' own qualifier/main-
+            // stage settings when Exclude Main Stage is on (qualifiers only,
+            // on purpose), when no main-stage match has been played yet
+            // (early in a season), or if that request failed.
+            // Both loads re-invoke this once done (see ensureSeasonStandingsLoaded).
+            let seasonStandings = null;
+            let mainStageOnly = false;
+            if (!state.excludeMainStage) {
+                ensureSeasonStandingsLoaded(divCode, league, true, false);
+                const mainStageBySeason = state.seasonStandingsApiCache[`${divCode}::true::false`];
+                if (!mainStageBySeason) return; // not loaded yet
+                const mainStage = mainStageBySeason[seasonKey];
+                if (mainStage && mainStage.standings.length) {
+                    seasonStandings = mainStage;
+                    mainStageOnly = true;
+                }
+            }
+            if (!mainStageOnly) {
+                ensureSeasonStandingsLoaded(divCode, league, state.excludeQualifiers, state.excludeMainStage);
+                const bySeason = state.seasonStandingsApiCache[`${divCode}::${state.excludeQualifiers}::${state.excludeMainStage}`] || {};
+                seasonStandings = bySeason[seasonKey];
+            }
 
             const originalSelectedLeague = state.selectedLeague;
             state.selectedLeague = league;
@@ -13276,7 +13327,8 @@
                         tournamentProgression: calculateTournamentProgression(stats.team, lastMatch),
                         season: seasonKey,
                         seasonStart: seasonDates.start, // for the expandable match lists
-                        seasonEnd: seasonDates.end
+                        seasonEnd: seasonDates.end,
+                        mainStageOnly // the match list then leaves out qualifiers too
                     };
                 })
                 .sort((a, b) =>
