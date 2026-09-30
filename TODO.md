@@ -80,9 +80,20 @@ Feature ideas, not yet scheduled.
   place in the CL league-phase table; compact fixture cards, with the three
   streak tables opening when a card is clicked (~150 fixtures in 14 days).
 
-  Progress: Phase 1 in progress on the `upcoming-matches` branch
-  (2026-09-29) - fixtures table in schema.sql, scripts/update_fixtures.py,
-  .github/workflows/update-fixtures.yml.
+  Progress (on the `upcoming-matches` branch, not merged):
+  - Phase 1 done (2026-09-29): fixtures table in schema.sql,
+    scripts/update_fixtures.py, .github/workflows/update-fixtures.yml.
+  - Desktop page done (2026-09-30), on a fixed sample fixture list
+    (upcoming-fixtures-sample.json): compact two-per-row cards; opened
+    card has the season table, H2H and record bars, Premier League era
+    switch, streak tables with an Overall / Home / Away switch.
+  - Next: UpcomingMatchesMobile.html + redirect; then /api/upcoming
+    (Worker deploy) and switching the page to live fixtures; then entry
+    points.
+  - **Before continuing on the branch: merge `main` into it.** `main` has
+    moved on since the branch was cut (local-format dates on all four
+    pages, the Continental Team Seasons qualifier fixes), so the branch's
+    copies of those pages are stale until it's brought up to date.
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
