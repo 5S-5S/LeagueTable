@@ -323,20 +323,39 @@ const KNOCKOUT_PHASES = [
     'Play-Offs', '1. Round', '2. Round',
 ];
 
+// Qualifying rounds are "Qualification ..." in the data but share round
+// names with the main stage, so they're their own "(Q)" stages. null for a
+// main-stage phase. "Qualification Qual. 1./2. Round" is the preliminary
+// round's semi-final and final.
+function qualifierRoundLabel(competitionPhase) {
+    if (!competitionPhase || !competitionPhase.startsWith('Qualification')) return null;
+    if (competitionPhase.includes('Play-Off')) return 'Play-Offs (Q)';
+    if (competitionPhase.includes('Qual.')) return 'Preliminary Round (Q)';
+    const round = competitionPhase.match(/(\d)\. Round/);
+    return round ? `${round[1]}. Round (Q)` : 'Qualifiers';
+}
+
+// Main Stage options never match a qualifying round; "Qualifiers" matches
+// every qualifying round and each "(Q)" option its own round.
+// 'group-stage'/'knockout-stage' are the League Tables dropdown's names for
+// the two category options.
 function matchesStageCategory(competitionPhase, stageCategory) {
     if (!competitionPhase || !stageCategory) return false;
+
+    const qualifierRound = qualifierRoundLabel(competitionPhase);
+    if (stageCategory === 'Qualifiers') return qualifierRound !== null;
+    if (stageCategory.endsWith('(Q)')) return qualifierRound === stageCategory;
+    if (qualifierRound) return false;
+
     const phase = competitionPhase.toLowerCase();
     switch (stageCategory) {
         case 'League/Group Stage':
+        case 'group-stage':
             return phase.includes('league phase') || phase.includes('group') ||
-                phase.includes('preliminary') || phase.includes('intermediate') ||
-                /group [a-z]/i.test(competitionPhase) ||
-                /preliminary gr\. [a-z]/i.test(competitionPhase) ||
-                /intermediate gr\. [a-z]/i.test(competitionPhase);
+                phase.includes('preliminary') || phase.includes('intermediate');
         case 'Knock-Out Stage':
-            return phase.includes('final') || phase.includes('semi-final') ||
-                phase.includes('quarter-final') || phase.includes('round of 16') ||
-                phase.includes('play-off') || phase.includes('2. round') || phase.includes('1. round');
+        case 'knockout-stage':
+            return KNOCKOUT_PHASES.includes(competitionPhase);
         case 'Final': return phase === 'final';
         case 'Semi-Finals': return phase === 'semi-finals';
         case 'Quarter-Finals': return phase === 'quarter-finals';
@@ -356,13 +375,7 @@ function filterContinentalMatches(matches, { excludeQualifiers, excludeMainStage
     if (excludeMainStage) filtered = filtered.filter(m => m.isQualifier);
 
     if (competitionStage) {
-        if (competitionStage === 'group-stage') {
-            filtered = filtered.filter(m => !KNOCKOUT_PHASES.includes(m.competitionPhase || ''));
-        } else if (competitionStage === 'knockout-stage') {
-            filtered = filtered.filter(m => KNOCKOUT_PHASES.includes(m.competitionPhase || ''));
-        } else {
-            filtered = filtered.filter(m => matchesStageCategory(m.competitionPhase, competitionStage));
-        }
+        filtered = filtered.filter(m => matchesStageCategory(m.competitionPhase, competitionStage));
     }
 
     return filtered;

@@ -92,8 +92,13 @@ Feature ideas, not yet scheduled.
     points.
   - **Before continuing on the branch: merge `main` into it.** `main` has
     moved on since the branch was cut (local-format dates on all four
-    pages, the Continental Team Seasons qualifier fixes), so the branch's
-    copies of those pages are stale until it's brought up to date.
+    pages, the Continental Team Seasons qualifier fixes, the Main Stage /
+    Qualifiers Competition Stage dropdowns with their Worker change, and
+    the Match History stage fix), so the branch's copies of those pages
+    are stale until it's brought up to date. One `git merge main` on the
+    branch brings all of it over - nothing needs reapplying by hand.
+    (The Worker is already deployed with the stage change; the branch
+    doesn't touch backend/worker/src/index.js, so no conflict there.)
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
