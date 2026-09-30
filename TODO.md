@@ -44,17 +44,62 @@ Feature ideas, not yet scheduled.
   five leagues and the Champions League (not CL qualifiers), ~10
   requests/min - one call per competition per day is plenty.
 
-  Open design points:
-  - Storage: fixtures have no score and get rescheduled, so keep them out
-    of the results `matches` table - a separate D1 table (keyed by the API
-    match id, replaced on each refresh) or a small JSON file.
-  - Refresh: a daily job alongside the existing score updates, replacing
-    fixtures rather than appending, and dropping ones that have been played.
-  - Where it lives: its own page/tab, the landing page, or per team on the
-    Team Dashboard (or several).
-  - The H2H record and streaks can reuse the existing head-to-head and
-    streak logic (/api/head-to-head, calculateActiveStreaks) rather than
-    new backend endpoints.
+  Decided (2026-09-29):
+  - A new standalone page covering all six competitions (not a tab, not
+    the landing page), with a side-menu link.
+  - Window: the next 14 days, grouped by day, then competition; kick-off
+    times in the visitor's local timezone.
+  - History is per competition: a Premier League fixture uses Premier
+    League meetings and form only, a Champions League fixture uses
+    Champions League meetings and form only.
+  - Per fixture: both teams' current league positions, last-5 form (W/D/L
+    dots), the head-to-head bars (as in the H2H panel), and three tables:
+    every active head-to-head streak of 3+ games (each with the Team
+    Streaks chevron to list its matches), every active 3+ streak for Team 1
+    (home), and the same for Team 2 (away), across all nine streak types.
+
+  Build plan:
+  1. Data: a `fixtures` table in D1 (football-data match id as key, div,
+     utc kick-off, home, away, matchday, stage, status), kept separate from
+     results. A daily `update_fixtures.py` pulls the next 14+ days for all
+     six competitions (one call each), reuses the score scripts' team-name
+     mappings, replaces the stored upcoming fixtures, and writes to D1 with
+     the sync job's Cloudflare secrets; own workflow + failure issue.
+  2. API: `/api/upcoming` returns fixtures with the per-match context
+     precomputed (positions, form, H2H record, active H2H and per-team
+     streaks with their matches), KV-cached until the next daily refresh -
+     computing it in the page would take ~3 API calls per fixture. Needs a
+     Worker copy of the streak logic, checked against Team Streaks.
+  3. Page: fixture cards, filters by competition and team, links into the
+     existing tabs via share links (League Tables H2H, Team Streaks).
+  4. Entry points: side menu; maybe a landing-page teaser and a "next
+     match" line on the Team Dashboard.
+
+  Also decided: a separate UpcomingMatchesMobile.html like every other
+  page; for Champions League fixtures, "league position" is the team's
+  place in the CL league-phase table; compact fixture cards, with the three
+  streak tables opening when a card is clicked (~150 fixtures in 14 days).
+
+  Progress: Phase 1 in progress on the `upcoming-matches` branch
+  (2026-09-29) - fixtures table in schema.sql, scripts/update_fixtures.py,
+  .github/workflows/update-fixtures.yml.
+
+- Later: **Show dates in the visitor's local format** — noted 2026-09-29.
+  Visitors in DD/MM/YYYY countries should see dates that way instead of
+  always MM/DD/YYYY. Current state is mixed:
+  - Domestic formats dates with a hardcoded `toLocaleDateString('en-US')`
+    (7 places desktop, 8 mobile), so it's always MM/DD/YYYY.
+  - Continental mostly uses `toLocaleDateString()` with no locale (8
+    places per page), which already follows the browser's locale, plus 3
+    hardcoded 'en-US' - so one page can show both formats today.
+  - The date filters are labelled "Start/End Date (MM/DD/YYYY)" (4 labels
+    per page), but native date inputs already display in the browser's own
+    format, so for DD/MM visitors the label is wrong already.
+  Likely fix: one shared formatter (browser locale, numeric day/month/year)
+  used everywhere a date is shown, and drop the format from the date input
+  labels. Check that nothing sorts or parses the displayed date strings
+  (sorting looks like it uses the Date objects). All four pages.
+  (The Upcoming Matches pages already use the browser's locale throughout.)
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
@@ -67,15 +112,6 @@ Feature ideas, not yet scheduled.
 - Maybe: **Team progression chart** — a line chart (points or league
   position per season) on the Team Dashboard for Domestic and Continental,
   possibly with a second team overlaid for comparison.
-
-- Maybe: **Aggregate stats for the active streak** — follow-up to the
-  Historic streaks aggregate columns (see Done). The active-streak view
-  (the current streak's match table) deliberately doesn't show them yet;
-  likely shape is a one-line summary under its match table, next to
-  "This streak started: N days ago", using the same per-type columns
-  (e.g. "GF 7 · GA 6 · GD +1 · PPG 1.75"). A running-total column in the
-  match table was the alternative considered - more detail, but wider,
-  which is tight on mobile.
 
 ## Done
 
