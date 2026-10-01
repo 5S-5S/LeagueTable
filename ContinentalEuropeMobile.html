@@ -8161,9 +8161,12 @@
             // Ties only exist in knockout and qualifying rounds - group-stage
             // matches are round-robin and can legitimately feature the same
             // two teams twice in one season without that being an aggregate
-            // "tie". (Exclude Qualifiers is applied by the caller.)
+            // "tie". The final is a single match (a replay included), never
+            // a two-legged tie, so it's left out too. (Exclude Qualifiers is
+            // applied by the caller.)
             let tieEligible = matches.filter(row =>
-                MAIN_KNOCKOUT_PHASES.includes(row.CompetitionPhase || '') || qualifierRoundLabel(row.CompetitionPhase) !== null);
+                (MAIN_KNOCKOUT_PHASES.includes(row.CompetitionPhase || '') && row.CompetitionPhase !== 'Final') ||
+                qualifierRoundLabel(row.CompetitionPhase) !== null);
 
             // Stage filter is safe to apply per-leg before pairing here -
             // both legs of a real tie always share the same CompetitionPhase.
