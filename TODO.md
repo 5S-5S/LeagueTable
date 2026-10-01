@@ -23,9 +23,15 @@ Feature ideas, not yet scheduled.
       / qualifiers only, and a country ("vs English clubs").
     - `team` (one team): the same filters, with its record and match
       history ("arsenal away since 2010", "arsenal last 20 games").
-    - `table` (no team): a season or dates, home / away / weekday tables,
-      2 or 3 points for a win, without deductions; Continental single
-      seasons answer with the final's winner.
+    - `table` (no team): dates, home / away / weekday tables, 2 or 3
+      points for a win, without deductions, Continental stages. A plain
+      single season ("2025-26 Serie A") opens Team Seasons' final
+      standings instead (medal colors, each club's matches a click away)
+      - "Inter won the 2025-26 Serie A with 87 points, 11 ahead of SSC
+      Napoli"; Continental: the winner and the beaten finalist. Stripped
+      titles (Marseille 1992-93, Juventus 2004-05 - shown as NR) are never
+      counted: "finished top ... but were stripped of the title - it
+      wasn't awarded".
     - Dates as well as years in ranges ("since 01/01/1991", "between 1
       Jan 1990 and 31/12/2000", "on 10/05/2026", "January 2010"); slashed
       dates follow the visitor's language (US: month first). A typed date
@@ -45,7 +51,16 @@ Feature ideas, not yet scheduled.
     goals (counts ties won / lost), penalties, stages, qualifiers. Needs a
     team - "biggest wins" alone asks for one. Answer names the top result
     and how many share it.
-  - Next tabs: Team Seasons, Last Time When, Team Streaks.
+  - Team Seasons done (2026-10-01), all four pages (`team-seasons`): a
+    team's seasons ("arsenal seasons" / "history"), a finish ("titles",
+    "3rd", "top 4", "runners up"; Continental "finals" / "semi finals" =
+    reached, "lost in the final" / "knocked out in the quarter finals" =
+    went out there), one season ("where did arsenal finish in 2003-04"),
+    every club at a finish ("premier league champions", "first time
+    champions"), eras, and "including historic" (the pre-Serie A /
+    pre-Bundesliga champions - answers then say "the German / Italian
+    championship").
+  - Next tabs: Last Time When, Team Streaks.
     Until each is done, its results open the full page.
   - Also fixed on the way: Continental `?team=` dashboard links never
     locked the team (the lock was consumed before /api/teams loaded).

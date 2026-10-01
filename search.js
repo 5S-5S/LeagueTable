@@ -977,12 +977,14 @@
         'victories': 'Biggest victories', 'defeats': 'Biggest defeats', 'draws': 'Highest-scoring draws',
         'totalGoals': 'Most total goals', 'leastGoals': 'Least total goals', 'scoreline': 'Scoreline'
     };
+    // Team Seasons' Champions League progressions ("how far they got")
     const CONTINENTAL_STAGE_PATTERNS = [
         ['Semi-Finals', /\b(semi ?finals?|semis)\b/],
         ['Quarter-Finals', /\b(quarter ?finals?|quarters)\b/],
         ['Round Of 16', /\b(round of 16|last 16)\b/],
-        ['Group Stage', /\b(group stage|groups)\b/],
-        ['Final', /\bfinals?\b/]
+        ['Play-Offs', /\bplay ?offs?\b/],
+        ['Group Stage', /\b(group stages?|groups|league phase)\b/],
+        ['Final', /\b(finals?|runners? up|beaten finalists?)\b/]
     ];
     // Words the query parser understands, so a trailing one is never
     // mistaken for the start of a team name still being typed
@@ -998,7 +1000,12 @@
         'quarter quarters round group stage home away active current since after before between until ' +
         'from points deductions penalties pens knockout knockouts big six era time ' +
         'by via over under through into than their his her its they we our any every which what who how ' +
-        'much many times or but not no do does got get getting beat beaten'
+        'much many times or but not no do does got get getting beat beaten ' +
+        // Everyday words, so they're never taken for the start of a team
+        'far well good bad did went go goes going reach reaching ever still yet now then also just only ' +
+        'more less very really team teams club clubs side sides play plays played playing year years ' +
+        'stats statistics score finish place out knocked eliminated runners up second third fourth ' +
+        'show list tell give find me us is are were has have had will would should can could'
     ).split(' '));
 
     function normalizeSearchText(text) {
@@ -1383,25 +1390,42 @@
     }
 
     // Which finishing position a Team Seasons search is after:
-    // { rank } for a domestic league, { stage } for the Champions
-    // League, and better = "or better" (top 4, reached the semis)
+    // { rank } for a domestic league, { stage } for the Champions League,
+    // better = "or better" (top 4, reached the semis), first = each club's
+    // first time only ("first-time champions"), historic = with the
+    // pre-Serie A / pre-Bundesliga champions
     function detectFinish(text) {
-        const finish = { rank: '', stage: '', better: /\b(top|reach|reached|at least|or better)\b/.test(text) };
-        const top = text.match(/\btop (\d{1,2})\b/);
+        const has = pattern => pattern.test(text);
+        const finish = {
+            rank: '', stage: '', better: false,
+            first: has(/\b(first (time|title|ever|win)|for the first time|first time (champions|winners))\b/),
+            historic: has(/\b(historic|pre (serie a|bundesliga)|before the (serie a|bundesliga)|old championships?)\b/)
+        };
+        const top = text.match(/\btop (\d{1,2}|two|three|four|five|six|seven|eight|ten)\b/);
         const ordinal = text.match(/\b(\d{1,2})(st|nd|rd|th)\b/);
-        if (/\b(titles?|champions|winners|won (the )?(league|title|cup|it))\b/.test(text)) {
+        const runnersUp = has(/\b(runners? up|second place|beaten finalists?|lost (in )?the final)\b/);
+        if (has(/\b(titles?|champions|winners|won (the )?(league|title|cup|it|competition))\b/) && !runnersUp) {
             finish.rank = '1';
             finish.stage = 'Champions';
         } else if (top) {
-            finish.rank = top[1];
+            finish.rank = String(toNumber(top[1]));
             finish.better = true;
+        } else if (runnersUp) {
+            finish.rank = '2';
         } else if (ordinal) {
             finish.rank = ordinal[1];
         }
         if (!finish.stage) {
             const stage = CONTINENTAL_STAGE_PATTERNS.find(([, pattern]) => pattern.test(text));
-            if (stage) finish.stage = stage[0];
+            if (stage) {
+                finish.stage = stage[0];
+                // "semi finals" / "reached the final" = that far or further;
+                // "knocked out in the semis" / "lost the final" = out there
+                const wentOut = runnersUp || has(/\b(knocked out|went out|go out|out in|eliminated|lost in|exit(ed)?)\b/);
+                finish.better = !wentOut;
+            }
         }
+        if (has(/\b(or better|at least|or higher)\b/)) finish.better = true;
         if (Number(finish.rank) > 24) finish.rank = '';
         return finish;
     }
@@ -1436,7 +1460,7 @@
         // A table asked for by name wins over the stage words in it
         // ("2004-05 group stage table")
         if (has(/\b(tables?|standings?|classification|rankings?)\b/)) return { view: 'table', location };
-        if (has(/\b(seasons|finish|finished|finishes|finishing|positions?|placed|titles?|champions|winners|won (the )?(league|title|cup|it)|top \d{1,2}|finals?|semi ?finals?|semis|quarter ?finals?|quarters|round of 16|last 16|group stage|\d{1,2}(st|nd|rd|th))\b/)) {
+        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semis|quarter ?finals?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
             return { view: 'team-seasons', finish: detectFinish(text), location };
         }
         if (has(/\b(vs|v|versus|against|h2h|head to head|head 2 head|meetings?|record)\b/)) return { view: 'h2h', location };
@@ -1751,6 +1775,24 @@
     // Each result: { kind, icon, crestTeam?, title, detail, comp, href }
     function tableResult(comp, parsed) {
         const parts = filterDetailParts(parsed, comp, 'table');
+        // A plain single season is that season's final standings in Team
+        // Seasons (medal colors, each club's matches a click away). League
+        // Tables only for what Team Seasons can't do: home / away / weekday
+        // tables, dates, points systems, deductions, stages, qualifiers.
+        const f = parsed.filters;
+        const leagueTablesOnly = f.location || f.day || f.points || f.deductions ||
+            (comp.continental && (f.stage || f.excludeQualifiers || f.excludeMainStage));
+        if (parsed.season !== null && !leagueTablesOnly) {
+            return {
+                kind: 'team-seasons', icon: '📊', comp,
+                title: `${comp.name} table · ${seasonKey(parsed.season)}`,
+                detail: 'Final standings',
+                href: competitionUrl(comp, 'team-seasons', {
+                    league: comp.continental ? comp.key : '',
+                    season: seasonKey(parsed.season)
+                })
+            };
+        }
         return {
             kind: 'table', icon: '📊', comp,
             title: `${comp.name} table · ${parts[0]}`,
@@ -1804,24 +1846,43 @@
         };
     }
 
-    function seasonsResult(comp, team, season, finish) {
+    function finishLabel(comp, finish) {
         const pos = comp.continental ? finish.stage : finish.rank;
-        let finishText = '';
-        if (pos) {
-            if (comp.continental) finishText = pos === 'Champions' ? 'Won the competition' : `Reached the ${pos}${finish.better ? ' or better' : ''}`;
-            else finishText = finish.better && pos !== '1' ? `Finished top ${pos}` : (pos === '1' ? 'League titles' : `Finished ${pos}${ordinalSuffix(pos)}`);
+        if (!pos) return '';
+        if (comp.continental) {
+            if (pos === 'Champions') return 'Titles';
+            const round = phaseWords(pos);
+            if (pos === 'Final' && !finish.better) return 'Lost in the final';
+            return finish.better ? `Reached the ${round}` : `Out in the ${round}`;
         }
+        if (pos === '1') return 'Titles';
+        return finish.better ? `Top ${pos} finishes` : `${pos}${ordinalSuffix(pos)} place finishes`;
+    }
+
+    // Team Seasons: one team's season-by-season finishes (optionally at a
+    // position / progression), or every team at a position
+    function seasonsResult(comp, team, parsed, finish) {
+        const pos = comp.continental ? finish.stage : finish.rank;
+        const era = parsed.eras[comp.key];
+        const params = {
+            league: comp.continental ? comp.key : '',
+            t1: team,
+            season: parsed.season !== null ? seasonKey(parsed.season) : (era || ''),
+            pos,
+            better: pos && finish.better && pos !== '1' && pos !== 'Champions' ? '1' : '',
+            first: !team && pos && finish.first ? '1' : '',
+            hist: !comp.continental && finish.historic ? '1' : ''
+        };
         return {
-            kind: 'seasons', icon: '📈', comp,
-            title: `${team || 'All teams'} · Season-by-season finishes`,
-            detail: joinDetail([finishText, season !== null ? seasonKey(season) : '']),
-            href: competitionUrl(comp, 'team-seasons', {
-                league: comp.continental ? comp.key : '',
-                t1: team,
-                season: season !== null ? seasonKey(season) : '',
-                pos,
-                better: pos && finish.better && pos !== '1' && pos !== 'Champions' ? '1' : ''
-            })
+            kind: 'team-seasons', icon: '📈', comp,
+            title: `${team || 'All teams'} · ${finishLabel(comp, finish) || 'Season-by-season finishes'}`,
+            detail: joinDetail([
+                'Team Seasons',
+                parsed.season !== null ? seasonKey(parsed.season) : (era ? `${capitalize(ERA_NAMES[era].replace(/^the /, ''))} era` : 'All seasons'),
+                params.first ? 'First time only' : '',
+                params.hist ? 'With historic seasons' : ''
+            ]),
+            href: competitionUrl(comp, 'team-seasons', params)
         };
     }
 
@@ -1930,7 +1991,7 @@
                 // Champions League, and a stage ("semi finals") nothing
                 // in a league - skip the competition that can't show it
                 if (comp.continental ? (rank && !stage) : (stage && !rank)) break;
-                primary.push(seasonsResult(comp, t1, season, intent.finish));
+                primary.push(seasonsResult(comp, t1, parsed, intent.finish));
                 break;
             }
             case 'h2h':
@@ -1958,7 +2019,7 @@
                 } else if (t1) {
                     primary.push(teamRecordResult(comp, t1, parsed));
                     related.push(dashboardResult(comp, t1));
-                    related.push(seasonsResult(comp, t1, season, { rank: '', stage: '', better: false }));
+                    related.push(seasonsResult(comp, t1, parsed, { rank: '', stage: '', better: false }));
                     related.push(streaksResult(comp, t1, null, { streakType: 'winning', historic: false, location }));
                     related.push(lastTimeResult(comp, t1, null, { location }));
                     related.push(matchFinderResult(comp, t1, [], parsed, 'victories'));
@@ -2267,6 +2328,164 @@
         return null;
     }
 
+    // Team Seasons. ctx.seasons: { rows, position, better, first } - the
+    // page's own rows (newest first or any order; each has season, team
+    // when it's every team at a position, and position for a league or
+    // tournamentProgression for the Champions League).
+    function describeTeamSeasons(ctx, params, { b, competition, shortCompetition }) {
+        const data = ctx.seasons;
+        if (!data) return null;
+        const continental = !SEARCH_SCOPES.domestic.some(comp => comp.key === ctx.league);
+        const startYear = row => Number(String(row.season).slice(0, 4));
+        const rows = [...(data.rows || [])].sort((x, y) => startYear(y) - startYear(x));
+        const pos = data.position || '';
+        const better = !!data.better;
+        const finishOf = row => continental ? row.tournamentProgression : row.position;
+        const revoked = (row, team) => !!(data.revoked && data.revoked(team || row.team || ctx.team1, row.season, finishOf(row)));
+        const won = row => continental ? finishOf(row) === 'Champions' : Number(finishOf(row)) === 1 && !revoked(row);
+        const times = n => n === 1 ? 'once' : (n === 2 ? 'twice' : `${formatNumber(n)} times`);
+        const latest = rows[0];
+        const earliest = rows[rows.length - 1];
+        // What the position means in words: "won", "finished 3rd in",
+        // "finished in the top 4 of", "reached the semi-finals of",
+        // "gone out in the quarter-finals of"
+        const reachedText = () => {
+            if (continental) {
+                if (pos === 'Champions') return { verb: 'won', of: '' };
+                const round = phaseWords(pos);
+                if (pos === 'Final' && !better) return { verb: 'lost', of: ' final', noun: `lost the final of` };
+                return better ? { noun: `reached the ${round} of` } : { noun: `gone out in the ${round} of` };
+            }
+            if (pos === '1') return { verb: 'won' };
+            if (better) return { noun: `finished in the top ${pos} of` };
+            return { noun: `finished ${pos}${ordinalSuffix(pos)} in` };
+        };
+
+        // One team's seasons
+        if (ctx.team1) {
+            const team = b(ctx.team1);
+            // A single season: where they finished
+            if (ctx.season) {
+                const row = rows.find(r => r.season === ctx.season);
+                if (!row) return { crestTeam: ctx.team1, html: `${team} weren't in the ${ctx.season} ${shortCompetition}.` };
+                const current = ctx.season === seasonKey(currentSeasonStart());
+                if (continental) {
+                    const how = row.tournamentProgression === 'Champions' ? `won the ${ctx.season} ${shortCompetition}`
+                        : (row.tournamentProgression === 'Final' ? `lost the final of the ${ctx.season} ${shortCompetition}`
+                            : `${current ? 'are in' : 'went out in'} the ${phaseWords(row.tournamentProgression)} of the ${ctx.season} ${shortCompetition}`);
+                    return { crestTeam: ctx.team1, html: `${team} ${how}.` };
+                }
+                const record = row.won !== undefined ? ` (${recordHtml(row.won, row.drawn, row.lost)})` : '';
+                const points = row.points !== undefined ? ` with ${formatNumber(row.points)} points` : '';
+                return {
+                    crestTeam: ctx.team1,
+                    html: current
+                        ? `${team} are ${row.position}${ordinalSuffix(row.position)} in the ${ctx.season} ${shortCompetition}${points} after ${row.played} games${record}.`
+                        : `${team} finished ${row.position}${ordinalSuffix(row.position)} in the ${ctx.season} ${shortCompetition}${points}${record}.`
+                };
+            }
+            // At a position: how often, first and most recent
+            if (pos) {
+                const what = reachedText();
+                if (rows.length === 0) {
+                    return { crestTeam: ctx.team1, html: what.verb === 'won'
+                        ? `${team} have never won ${competition}.`
+                        : `${team} have never ${what.noun} ${competition}.` };
+                }
+                const span = rows.length > 1 ? `, first in ${earliest.season} and most recently in ${latest.season}` : ` in ${latest.season}`;
+                const html = what.verb === 'won'
+                    ? `${team} have won ${competition} ${times(rows.length)}${span}.`
+                    : `${team} have ${what.noun} ${competition} ${times(rows.length)}${span}.`;
+                return { crestTeam: ctx.team1, html };
+            }
+            // Every season: how many, titles, best finish
+            if (rows.length === 0) return { crestTeam: ctx.team1, html: `No ${shortCompetition} seasons found for ${team}.` };
+            const titles = rows.filter(won);
+            let tail;
+            if (titles.length) {
+                tail = `winning it ${times(titles.length)}, most recently in ${titles[0].season}`;
+            } else if (continental) {
+                const order = ['Final', 'Semi-Finals', 'Quarter-Finals', 'Round Of 16', 'Play-Offs', 'Group Stage', '2. Round', '1. Round'];
+                const best = order.find(stage => rows.some(r => finishOf(r) === stage));
+                const bestRows = rows.filter(r => finishOf(r) === best);
+                tail = best ? `their best run reaching the ${phaseWords(best)} (${times(bestRows.length)}, most recently in ${bestRows[0].season})` : '';
+            } else {
+                const bestPos = Math.min(...rows.map(r => Number(finishOf(r))));
+                const bestRows = rows.filter(r => Number(finishOf(r)) === bestPos);
+                tail = `with a best finish of ${bestPos}${ordinalSuffix(bestPos)} (${times(bestRows.length)}, most recently in ${bestRows[0].season})`;
+            }
+            return {
+                crestTeam: ctx.team1,
+                html: `${team} have played ${formatNumber(rows.length)} season${rows.length === 1 ? '' : 's'} in ${competition}${tail ? `, ${tail}` : ''}.`
+            };
+        }
+
+        // A season's final standings: who won it (Domestic rows carry a
+        // position, Continental rows how far each club got)
+        if (!pos && ctx.season) {
+            if (rows.length === 0) return null;
+            const current = ctx.season === seasonKey(currentSeasonStart());
+            if (continental) {
+                const winner = rows.find(r => r.tournamentProgression === 'Champions');
+                const runnerUp = rows.find(r => r.tournamentProgression === 'Final');
+                if (!winner) return { html: `No final has been played yet in the ${ctx.season} ${shortCompetition}.` };
+                return {
+                    crestTeam: winner.team,
+                    html: `${b(winner.team)} won the ${ctx.season} ${shortCompetition}${runnerUp ? `, beating ${b(runnerUp.team)} in the final` : ''}.`
+                };
+            }
+            const leader = rows.find(r => Number(r.position) === 1) || rows[0];
+            const second = rows.find(r => Number(r.position) === 2);
+            // Top but stripped of the title, which wasn't awarded
+            if (revoked(leader) && Number(leader.position) === 1) {
+                return {
+                    crestTeam: leader.team,
+                    html: `${b(leader.team)} finished top of the ${ctx.season} ${shortCompetition} with ${formatNumber(leader.points)} points, but were stripped of the title - it wasn't awarded.`
+                };
+            }
+            const gap = second ? leader.points - second.points : 0;
+            if (current) {
+                return {
+                    crestTeam: leader.team,
+                    html: `${b(leader.team)} are top of the ${ctx.season} ${shortCompetition} with ${formatNumber(leader.points)} points from ${leader.played} games${second ? `, ${gap === 0 ? `level with ${b(second.team)}` : `${gap} ahead of ${b(second.team)}`}` : ''}.`
+                };
+            }
+            return {
+                crestTeam: leader.team,
+                html: `${b(leader.team)} won the ${ctx.season} ${shortCompetition} with ${formatNumber(leader.points)} points${second ? `, ${gap === 0 ? `level on points with ${b(second.team)}` : `${gap} ahead of ${b(second.team)}`}` : ''}.`
+            };
+        }
+
+        // Every team at a position
+        if (!pos) return null;
+        if (rows.length === 0) return { html: `No seasons found.` };
+        const what = reachedText();
+        // A single season: who finished there
+        if (ctx.season) {
+            const names = rows.map(r => b(r.team));
+            const who = names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}` : names[0];
+            // Past tense for one season: "went out in", not "gone out in"
+            const verb = what.verb === 'won' ? 'won' : what.noun.replace(/^gone out/, 'went out');
+            return { crestTeam: rows[0].team, html: `${who} ${verb} the ${ctx.season} ${shortCompetition}.` };
+        }
+        const counts = {};
+        rows.forEach(r => { counts[r.team] = (counts[r.team] || 0) + 1; });
+        const clubs = Object.keys(counts).length;
+        if (data.first) {
+            const label = what.verb === 'won' ? `won ${competition}` : `${what.noun} ${competition}`;
+            return {
+                crestTeam: latest.team,
+                html: `${formatNumber(clubs)} club${clubs === 1 ? ' has' : 's have'} ${label}; the most recent first-timer was ${b(latest.team)} in ${latest.season}.`
+            };
+        }
+        const [leader, most] = Object.entries(counts).sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1))[0];
+        const label = what.verb === 'won' ? `won ${competition} the most` : `${what.noun} ${competition} the most`;
+        return {
+            crestTeam: leader,
+            html: `${b(leader)} have ${label} (${times(most)}), one of ${formatNumber(clubs)} club${clubs === 1 ? '' : 's'} to do it. The most recent was ${b(latest.team)} in ${latest.season}.`
+        };
+    }
+
     // { html, crestTeam } for the answer, or null when there's nothing to say
     function describeAnswer(ctx, params) {
         const b = text => `<strong>${escapeSearchHtml(text)}</strong>`;
@@ -2317,6 +2536,16 @@
         }
 
         if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
+        if (ctx.view === 'team-seasons') {
+            // With the pre-Bundesliga / pre-Serie A champions it's the
+            // national championship, not the league
+            const historic = params.get('hist') === '1' && { 'bundesliga': 'the German championship', 'serie-a': 'the Italian championship' }[ctx.league];
+            return describeTeamSeasons(ctx, params, {
+                b,
+                competition: historic || competition,
+                shortCompetition: historic ? historic.replace(/^the /, '') : shortCompetition
+            });
+        }
 
         if (ctx.view === 'team') {
             if (!ctx.team1 || !ctx.matches) return null;
@@ -2391,7 +2620,7 @@
     // Result kinds whose page has a search mode: the page opens with its
     // controls hidden and just the answer showing (?search=<kind>). The
     // rest still open the full page.
-    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder'];
+    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons'];
 
     function resultHref(result, query, scope) {
         if (!SEARCH_MODE_KINDS.includes(result.kind)) return result.href;

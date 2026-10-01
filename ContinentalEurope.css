@@ -1857,17 +1857,23 @@ html.search-mode[data-search-view="table"] #matchHistorySection {
     display: none !important;
 }
 
-/* Match Finder: its results live inside the tabs area, so show that area
-   with only the results box (no tab buttons, description or filters),
-   and none of the League Tables boxes below */
-html.search-mode[data-search-view="match-finder"] #controlsSection {
+/* Match Finder and Team Seasons: their results live inside the tabs
+   area, so show that area with only the results box (no tab buttons,
+   description or filters), and none of the League Tables boxes below */
+html.search-mode[data-search-view="match-finder"] #controlsSection,
+html.search-mode[data-search-view="team-seasons"] #controlsSection {
     display: block !important;
 }
 
 html.search-mode[data-search-view="match-finder"] #controlsSection .tab-container,
 html.search-mode[data-search-view="match-finder"] #controlsSection .tab-content:not(#matchFinderContent),
 html.search-mode[data-search-view="match-finder"] #matchFinderContent > :not(#matchFinderResults),
-html.search-mode[data-search-view="match-finder"] .table-section {
+html.search-mode[data-search-view="match-finder"] .table-section,
+html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-container,
+html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-content:not(#teamSeasonsContent),
+html.search-mode[data-search-view="team-seasons"] #teamSeasonsContent > :not(#teamHistoryTable),
+html.search-mode[data-search-view="team-seasons"] #teamHistoryBackArrow,
+html.search-mode[data-search-view="team-seasons"] .table-section {
     display: none !important;
 }
 
