@@ -6,6 +6,18 @@
     <title>Continental Football - League Table Statistics</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="ContinentalEurope.css">
+    <link rel="stylesheet" href="search.css">
+    <script>
+        // Search mode (?search=h2h, from the search bar): flag it before the
+        // first paint so the controls never flash up (see ContinentalEurope.css)
+        (function() {
+            const searchView = new URLSearchParams(window.location.search).get('search');
+            if (searchView) {
+                document.documentElement.classList.add('search-mode');
+                document.documentElement.dataset.searchView = searchView;
+            }
+        })();
+    </script>
     <script>
         // Device detection and redirect logic
         (function() {
@@ -130,6 +142,11 @@
 
     <div class="league-table-container">
         <div class="main-card">
+            <!-- Search mode: the search bar and a one-line answer, in place
+                 of the header and controls -->
+            <div id="searchModeBar" class="search-mode-bar"></div>
+            <div id="searchAnswer" class="search-answer"></div>
+
             <!-- Header -->
             <div class="header">
                 <div class="header-content">
@@ -1155,25 +1172,25 @@
                     <div class="flex items-center gap-6">
                         <h3 class="text-lg font-semibold text-gray-700">Head-to-Head Record</h3>
 
-                        <label class="flex items-center cursor-pointer">
+                        <label class="flex items-center cursor-pointer search-mode-hidden">
                             <div id="h2hHomeCheckbox" class="checkbox checked"></div>
                             <span class="icon-home mr-1"></span>
                             <span class="text-sm font-medium">Home</span>
                         </label>
 
-                        <label class="flex items-center cursor-pointer">
+                        <label class="flex items-center cursor-pointer search-mode-hidden">
                             <div id="h2hAwayCheckbox" class="checkbox checked"></div>
                             <span class="icon-plane mr-1"></span>
                             <span class="text-sm font-medium">Away</span>
                         </label>
 
-                        <label class="flex items-center cursor-pointer">
+                        <label class="flex items-center cursor-pointer search-mode-hidden">
                             <div id="h2hPenaltyCheckbox" class="checkbox"></div>
                             <span class="mr-1">⚽</span>
                             <span class="text-sm font-medium">Penalty Shootouts</span>
                         </label>
                     </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-4 search-mode-hidden">
                         <label class="text-sm font-medium text-gray-700">Competition Stage</label>
                         <select id="h2hStageSelect" class="px-3 py-1 border border-gray-300 rounded focus:border-green-500 focus:outline-none text-sm">
                             <option value="">All</option>
@@ -1200,7 +1217,7 @@
                         <span class="text-sm text-gray-600" id="h2hMatchCount"></span>
                     </div>
                 </div>
-                <div class="flex items-center mb-4 gap-2" style="justify-content: flex-end;">
+                <div class="flex items-center mb-4 gap-2 search-mode-hidden" style="justify-content: flex-end;">
                     <label class="text-sm font-medium text-gray-700">Most Recent Head-to-Head</label>
                     <input type="text" id="recentH2HSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
                 </div>
@@ -1323,6 +1340,7 @@
         </div>
     </div>
 
+    <script src="search.js"></script>
     <script>
         // Application state
         const state = {
@@ -3233,7 +3251,9 @@
                 }
             }
 
-            history.replaceState(null, '', window.location.pathname);
+            // In search mode the URL is the question - keep it so a reload
+            // or a shared link still shows the answer
+            if (!SEARCH_MODE_VIEW) history.replaceState(null, '', window.location.pathname);
         }
 
         // Get contrasting text color (white or black) based on background color
@@ -4960,7 +4980,69 @@
         }
 
         // Initialize the application
+        // --- Search mode (?search=h2h&q=&scope=, from the search bar) ---
+        // CSS (html.search-mode) hides the header, tabs and filters; the
+        // page fills its filters from the link's Copy Link parameters as
+        // usual, so its own calculations produce the answer, and only that
+        // answer shows under the search bar.
+        const SEARCH_MODE_VIEW = new URLSearchParams(window.location.search).get('search');
+
+        const SEARCH_ANSWER_LEAGUE_NAMES = {
+            'champions-league': 'the Champions League',
+            'europa-league': 'the Europa League',
+            'conference-league': 'the Conference League'
+        };
+
+        function initSearchMode() {
+            if (!SEARCH_MODE_VIEW) return;
+            const params = new URLSearchParams(window.location.search);
+            LeagueSearch.mount(document.getElementById('searchModeBar'), {
+                query: params.get('q') || '',
+                scope: params.get('scope') || ''
+            });
+        }
+
+        function escapeAnswerHtml(text) {
+            return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+        }
+
+        // "AFC Ajax have a W3 D2 L5 record against Real Madrid in the
+        // Champions League all-time." - from the same numbers the record box shows
+        function updateSearchAnswerH2H(h2hResult) {
+            if (SEARCH_MODE_VIEW !== 'h2h') return;
+            const answerEl = document.getElementById('searchAnswer');
+            const team1 = state.selectedTeam1;
+            const team2 = state.selectedTeam2;
+            if (!team1 || !team2) {
+                answerEl.innerHTML = '';
+                return;
+            }
+            const loaded = !state.h2hApiLoading && (state.h2hApiCacheKey || '').endsWith(`::${team1}::${team2}`);
+            if (!h2hResult || !loaded) {
+                answerEl.innerHTML = '<p class="search-answer-loading">Working out the answer...</p>';
+                return;
+            }
+
+            const league = SEARCH_ANSWER_LEAGUE_NAMES[state.selectedLeague] || '';
+            // The all-seasons era filter is this page's default, so it means all-time
+            const isSingleSeason = state.selectedSeason && !state.selectedSeason.startsWith('all-');
+            const seasonOption = isSingleSeason ? elements.seasonSelect.selectedOptions[0] : null;
+            const when = seasonOption ? `in ${escapeAnswerHtml(seasonOption.text)}` : 'all‑time'; // non-breaking hyphen
+            const t1 = escapeAnswerHtml(team1);
+            const t2 = escapeAnswerHtml(team2);
+            const { team1Wins, draws, team2Wins, total } = h2hResult.overallStats;
+            const logo = getTeamLogoUrl(team1, state.selectedLeague);
+
+            const sentence = total === 0
+                ? `<strong>${t1}</strong> and <strong>${t2}</strong> have never met in ${league} ${when}.`
+                : `<strong>${t1}</strong> have a <span class="search-answer-record">W${team1Wins} D${draws} L${team2Wins}</span> record against <strong>${t2}</strong> in ${league} ${when}.`;
+            answerEl.innerHTML = `
+                ${logo ? `<img src="${logo}" class="search-answer-crest" alt="">` : ''}
+                <p class="search-answer-text">${sentence}</p>`;
+        }
+
         function init() {
+            initSearchMode();
             applyTeamDashboardUrlParams();
             applyShareableFilterUrlParams();
             setupEventListeners();
@@ -7582,8 +7664,10 @@
             matchFinderTeam1Combobox.setOptions(matchFinderTeam1ComboOptions);
             matchFinderTeam2Combobox.setOptions(matchFinderTeam2ComboOptions);
 
-            // Team Dashboard: consume a pending team lock from the URL (once)
-            if (state.pendingTeamLock) {
+            // Team Dashboard: consume a pending team lock from the URL (once),
+            // only once the roster from /api/teams has loaded - this runs
+            // again when it lands, and an empty first pass would drop the lock
+            if (state.pendingTeamLock && leagueTeams.length > 0) {
                 const lockedTeam = state.pendingTeamLock;
                 state.pendingTeamLock = '';
                 if (leagueTeams.includes(lockedTeam)) {
@@ -12745,6 +12829,7 @@
 
         // Update head-to-head display with custom team colors
         function updateHeadToHeadDisplay(h2hResult) {
+            updateSearchAnswerH2H(h2hResult);
             if (h2hResult && state.selectedTeam1 && state.selectedTeam2) {
                 elements.h2hSection.classList.remove('hidden');
                 

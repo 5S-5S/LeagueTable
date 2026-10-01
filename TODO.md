@@ -2,6 +2,25 @@
 
 Feature ideas, not yet scheduled.
 
+- In progress: **Search page** — on the `search-bar` branch (2026-10-01).
+  `index.html` is now a plain search page (title, search bar with a
+  sport/competition dropdown: Top 5 Leagues, each league, Champions
+  League; NFL/NBA greyed out). The search itself lives in `search.js` /
+  `search.css`, shared with the sport pages: it reads a plain-English
+  query for teams, a season and what's being asked, and links to that
+  view through the pages' Copy Link parameters.
+  - Search mode (`?search=<kind>&q=&scope=` on top of a Copy Link URL):
+    the page hides its header, tabs and filters, shows the search bar and
+    a one-line answer, and only the results for that question - worked
+    out by the page's own functions. Done for head to head (`h2h`) on all
+    four pages: answer line, the two-team table, H2H record and match list.
+  - Next: the other question types in search mode (Last Time When,
+    streaks, Match Finder, league tables, season finishes) - each needs
+    its own "show only this" CSS rule and answer sentence. Until then
+    those results open the full page.
+  - Also fixed on the way: Continental `?team=` dashboard links never
+    locked the team (the lock was consumed before /api/teams loaded).
+
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
   needed before it's release-worthy. Adds a List View/Bracket View

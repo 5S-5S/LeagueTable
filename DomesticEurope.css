@@ -1899,3 +1899,88 @@ body {
 .controls-collapsed .collapsible-control {
     display: none !important;
 }
+/* Search mode (?search=..., from the search bar): the search bar and a
+   one-line answer replace the header, team search, tabs and filters, and
+   only the results for that kind of question show. html.search-mode and
+   data-search-view are set in <head> before the first paint. */
+.search-mode-bar,
+.search-answer {
+    display: none;
+}
+
+html.search-mode .search-mode-bar {
+    display: block;
+    padding: 1.5rem 2rem 0;
+}
+
+html.search-mode .search-answer {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 1.5rem 2rem 0;
+}
+
+html.search-mode .main-card {
+    overflow: visible; /* the search results float out of the card */
+}
+
+html.search-mode .header,
+html.search-mode #teamDashboardHeader,
+html.search-mode #teamDashboardSearch,
+html.search-mode #controlsSection,
+html.search-mode #tableInfo,
+html.search-mode #collapseControlsBtn {
+    display: none !important;
+}
+
+/* Filters inside the result boxes. Each :not(#search-mode-none) only adds an
+   ID's weight, to beat the pages' own two-ID !important display rules (e.g.
+   #h2hSection div:has(#recentH2HSelect) on mobile) */
+html.search-mode .search-mode-hidden:not(#search-mode-none):not(#search-mode-none) {
+    display: none !important;
+}
+
+/* Head to head: the two teams' table, the record box and the match list */
+html.search-mode[data-search-view="h2h"] #matchHistorySection {
+    display: none !important;
+}
+
+html.search-mode .table-section {
+    padding-top: 1.5rem;
+}
+
+.search-answer-crest {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.search-answer-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #1f2937;
+}
+
+.search-answer-record {
+    color: #047857;
+    white-space: nowrap;
+}
+
+.search-answer-loading {
+    font-size: 1.1rem;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .search-answer-text {
+    color: white;
+}
+
+[data-theme="dark"] .search-answer-record {
+    color: #10b981;
+}
+
+[data-theme="dark"] .search-answer-loading {
+    color: #ccc;
+}
