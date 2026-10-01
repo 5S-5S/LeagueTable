@@ -1005,7 +1005,10 @@
         'far well good bad did went go goes going reach reaching ever still yet now then also just only ' +
         'more less very really team teams club clubs side sides play plays played playing year years ' +
         'stats statistics score finish place out knocked eliminated runners up second third fourth ' +
-        'show list tell give find me us is are were has have had will would should can could'
+        'show list tell give find me us is are were has have had will would should can could ' +
+        // Weekdays ("on a Wednesday" isn't Sheffield Wednesday being typed)
+        'monday tuesday wednesday thursday friday saturday sunday ' +
+        'mondays tuesdays wednesdays thursdays fridays saturdays sundays'
     ).split(' '));
 
     function normalizeSearchText(text) {
@@ -1404,7 +1407,7 @@
         const top = text.match(/\btop (\d{1,2}|two|three|four|five|six|seven|eight|ten)\b/);
         const ordinal = text.match(/\b(\d{1,2})(st|nd|rd|th)\b/);
         const runnersUp = has(/\b(runners? up|second place|beaten finalists?|lost (in )?the final)\b/);
-        if (has(/\b(titles?|champions|winners|won (the )?(league|title|cup|it|competition))\b/) && !runnersUp) {
+        if (has(/\b(titles?|champions|winners|(won|win|wins) (the )?(league|title|cup|it|competition|championship|scudetto))\b/) && !runnersUp) {
             finish.rank = '1';
             finish.stage = 'Champions';
         } else if (top) {
@@ -1444,8 +1447,19 @@
                 location
             };
         }
-        if (has(/\b(last time|when did|when was|last (win|won|beat|loss|lost|defeat|draw|drew|victory))\b/)) {
-            return { view: 'last-time-when', location };
+        if (has(/\b(last time|when did|when was|last (win|won|beat|loss|lost|defeat|draw|drew|victory|played|met|game|match))\b|\blast (beat|lost|drew|played)\b/)) {
+            // "When did Arsenal last win the league" is a season question
+            // ("won the ·" - a competition name was taken out there)
+            if (/\b(won?|win) (the |a )?(·|league|title|titles|championship|scudetto|cup|competition|it\b)/.test(text) ||
+                /\b(finish(ed)?|top \d|runners? up|relegated|titles?)\b/.test(text)) {
+                return { view: 'team-seasons', finish: detectFinish(text.replace(/·/g, 'league')), location };
+            }
+            // Which result: lost first ("were beaten by"), then drew, then won
+            let result = 'any';
+            if (/\b(lost|lose|loses|losing|loss|defeat(ed)? by|beaten by|were beaten|was beaten)\b/.test(text)) result = 'loss';
+            else if (/\b(drew|draws?|drawn|tied|level)\b/.test(text)) result = 'draw';
+            else if (/\b(beat|beaten|won|wins?|winning|victory|defeated|thrashed)\b/.test(text)) result = 'win';
+            return { view: 'last-time-when', result, location };
         }
         let category = null;
         if (scoreline) category = 'scoreline';
@@ -1837,12 +1851,29 @@
         };
     }
 
-    function lastTimeResult(comp, t1, t2, intent) {
+    const LAST_TIME_VERBS = { win: 'won', loss: 'lost', draw: 'drew', any: 'played' };
+
+    // Last Time When: the last time Team 1 won / lost / drew (or played),
+    // against Team 2 (a team, the Big 6 or a country's clubs) or anyone.
+    // The tab has no season or date filters. res= is the search's own
+    // parameter (which result was asked about) - the page ignores it.
+    function lastTimeResult(comp, t1, opponent, parsed, result) {
+        const f = parsed.filters;
+        const params = { t1, t2: opponent || '', day: f.day, loc: f.location, res: result || 'any' };
+        if (comp.continental && f.stage) params.stage = STAGE_VALUES.box[f.stage] || f.stage;
+        const verb = opponent
+            ? `${{ win: 'beat', loss: 'lost to', draw: 'drew with', any: 'played' }[result || 'any']} ${opponentLabel([opponent])}`
+            : LAST_TIME_VERBS[result || 'any'];
         return {
-            kind: 'last-time', icon: '🔍', comp,
-            title: t1 ? `Last time when... ${t2 ? `${t1} vs ${t2}` : t1}` : 'Last time when...',
-            detail: joinDetail(['When each result last happened', locationLabel(intent.location)]),
-            href: competitionUrl(comp, 'last-time-when', { t1, t2, loc: intent.location })
+            kind: 'last-time-when', icon: '🔍', comp,
+            title: `Last time ${t1} ${verb}`,
+            detail: joinDetail([
+                'Last Time When',
+                locationLabel(f.location),
+                f.day ? `${capitalize(WEEKDAYS[Number(f.day)])}s` : '',
+                comp.continental && f.stage ? capitalize(STAGE_WORDS[f.stage].replace(/^the /, '')) : ''
+            ]),
+            href: competitionUrl(comp, 'last-time-when', params)
         };
     }
 
@@ -1973,7 +2004,8 @@
                 primary.push(streaksResult(comp, t1, t2, { ...intent, location }));
                 break;
             case 'last-time-when':
-                primary.push(lastTimeResult(comp, t1, t2, { location }));
+                // Needs a team; takes one opponent (a team, the Big 6 or a country)
+                if (t1) primary.push(lastTimeResult(comp, t1, opponents[0], parsed, intent.result));
                 break;
             case 'match-finder':
                 // Match Finder needs a team to look from
@@ -2012,7 +2044,7 @@
                 if (opponents.length > 0) {
                     primary.push(headToHeadResult(comp, t1, opponents, parsed));
                     if (t2) {
-                        related.push(lastTimeResult(comp, t1, t2, { location }));
+                        related.push(lastTimeResult(comp, t1, t2, parsed, 'any'));
                         related.push(matchFinderResult(comp, t1, opponents, parsed, 'victories'));
                         related.push(streaksResult(comp, t1, t2, { streakType: 'winning', historic: true, location }));
                     }
@@ -2021,7 +2053,7 @@
                     related.push(dashboardResult(comp, t1));
                     related.push(seasonsResult(comp, t1, parsed, { rank: '', stage: '', better: false }));
                     related.push(streaksResult(comp, t1, null, { streakType: 'winning', historic: false, location }));
-                    related.push(lastTimeResult(comp, t1, null, { location }));
+                    related.push(lastTimeResult(comp, t1, '', parsed, 'win'));
                     related.push(matchFinderResult(comp, t1, [], parsed, 'victories'));
                 } else if (asksForTable || location || parsed.filters.day) {
                     primary.push(tableResult(comp, parsed));
@@ -2101,6 +2133,9 @@
         }).slice(0, MAX_SEARCH_RESULTS);
 
         if (results.length === 0) {
+            if (parsed.intent.view === 'last-time-when' && parsed.mentions.length === 0) {
+                return { results: [], message: 'Last Time When looks from one team\'s side - add a team, e.g. "last time Arsenal beat Chelsea".' };
+            }
             if (parsed.intent.view === 'match-finder' && parsed.mentions.length === 0) {
                 return { results: [], message: 'Match Finder looks from one team\'s side - add a team, e.g. "Arsenal biggest wins".' };
             }
@@ -2328,6 +2363,65 @@
         return null;
     }
 
+    // Last Time When. ctx.lastTime: the page's six results - team1HomeWin,
+    // team1AwayWin, team1HomeDraw, team1AwayDraw, team1HomeLoss,
+    // team1AwayLoss - each the latest such match (or null). res= in the URL
+    // says which result was asked about (win / loss / draw / any).
+    function describeLastTime(ctx, params, { b, competition }) {
+        const results = ctx.lastTime;
+        if (!ctx.team1 || !results) return null;
+        const res = params.get('res') || 'any';
+        const loc = params.get('loc') || '';
+        const kinds = { win: ['Win'], loss: ['Loss'], draw: ['Draw'], any: ['Win', 'Draw', 'Loss'] }[res] || ['Win', 'Draw', 'Loss'];
+        const venues = loc === 'home' ? ['Home'] : (loc === 'away' ? ['Away'] : ['Home', 'Away']);
+        const candidates = [];
+        kinds.forEach(kind => venues.forEach(venue => {
+            const match = results[`team1${venue}${kind}`];
+            if (match) candidates.push({ match, kind });
+        }));
+        candidates.sort((x, y) => new Date(y.match.dateObj) - new Date(x.match.dateObj));
+        const latest = candidates[0];
+
+        const opponent = ctx.opponents[0] || '';
+        const against = !opponent ? ''
+            : (opponent === 'BIG_6' ? ' a Big 6 club'
+                : (opponent.startsWith('COUNTRY:') ? ` a club from ${escapeSearchHtml(opponent.slice('COUNTRY:'.length))}` : ` ${b(opponent)}`));
+        const day = params.get('day');
+        const stage = params.get('stage');
+        const extras = [
+            loc === 'home' ? 'at home' : (loc === 'away' ? 'away' : ''),
+            day !== null && day !== '' ? `on a ${capitalize(WEEKDAYS[Number(day)])}` : '',
+            stage ? `in ${STAGE_WORDS[stage] || stage}` : ''
+        ].filter(Boolean).join(' ');
+        const tail = extras ? ` ${extras}` : '';
+        const team1 = b(ctx.team1);
+        // "beat Real Madrid" / "lost to Real Madrid" / "drew with" / "played"
+        const action = {
+            win: opponent ? `beat${against}` : 'won',
+            loss: opponent ? `lost to${against}` : 'lost',
+            draw: opponent ? `drew with${against}` : 'drew',
+            any: opponent ? `played${against}` : 'played'
+        }[res];
+
+        if (!latest) {
+            const never = {
+                win: opponent ? `beaten${against}` : 'won', loss: opponent ? `lost to${against}` : 'lost',
+                draw: opponent ? `drawn with${against}` : 'drawn', any: opponent ? `played${against}` : 'played'
+            }[res];
+            return { crestTeam: ctx.team1, html: `${team1} have never ${never}${tail} in ${competition}.` };
+        }
+        const m = latest.match;
+        const days = Math.floor((Date.now() - new Date(m.dateObj)) / 86400000);
+        // Days, like the page, until it's long enough that years read better
+        const ago = days === 0 ? 'today' : (days === 1 ? 'yesterday'
+            : (days < 730 ? `${formatNumber(days)} days ago` : `${Math.floor(days / 365.25)} years ago`));
+        const outcome = res === 'any' ? `, a ${{ Win: 'win', Draw: 'draw', Loss: 'defeat' }[latest.kind]}` : '';
+        return {
+            crestTeam: ctx.team1,
+            html: `The last time ${team1} ${action}${tail} was ${longDate(m.dateObj)}: ${b(m.HomeTeam)} ${m.FTHG}-${m.FTAG} ${b(m.AwayTeam)}${outcome} (${ago}).`
+        };
+    }
+
     // Team Seasons. ctx.seasons: { rows, position, better, first } - the
     // page's own rows (newest first or any order; each has season, team
     // when it's every team at a position, and position for a league or
@@ -2536,6 +2630,7 @@
         }
 
         if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
+        if (ctx.view === 'last-time-when') return describeLastTime(ctx, params, { b, competition });
         if (ctx.view === 'team-seasons') {
             // With the pre-Bundesliga / pre-Serie A champions it's the
             // national championship, not the league
@@ -2620,7 +2715,7 @@
     // Result kinds whose page has a search mode: the page opens with its
     // controls hidden and just the answer showing (?search=<kind>). The
     // rest still open the full page.
-    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons'];
+    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons', 'last-time-when'];
 
     function resultHref(result, query, scope) {
         if (!SEARCH_MODE_KINDS.includes(result.kind)) return result.href;

@@ -5004,19 +5004,24 @@
 
         // One-line answer above the results, worded by search.js from what
         // this page just worked out (it reads the filters off the URL).
-        // League Tables answers come from updateTable(); Match Finder's from
-        // its own results (finderResults), Team Seasons' from the rows its
-        // table shows (seasonsRows).
-        function updateSearchAnswer(tableResult, h2hResult, matchHistoryResult, finderResults, seasonsRows) {
+        // Each tab passes what it just worked out, and only the search's
+        // own view is answered: from = { table, h2h, matchHistory } from
+        // updateTable(), { finder } from Match Finder, { seasons } from
+        // Team Seasons' rows, { lastTime } from Last Time When's results.
+        function updateSearchAnswer(from) {
             if (!SEARCH_MODE_VIEW) return;
+            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'last-time-when': 'lastTime' }[SEARCH_MODE_VIEW] || 'table';
+            if (!(source in from)) return;
+            const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, lastTime } = from;
             const isFinder = SEARCH_MODE_VIEW === 'match-finder';
             const isSeasons = SEARCH_MODE_VIEW === 'team-seasons';
-            if (isFinder !== (finderResults !== undefined)) return;
-            if (isSeasons !== (seasonsRows !== undefined)) return;
-            const team1 = isSeasons ? state.teamSeasonsSelectedTeam : (isFinder ? state.matchFinderTeam1 : state.selectedTeam1);
-            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2 : state.selectedTeam2);
-            const extraTeam2s = isSeasons ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
-            const season = isSeasons ? state.teamSeasonsSelectedSeason : (isFinder ? state.matchFinderSeason : state.selectedSeason);
+            const isLastTime = SEARCH_MODE_VIEW === 'last-time-when';
+            const team1 = isSeasons ? state.teamSeasonsSelectedTeam
+                : (isFinder ? state.matchFinderTeam1 : (isLastTime ? state.lastTimeTeam1 : state.selectedTeam1));
+            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2 : (isLastTime ? state.lastTimeTeam2 : state.selectedTeam2));
+            const extraTeam2s = isSeasons || isLastTime ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
+            const season = isSeasons ? state.teamSeasonsSelectedSeason
+                : (isFinder ? state.matchFinderSeason : (isLastTime ? '' : state.selectedSeason));
             const league = isSeasons ? state.teamSeasonsSelectedLeague : state.selectedLeague;
             // Season standings load as one batch (a flag per cache entry on
             // Continental, one flag on Domestic)
@@ -5029,6 +5034,7 @@
             const grouped = !!(tableResult && tableResult.isGroupedByPhase);
             const ready = {
                 'team-seasons': () => !seasonsLoading && seasonsLoaded,
+                'last-time-when': () => !state.lastTimeApiLoading && (state.lastTimeApiCacheKey || '').includes(`::${team1}`),
                 'match-finder': () => !state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`),
                 h2h: () => !state.h2hApiLoading && (state.h2hApiCacheKey || '').includes(`::${team1}::`),
                 team: () => !state.teamHistoryApiLoading && (state.teamHistoryApiCacheKey || '').endsWith(`::${team1}`),
@@ -5051,6 +5057,7 @@
                 table: tableResult && !grouped ? tableResult.tableData : null,
                 seasonMatches: grouped ? state.seasonMatchesApiCache : null,
                 finder: isFinder ? { mode: state.matchFinderMode || 'single', category: state.matchFinderCategory, results: finderResults } : null,
+                lastTime: isLastTime ? lastTime : null,
                 seasons: isSeasons ? {
                     rows: seasonsRows,
                     position: state.teamSeasonsSelectedPosition,
@@ -5629,7 +5636,7 @@
 
         // Display progression-only table
         function displayAllTeamsAtProgression(allProgressionData, progression, league) {
-            updateSearchAnswer(undefined, undefined, undefined, undefined, allProgressionData);
+            updateSearchAnswer({ seasons: allProgressionData });
             window.currentSeasonStandingsView = null;
             pendingTeamSeasonsPositionInfo = '';
             if (!allProgressionData || allProgressionData.length === 0) {
@@ -8415,7 +8422,7 @@
         }
 
         function updateMatchFinderTieResults(classified) {
-            updateSearchAnswer(undefined, undefined, undefined, classified);
+            updateSearchAnswer({ finder: classified });
             elements.matchFinderResults.classList.remove('hidden');
             elements.matchFinderSingleMatchCard.classList.add('hidden');
             elements.matchFinderTieResultsCard.classList.remove('hidden');
@@ -8666,7 +8673,7 @@
         }
 
         function updateMatchFinderTable(classified) {
-            updateSearchAnswer(undefined, undefined, undefined, classified);
+            updateSearchAnswer({ finder: classified });
             elements.matchFinderResults.classList.remove('hidden');
             elements.matchFinderSingleMatchCard.classList.remove('hidden');
             elements.matchFinderTieResultsCard.classList.add('hidden');
@@ -9201,6 +9208,7 @@
             
             // Show results
             elements.lastTimeResults.classList.remove('hidden');
+            updateSearchAnswer({ lastTime: results });
         }
 
         // Calculate single team results (Team 1 vs all opponents)
@@ -9362,6 +9370,7 @@
             
             // Show results
             elements.lastTimeResults.classList.remove('hidden');
+            updateSearchAnswer({ lastTime: results });
         }
 
         // Qualifying rounds are "Qualification ..." in the data, but share
@@ -11660,7 +11669,7 @@
             updateMatchHistoryDisplay(matchHistoryResult);
             updateTableInfo(tableResult);
             updateTeamDashboardHeader();
-            updateSearchAnswer(tableResult, h2hResult, matchHistoryResult);
+            updateSearchAnswer({ table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult });
 
             // Handle position colors for dark mode
             setTimeout(handlePositionColors, 50);
@@ -14049,7 +14058,7 @@
             window.currentTeamHistoryData = null;
             window.currentTeamHistoryName = null;
             window.currentSeasonStandingsView = { seasonKey, league, rows };
-            updateSearchAnswer(undefined, undefined, undefined, undefined, rows);
+            updateSearchAnswer({ seasons: rows });
             elements.teamSeasonsPositionInfo.textContent = '';
             pendingTeamSeasonsPositionInfo = '';
             renderSeasonStandingsTable();
@@ -14206,7 +14215,7 @@
             
             // Update progression info display and ensure it persists
             elements.teamSeasonsPositionInfo.innerHTML = positionInfo || 'NO POSITION INFO';
-            updateSearchAnswer(undefined, undefined, undefined, undefined, filteredData);
+            updateSearchAnswer({ seasons: filteredData });
 
             // Apply proper styling for the position info text
             elements.teamSeasonsPositionInfo.style.cssText = 'margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280; line-height: 1.25;';

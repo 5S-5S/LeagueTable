@@ -60,7 +60,14 @@ Feature ideas, not yet scheduled.
     champions"), eras, and "including historic" (the pre-Serie A /
     pre-Bundesliga champions - answers then say "the German / Italian
     championship").
-  - Next tabs: Last Time When, Team Streaks.
+  - Last Time When done (2026-10-01), all four pages (`last-time-when`):
+    "last time X beat / lost to / drew with / played Y", one team ("last
+    time arsenal won away"), the Big 6, a country's clubs, home / away, a
+    weekday, Continental stages ("won a final"). Which result was asked
+    rides in the link as res= (the page ignores it). Season questions
+    worded this way ("when did arsenal last win the league") go to Team
+    Seasons. The tab has no season / date filters, so none are applied.
+  - Next tab: Team Streaks.
     Until each is done, its results open the full page.
   - Also fixed on the way: Continental `?team=` dashboard links never
     locked the team (the lock was consumed before /api/teams loaded).
