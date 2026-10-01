@@ -59,7 +59,15 @@ Feature ideas, not yet scheduled.
     every club at a finish ("premier league champions", "first time
     champions"), eras, and "including historic" (the pre-Serie A /
     pre-Bundesliga champions - answers then say "the German / Italian
-    championship").
+    championship"). Title questions in Serie A / the Bundesliga include
+    those by default ("Schalke titles" = 7); naming the league ("Schalke
+    Bundesliga titles") means that league only, with a small-print link
+    under the answer to the full count. "German / Italian champions" work
+    as searches. Only titles - seasons, top 4 etc. stay league-only (the
+    historic list only has champions). Titles narrowed to one era ("Man
+    Utd premier league titles", "Ajax european cup titles", "premier
+    league champions") get a link to the all-eras search too, naming the
+    other era (no count - the page only works out the era asked about).
   - Last Time When done (2026-10-01), all four pages (`last-time-when`):
     "last time X beat / lost to / drew with / played Y", one team ("last
     time arsenal won away"), the Big 6, a country's clubs, home / away, a
@@ -67,7 +75,14 @@ Feature ideas, not yet scheduled.
     rides in the link as res= (the page ignores it). Season questions
     worded this way ("when did arsenal last win the league") go to Team
     Seasons. The tab has no season / date filters, so none are applied.
-  - Next tab: Team Streaks.
+  - Team Streaks done (2026-10-01), all four pages (`team-streaks`): a
+    team's current run ("liverpool unbeaten streak", "games without a
+    win", "clean sheets in a row") or longest ("arsenal longest unbeaten
+    run" - 49 games), against a team / the Big 6 / a country's clubs, home
+    / away, Continental stages; every team's longest or current runs
+    ("longest winning streaks" - ties named). A 1-game run is worded as
+    what happened in that game. The tab has no season / date filters.
+  - Every tab now answers in search mode.
     Until each is done, its results open the full page.
   - Also fixed on the way: Continental `?team=` dashboard links never
     locked the team (the lock was consumed before /api/teams loaded).

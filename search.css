@@ -181,6 +181,26 @@
         }
 }
 
+/* The answer line's small print (search mode on the sport pages), e.g.
+   pointing "Schalke Bundesliga titles" to "Schalke titles" */
+.search-answer-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-answer-note {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #6b7280;
+}
+
+.search-answer-note a {
+    color: #047857;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
 /* Dark mode - fixed colors rather than the pages' --bg-* variables,
    which index.css and DomesticEurope.css define the other way round */
 [data-theme="dark"] .search-bar,
@@ -216,6 +236,11 @@
 
 [data-theme="dark"] .search-result-detail,
 [data-theme="dark"] .search-result-comp,
-[data-theme="dark"] .search-empty {
+[data-theme="dark"] .search-empty,
+[data-theme="dark"] .search-answer-note {
     color: #ccc;
+}
+
+[data-theme="dark"] .search-answer-note a {
+    color: #10b981;
 }

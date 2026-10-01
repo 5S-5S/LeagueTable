@@ -382,16 +382,18 @@ body {
 .search-page {
     min-height: 100vh;
     background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
-    padding: 18vh 1rem 2rem;
+    padding: 1.25rem;
 }
 
+/* Same place and width as the sport pages' card, so the search bar
+   doesn't move between the home page and an answer */
 .search-card {
-    max-width: 48rem;
+    max-width: 72rem;
     margin: 0 auto;
     background: rgba(255, 255, 255, 0.95);
     border-radius: 1.5rem;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    padding: 3rem 2rem 2rem;
+    padding: 2rem;
     text-align: center;
 }
 
@@ -399,7 +401,7 @@ body {
     font-size: 3rem;
     font-weight: 900;
     line-height: 1.15;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     background: linear-gradient(135deg, #059669, #047857);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -438,11 +440,12 @@ body {
 
 @media (max-width: 640px) {
     .search-page {
-            padding: 5.5rem 1rem 2rem;
+            padding: 1.25rem;
         }
 
+    /* Clear of the fixed menu button and dark mode switch */
     .search-card {
-            padding: 2rem 1rem 1.5rem;
+            padding: 4.25rem 1rem 1.5rem;
         }
 
     .hero-title {

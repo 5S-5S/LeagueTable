@@ -3462,7 +3462,26 @@ html.search-mode .main-card {
     overflow: visible; /* the search results float out of the card */
 }
 
-html.search-mode .header,
+/* The header goes, except its dark mode switch - pinned top-right, where
+   the home page has it */
+html.search-mode .header {
+    padding: 0;
+    height: 0;
+    overflow: visible;
+    background: none;
+}
+
+html.search-mode .header-content > :not(.dark-mode-toggle) {
+    display: none !important;
+}
+
+html.search-mode .dark-mode-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1001;
+}
+
 html.search-mode #teamDashboardHeader,
 html.search-mode #teamDashboardSearch,
 html.search-mode #controlsSection,
@@ -3492,12 +3511,13 @@ html.search-mode[data-search-view="table"] #matchHistorySection {
     display: none !important;
 }
 
-/* Match Finder, Team Seasons and Last Time When: their results live inside the tabs
+/* Match Finder, Team Seasons, Last Time When and Team Streaks: their results live inside the tabs
    area, so show that area with only the results box (no tab buttons,
    description or filters), and none of the League Tables boxes below */
 html.search-mode[data-search-view="match-finder"] #controlsSection,
 html.search-mode[data-search-view="team-seasons"] #controlsSection,
-html.search-mode[data-search-view="last-time-when"] #controlsSection {
+html.search-mode[data-search-view="last-time-when"] #controlsSection,
+html.search-mode[data-search-view="team-streaks"] #controlsSection {
     display: block !important;
 }
 
@@ -3513,7 +3533,11 @@ html.search-mode[data-search-view="team-seasons"] .table-section,
 html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-container,
 html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-content:not(#lastTimeWhenContent),
 html.search-mode[data-search-view="last-time-when"] #lastTimeWhenContent > :not(#lastTimeResults),
-html.search-mode[data-search-view="last-time-when"] .table-section {
+html.search-mode[data-search-view="last-time-when"] .table-section,
+html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-container,
+html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-content:not(#teamStreaksContent),
+html.search-mode[data-search-view="team-streaks"] #teamStreaksContent > :not(#teamStreaksResults),
+html.search-mode[data-search-view="team-streaks"] .table-section {
     display: none !important;
 }
 

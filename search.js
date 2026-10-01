@@ -363,19 +363,19 @@
     const SEARCH_COMPETITIONS = [
         { key: 'premier-league', page: 'DomesticEurope.html', name: 'Premier League', badge: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League',
             seasons: '1888-1914,1919-1938,1946-',
-            aliases: ['premier league', 'epl', 'english first division', 'first division', 'english league', 'england'] },
+            aliases: ['premier league', 'epl', 'english first division', 'first division', 'english league', 'england', 'english'] },
         { key: 'la-liga', page: 'DomesticEurope.html', name: 'La Liga', badge: '🇪🇸 La Liga',
             seasons: '1928-1935,1939-',
-            aliases: ['la liga', 'laliga', 'primera division', 'spanish league', 'spain'] },
+            aliases: ['la liga', 'laliga', 'primera division', 'spanish league', 'spain', 'spanish'] },
         { key: 'serie-a', page: 'DomesticEurope.html', name: 'Serie A', badge: '🇮🇹 Serie A',
             seasons: '1929-1942,1946-',
-            aliases: ['serie a', 'italian league', 'italy'] },
+            aliases: ['serie a', 'italian league', 'italy', 'italian'] },
         { key: 'bundesliga', page: 'DomesticEurope.html', name: 'Bundesliga', badge: '🇩🇪 Bundesliga',
             seasons: '1963-',
-            aliases: ['bundesliga', 'german league', 'germany'] },
+            aliases: ['bundesliga', 'german league', 'germany', 'german'] },
         { key: 'ligue-1', page: 'DomesticEurope.html', name: 'Ligue 1', badge: '🇫🇷 Ligue 1',
             seasons: '1932-1938,1945-',
-            aliases: ['ligue 1', 'ligue un', 'french division 1', 'division 1', 'french league', 'france'] },
+            aliases: ['ligue 1', 'ligue un', 'french division 1', 'division 1', 'french league', 'france', 'french'] },
         { key: 'champions-league', page: 'ContinentalEurope.html', name: 'Champions League', badge: '🏆 Champions League',
             continental: true,
             seasons: '1955-',
@@ -395,6 +395,16 @@
         'cl': 'champions-league-era-1992-2026',
         'european cup': 'european-cup-era-1955-1992'
     };
+    // A title search narrowed to one era: the other era (named, not
+    // counted - the page only works out the era asked about) and the
+    // search that covers both
+    const ERA_TITLE_NOTES = {
+        'premier-league-era-1992-2025': { other: 'the First Division era', allQuery: 'English champions' },
+        'english-first-division-era-1888-1992': { other: 'the Premier League era', allQuery: 'English champions' },
+        'champions-league-era-1992-2026': { other: 'the European Cup era', allQuery: 'Champions League winners all-time' },
+        'european-cup-era-1955-1992': { other: 'the Champions League era', allQuery: 'Champions League winners all-time' }
+    };
+
     // An era's name in answers and result labels
     const ERA_NAMES = {
         'premier-league-era-1992-2025': 'the Premier League',
@@ -402,6 +412,12 @@
         'champions-league-era-1992-2026': 'the Champions League',
         'european-cup-era-1955-1992': 'the European Cup'
     };
+
+    // Italy and Germany crowned champions before Serie A (1929) and the
+    // Bundesliga (1963) - Team Seasons' "historic seasons". Title questions
+    // count those by default, as people do; naming the league itself
+    // ("Schalke Bundesliga titles") means that league only.
+    const HISTORIC_TITLE_LEAGUES = { 'serie-a': 'serie a', 'bundesliga': 'bundesliga' };
 
     const SEARCH_SCOPES = {
         'domestic': SEARCH_COMPETITIONS.filter(comp => !comp.continental)
@@ -1439,11 +1455,13 @@
         const has = pattern => pattern.test(text);
         const location = has(/\bhome\b/) ? 'home' : (has(/\b(away|road)\b/) ? 'away' : '');
 
-        if (has(/\b(streaks?|runs?|in a row|consecutive|unbeaten|undefeated|winless)\b/)) {
+        if (has(/\b(streaks?|runs?|in a row|consecutive|unbeaten|undefeated|winless|(games?|matches) without( a)? (win|winning|defeat|losing|loss|scoring|conceding))\b/)) {
             return {
                 view: 'team-streaks',
                 streakType: detectStreakType(text),
-                historic: has(/\b(longest|historic|historical|history|records?|all time|ever|best|worst|biggest)\b/),
+                // Longest ever, unless it asks about now
+                historic: !has(/\b(current|currently|active|ongoing|now|right now|at the moment|this season)\b/) &&
+                    has(/\b(longest|historic|historical|history|records?|all time|ever|best|worst|biggest)\b/),
                 location
             };
         }
@@ -1588,6 +1606,7 @@
         // the era a name means: "Premier League" = 1992 onwards)
         const competitions = [];
         const eras = {};
+        const leaguesNamed = []; // "bundesliga" / "serie a" typed as such
         SEARCH_COMPETITIONS
             .flatMap(comp => comp.aliases.map(alias => [alias.split(' '), comp.key]))
             .sort((a, b) => b[0].length - a[0].length)
@@ -1597,6 +1616,7 @@
                     if (span.join(' ') === aliasWords.join(' ') && !used.slice(i, i + aliasWords.length).some(Boolean)) {
                         for (let k = i; k < i + aliasWords.length; k++) used[k] = true;
                         if (!competitions.includes(key)) competitions.push(key);
+                        if (HISTORIC_TITLE_LEAGUES[key] === aliasWords.join(' ')) leaguesNamed.push(key);
                         const era = ALIAS_ERAS[aliasWords.join(' ')];
                         if (era && !eras[key]) eras[key] = era;
                     }
@@ -1647,6 +1667,7 @@
             scoreline,
             competitions,
             eras,
+            leaguesNamed,
             mentions: mentions.slice(0, 6),
             opponentGroup,
             intent,
@@ -1835,18 +1856,28 @@
         };
     }
 
-    function streaksResult(comp, t1, t2, intent) {
+    // Team Streaks: a team's current streak (active) or its streaks of
+    // 3+ games (historic), optionally against one opponent (a team, the
+    // Big 6 or a country's clubs), or every team's streaks of a type. The
+    // tab has no season / date filters.
+    function streaksResult(comp, t1, opponent, intent, parsed) {
         const type = intent.streakType || 'winning';
         const typeLabel = STREAK_TYPE_LABELS[type];
-        const who = t1 ? (t2 ? `${t1} vs ${t2}` : t1) : 'All teams';
+        const who = t1 ? (opponent ? `${t1} vs ${opponentLabel([opponent]).replace(/^the /, '')}` : t1) : 'All teams';
+        const stage = parsed && comp.continental && parsed.filters.stage ? parsed.filters.stage : '';
         return {
-            kind: 'streaks', icon: '⚡', comp,
+            kind: 'team-streaks', icon: '⚡', comp,
             title: `${who} · ${typeLabel} streaks`,
-            detail: joinDetail([intent.historic ? 'Longest in history' : 'Active streaks', locationLabel(intent.location)]),
+            detail: joinDetail([
+                intent.historic ? 'Longest in history' : 'Active streaks',
+                locationLabel(intent.location),
+                stage ? capitalize(STAGE_WORDS[stage].replace(/^the /, '')) : ''
+            ]),
             href: competitionUrl(comp, 'team-streaks', {
-                t1, t2, type,
+                t1, t2: opponent || '', type,
                 status: intent.historic ? 'historic' : '',
-                loc: intent.location
+                loc: intent.location,
+                stage: stage ? (STAGE_VALUES.box[stage] || stage) : ''
             })
         };
     }
@@ -1902,7 +1933,11 @@
             pos,
             better: pos && finish.better && pos !== '1' && pos !== 'Champions' ? '1' : '',
             first: !team && pos && finish.first ? '1' : '',
-            hist: !comp.continental && finish.historic ? '1' : ''
+            // Titles count the pre-league champions unless the league itself
+            // was named; asking for "historic" always does
+            hist: !comp.continental && (finish.historic ||
+                (HISTORIC_TITLE_LEAGUES[comp.key] && pos === '1' && !finish.better &&
+                    parsed.season === null && !parsed.leaguesNamed.includes(comp.key))) ? '1' : ''
         };
         return {
             kind: 'team-seasons', icon: '📈', comp,
@@ -2001,7 +2036,7 @@
 
         switch (intent.view) {
             case 'team-streaks':
-                primary.push(streaksResult(comp, t1, t2, { ...intent, location }));
+                primary.push(streaksResult(comp, t1, opponents[0], { ...intent, location }, parsed));
                 break;
             case 'last-time-when':
                 // Needs a team; takes one opponent (a team, the Big 6 or a country)
@@ -2046,13 +2081,13 @@
                     if (t2) {
                         related.push(lastTimeResult(comp, t1, t2, parsed, 'any'));
                         related.push(matchFinderResult(comp, t1, opponents, parsed, 'victories'));
-                        related.push(streaksResult(comp, t1, t2, { streakType: 'winning', historic: true, location }));
+                        related.push(streaksResult(comp, t1, t2, { streakType: 'winning', historic: true, location }, parsed));
                     }
                 } else if (t1) {
                     primary.push(teamRecordResult(comp, t1, parsed));
                     related.push(dashboardResult(comp, t1));
                     related.push(seasonsResult(comp, t1, parsed, { rank: '', stage: '', better: false }));
-                    related.push(streaksResult(comp, t1, null, { streakType: 'winning', historic: false, location }));
+                    related.push(streaksResult(comp, t1, '', { streakType: 'winning', historic: false, location }, parsed));
                     related.push(lastTimeResult(comp, t1, '', parsed, 'win'));
                     related.push(matchFinderResult(comp, t1, [], parsed, 'victories'));
                 } else if (asksForTable || location || parsed.filters.day) {
@@ -2179,7 +2214,10 @@
         const logo = answer.crestTeam && ctx.logo ? ctx.logo(answer.crestTeam) : '';
         el.innerHTML = `
             ${logo ? `<img src="${logo}" class="search-answer-crest" alt="">` : ''}
-            <p class="search-answer-text">${answer.html}</p>`;
+            <div class="search-answer-body">
+                <p class="search-answer-text">${answer.html}</p>
+                ${answer.note ? `<p class="search-answer-note">${answer.note}</p>` : ''}
+            </div>`;
     }
 
     function recordHtml(w, d, l) {
@@ -2361,6 +2399,94 @@
             }
         }
         return null;
+    }
+
+    // A streak type as a run: "a 12-game unbeaten run"
+    const STREAK_RUN_NOUNS = {
+        'winning': 'winning run', 'unbeaten': 'unbeaten run', 'draw': 'run of draws', 'winless': 'winless run',
+        'losing': 'losing run', 'clean-sheet': 'run of clean sheets', 'goals-conceded': 'run of games conceding',
+        'scoring': 'scoring run', 'no-score': 'run of games without scoring'
+    };
+
+    // Team Streaks. ctx.streaks: { mode: 'active', streak } (the current
+    // run's matches, newest first), { mode: 'historic', streaks } (a team's
+    // runs of 3+ games: count, startDate, endDate, matches) or
+    // { mode: 'league', streaks } (every team's, each with its team).
+    function describeStreaks(ctx, params, { b, competition }) {
+        const data = ctx.streaks;
+        if (!data) return null;
+        const type = params.get('type') || 'winning';
+        const run = STREAK_RUN_NOUNS[type] || 'run';
+        const loc = params.get('loc');
+        const venue = loc === 'home' ? 'home ' : (loc === 'away' ? 'away ' : '');
+        const stage = params.get('stage');
+        const opponent = ctx.opponents[0] || '';
+        const against = !opponent ? ''
+            : ` against ${opponent === 'BIG_6' || opponent.startsWith('COUNTRY:') ? escapeSearchHtml(opponentLabel([opponent])) : b(opponent)}`;
+        // "in the semi-finals of the Champions League", "in Champions League qualifying"
+        const where = stage === 'Qualifiers'
+            ? `${against} in ${competition.replace(/^the /, '')} qualifying`
+            : `${against}${stage ? ` in ${STAGE_WORDS[stage] || stage} of` : ' in'} ${competition}`;
+        const games = n => `${formatNumber(n)} game${n === 1 ? '' : 's'}`;
+        // "a 12-game unbeaten run" / "an 8-game ..."
+        const aRun = n => `${String(n)[0] === '8' || n === 11 || n === 18 ? 'an' : 'a'} ${n}-game ${venue}${run}`;
+        const span = streak => `${longDate(streak.startDate)} to ${longDate(streak.endDate)}`;
+        // "an away run", "a home run", "an unbeaten run"
+        const article = words => /^[aeiou]/i.test(words) ? 'an' : 'a';
+
+        if (data.mode === 'active') {
+            const streak = data.streak || [];
+            const team = b(ctx.team1);
+            if (streak.length === 0) {
+                return { crestTeam: ctx.team1, html: `${team} aren't on ${article(venue + run)} ${venue}${run}${where} right now.` };
+            }
+            const since = streak[streak.length - 1].dateObj;
+            // One game isn't much of a run - say what happened instead
+            if (streak.length === 1) {
+                const did = {
+                    'winning': 'won', 'unbeaten': 'avoided defeat in', 'draw': 'drew', 'winless': 'didn\'t win',
+                    'losing': 'lost', 'clean-sheet': 'kept a clean sheet in', 'goals-conceded': 'conceded in',
+                    'scoring': 'scored in', 'no-score': 'failed to score in'
+                }[type] || 'played';
+                return {
+                    crestTeam: ctx.team1,
+                    html: `${team} ${did} their last ${venue}game${where} (${longDate(since)}) - a 1-game run so far.`
+                };
+            }
+            return {
+                crestTeam: ctx.team1,
+                html: `${team} are on ${aRun(streak.length)}${where}, since ${longDate(since)}.`
+            };
+        }
+
+        const streaks = [...(data.streaks || [])].sort((x, y) => y.count - x.count || new Date(y.endDate) - new Date(x.endDate));
+        const longest = streaks[0];
+        if (data.mode === 'historic') {
+            const team = b(ctx.team1);
+            if (!longest) return { crestTeam: ctx.team1, html: `${team} have never had ${article(venue + run)} ${venue}${run} of 3 or more games${where}.` };
+            const tied = streaks.filter(s => s.count === longest.count).length;
+            return {
+                crestTeam: ctx.team1,
+                html: `${b(possessive(ctx.team1))} longest ${venue}${run}${where} is ${games(longest.count)}, from ${span(longest)}${tied > 1 ? ` (one of ${tied} that long)` : ''}.`
+            };
+        }
+
+        // Every team's streaks
+        if (!longest) return { html: `No ${venue}${run}s of 3 or more games found${where}.` };
+        const active = params.get('status') !== 'historic';
+        // Others level with it: "(joint with Manchester City, ...)"
+        const level = streaks.filter(other => other !== longest && other.count === longest.count);
+        const levelTeams = [...new Set(level.map(other => other.team))].filter(team => team !== longest.team);
+        const joint = level.length === 0 ? ''
+            : (levelTeams.length && levelTeams.length <= 3
+                ? ` - level with ${levelTeams.map(b).join(', ')}`
+                : ` - one of ${level.length + 1} that long`);
+        return {
+            crestTeam: longest.team,
+            html: active
+                ? `${b(longest.team)} are on the longest current ${venue}${run}${where}: ${games(longest.count)}, since ${longDate(longest.startDate)}${joint}.`
+                : `${b(longest.team)} hold the longest ${venue}${run}${where}: ${games(longest.count)}, from ${span(longest)}${joint}.`
+        };
     }
 
     // Last Time When. ctx.lastTime: the page's six results - team1HomeWin,
@@ -2572,11 +2698,14 @@
                 html: `${formatNumber(clubs)} club${clubs === 1 ? ' has' : 's have'} ${label}; the most recent first-timer was ${b(latest.team)} in ${latest.season}.`
             };
         }
-        const [leader, most] = Object.entries(counts).sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1))[0];
+        const ranked = Object.entries(counts).sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1));
+        const [leader, most] = ranked[0];
+        // Others with the same count ("level with Manchester United")
+        const level = ranked.slice(1).filter(([, n]) => n === most).map(([team]) => team);
         const label = what.verb === 'won' ? `won ${competition} the most` : `${what.noun} ${competition} the most`;
         return {
             crestTeam: leader,
-            html: `${b(leader)} have ${label} (${times(most)}), one of ${formatNumber(clubs)} club${clubs === 1 ? '' : 's'} to do it. The most recent was ${b(latest.team)} in ${latest.season}.`
+            html: `${b(leader)} have ${label} (${times(most)}${level.length ? `, level with ${level.map(b).join(' and ')}` : ''}), one of ${formatNumber(clubs)} club${clubs === 1 ? '' : 's'} to do it. The most recent was ${b(latest.team)} in ${latest.season}.`
         };
     }
 
@@ -2631,15 +2760,49 @@
 
         if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
         if (ctx.view === 'last-time-when') return describeLastTime(ctx, params, { b, competition });
+        if (ctx.view === 'team-streaks') return describeStreaks(ctx, params, { b, competition });
         if (ctx.view === 'team-seasons') {
             // With the pre-Bundesliga / pre-Serie A champions it's the
             // national championship, not the league
-            const historic = params.get('hist') === '1' && { 'bundesliga': 'the German championship', 'serie-a': 'the Italian championship' }[ctx.league];
-            return describeTeamSeasons(ctx, params, {
+            const championship = { 'bundesliga': 'the German championship', 'serie-a': 'the Italian championship' }[ctx.league];
+            const historic = params.get('hist') === '1' && championship;
+            const answer = describeTeamSeasons(ctx, params, {
                 b,
                 competition: historic || competition,
                 shortCompetition: historic ? historic.replace(/^the /, '') : shortCompetition
             });
+            // Titles with the league named ("Schalke Bundesliga titles"):
+            // a link to the same search counting the earlier champions
+            const titles = params.get('pos') === '1' && params.get('better') !== '1' && !ctx.season;
+            if (answer && championship && titles && !historic) {
+                const league = competition; // "the Bundesliga", "Serie A"
+                const nation = championship.replace(/^the /, '').replace(' championship', ''); // "German"
+                const earlier = ctx.team1 ? (ctx.historicTitles || 0) : null;
+                if (earlier !== 0) {
+                    const query = ctx.team1 ? `${ctx.team1} titles`
+                        : (params.get('first') === '1' ? `first time ${nation} champions` : `${nation} champions`);
+                    const link = new URL(window.location.href);
+                    link.searchParams.set('hist', '1');
+                    link.searchParams.set('q', query);
+                    const what = ctx.team1
+                        ? `their ${earlier === 1 ? 'one' : earlier} ${nation} championship${earlier === 1 ? '' : 's'} from before ${league}`
+                        : `the ${nation} champions from before ${league}`;
+                    answer.note = `Search <a href="${escapeSearchHtml(link.pathname + link.search)}">“${escapeSearchHtml(query)}”</a> to include ${what}.`;
+                }
+            }
+            // Titles in one era ("Manchester United premier league titles"):
+            // the same, pointing to every era's titles
+            const eraNote = ERA_TITLE_NOTES[params.get('season')];
+            const eraTitles = (params.get('pos') === '1' || params.get('pos') === 'Champions') && params.get('better') !== '1';
+            if (answer && eraNote && eraTitles) {
+                const query = ctx.team1 ? `${ctx.team1} titles`
+                    : (params.get('first') === '1' ? `first time ${eraNote.allQuery}` : eraNote.allQuery);
+                const link = new URL(window.location.href);
+                link.searchParams.delete('season');
+                link.searchParams.set('q', query);
+                answer.note = `Search <a href="${escapeSearchHtml(link.pathname + link.search)}">“${escapeSearchHtml(query)}”</a> to include ${eraNote.other} too.`;
+            }
+            return answer;
         }
 
         if (ctx.view === 'team') {
@@ -2715,7 +2878,7 @@
     // Result kinds whose page has a search mode: the page opens with its
     // controls hidden and just the answer showing (?search=<kind>). The
     // rest still open the full page.
-    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons', 'last-time-when'];
+    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons', 'last-time-when', 'team-streaks'];
 
     function resultHref(result, query, scope) {
         if (!SEARCH_MODE_KINDS.includes(result.kind)) return result.href;
@@ -2746,7 +2909,8 @@
         </optgroup>`;
 
     // Puts the search bar (dropdown, input, results) into container.
-    // options: { query, scope, autofocus }. Returns { setQuery(text) }.
+    // options: { query, scope, autofocus, onScopeChange(scope) }.
+    // Returns { setQuery(text), scope() }.
     function mount(container, options = {}) {
         container.classList.add('search-mount');
         container.innerHTML = `
@@ -2816,6 +2980,7 @@
 
         scopeSelect.addEventListener('change', () => {
             try { localStorage.setItem('searchScope', scopeSelect.value); } catch (err) { /* ignore */ }
+            if (options.onScopeChange) options.onScopeChange(scopeSelect.value);
             run();
             input.focus();
         });
@@ -2850,6 +3015,7 @@
             if (!resultsEl.classList.contains('hidden')) run();
         });
         return {
+            scope: () => scopeSelect.value,
             setQuery(text) {
                 input.value = text;
                 run();

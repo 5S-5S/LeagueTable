@@ -3288,6 +3288,7 @@
         }
 
         function displayLeagueStreaks(streaks, status, streakType, location) {
+            updateSearchAnswer({ streaks: { mode: 'league', streaks } });
             const streakName = getStreakDisplayName(streakType);
             const locationText = location === 'both' ? '' : ` (${location.charAt(0).toUpperCase() + location.slice(1)})`;
             const isActive = status === 'active';
@@ -3616,6 +3617,7 @@
         }
 
         function displayHistoricStreaksResults(streaks, team1, team2, streakType, location) {
+            updateSearchAnswer({ streaks: { mode: 'historic', streaks } });
             if (streaks.length === 0) {
                 elements.teamStreaksResults.innerHTML = `
                     <div class="text-center py-8">
@@ -3868,6 +3870,7 @@
 
         // Display streak results in table format
         function displayStreakResults(streak, team1, team2, streakType, location) {
+            updateSearchAnswer({ streaks: { mode: 'active', streak } });
             if (streak.length === 0) {
                 elements.teamStreaksResults.innerHTML = `
                     <div class="text-center py-8">
@@ -4183,18 +4186,21 @@
         // Team Seasons' rows, { lastTime } from Last Time When's results.
         function updateSearchAnswer(from) {
             if (!SEARCH_MODE_VIEW) return;
-            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'last-time-when': 'lastTime' }[SEARCH_MODE_VIEW] || 'table';
+            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'last-time-when': 'lastTime', 'team-streaks': 'streaks' }[SEARCH_MODE_VIEW] || 'table';
             if (!(source in from)) return;
-            const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, lastTime } = from;
+            const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, lastTime, streaks } = from;
             const isFinder = SEARCH_MODE_VIEW === 'match-finder';
             const isSeasons = SEARCH_MODE_VIEW === 'team-seasons';
             const isLastTime = SEARCH_MODE_VIEW === 'last-time-when';
+            const isStreaks = SEARCH_MODE_VIEW === 'team-streaks';
             const team1 = isSeasons ? state.teamSeasonsSelectedTeam
-                : (isFinder ? state.matchFinderTeam1 : (isLastTime ? state.lastTimeTeam1 : state.selectedTeam1));
-            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2 : (isLastTime ? state.lastTimeTeam2 : state.selectedTeam2));
-            const extraTeam2s = isSeasons || isLastTime ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
+                : (isFinder ? state.matchFinderTeam1 : (isLastTime ? state.lastTimeTeam1
+                    : (isStreaks ? elements.teamStreaksTeam1Select.value : state.selectedTeam1)));
+            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2 : (isLastTime ? state.lastTimeTeam2
+                : (isStreaks ? elements.teamStreaksTeam2Select.value : state.selectedTeam2)));
+            const extraTeam2s = isSeasons || isLastTime || isStreaks ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
             const season = isSeasons ? state.teamSeasonsSelectedSeason
-                : (isFinder ? state.matchFinderSeason : (isLastTime ? '' : state.selectedSeason));
+                : (isFinder ? state.matchFinderSeason : (isLastTime || isStreaks ? '' : state.selectedSeason));
             const league = isSeasons ? state.teamSeasonsSelectedLeague : state.selectedLeague;
             // Season standings load as one batch (a flag per cache entry on
             // Continental, one flag on Domestic)
@@ -4208,6 +4214,8 @@
             const ready = {
                 'team-seasons': () => !seasonsLoading && seasonsLoaded,
                 'last-time-when': () => !state.lastTimeApiLoading && (state.lastTimeApiCacheKey || '').includes(`::${team1}`),
+                // The all-teams list only shows once its data is in
+                'team-streaks': () => !team1 || (!state.teamStreaksApiLoading && (state.teamStreaksApiCacheKey || '').includes(`::${team1}`)),
                 'match-finder': () => !state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`),
                 h2h: () => !state.h2hApiLoading && (state.h2hApiCacheKey || '').includes(`::${team1}::`),
                 team: () => !state.teamHistoryApiLoading && (state.teamHistoryApiCacheKey || '').endsWith(`::${team1}`),
@@ -4231,6 +4239,12 @@
                 seasonMatches: grouped ? state.seasonMatchesApiCache : null,
                 finder: isFinder ? { mode: state.matchFinderMode || 'single', category: state.matchFinderCategory, results: finderResults } : null,
                 lastTime: isLastTime ? lastTime : null,
+                streaks: isStreaks ? streaks : null,
+                // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
+                historicTitles: isSeasons && team1 && typeof historicSeasonsData !== 'undefined'
+                    ? historicSeasonsData.filter(([s, div, pos, team]) => team === team1 && pos === 1 &&
+                        div === { 'serie-a': 'I1', 'bundesliga': 'D1' }[league]).length
+                    : 0,
                 seasons: isSeasons ? {
                     rows: seasonsRows,
                     position: state.teamSeasonsSelectedPosition,
