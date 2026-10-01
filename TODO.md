@@ -36,7 +36,16 @@ Feature ideas, not yet scheduled.
       beat an era. Answers name the era: "the English top flight", "the
       European Cup and Champions League" for all-time. Ligue 1 left out -
       Division 1 to Ligue 1 was only a rename.
-  - Next tabs: Match Finder, Team Seasons, Last Time When, Team Streaks.
+  - Match Finder done (2026-10-01), all four pages (`match-finder`):
+    biggest wins / defeats, highest-scoring draws, most / fewest goals
+    (goalless), a scoreline (home-away), against a team / several / the
+    Big 6 / a country, with seasons, eras, dates, weekdays, home / away.
+    Continental: two-legged ties on aggregate ("aggregate", "two-legged";
+    aggregate scorelines are Team 1-opponent), after extra time, on away
+    goals (counts ties won / lost), penalties, stages, qualifiers. Needs a
+    team - "biggest wins" alone asks for one. Answer names the top result
+    and how many share it.
+  - Next tabs: Team Seasons, Last Time When, Team Streaks.
     Until each is done, its results open the full page.
   - Also fixed on the way: Continental `?team=` dashboard links never
     locked the team (the lock was consumed before /api/teams loaded).

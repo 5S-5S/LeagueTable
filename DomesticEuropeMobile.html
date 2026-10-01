@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="DomesticEuropeMobile.css">
     <link rel="stylesheet" href="search.css">
     <script>
-        // Search mode (?search=h2h|team|table, from the search bar): flag it before the
+        // Search mode (?search=<kind>, from the search bar): flag it before the
         // first paint so the controls never flash up (see DomesticEuropeMobile.css)
         (function() {
             const searchView = new URLSearchParams(window.location.search).get('search');
@@ -4151,7 +4151,7 @@
             `;
         }
 
-        // --- Search mode (?search=h2h|team|table&q=&scope=, from the search bar) ---
+        // --- Search mode (?search=h2h|team|table|match-finder&q=&scope=, from the search bar) ---
         // CSS (html.search-mode) hides the header, tabs and filters; the
         // page fills its filters from the link's Copy Link parameters as
         // usual, so its own calculations produce the answer, and only that
@@ -4176,12 +4176,20 @@
         }
 
         // One-line answer above the results, worded by search.js from what
-        // this page just worked out (it reads the filters off the URL)
-        function updateSearchAnswer(tableResult, h2hResult, matchHistoryResult) {
+        // this page just worked out (it reads the filters off the URL).
+        // League Tables answers come from updateTable(); Match Finder's from
+        // its own results (finderResults).
+        function updateSearchAnswer(tableResult, h2hResult, matchHistoryResult, finderResults) {
             if (!SEARCH_MODE_VIEW) return;
-            const team1 = state.selectedTeam1;
+            const isFinder = SEARCH_MODE_VIEW === 'match-finder';
+            if (isFinder !== (finderResults !== undefined)) return;
+            const team1 = isFinder ? state.matchFinderTeam1 : state.selectedTeam1;
+            const team2 = isFinder ? state.matchFinderTeam2 : state.selectedTeam2;
+            const extraTeam2s = isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s;
+            const season = isFinder ? state.matchFinderSeason : state.selectedSeason;
             const grouped = !!(tableResult && tableResult.isGroupedByPhase);
             const ready = {
+                'match-finder': () => !state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`),
                 h2h: () => !state.h2hApiLoading && (state.h2hApiCacheKey || '').includes(`::${team1}::`),
                 team: () => !state.teamHistoryApiLoading && (state.teamHistoryApiCacheKey || '').endsWith(`::${team1}`),
                 table: () => grouped
@@ -4195,13 +4203,14 @@
                 league: state.selectedLeague,
                 competition: SEARCH_ANSWER_LEAGUE_NAMES[state.selectedLeague] || '',
                 // Only a single season counts ('' for all seasons or an era)
-                season: /^\d{4}-\d{2}$/.test(state.selectedSeason || '') ? state.selectedSeason : '',
+                season: /^\d{4}-\d{2}$/.test(season || '') ? season : '',
                 team1,
-                opponents: [state.selectedTeam2, ...activeExtraTeam2s(team1, state.selectedTeam2, state.extraTeam2s)].filter(Boolean),
+                opponents: [team2, ...activeExtraTeam2s(team1, team2, extraTeam2s)].filter(Boolean),
                 record: stats ? { w: stats.team1Wins, d: stats.draws, l: stats.team2Wins, total: stats.total } : null,
                 matches: matchHistoryResult ? matchHistoryResult.matches : null,
                 table: tableResult && !grouped ? tableResult.tableData : null,
                 seasonMatches: grouped ? state.seasonMatchesApiCache : null,
+                finder: isFinder ? { mode: state.matchFinderMode || 'single', category: state.matchFinderCategory, results: finderResults } : null,
                 logo: name => getTeamLogoUrl(name, state.selectedLeague)
             });
         }
@@ -7347,6 +7356,7 @@
         // two. The desktop version's Stage column doesn't apply here either
         // - Domestic league matches carry no CompetitionPhase.
         function updateMatchFinderTable(classified) {
+            updateSearchAnswer(undefined, undefined, undefined, classified);
             elements.matchFinderResults.classList.remove('hidden');
 
             const cat = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);

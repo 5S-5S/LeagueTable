@@ -3645,6 +3645,20 @@ html.search-mode[data-search-view="table"] #matchHistorySection {
     display: none !important;
 }
 
+/* Match Finder: its results live inside the tabs area, so show that area
+   with only the results box (no tab buttons, description or filters),
+   and none of the League Tables boxes below */
+html.search-mode[data-search-view="match-finder"] #controlsSection {
+    display: block !important;
+}
+
+html.search-mode[data-search-view="match-finder"] #controlsSection .tab-container,
+html.search-mode[data-search-view="match-finder"] #controlsSection .tab-content:not(#matchFinderContent),
+html.search-mode[data-search-view="match-finder"] #matchFinderContent > :not(#matchFinderResults),
+html.search-mode[data-search-view="match-finder"] .table-section {
+    display: none !important;
+}
+
 html.search-mode .table-section {
     padding-top: 1.5rem;
 }

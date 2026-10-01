@@ -996,7 +996,9 @@
         'game games result results fixtures seasons season finish finished finishes finishing position ' +
         'positions placed title titles champions winners top reached reach better final finals semi semis ' +
         'quarter quarters round group stage home away active current since after before between until ' +
-        'from points deductions penalties pens knockout knockouts big six era time'
+        'from points deductions penalties pens knockout knockouts big six era time ' +
+        'by via over under through into than their his her its they we our any every which what who how ' +
+        'much many times or but not no do does got get getting beat beaten'
     ).split(' '));
 
     function normalizeSearchText(text) {
@@ -1286,7 +1288,11 @@
         ['deductions', '1', /\bwith\s+(?:points?\s+)?deductions?\b/],
         ['excludeMainStage', true, /\b(?:qualif(?:iers?|ying)(?:\s+rounds?)?\s+only|only\s+(?:the\s+)?qualif(?:iers?|ying)(?:\s+rounds?)?)\b/],
         ['excludeQualifiers', true, /\b(?:excluding|without|no|not including)\s+(?:the\s+)?qualif(?:iers?|ying)(?:\s+rounds?)?\b|\bmain\s+(?:stage|draw|competition)(?:\s+only)?\b/],
-        ['penalties', true, /\b(?:(?:on|via|decided on)\s+)?(?:penalt(?:y|ies)(?:\s+shoot\s*-?\s*outs?)?|pens|shoot\s*-?\s*outs?)\b/]
+        ['penalties', true, /\b(?:(?:on|via|by|after|decided on|decided by)\s+)?(?:penalt(?:y|ies)(?:\s+shoot\s*-?\s*outs?)?|pens|shoot\s*-?\s*outs?)\b/],
+        // Match Finder (Champions League)
+        ['extraTime', true, /\b(?:(?:after|in|during|decided in)\s+)?extra[ -]?time\b|\baet\b/],
+        ['awayGoals', true, /\b(?:(?:on|via|by|through|decided on|decided by)\s+)?(?:the\s+)?away[ -]goals?(?:\s+rule)?\b/],
+        ['tieMode', true, /\b(?:on\s+)?aggregate\b|\b(?:two|double|2)[ -]?legged(?:\s+ties?)?\b|\bover two legs\b|\bties\b/]
     ];
 
     const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -1419,11 +1425,11 @@
         }
         let category = null;
         if (scoreline) category = 'scoreline';
-        else if (has(/\b(biggest|heaviest|largest) (wins?|victory|victories)\b/)) category = 'victories';
-        else if (has(/\b(biggest|heaviest|worst|largest) (defeats?|loss|losses|thrashings?)\b/)) category = 'defeats';
-        else if (has(/\b(highest scoring draws?|score draws?)\b/)) category = 'draws';
-        else if (has(/\b(most goals|highest scoring|goal ?fests?)\b/)) category = 'totalGoals';
-        else if (has(/\b((least|fewest) goals|lowest scoring)\b/)) category = 'leastGoals';
+        else if (has(/\b(biggest|heaviest|largest|record|best) (wins?|victory|victories)\b|\bthrashings?\b|\bbiggest margins?\b/)) category = 'victories';
+        else if (has(/\b(biggest|heaviest|worst|largest|record) (defeats?|loss|losses|beatings?)\b/)) category = 'defeats';
+        else if (has(/\b(highest scoring|biggest) draws?\b|\bscore draws?\b/)) category = 'draws';
+        else if (has(/\b(most (total |combined |aggregate )?goals|highest scoring|goal ?fests?)\b/)) category = 'totalGoals';
+        else if (has(/\b((least|fewest) (total |combined |aggregate )?goals|lowest scoring|goalless|scoreless|nil nil)\b/)) category = 'leastGoals';
         else if (has(/\b(match finder|biggest)\b/)) category = 'victories';
         if (category) return { view: 'match-finder', category, location };
 
@@ -1486,7 +1492,8 @@
             const blocked = words.slice(start).some((word, j) => used[start + j] && !mentions.some(m => start + j >= m.start && start + j < m.end));
             if (blocked) continue;
             const fragment = words.slice(start).join(' ');
-            if (fragment.length < 2) continue;
+            // Too short to mean a team yet ("by" isn't the start of Bytom)
+            if (fragment.length < 3) continue;
             const matches = new Map();
             teamNameIndex.forEach(([phrase, name]) => {
                 if (phrase.startsWith(fragment)) matches.set(name, Math.min(matches.get(name) ?? 2, 0));
@@ -1507,7 +1514,8 @@
         let text = ' ' + query.toLowerCase() + ' ';
         const filters = {
             dateFrom: '', dateTo: '', day: '', location: '', lastN: '', points: '', deductions: '',
-            stage: '', penalties: false, excludeQualifiers: false, excludeMainStage: false
+            stage: '', penalties: false, excludeQualifiers: false, excludeMainStage: false,
+            extraTime: false, awayGoals: false, tieMode: false
         };
         TEXT_FILTERS.forEach(([key, value, pattern]) => {
             const m = text.match(pattern);
@@ -1573,6 +1581,17 @@
         // "Barcelona at Real Madrid": the first team away
         if (mentions.length >= 2 && words.slice(mentions[0].end, mentions[1].start).join(' ') === 'at') {
             filters.location = 'away';
+        }
+        // Away goals only decide two-legged ties
+        if (filters.awayGoals) filters.tieMode = true;
+        // Two-legged ties, extra time and away goals only exist in Match
+        // Finder: on their own they mean its default (biggest wins)
+        if ((filters.tieMode || filters.extraTime || filters.awayGoals) && intent.view !== 'match-finder') {
+            intent.view = 'match-finder';
+            if (scoreline) intent.category = 'scoreline';
+            else if (/\b(lost|lose|losses|defeats?|knocked out|eliminated|beaten|went out|go out)\b/.test(rest)) intent.category = 'defeats';
+            else if (/\b(draws?|drew|level)\b/.test(rest)) intent.category = 'draws';
+            else intent.category = 'victories';
         }
         // A named opponent makes it a head to head, whatever else the
         // words suggest (a stage, "matches", "table")
@@ -1684,6 +1703,8 @@
         if (f.lastN && kind !== 'table') parts.push(`Last ${f.lastN}`);
         if (comp.continental && f.stage) parts.push(capitalize(STAGE_WORDS[f.stage].replace(/^the /, '')));
         if (comp.continental && f.penalties && kind !== 'table') parts.push('Penalty shootouts');
+        if (comp.continental && kind === 'match-finder' && f.extraTime) parts.push('After extra time');
+        if (comp.continental && kind === 'match-finder' && f.awayGoals) parts.push('Away goals');
         if (comp.continental && f.excludeQualifiers) parts.push('Main stage only');
         if (comp.continental && f.excludeMainStage) parts.push('Qualifiers only');
         if (f.points === '0') parts.push('2 points for a win');
@@ -1810,26 +1831,54 @@
         return { 1: 'st', 2: 'nd', 3: 'rd' }[num % 10] || 'th';
     }
 
-    function matchFinderResult(comp, t1, t2, season, category, scoreline, location) {
-        const params = {
-            t1, t2,
-            season: season !== null ? seasonKey(season) : '',
-            cat: category === 'victories' ? '' : category,
-            home: location === 'away' ? '0' : '',
-            away: location === 'home' ? '0' : ''
-        };
-        if (category === 'scoreline') {
-            Object.assign(params, { hsOp: 'exactly', hsVal: scoreline.home, asOp: 'exactly', asVal: scoreline.away });
+    const MATCH_FINDER_TIE_LABELS = {
+        'victories': 'Biggest aggregate wins', 'defeats': 'Biggest aggregate defeats',
+        'draws': 'Highest-scoring aggregate draws', 'totalGoals': 'Most aggregate goals',
+        'leastGoals': 'Fewest aggregate goals', 'scoreline': 'Aggregate scoreline'
+    };
+
+    // Match Finder (needs Team 1). Single matches, or two-legged ties on
+    // aggregate (Champions League, "aggregate" / "two-legged"). A
+    // scoreline is home-away for single matches, Team 1-opponent for ties.
+    function matchFinderResult(comp, t1, opponents, parsed, category) {
+        const f = parsed.filters;
+        const tie = comp.continental && f.tieMode;
+        const params = { t1, t2: opponents };
+        if (parsed.season !== null) params.season = seasonKey(parsed.season);
+        else if (parsed.eras[comp.key]) params.season = parsed.eras[comp.key];
+        else {
+            params.from = f.dateFrom;
+            params.to = f.dateTo;
         }
-        const label = category === 'scoreline' ? `${scoreline.home}-${scoreline.away} matches` : MATCH_FINDER_LABELS[category];
-        const who = t1 ? (t2 ? `${t1} vs ${t2}` : t1) : '';
+        params.day = f.day;
+        if (f.location === 'home') params.away = '0';
+        if (f.location === 'away') params.home = '0';
+        if (category !== 'victories') params.cat = category;
+        const scoreline = parsed.scoreline;
+        if (category === 'scoreline' && scoreline) {
+            if (tie) Object.assign(params, { t1sOp: 'exactly', t1sVal: scoreline.home, osOp: 'exactly', osVal: scoreline.away });
+            else Object.assign(params, { hsOp: 'exactly', hsVal: scoreline.home, asOp: 'exactly', asVal: scoreline.away });
+        }
+        if (comp.continental) {
+            if (tie) params.mode = 'tie';
+            if (f.stage) params.stage = STAGE_VALUES.table[f.stage] || f.stage;
+            if (f.penalties) params.pso = '1';
+            if (f.extraTime) params.aet = '1';
+            if (f.awayGoals) params.ag = '1';
+            if (f.excludeQualifiers) params.exQ = '1';
+            if (f.excludeMainStage) params.exM = '1';
+        }
+        const label = category === 'scoreline' && scoreline
+            ? `${scoreline.home}-${scoreline.away} ${tie ? 'on aggregate' : 'matches'}`
+            : (tie ? MATCH_FINDER_TIE_LABELS : MATCH_FINDER_LABELS)[category];
+        const who = opponents.length ? `${t1} vs ${opponentLabel(opponents).replace(/^the /, '')}` : t1;
+        const parts = filterDetailParts(parsed, comp, 'match-finder');
         return {
             kind: 'match-finder', icon: '🎯', comp,
-            title: who ? `${who} · ${label}` : label,
+            title: `${who} · ${label}`,
             detail: joinDetail([
-                category === 'scoreline' ? 'Home score - away score' : 'Match Finder',
-                season !== null ? seasonKey(season) : '',
-                locationLabel(location)
+                category === 'scoreline' && !tie ? 'Home score - away score' : (tie ? 'Two-legged ties' : 'Match Finder'),
+                ...parts
             ]),
             href: competitionUrl(comp, 'match-finder', params)
         };
@@ -1866,7 +1915,8 @@
                 primary.push(lastTimeResult(comp, t1, t2, { location }));
                 break;
             case 'match-finder':
-                primary.push(matchFinderResult(comp, t1, t2, season, intent.category, scoreline, location));
+                // Match Finder needs a team to look from
+                if (t1) primary.push(matchFinderResult(comp, t1, opponents, parsed, intent.category));
                 break;
             case 'team-seasons': {
                 const { rank, stage } = intent.finish;
@@ -1902,7 +1952,7 @@
                     primary.push(headToHeadResult(comp, t1, opponents, parsed));
                     if (t2) {
                         related.push(lastTimeResult(comp, t1, t2, { location }));
-                        related.push(matchFinderResult(comp, t1, t2, season, 'victories', null, location));
+                        related.push(matchFinderResult(comp, t1, opponents, parsed, 'victories'));
                         related.push(streaksResult(comp, t1, t2, { streakType: 'winning', historic: true, location }));
                     }
                 } else if (t1) {
@@ -1911,7 +1961,7 @@
                     related.push(seasonsResult(comp, t1, season, { rank: '', stage: '', better: false }));
                     related.push(streaksResult(comp, t1, null, { streakType: 'winning', historic: false, location }));
                     related.push(lastTimeResult(comp, t1, null, { location }));
-                    related.push(matchFinderResult(comp, t1, null, season, 'victories', null, location));
+                    related.push(matchFinderResult(comp, t1, [], parsed, 'victories'));
                 } else if (asksForTable || location || parsed.filters.day) {
                     primary.push(tableResult(comp, parsed));
                 }
@@ -1990,6 +2040,9 @@
         }).slice(0, MAX_SEARCH_RESULTS);
 
         if (results.length === 0) {
+            if (parsed.intent.view === 'match-finder' && parsed.mentions.length === 0) {
+                return { results: [], message: 'Match Finder looks from one team\'s side - add a team, e.g. "Arsenal biggest wins".' };
+            }
             if (parsed.opponentGroup === 'BIG_6' && !comps.some(comp => comp.key === 'premier-league')) {
                 return { results: [], message: 'The Big 6 are Premier League clubs - pick the Premier League in the dropdown.' };
             }
@@ -2064,6 +2117,156 @@
         return bothNames;
     }
 
+    // A Champions League round in words: "1. Round" -> "first round",
+    // "Play-Offs (Q)" -> "qualifying play-offs"
+    function phaseWords(phase) {
+        if (!phase) return '';
+        const qualifying = /\(Q\)/.test(phase);
+        let words = phase.replace(/\s*\(Q\)/, '')
+            .replace(/^1\. Round$/, 'first round').replace(/^2\. Round$/, 'second round').replace(/^3\. Round$/, 'third round')
+            .toLowerCase();
+        return qualifying ? `qualifying ${words}` : words;
+    }
+
+    function possessive(name) {
+        return /s$/i.test(name) ? `${name}'` : `${name}'s`;
+    }
+
+    function longDate(date) {
+        return new Date(date).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+
+    // Match Finder: the top result for the category, and how many share it.
+    // ctx.finder: { mode: 'single' | 'tie', category, results } - the
+    // page's own sorted results (single: { match, isHome, team1Goals,
+    // opponentGoals, margin, totalGoals }; tie: the same plus breakdown,
+    // legMatches, lastLegDate).
+    function describeMatchFinder(ctx, params, { b, location, span, penalties }) {
+        const finder = ctx.finder;
+        if (!ctx.team1 || !finder) return null;
+        const tie = finder.mode === 'tie';
+        const results = finder.results || [];
+        const team1 = b(ctx.team1);
+        const team1s = b(possessive(ctx.team1));
+        const singleOpponent = ctx.opponents.length === 1 && ctx.opponents[0] !== 'BIG_6' && !ctx.opponents[0].startsWith('COUNTRY:');
+        const against = ctx.opponents.length
+            ? ` against ${singleOpponent ? b(ctx.opponents[0]) : escapeSearchHtml(opponentLabel(ctx.opponents))}`
+            : '';
+        const how = [
+            params.get('aet') === '1' ? 'after extra time' : '',
+            params.get('ag') === '1' ? 'decided on away goals' : '',
+            penalties ? 'decided on penalties' : ''
+        ].filter(Boolean).join(', ');
+        const scope = `${how ? ` ${how}` : ''}${against} ${span}`;
+        const venue = location === 'home' ? 'home ' : (location === 'away' ? 'away ' : '');
+        const unit = tie ? 'tie' : 'game';
+
+        // One result in words: "7-0 at home to Everton FC on May 11, 2005" /
+        // "9-2 on aggregate against X in the 1961-62 Round Of 16"
+        const opponentOf = entry => tie
+            ? (entry.breakdown.teamA === ctx.team1 ? entry.breakdown.teamB : entry.breakdown.teamA)
+            : (entry.isHome ? entry.match.AwayTeam : entry.match.HomeTeam);
+        // "2022-23 quarter-finals" for a tie
+        const tieRound = entry => {
+            const last = new Date(entry.lastLegDate);
+            const season = seasonKey(last.getMonth() >= 6 ? last.getFullYear() : last.getFullYear() - 1);
+            const phase = entry.legMatches[0] && entry.legMatches[0].CompetitionPhase;
+            return `${season}${phase ? ` ${escapeSearchHtml(phaseWords(phase))}` : ''}`;
+        };
+        const describeOne = entry => {
+            const score = `${entry.team1Goals}-${entry.opponentGoals}`;
+            if (tie) {
+                return `${score} on aggregate against ${b(opponentOf(entry))} in the ${tieRound(entry)}`;
+            }
+            const when = `on ${longDate(entry.match.dateObj)}`;
+            // One named opponent is already in the sentence
+            if (singleOpponent) return `${score} ${venue ? '' : (entry.isHome ? 'at home ' : 'away ')}${when}`;
+            // The venue's already in the question for a home / away search
+            const where = venue ? (entry.isHome ? 'against' : 'at') : (entry.isHome ? 'at home to' : 'away at');
+            return `${score} ${where} ${b(opponentOf(entry))} ${when}`;
+        };
+        const nothing = what => ({ crestTeam: ctx.team1, html: `No ${what} found for ${team1}${scope}.` });
+
+        if (results.length === 0) {
+            return nothing({
+                victories: `${venue}${tie ? 'aggregate ' : ''}wins`, defeats: `${venue}${tie ? 'aggregate ' : ''}defeats`,
+                draws: `${venue}${tie ? 'aggregate ' : ''}draws`
+            }[finder.category] || `${venue}${tie ? 'ties' : 'matches'}`);
+        }
+        const top = results[0];
+        const sharing = test => results.filter(test).length;
+
+        switch (finder.category) {
+            case 'victories':
+            case 'defeats': {
+                const win = finder.category === 'victories';
+                // Ties won / lost on away goals are level on aggregate, so
+                // there's no "biggest" - count them instead
+                if (params.get('ag') === '1') {
+                    const latest = [...results].sort((x, y) => new Date(y.lastLegDate) - new Date(x.lastLegDate))[0];
+                    const scopeWithoutHow = scope.replace(/^ decided on away goals,?/, '');
+                    return {
+                        crestTeam: ctx.team1,
+                        html: `${team1} have ${win ? 'won' : 'gone out of'} ${formatNumber(results.length)} two-legged tie${results.length === 1 ? '' : 's'} on away goals${scopeWithoutHow}; the most recent was ${describeOne(latest)}.`
+                    };
+                }
+                const k = sharing(r => r.margin === top.margin);
+                const noun = `${venue}${tie ? 'aggregate ' : ''}${win ? 'win' : 'defeat'}`;
+                const goals = Math.abs(top.margin);
+                return {
+                    crestTeam: ctx.team1,
+                    html: `${team1s} biggest ${noun}${scope} is ${describeOne(top)}${k > 1 ? ` - one of ${k} ${win ? 'wins' : 'defeats'} by ${goals} goal${goals === 1 ? '' : 's'}` : ''}.`
+                };
+            }
+            case 'draws': {
+                const k = sharing(r => r.totalGoals === top.totalGoals);
+                return {
+                    crestTeam: ctx.team1,
+                    html: `${team1s} highest-scoring ${venue}${tie ? 'aggregate ' : ''}draw${scope} is ${describeOne(top)}${k > 1 ? ` - one of ${k} at ${top.team1Goals}-${top.opponentGoals}` : ''}.`
+                };
+            }
+            case 'totalGoals': {
+                const k = sharing(r => r.totalGoals === top.totalGoals);
+                return {
+                    crestTeam: ctx.team1,
+                    html: `${team1s} highest-scoring ${venue}${unit}${scope} had ${top.totalGoals} goals: ${describeOne(top)}${k > 1 ? ` (one of ${k})` : ''}.`
+                };
+            }
+            case 'leastGoals': {
+                const k = sharing(r => r.totalGoals === top.totalGoals);
+                if (top.totalGoals === 0) {
+                    return {
+                        crestTeam: ctx.team1,
+                        html: `${team1} have had ${formatNumber(k)} goalless ${venue}${unit}${k === 1 ? '' : 's'}${scope}; the most recent was ${describeOne(top)}.`
+                    };
+                }
+                return {
+                    crestTeam: ctx.team1,
+                    html: `${team1s} lowest-scoring ${venue}${unit}s${scope} had ${top.totalGoals} goal${top.totalGoals === 1 ? '' : 's'}: ${formatNumber(k)} of them, most recently ${describeOne(top)}.`
+                };
+            }
+            case 'scoreline': {
+                const n = results.length;
+                if (tie) {
+                    const t1Goals = params.get('t1sVal');
+                    const oppGoals = params.get('osVal');
+                    return {
+                        crestTeam: ctx.team1,
+                        html: `${formatNumber(n)} of ${team1s} ${venue}two-legged ties${scope} ended ${t1Goals}-${oppGoals} on aggregate; the most recent was against ${b(opponentOf(top))} in the ${tieRound(top)}.`
+                    };
+                }
+                const home = params.get('hsVal');
+                const away = params.get('asVal');
+                const m = top.match;
+                return {
+                    crestTeam: ctx.team1,
+                    html: `${formatNumber(n)} of ${team1s} ${venue}games${scope} ended ${home}-${away} (home team first); the most recent was ${b(m.HomeTeam)} ${m.FTHG}-${m.FTAG} ${b(m.AwayTeam)} on ${longDate(m.dateObj)}.`
+                };
+            }
+        }
+        return null;
+    }
+
     // { html, crestTeam } for the answer, or null when there's nothing to say
     function describeAnswer(ctx, params) {
         const b = text => `<strong>${escapeSearchHtml(text)}</strong>`;
@@ -2075,7 +2278,7 @@
         const day = params.get('day');
         const dayText = day !== null && day !== '' ? `on ${capitalize(WEEKDAYS[Number(day)])}s` : '';
         const stage = params.get(ctx.view === 'h2h' ? 'h2hStage' : (ctx.view === 'team' ? 'mhStage' : 'stage')) || params.get('stage');
-        const penalties = params.get(ctx.view === 'h2h' ? 'h2hPso' : 'mhPso') === '1';
+        const penalties = params.get({ h2h: 'h2hPso', team: 'mhPso', 'match-finder': 'pso' }[ctx.view]) === '1';
         const qualifiersOnly = stage === 'Qualifiers' || params.get('exM') === '1';
         const mainStageOnly = params.get('exQ') === '1';
 
@@ -2089,7 +2292,8 @@
         else where = `in ${competition}`;
         // "all-time" only when nothing else narrows it down
         const era = !!ERA_NAMES[params.get('season')];
-        const narrowed = !!(ctx.season || era || dates || dayText || stage || penalties || qualifiersOnly || mainStageOnly);
+        const narrowed = !!(ctx.season || era || dates || dayText || stage || penalties || qualifiersOnly || mainStageOnly ||
+            params.get('aet') === '1' || params.get('ag') === '1');
         const when = ctx.season ? `in ${ctx.season}` : (dates || (narrowed ? '' : 'all‑time')); // non-breaking hyphen
         const span = [where, when, dayText].filter(Boolean).join(' ');
         const onPenalties = penalties ? ', in matches decided on penalties' : '';
@@ -2111,6 +2315,8 @@
                 : span;
             return { crestTeam: ctx.team1, html: `${b(ctx.team1)} have a ${recordHtml(w, d, l)} record ${at}against ${against} ${meetings}${onPenalties}.` };
         }
+
+        if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
 
         if (ctx.view === 'team') {
             if (!ctx.team1 || !ctx.matches) return null;
@@ -2185,7 +2391,7 @@
     // Result kinds whose page has a search mode: the page opens with its
     // controls hidden and just the answer showing (?search=<kind>). The
     // rest still open the full page.
-    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table'];
+    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder'];
 
     function resultHref(result, query, scope) {
         if (!SEARCH_MODE_KINDS.includes(result.kind)) return result.href;
