@@ -12,12 +12,32 @@ Feature ideas, not yet scheduled.
   - Search mode (`?search=<kind>&q=&scope=` on top of a Copy Link URL):
     the page hides its header, tabs and filters, shows the search bar and
     a one-line answer, and only the results for that question - worked
-    out by the page's own functions. Done for head to head (`h2h`) on all
-    four pages: answer line, the two-team table, H2H record and match list.
-  - Next: the other question types in search mode (Last Time When,
-    streaks, Match Finder, league tables, season finishes) - each needs
-    its own "show only this" CSS rule and answer sentence. Until then
-    those results open the full page.
+    out by the page's own functions; search.js words the answer line
+    (renderAnswer) from what the page passes in plus the URL's filters.
+  - Going tab by tab, covering every kind of question each tab answers.
+    League Tables & Head to Head is done (2026-10-01), all four pages:
+    - `h2h`: home / away / "X at Y", a season, since / before / between
+      years, "last 5 seasons", a weekday, "last 10 meetings", several
+      opponents ("vs Chelsea and Liverpool"), the Big 6; Continental also
+      a stage ("semi finals", "knockouts"), penalty shootouts, main stage
+      / qualifiers only, and a country ("vs English clubs").
+    - `team` (one team): the same filters, with its record and match
+      history ("arsenal away since 2010", "arsenal last 20 games").
+    - `table` (no team): a season or dates, home / away / weekday tables,
+      2 or 3 points for a win, without deductions; Continental single
+      seasons answer with the final's winner.
+    - Dates as well as years in ranges ("since 01/01/1991", "between 1
+      Jan 1990 and 31/12/2000", "on 10/05/2026", "January 2010"); slashed
+      dates follow the visitor's language (US: month first). A typed date
+      is spelled out in the answer ("since January 1, 1991").
+    - Eras: typing "Premier League"/"EPL" or "Champions League"/"UCL"/"CL"
+      means 1992 onwards, "First Division" / "European Cup" the older era;
+      no name (or "all-time") means every season, and a season or dates
+      beat an era. Answers name the era: "the English top flight", "the
+      European Cup and Champions League" for all-time. Ligue 1 left out -
+      Division 1 to Ligue 1 was only a rename.
+  - Next tabs: Match Finder, Team Seasons, Last Time When, Team Streaks.
+    Until each is done, its results open the full page.
   - Also fixed on the way: Continental `?team=` dashboard links never
     locked the team (the lock was consumed before /api/teams loaded).
 

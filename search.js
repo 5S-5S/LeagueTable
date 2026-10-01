@@ -3,7 +3,8 @@
 // their Mobile versions. Reads a plain-English query for teams, a season and
 // what the visitor is after, and links each result to the sport page's view
 // through that page's own Copy Link parameters (?view=&lg=&t1=...).
-// Exposes window.LeagueSearch = { mount(container, options), searchFor }.
+// Exposes window.LeagueSearch = { mount(container, options), searchFor,
+// renderAnswer(el, ctx) } - renderAnswer words the search-mode answer line.
 (function () {
     'use strict';
 
@@ -380,6 +381,28 @@
             seasons: '1955-',
             aliases: ['champions league', 'european cup', 'ucl', 'cl', 'europe'] }
     ];
+    // Competition names that also mean an era - the old and new formats,
+    // not just a rename (so Ligue 1 / Division 1 aren't here). Typing the
+    // name means that era; leaving it out, or "all-time", means every
+    // season. Values are the pages' own season keys.
+    const ALIAS_ERAS = {
+        'premier league': 'premier-league-era-1992-2025',
+        'epl': 'premier-league-era-1992-2025',
+        'first division': 'english-first-division-era-1888-1992',
+        'english first division': 'english-first-division-era-1888-1992',
+        'champions league': 'champions-league-era-1992-2026',
+        'ucl': 'champions-league-era-1992-2026',
+        'cl': 'champions-league-era-1992-2026',
+        'european cup': 'european-cup-era-1955-1992'
+    };
+    // An era's name in answers and result labels
+    const ERA_NAMES = {
+        'premier-league-era-1992-2025': 'the Premier League',
+        'english-first-division-era-1888-1992': 'the First Division',
+        'champions-league-era-1992-2026': 'the Champions League',
+        'european-cup-era-1955-1992': 'the European Cup'
+    };
+
     const SEARCH_SCOPES = {
         'domestic': SEARCH_COMPETITIONS.filter(comp => !comp.continental)
     };
@@ -972,7 +995,8 @@
         'records all ever best worst biggest heaviest most least fewest goals highest lowest match matches ' +
         'game games result results fixtures seasons season finish finished finishes finishing position ' +
         'positions placed title titles champions winners top reached reach better final finals semi semis ' +
-        'quarter quarters round group stage home away active current'
+        'quarter quarters round group stage home away active current since after before between until ' +
+        'from points deductions penalties pens knockout knockouts big six era time'
     ).split(' '));
 
     function normalizeSearchText(text) {
@@ -1038,12 +1062,6 @@
     }
     buildTeamIndexes();
 
-    function teamInCompetition(teamName, comp) {
-        const team = SEARCH_TEAMS.get(teamName);
-        if (!team) return false;
-        return comp.continental ? team.continental : team.league === comp.key;
-    }
-
     // Merge in the live Champions League roster (clubs new to the
     // competition since the list above was taken). Fetched once per
     // page; onUpdate re-runs a search that's showing.
@@ -1090,11 +1108,25 @@
         });
     }
 
-    // "2003-04", "2003/04", "2003-2004", "03-04", or a single year,
-    // which means the season that ended in it (2004 -> 2003-04).
-    // Returns { startYear, text } or null.
+    const NUMBER_WORDS = {
+        one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+        eleven: 11, twelve: 12, fifteen: 15, twenty: 20, thirty: 30, fifty: 50
+    };
+    const NUMBER_PATTERN = `(\\d{1,3}|${Object.keys(NUMBER_WORDS).join('|')})`;
+
+    function toNumber(text) {
+        return /^\d+$/.test(text) ? Number(text) : NUMBER_WORDS[text];
+    }
+
+    // "2003-04", "2003/04", "2003-2004", "03-04", "this season", "last
+    // season", or a single year, which means the season that ended in it
+    // (2004 -> 2003-04). Returns { startYear, text } or null.
     function extractSeason(text) {
-        let m = text.match(/\b(1[89]\d{2}|20\d{2})\s*[-\/–]\s*(\d{4}|\d{2})\b/);
+        let m = text.match(/\b(this|current) season\b/);
+        if (m) return { startYear: currentSeasonStart(), text: m[0] };
+        m = text.match(/\b(last|previous) season\b/);
+        if (m) return { startYear: currentSeasonStart() - 1, text: m[0] };
+        m = text.match(/\b(1[89]\d{2}|20\d{2})\s*[-\/–]\s*(\d{4}|\d{2})\b/);
         if (m) {
             const start = Number(m[1]);
             if (Number(m[2]) % 100 === (start + 1) % 100) return { startYear: start, text: m[0] };
@@ -1110,10 +1142,233 @@
         return null;
     }
 
+    const MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august',
+        'september', 'october', 'november', 'december'];
+    // Full names first, so "march" is never read as "mar" + "ch"
+    const MONTH_PATTERN = `(${[...MONTHS, 'sept', 'jan', 'feb', 'mar', 'apr', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].join('|')})`;
+
+    function monthNumber(name) {
+        return MONTHS.findIndex(month => month.startsWith(name.slice(0, 3))) + 1;
+    }
+
+    function isoDate(year, month, day) {
+        const date = new Date(Date.UTC(year, month - 1, day));
+        // Rejects 31/02 and the like (the date rolls over into another month)
+        if (date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+        return date.toISOString().slice(0, 10);
+    }
+
+    function addDays(iso, days) {
+        const date = new Date(`${iso}T00:00:00Z`);
+        date.setUTCDate(date.getUTCDate() + days);
+        return date.toISOString().slice(0, 10);
+    }
+
+    // 03/04/2010: day first, except for US English visitors (month first).
+    // A number over 12 settles it either way.
+    function dayFirst() {
+        const language = typeof navigator !== 'undefined' && navigator.language ? navigator.language.toLowerCase() : 'en-gb';
+        return language !== 'en-us';
+    }
+
+    // Dates written out in full, each as the span it covers: a day
+    // ("01/01/1991", "1991-01-01", "1 January 1991", "Jan 1 1991") or a
+    // month ("January 1991"). Returns [{ text, start, end }] (ISO dates).
+    function findDates(text) {
+        const found = [];
+        const add = (match, start, end) => {
+            if (start && end) found.push({ text: match, start, end });
+        };
+        const monthEnd = (year, month) => addDays(isoDate(month === 12 ? year + 1 : year, month === 12 ? 1 : month + 1, 1), -1);
+        let rest = text;
+        const take = (pattern, handle) => {
+            rest = rest.replace(pattern, (...m) => {
+                handle(m);
+                return ' ';
+            });
+        };
+        take(/\b(1[89]\d{2}|20\d{2})-(\d{1,2})-(\d{1,2})\b/g, m => {
+            const date = isoDate(Number(m[1]), Number(m[2]), Number(m[3]));
+            add(m[0], date, date);
+        });
+        take(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](1[89]\d{2}|20\d{2})\b/g, m => {
+            let [first, second] = [Number(m[1]), Number(m[2])];
+            const swap = first > 12 ? false : (second > 12 ? true : !dayFirst());
+            const [day, month] = swap ? [second, first] : [first, second];
+            const date = isoDate(Number(m[3]), month, day);
+            add(m[0], date, date);
+        });
+        take(new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:of\\s+)?${MONTH_PATTERN}\\.?,?\\s+(1[89]\\d{2}|20\\d{2})\\b`, 'g'), m => {
+            const date = isoDate(Number(m[3]), monthNumber(m[2]), Number(m[1]));
+            add(m[0], date, date);
+        });
+        take(new RegExp(`\\b${MONTH_PATTERN}\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?,?\\s+(1[89]\\d{2}|20\\d{2})\\b`, 'g'), m => {
+            const date = isoDate(Number(m[3]), monthNumber(m[1]), Number(m[2]));
+            add(m[0], date, date);
+        });
+        take(new RegExp(`\\b${MONTH_PATTERN}\\.?,?\\s+(1[89]\\d{2}|20\\d{2})\\b`, 'g'), m => {
+            const month = monthNumber(m[1]);
+            add(m[0], isoDate(Number(m[2]), month, 1), monthEnd(Number(m[2]), month));
+        });
+        return found;
+    }
+
+    // A date range: "since 2010" / "since 01/01/1991" / "since the 2010-11
+    // season", "after ...", "before ...", "until ...", "between ... and
+    // ...", "from ... to ...", "last 5 seasons", or a lone date or month
+    // ("on 10/05/2026", "in January 2010"). Each end can be a year or a
+    // written-out date. Returns { from, to, text } - ISO dates ('' for an
+    // open end) and the query with the range taken out - or null. Read
+    // before the season, so its years are never taken as one.
+    function extractDateRange(text) {
+        // Swap written-out dates for placeholders (§0§) so one pattern
+        // per kind of range covers years and dates alike
+        const dates = findDates(text);
+        let marked = text;
+        dates.forEach((date, i) => { marked = marked.replace(date.text, ` §${i}§ `); });
+        const restore = remaining => remaining.replace(/§(\d+)§/g, (_, i) => dates[Number(i)].text);
+        const BOUND = '(§\\d+§|1[89]\\d{2}|20\\d{2})';
+        const span = bound => {
+            const token = bound.match(/^§(\d+)§$/);
+            if (token) return dates[Number(token[1])];
+            return { start: `${bound}-01-01`, end: `${bound}-12-31` };
+        };
+        const result = (m, from, to) => ({ from, to, text: restore(marked.replace(m[0], ' ')) });
+
+        let m = marked.match(new RegExp(`\\b(?:between|from)\\s+${BOUND}\\s*(?:and|to|until|till|-|–)\\s*${BOUND}`));
+        if (m) {
+            let [first, last] = [span(m[1]), span(m[2])];
+            if (first.start > last.start) [first, last] = [last, first];
+            return result(m, first.start, last.end);
+        }
+        m = marked.match(new RegExp(`\\b(since|after)\\s+(?:the\\s+)?${BOUND}(?:\\s*[-\\/–]\\s*(\\d{4}|\\d{2})\\b)?(?:\\s+season)?`));
+        if (m) {
+            const isSeason = m[3] !== undefined && /^\d{4}$/.test(m[2]) && Number(m[3]) % 100 === (Number(m[2]) + 1) % 100;
+            if (isSeason) return result(m, `${m[2]}-07-01`, '');
+            const bound = span(m[2]);
+            return result(m, m[1] === 'after' ? addDays(bound.end, 1) : bound.start, '');
+        }
+        m = marked.match(new RegExp(`\\b(?:before|prior to)\\s+${BOUND}`));
+        if (m) return result(m, '', addDays(span(m[1]).start, -1));
+        m = marked.match(new RegExp(`\\b(?:until|up to|till)\\s+${BOUND}`));
+        if (m) return result(m, '', span(m[1]).end);
+        m = marked.match(new RegExp(`\\b(?:last|past|previous)\\s+${NUMBER_PATTERN}\\s+seasons\\b`));
+        if (m) return result(m, `${currentSeasonStart() - toNumber(m[1]) + 1}-07-01`, '');
+        // A lone date or month: just that day / month
+        m = marked.match(/(?:\b(?:on|in|during)\s+)?§(\d+)§/);
+        if (m) {
+            const date = dates[Number(m[1])];
+            return result(m, date.start, date.end);
+        }
+        return null;
+    }
+
+    // "last 10 meetings", "last five games" -> 10 / 5 (with a noun, so a
+    // stage like "last 16" is never read as a count)
+    function extractLastN(text) {
+        const m = text.match(new RegExp(`\\b(?:last|past|previous|most recent)\\s+${NUMBER_PATTERN}\\s+(?:meetings?|games?|matches|fixtures|results|h2hs?|head to heads?|times?|encounters?)\\b`));
+        return m ? { n: toNumber(m[1]), text: m[0] } : null;
+    }
+
     // A scoreline like "5-0" or "3:3" -> { home, away }
     function extractScoreline(text) {
         const m = text.match(/(?:^|\s)(\d{1,2})\s*[-:]\s*(\d{1,2})(?=\s|$)/);
         return m ? { home: m[1], away: m[2], text: m[0] } : null;
+    }
+
+    // Filters written out in words, read off the raw query (and removed
+    // from it) before teams are looked for: points system, deductions,
+    // and the Champions League's penalty shootouts and qualifier toggles
+    const TEXT_FILTERS = [
+        ['points', '0', /\b(?:2|two)[ -]points?\s+(?:for|per)\s+(?:a\s+)?win\b|\b(?:historic(?:al)?|old|original)\s+points(?:\s+system)?\b/],
+        ['points', '1', /\b(?:3|three)[ -]points?\s+(?:for|per)\s+(?:a\s+)?win\b/],
+        ['deductions', '0', /\b(?:without|no|ignoring|excluding|minus)\s+(?:points?\s+)?deductions?\b/],
+        ['deductions', '1', /\bwith\s+(?:points?\s+)?deductions?\b/],
+        ['excludeMainStage', true, /\b(?:qualif(?:iers?|ying)(?:\s+rounds?)?\s+only|only\s+(?:the\s+)?qualif(?:iers?|ying)(?:\s+rounds?)?)\b/],
+        ['excludeQualifiers', true, /\b(?:excluding|without|no|not including)\s+(?:the\s+)?qualif(?:iers?|ying)(?:\s+rounds?)?\b|\bmain\s+(?:stage|draw|competition)(?:\s+only)?\b/],
+        ['penalties', true, /\b(?:(?:on|via|decided on)\s+)?(?:penalt(?:y|ies)(?:\s+shoot\s*-?\s*outs?)?|pens|shoot\s*-?\s*outs?)\b/]
+    ];
+
+    const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+    // Champions League stages, in the words people use. Keys are the
+    // canonical stage; the page values differ by filter (see STAGE_VALUES)
+    const STAGE_PATTERNS = [
+        ['group', /\b(group stages?|group phase|groups|league phase|league stage)\b/],
+        ['knockout', /\b(knock ?outs?|knock ?out stage|ko stage)\b/],
+        ['Semi-Finals', /\b(semi ?finals?|semis)\b/],
+        ['Quarter-Finals', /\b(quarter ?finals?|quarters)\b/],
+        ['Round Of 16', /\b(round of 16|last 16)\b/],
+        ['Play-Offs', /\bplay ?offs?\b/],
+        ['Final', /\bfinals?\b/],
+        ['Qualifiers', /\b(qualifiers?|qualifying)\b/]
+    ];
+    // League table stage (?stage=) and the H2H / match history boxes'
+    // stage (?h2hStage= / ?mhStage=) use different values for two stages
+    const STAGE_VALUES = {
+        table: { group: 'group-stage', knockout: 'knockout-stage' },
+        box: { group: 'League/Group Stage', knockout: 'Knock-Out Stage' }
+    };
+    const STAGE_WORDS = {
+        'group': 'the group stage', 'group-stage': 'the group stage', 'League/Group Stage': 'the group stage',
+        'knockout': 'the knockout stage', 'knockout-stage': 'the knockout stage', 'Knock-Out Stage': 'the knockout stage',
+        'Final': 'the final', 'Semi-Finals': 'the semi-finals', 'Quarter-Finals': 'the quarter-finals',
+        'Round Of 16': 'the round of 16', 'Play-Offs': 'the play-offs', 'Qualifiers': 'qualifying'
+    };
+
+    // Champions League opponents by country: "English clubs", "vs Spain"
+    const COUNTRY_DEMONYMS = {
+        english: 'England', scottish: 'Scotland', welsh: 'Wales', spanish: 'Spain', italian: 'Italy',
+        german: 'Germany', french: 'France', portuguese: 'Portugal', dutch: 'Netherlands', belgian: 'Belgium',
+        turkish: 'Turkey', greek: 'Greece', serbian: 'Serbia', ukrainian: 'Ukraine', russian: 'Russia',
+        czech: 'Czech Republic', swiss: 'Switzerland', austrian: 'Austria', danish: 'Denmark',
+        swedish: 'Sweden', norwegian: 'Norway', croatian: 'Croatia', polish: 'Poland', romanian: 'Romania',
+        bulgarian: 'Bulgaria', hungarian: 'Hungary', cypriot: 'Cyprus', israeli: 'Israel', irish: 'Republic of Ireland'
+    };
+    const COUNTRY_NAMES = [
+        'England', 'Scotland', 'Wales', 'Northern Ireland', 'Spain', 'Italy', 'Germany', 'France', 'Portugal',
+        'Netherlands', 'Belgium', 'Turkey', 'Greece', 'Serbia', 'Ukraine', 'Russia', 'Czech Republic',
+        'Switzerland', 'Austria', 'Denmark', 'Sweden', 'Norway', 'Croatia', 'Poland', 'Romania', 'Bulgaria',
+        'Hungary', 'Cyprus', 'Israel', 'Scotland', 'Republic of Ireland'
+    ];
+    const OPPONENT_GROUP_NOUNS = new Set(['teams', 'team', 'clubs', 'club', 'sides', 'side', 'opposition', 'opponents']);
+    const VERSUS_WORDS = new Set(['vs', 'v', 'versus', 'against']);
+
+    // A group as Team 2 - the Big 6 (Premier League) or every club from
+    // one country (Champions League) - on words no team took.
+    // Returns 'BIG_6' / 'COUNTRY:<name>' (marking its words used), or null.
+    function findOpponentGroup(words, used) {
+        const free = (i, n) => i + n <= words.length && !used.slice(i, i + n).some(Boolean);
+        const take = (i, n) => { for (let k = i; k < i + n; k++) used[k] = true; };
+        for (let i = 0; i < words.length; i++) {
+            if (free(i, 2) && words[i] === 'big' && (words[i + 1] === '6' || words[i + 1] === 'six')) {
+                take(i, 2);
+                return 'BIG_6';
+            }
+        }
+        for (let i = 0; i < words.length; i++) {
+            let country = null;
+            let length = 1;
+            if (COUNTRY_DEMONYMS[words[i]]) {
+                country = COUNTRY_DEMONYMS[words[i]];
+            } else {
+                const name = COUNTRY_NAMES.find(c => {
+                    const parts = normalizeSearchText(c).split(' ');
+                    return words.slice(i, i + parts.length).join(' ') === parts.join(' ');
+                });
+                if (name) {
+                    country = name;
+                    length = normalizeSearchText(name).split(' ').length;
+                }
+            }
+            if (!country || !free(i, length)) continue;
+            const before = i > 0 && !used[i - 1] && VERSUS_WORDS.has(words[i - 1]);
+            const after = OPPONENT_GROUP_NOUNS.has(words[i + length]) && !used[i + length];
+            if (!before && !after) continue;
+            take(i, length + (after ? 1 : 0));
+            return `COUNTRY:${country}`;
+        }
+        return null;
     }
 
     function detectStreakType(text) {
@@ -1149,7 +1404,7 @@
     // competitions and the season are taken out
     function detectIntent(text, scoreline) {
         const has = pattern => pattern.test(text);
-        const location = has(/\bhome\b/) ? 'home' : (has(/\baway\b/) ? 'away' : '');
+        const location = has(/\bhome\b/) ? 'home' : (has(/\b(away|road)\b/) ? 'away' : '');
 
         if (has(/\b(streaks?|runs?|in a row|consecutive|unbeaten|undefeated|winless)\b/)) {
             return {
@@ -1172,13 +1427,25 @@
         else if (has(/\b(match finder|biggest)\b/)) category = 'victories';
         if (category) return { view: 'match-finder', category, location };
 
+        // A table asked for by name wins over the stage words in it
+        // ("2004-05 group stage table")
+        if (has(/\b(tables?|standings?|classification|rankings?)\b/)) return { view: 'table', location };
         if (has(/\b(seasons|finish|finished|finishes|finishing|positions?|placed|titles?|champions|winners|won (the )?(league|title|cup|it)|top \d{1,2}|finals?|semi ?finals?|semis|quarter ?finals?|quarters|round of 16|last 16|group stage|\d{1,2}(st|nd|rd|th))\b/)) {
-            return { view: 'team-seasons', finish: detectFinish(text) };
+            return { view: 'team-seasons', finish: detectFinish(text), location };
         }
-        if (has(/\b(tables?|standings?|classification|rankings?)\b/)) return { view: 'table' };
-        if (has(/\b(vs|v|versus|against|h2h|head to head|head 2 head|meetings?)\b/)) return { view: 'h2h' };
-        if (has(/\b(match|matches|games?|results?|fixtures|scores|history)\b/)) return { view: 'matches' };
+        if (has(/\b(vs|v|versus|against|h2h|head to head|head 2 head|meetings?|record)\b/)) return { view: 'h2h', location };
+        if (has(/\b(match|matches|games?|results?|fixtures|scores|history|form)\b/)) return { view: 'matches', location };
         return { view: null, location };
+    }
+
+    // The League Tables tab's own filters, from the words left over
+    function detectTableFilters(text) {
+        const filters = { day: '', stage: '' };
+        const day = WEEKDAYS.findIndex(name => new RegExp(`\\b${name}s?\\b`).test(text));
+        if (day >= 0) filters.day = String(day);
+        const stage = STAGE_PATTERNS.find(([, pattern]) => pattern.test(text));
+        if (stage) filters.stage = stage[0];
+        return filters;
     }
 
     // Teams named in the query, longest name first:
@@ -1238,6 +1505,29 @@
 
     function parseSearchQuery(query) {
         let text = ' ' + query.toLowerCase() + ' ';
+        const filters = {
+            dateFrom: '', dateTo: '', day: '', location: '', lastN: '', points: '', deductions: '',
+            stage: '', penalties: false, excludeQualifiers: false, excludeMainStage: false
+        };
+        TEXT_FILTERS.forEach(([key, value, pattern]) => {
+            const m = text.match(pattern);
+            if (m && (filters[key] === '' || filters[key] === false)) {
+                filters[key] = value;
+                text = text.replace(m[0], ' ');
+            }
+        });
+        const dateRange = extractDateRange(text);
+        if (dateRange) {
+            filters.dateFrom = dateRange.from;
+            filters.dateTo = dateRange.to;
+            filters.exactDates = hasWrittenDate(text);
+            text = dateRange.text;
+        }
+        const lastN = extractLastN(text);
+        if (lastN) {
+            filters.lastN = String(lastN.n);
+            text = text.replace(lastN.text, ' ');
+        }
         const season = extractSeason(text);
         if (season) text = text.replace(season.text, ' ');
         const scoreline = extractScoreline(text);
@@ -1246,9 +1536,12 @@
         const words = normalizeSearchText(text).split(' ').filter(Boolean);
         const used = words.map(() => false);
         let mentions = findTeamMentions(words, used);
+        const opponentGroup = findOpponentGroup(words, used);
 
-        // Competitions named in the query, on the words no team took
+        // Competitions named in the query, on the words no team took (and
+        // the era a name means: "Premier League" = 1992 onwards)
         const competitions = [];
+        const eras = {};
         SEARCH_COMPETITIONS
             .flatMap(comp => comp.aliases.map(alias => [alias.split(' '), comp.key]))
             .sort((a, b) => b[0].length - a[0].length)
@@ -1258,6 +1551,8 @@
                     if (span.join(' ') === aliasWords.join(' ') && !used.slice(i, i + aliasWords.length).some(Boolean)) {
                         for (let k = i; k < i + aliasWords.length; k++) used[k] = true;
                         if (!competitions.includes(key)) competitions.push(key);
+                        const era = ALIAS_ERAS[aliasWords.join(' ')];
+                        if (era && !eras[key]) eras[key] = era;
                     }
                 }
             });
@@ -1272,13 +1567,34 @@
         // Taken-out words become a marker, so the words either side of a
         // team are never read as one phrase ("last · time")
         const rest = words.map((word, i) => used[i] ? '·' : word).join(' ');
+        const intent = detectIntent(rest, scoreline);
+        Object.assign(filters, detectTableFilters(rest));
+        filters.location = intent.location || '';
+        // "Barcelona at Real Madrid": the first team away
+        if (mentions.length >= 2 && words.slice(mentions[0].end, mentions[1].start).join(' ') === 'at') {
+            filters.location = 'away';
+        }
+        // A named opponent makes it a head to head, whatever else the
+        // words suggest (a stage, "matches", "table")
+        if ((mentions.length >= 2 || opponentGroup) && ['team-seasons', 'table', 'matches', null].includes(intent.view)) {
+            intent.view = 'h2h';
+        }
+
+        // A season or dates are more specific than an era, and "all-time"
+        // asks for every season
+        const allTime = /\b(all time|alltime|all seasons|every season)\b/.test(rest);
+        if (season || dateRange || allTime) Object.keys(eras).forEach(key => delete eras[key]);
+
         return {
             season: season ? season.startYear : null,
             scoreline,
             competitions,
-            mentions: mentions.slice(0, 2),
-            intent: detectIntent(rest, scoreline),
-            isEmpty: words.length === 0 && !season && !scoreline
+            eras,
+            mentions: mentions.slice(0, 6),
+            opponentGroup,
+            intent,
+            filters,
+            isEmpty: words.length === 0 && !season && !scoreline && !dateRange
         };
     }
 
@@ -1287,7 +1603,8 @@
     function competitionUrl(comp, view, params) {
         const qs = new URLSearchParams({ view, lg: comp.key });
         Object.entries(params).forEach(([key, value]) => {
-            if (value !== '' && value !== null && value !== undefined) qs.set(key, value);
+            if (Array.isArray(value)) value.forEach(v => qs.append(key, v));
+            else if (value !== '' && value !== null && value !== undefined) qs.set(key, value);
         });
         return `${comp.page}?${qs.toString()}`;
     }
@@ -1306,23 +1623,138 @@
         return parts.filter(Boolean).join(' · ');
     }
 
+    function capitalize(text) {
+        return text ? text.charAt(0).toUpperCase() + text.slice(1) : text;
+    }
+
+    // Team 2 for display: a team, the Big 6, a country's clubs, or a list
+    function opponentLabel(opponents) {
+        const labels = opponents.map(opp => {
+            if (opp === 'BIG_6') return 'the Big 6';
+            if (opp.startsWith('COUNTRY:')) return `clubs from ${opp.slice('COUNTRY:'.length)}`;
+            return opp;
+        });
+        if (labels.length <= 1) return labels[0] || '';
+        return `${labels.slice(0, -1).join(', ')} and ${labels[labels.length - 1]}`;
+    }
+
+    // "since 2010", "before 2000", "between 1990 and 2000", "since the
+    // 2010-11 season", "in January 2010". exact: the question had a
+    // written-out date, so a day is always spelled out ("since January 1,
+    // 1991", not "since 1991"), in the visitor's own date style.
+    function describeDates(from, to, exact) {
+        const yearStart = date => !exact && /^\d{4}-01-01$/.test(date);
+        const seasonStart = date => !exact && /^\d{4}-07-01$/.test(date);
+        const yearEnd = date => !exact && /^\d{4}-12-31$/.test(date);
+        const year = date => Number(date.slice(0, 4));
+        const day = date => new Date(`${date}T00:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
+        if (from && !to) {
+            if (yearStart(from)) return `since ${year(from)}`;
+            if (seasonStart(from)) return `since the ${seasonKey(year(from))} season`;
+            return `since ${day(from)}`;
+        }
+        // "before" a date is up to the day before it
+        if (to && !from) return yearEnd(to) ? `before ${year(to) + 1}` : `before ${day(addDays(to, 1))}`;
+        if (from && to) {
+            if (from === to) return `on ${day(from)}`;
+            if (/-01$/.test(from) && to === addDays(addDays(`${from.slice(0, 7)}-28`, 4).slice(0, 7) + '-01', -1)) {
+                return `in ${new Date(`${from}T00:00:00`).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}`;
+            }
+            if (yearStart(from) && yearEnd(to)) return year(from) === year(to) ? `in ${year(from)}` : `between ${year(from)} and ${year(to)}`;
+            return `between ${day(from)} and ${day(to)}`;
+        }
+        return '';
+    }
+
+    // Whether a query wrote out a date (not just a year or season)
+    function hasWrittenDate(query) {
+        return findDates(` ${(query || '').toLowerCase()} `).length > 0;
+    }
+
+    // Short labels for a result's filters (season or dates, home/away,
+    // day, last N, stage, penalties)
+    function filterDetailParts(parsed, comp, kind) {
+        const f = parsed.filters;
+        const era = parsed.eras[comp.key];
+        const parts = [parsed.season !== null ? seasonKey(parsed.season)
+            : (era ? `${capitalize(ERA_NAMES[era].replace(/^the /, ''))} era`
+                : capitalize(describeDates(f.dateFrom, f.dateTo, f.exactDates)) || 'All seasons')];
+        parts.push(locationLabel(f.location));
+        if (f.day) parts.push(`${capitalize(WEEKDAYS[Number(f.day)])}s`);
+        if (f.lastN && kind !== 'table') parts.push(`Last ${f.lastN}`);
+        if (comp.continental && f.stage) parts.push(capitalize(STAGE_WORDS[f.stage].replace(/^the /, '')));
+        if (comp.continental && f.penalties && kind !== 'table') parts.push('Penalty shootouts');
+        if (comp.continental && f.excludeQualifiers) parts.push('Main stage only');
+        if (comp.continental && f.excludeMainStage) parts.push('Qualifiers only');
+        if (f.points === '0') parts.push('2 points for a win');
+        if (f.points === '1') parts.push('3 points for a win');
+        if (f.deductions === '0') parts.push('No deductions');
+        return parts;
+    }
+
+    // The League Tables tab's Copy Link parameters for the query's filters.
+    // kind: 'table' (no team), 'team' (one team) or 'h2h'.
+    function leagueFilterParams(comp, parsed, kind) {
+        const f = parsed.filters;
+        const params = {};
+        if (parsed.season !== null) {
+            params.season = seasonKey(parsed.season);
+        } else if (parsed.eras[comp.key]) {
+            params.season = parsed.eras[comp.key];
+        } else {
+            params.from = f.dateFrom;
+            params.to = f.dateTo;
+        }
+        params.day = f.day;
+        if (f.location === 'home') params.away = '0';
+        if (f.location === 'away') params.home = '0';
+        params.ded = f.deductions;
+        params.p3 = f.points;
+        if (kind === 'h2h') params.h2hN = f.lastN;
+        if (kind === 'team') params.mhN = f.lastN;
+        if (comp.continental) {
+            if (f.excludeQualifiers) params.exQ = '1';
+            if (f.excludeMainStage) params.exM = '1';
+            if (f.stage) {
+                params.stage = STAGE_VALUES.table[f.stage] || f.stage;
+                const boxStage = STAGE_VALUES.box[f.stage] || f.stage;
+                if (kind === 'h2h') params.h2hStage = boxStage;
+                if (kind === 'team') params.mhStage = boxStage;
+            }
+            if (f.penalties && kind === 'h2h') params.h2hPso = '1';
+            if (f.penalties && kind === 'team') params.mhPso = '1';
+        }
+        return params;
+    }
+
     // Each result: { kind, icon, crestTeam?, title, detail, comp, href }
-    function tableResult(comp, season, team) {
-        const seasonText = season !== null ? seasonKey(season) : 'All seasons';
+    function tableResult(comp, parsed) {
+        const parts = filterDetailParts(parsed, comp, 'table');
         return {
             kind: 'table', icon: '📊', comp,
-            title: team ? `${team} · ${seasonText}` : `${comp.name} table · ${seasonText}`,
-            detail: team ? 'League table with their match history' : 'Standings, head to head and match history',
-            href: competitionUrl(comp, 'league-filters', { season: season !== null ? seasonKey(season) : '', t1: team })
+            title: `${comp.name} table · ${parts[0]}`,
+            detail: joinDetail(['League table', ...parts.slice(1)]),
+            href: competitionUrl(comp, 'league-filters', leagueFilterParams(comp, parsed, 'table'))
         };
     }
 
-    function headToHeadResult(comp, t1, t2, season) {
+    function teamRecordResult(comp, team, parsed) {
+        const parts = filterDetailParts(parsed, comp, 'team');
+        return {
+            kind: 'team', icon: '', crestTeam: team, comp,
+            title: `${team} · ${parts[0]}`,
+            detail: joinDetail(['Record and match history', ...parts.slice(1)]),
+            href: competitionUrl(comp, 'league-filters', { ...leagueFilterParams(comp, parsed, 'team'), t1: team })
+        };
+    }
+
+    function headToHeadResult(comp, t1, opponents, parsed) {
+        const parts = filterDetailParts(parsed, comp, 'h2h');
         return {
             kind: 'h2h', icon: '⚔️', comp,
-            title: `${t1} vs ${t2}`,
-            detail: joinDetail(['Head to head and match history', season !== null ? seasonKey(season) : 'All seasons']),
-            href: competitionUrl(comp, 'league-filters', { season: season !== null ? seasonKey(season) : '', t1, t2 })
+            title: `${t1} vs ${opponentLabel(opponents).replace(/^the /, '')}`,
+            detail: joinDetail(['Head to head', ...parts]),
+            href: competitionUrl(comp, 'league-filters', { ...leagueFilterParams(comp, parsed, 'h2h'), t1, t2: opponents })
         };
     }
 
@@ -1407,79 +1839,110 @@
         return {
             kind: 'dashboard', icon: '', crestTeam: team, comp,
             title: team,
-            detail: 'Team Dashboard',
+            detail: 'Team Dashboard (full page)',
             href: dashboardUrl(comp, team)
         };
     }
 
-    // Results for one competition and one set of teams (0-2):
-    // { primary: [...], related: [...] }
+    // Results for one competition and one set of teams ([] / [team1] /
+    // [team1, ...opponents]): { primary: [...], related: [...] }
     function competitionResults(comp, teams, parsed) {
-        const [t1, t2] = teams;
+        const [t1, ...opponents] = teams;
+        // A single real team as Team 2 (not the Big 6 or a country), for the
+        // tabs that only take one
+        const t2 = opponents.length === 1 && opponents[0] !== 'BIG_6' && !opponents[0].startsWith('COUNTRY:') ? opponents[0] : '';
         const { season, intent, scoreline } = parsed;
-        const location = intent.location || '';
+        const location = parsed.filters.location;
         const primary = [];
         const related = [];
+        const asksForTable = season !== null || parsed.competitions.includes(comp.key) ||
+            parsed.filters.dateFrom || parsed.filters.dateTo;
 
         switch (intent.view) {
             case 'team-streaks':
-                primary.push(streaksResult(comp, t1, t2, intent));
+                primary.push(streaksResult(comp, t1, t2, { ...intent, location }));
                 break;
             case 'last-time-when':
-                primary.push(lastTimeResult(comp, t1, t2, intent));
+                primary.push(lastTimeResult(comp, t1, t2, { location }));
                 break;
             case 'match-finder':
                 primary.push(matchFinderResult(comp, t1, t2, season, intent.category, scoreline, location));
                 break;
             case 'team-seasons': {
+                const { rank, stage } = intent.finish;
+                // A stage on its own with no team is a stage of the table
+                // ("champions league 2004-05 group stage")
+                if (!t1 && stage && !rank) {
+                    primary.push(tableResult(comp, parsed));
+                    break;
+                }
                 // A league position ("top 4") means nothing in the
                 // Champions League, and a stage ("semi finals") nothing
                 // in a league - skip the competition that can't show it
-                const { rank, stage } = intent.finish;
                 if (comp.continental ? (rank && !stage) : (stage && !rank)) break;
                 primary.push(seasonsResult(comp, t1, season, intent.finish));
                 break;
             }
-            case 'table':
-                primary.push(tableResult(comp, season, t1 && !t2 ? t1 : ''));
-                if (t1 && t2) primary.push(headToHeadResult(comp, t1, t2, season));
-                break;
             case 'h2h':
+                if (opponents.length > 0) {
+                    primary.push(headToHeadResult(comp, t1, opponents, parsed));
+                } else if (t1) {
+                    primary.push(teamRecordResult(comp, t1, parsed));
+                } else {
+                    primary.push(tableResult(comp, parsed));
+                }
+                break;
+            case 'table':
             case 'matches':
-                if (t1 && t2) primary.push(headToHeadResult(comp, t1, t2, season));
-                else primary.push(tableResult(comp, season, t1));
+                if (t1) primary.push(teamRecordResult(comp, t1, parsed));
+                else primary.push(tableResult(comp, parsed));
                 break;
             default:
-                if (t1 && t2) {
-                    primary.push(headToHeadResult(comp, t1, t2, season));
-                    related.push(lastTimeResult(comp, t1, t2, { location }));
-                    related.push(matchFinderResult(comp, t1, t2, season, 'victories', null, location));
-                    related.push(streaksResult(comp, t1, t2, { streakType: 'winning', historic: true, location }));
-                } else if (t1 && season !== null) {
-                    primary.push(tableResult(comp, season, t1));
-                    related.push(seasonsResult(comp, t1, season, { rank: '', stage: '', better: false }));
+                if (opponents.length > 0) {
+                    primary.push(headToHeadResult(comp, t1, opponents, parsed));
+                    if (t2) {
+                        related.push(lastTimeResult(comp, t1, t2, { location }));
+                        related.push(matchFinderResult(comp, t1, t2, season, 'victories', null, location));
+                        related.push(streaksResult(comp, t1, t2, { streakType: 'winning', historic: true, location }));
+                    }
                 } else if (t1) {
-                    primary.push(dashboardResult(comp, t1));
-                    related.push(seasonsResult(comp, t1, null, { rank: '', stage: '', better: false }));
+                    primary.push(teamRecordResult(comp, t1, parsed));
+                    related.push(dashboardResult(comp, t1));
+                    related.push(seasonsResult(comp, t1, season, { rank: '', stage: '', better: false }));
                     related.push(streaksResult(comp, t1, null, { streakType: 'winning', historic: false, location }));
                     related.push(lastTimeResult(comp, t1, null, { location }));
-                    related.push(matchFinderResult(comp, t1, null, null, 'victories', null, location));
-                } else if (season !== null || parsed.competitions.includes(comp.key)) {
-                    primary.push(tableResult(comp, season, ''));
+                    related.push(matchFinderResult(comp, t1, null, season, 'victories', null, location));
+                } else if (asksForTable || location || parsed.filters.day) {
+                    primary.push(tableResult(comp, parsed));
                 }
         }
         return { primary, related };
     }
 
-    // Every pairing of the (up to two) mentioned teams, when a mention
-    // can mean more than one team ("Manchester")
-    function teamCombinations(mentions) {
+    // An opponent group (Big 6, a country) is only in one competition
+    function teamInCompetition(teamName, comp) {
+        if (teamName === 'BIG_6') return comp.key === 'premier-league';
+        if (teamName.startsWith('COUNTRY:')) return !!comp.continental;
+        const team = SEARCH_TEAMS.get(teamName);
+        if (!team) return false;
+        return comp.continental ? team.continental : team.league === comp.key;
+    }
+
+    // Every reading of the mentioned teams: the first mention is Team 1,
+    // the rest (and any group) its opponents. A mention can mean more than
+    // one team ("Manchester") - only the first two mentions are expanded.
+    function teamCombinations(mentions, opponentGroup) {
+        const group = opponentGroup ? [opponentGroup] : [];
         if (mentions.length === 0) return [[]];
-        const [first, second] = mentions;
+        const [first, second, ...others] = mentions;
+        const extra = others.map(m => m.teams[0]);
         const combos = [];
         first.teams.forEach(a => {
-            if (!second) combos.push([a]);
-            else second.teams.forEach(b => { if (a !== b) combos.push([a, b]); });
+            if (!second) combos.push([a, ...group]);
+            else second.teams.forEach(b => {
+                const opponents = [b, ...extra].filter(team => team !== a);
+                if (opponents.length > 0) combos.push([a, ...new Set(opponents), ...group]);
+            });
         });
         return combos.slice(0, 8);
     }
@@ -1510,7 +1973,7 @@
 
         const primary = [];
         const related = [];
-        teamCombinations(parsed.mentions).forEach(teams => {
+        teamCombinations(parsed.mentions, parsed.opponentGroup).forEach(teams => {
             comps.forEach(comp => {
                 if (!teams.every(team => teamInCompetition(team, comp))) return;
                 const found = competitionResults(comp, teams, parsed);
@@ -1527,6 +1990,12 @@
         }).slice(0, MAX_SEARCH_RESULTS);
 
         if (results.length === 0) {
+            if (parsed.opponentGroup === 'BIG_6' && !comps.some(comp => comp.key === 'premier-league')) {
+                return { results: [], message: 'The Big 6 are Premier League clubs - pick the Premier League in the dropdown.' };
+            }
+            if (parsed.opponentGroup && parsed.opponentGroup.startsWith('COUNTRY:') && !comps.some(comp => comp.continental)) {
+                return { results: [], message: 'Clubs by country are a Champions League search - pick it in the dropdown.' };
+            }
             if (parsed.mentions.length > 0) {
                 const names = parsed.mentions.map(m => m.teams[0]).join(' and ');
                 const where = comps.map(comp => comp.name).join(' / ');
@@ -1537,12 +2006,186 @@
         return { results, message: '' };
     }
 
+    // --- Answer line (search mode) ---
+
+    // The one-line answer above a search-mode page's results. The page
+    // passes what it worked out (ctx); the filters are read off the URL,
+    // which is the question. ctx: { view: 'h2h' | 'team' | 'table', ready,
+    // league (key), competition ('the Champions League'; used when the
+    // league key has no era names), season ('2003-04' or ''), team1,
+    // opponents (Team 2 values), record ({ w, d, l, total }, h2h), matches
+    // (team's match rows, newest first), table (rows, by position),
+    // seasonMatches (one Champions League season's match rows), logo(name) }
+    function renderAnswer(el, ctx) {
+        if (!el) return;
+        if (!ctx.ready) {
+            el.innerHTML = '<p class="search-answer-loading">Working out the answer...</p>';
+            return;
+        }
+        const answer = describeAnswer(ctx, new URLSearchParams(window.location.search));
+        if (!answer) {
+            el.innerHTML = '';
+            return;
+        }
+        const logo = answer.crestTeam && ctx.logo ? ctx.logo(answer.crestTeam) : '';
+        el.innerHTML = `
+            ${logo ? `<img src="${logo}" class="search-answer-crest" alt="">` : ''}
+            <p class="search-answer-text">${answer.html}</p>`;
+    }
+
+    function recordHtml(w, d, l) {
+        return `<span class="search-answer-record">W${w} D${d} L${l}</span>`;
+    }
+
+    function formatNumber(n) {
+        return Number(n).toLocaleString('en-US');
+    }
+
+    // Competitions whose format changed in 1992-93: the English First
+    // Division became the Premier League, the European Cup the Champions
+    // League. [new format's first season, old name, new name, both together]
+    const LEAGUE_ERAS = {
+        'premier-league': [1992, 'the First Division', 'the Premier League', 'the English top flight'],
+        'champions-league': [1992, 'the European Cup', 'the Champions League', 'the European Cup and Champions League']
+    };
+
+    // The competition's name for the span asked about
+    function competitionName(ctx, params, recentOnly) {
+        const era = LEAGUE_ERAS[ctx.league];
+        if (!era) return ctx.competition;
+        const [firstYear, oldName, newName, bothNames] = era;
+        if (recentOnly) return newName;
+        if (ERA_NAMES[params.get('season')]) return ERA_NAMES[params.get('season')];
+        if (ctx.season) return Number(ctx.season.slice(0, 4)) >= firstYear ? newName : oldName;
+        const from = params.get('from');
+        const to = params.get('to');
+        if (from && from >= `${firstYear}-07-01`) return newName;
+        if (to && to < `${firstYear}-07-01`) return oldName;
+        return bothNames;
+    }
+
+    // { html, crestTeam } for the answer, or null when there's nothing to say
+    function describeAnswer(ctx, params) {
+        const b = text => `<strong>${escapeSearchHtml(text)}</strong>`;
+        const location = params.get('home') === '0' ? 'away' : (params.get('away') === '0' ? 'home' : '');
+        const lastN = Number(params.get(ctx.view === 'h2h' ? 'h2hN' : 'mhN')) || 0;
+        const competition = competitionName(ctx, params, !!lastN);
+        const shortCompetition = competition.replace(/^the /, '');
+        const dates = describeDates(params.get('from') || '', params.get('to') || '', hasWrittenDate(params.get('q')));
+        const day = params.get('day');
+        const dayText = day !== null && day !== '' ? `on ${capitalize(WEEKDAYS[Number(day)])}s` : '';
+        const stage = params.get(ctx.view === 'h2h' ? 'h2hStage' : (ctx.view === 'team' ? 'mhStage' : 'stage')) || params.get('stage');
+        const penalties = params.get(ctx.view === 'h2h' ? 'h2hPso' : 'mhPso') === '1';
+        const qualifiersOnly = stage === 'Qualifiers' || params.get('exM') === '1';
+        const mainStageOnly = params.get('exQ') === '1';
+
+        // "in the Premier League", "in the semi-finals of the Champions
+        // League", "in Champions League qualifying", "in the Champions
+        // League main stage"
+        let where;
+        if (qualifiersOnly) where = `in ${shortCompetition} qualifying`;
+        else if (stage) where = `in ${STAGE_WORDS[stage] || stage} of ${competition}`;
+        else if (mainStageOnly) where = `in the ${shortCompetition} main stage`;
+        else where = `in ${competition}`;
+        // "all-time" only when nothing else narrows it down
+        const era = !!ERA_NAMES[params.get('season')];
+        const narrowed = !!(ctx.season || era || dates || dayText || stage || penalties || qualifiersOnly || mainStageOnly);
+        const when = ctx.season ? `in ${ctx.season}` : (dates || (narrowed ? '' : 'all‑time')); // non-breaking hyphen
+        const span = [where, when, dayText].filter(Boolean).join(' ');
+        const onPenalties = penalties ? ', in matches decided on penalties' : '';
+
+        if (ctx.view === 'h2h') {
+            if (!ctx.team1 || !ctx.record) return null;
+            const { w, d, l, total } = ctx.record;
+            const singleTeam = ctx.opponents.length === 1 && ctx.opponents[0] !== 'BIG_6' && !ctx.opponents[0].startsWith('COUNTRY:');
+            const against = singleTeam ? b(ctx.opponents[0]) : escapeSearchHtml(opponentLabel(ctx.opponents));
+            const at = location === 'home' ? 'at home ' : (location === 'away' ? 'away ' : '');
+            if (total === 0) {
+                return {
+                    crestTeam: ctx.team1,
+                    html: `No matches found for ${b(ctx.team1)} ${at}against ${against} ${span}${penalties ? ' decided on penalties' : ''}.`
+                };
+            }
+            const meetings = lastN
+                ? `in their last ${Math.min(lastN, total)} ${shortCompetition} meetings${[when, dayText].filter(Boolean).map(t => ` ${t}`).join('')}`
+                : span;
+            return { crestTeam: ctx.team1, html: `${b(ctx.team1)} have a ${recordHtml(w, d, l)} record ${at}against ${against} ${meetings}${onPenalties}.` };
+        }
+
+        if (ctx.view === 'team') {
+            if (!ctx.team1 || !ctx.matches) return null;
+            const matches = lastN ? ctx.matches.slice(0, lastN) : ctx.matches;
+            let w = 0, d = 0, l = 0, scored = 0, conceded = 0;
+            matches.forEach(m => {
+                const home = m.HomeTeam === ctx.team1;
+                const gf = Number(home ? m.FTHG : m.FTAG) || 0;
+                const ga = Number(home ? m.FTAG : m.FTHG) || 0;
+                scored += gf;
+                conceded += ga;
+                if (gf > ga) w++; else if (gf < ga) l++; else d++;
+            });
+            const at = location === 'home' ? ' at home' : (location === 'away' ? ' away' : '');
+            if (matches.length === 0) {
+                return { crestTeam: ctx.team1, html: `No matches found for ${b(ctx.team1)}${at} ${span}${penalties ? ' decided on penalties' : ''}.` };
+            }
+            const past = ctx.season && ctx.season !== seasonKey(currentSeasonStart());
+            const games = lastN
+                ? `in their last ${matches.length} ${shortCompetition} games${[when, dayText].filter(Boolean).map(t => ` ${t}`).join('')}`
+                : span;
+            return {
+                crestTeam: ctx.team1,
+                html: `${b(ctx.team1)} ${past ? 'had' : 'have'} a ${recordHtml(w, d, l)} record${at} ${games}${onPenalties}, scoring ${formatNumber(scored)} and conceding ${formatNumber(conceded)}.`
+            };
+        }
+
+        if (ctx.view === 'table') {
+            // One Champions League season: who won the final
+            if (ctx.seasonMatches) {
+                const finals = ctx.seasonMatches
+                    .filter(m => m.CompetitionPhase === 'Final')
+                    .sort((x, y) => new Date(x.dateObj) - new Date(y.dateObj));
+                const final = finals[finals.length - 1];
+                if (!final) return { html: `No final has been played yet in the ${ctx.season} ${shortCompetition}.` };
+                let homeWon = Number(final.FTHG) > Number(final.FTAG);
+                if (Number(final.FTHG) === Number(final.FTAG)) {
+                    const pso = (final.AdditionalInfo || '').match(/pso\s*(\d+):(\d+)/i);
+                    if (!pso) return null;
+                    homeWon = Number(pso[1]) > Number(pso[2]);
+                }
+                const winner = homeWon ? final.HomeTeam : final.AwayTeam;
+                const runnerUp = homeWon ? final.AwayTeam : final.HomeTeam;
+                return { crestTeam: winner, html: `${b(winner)} won the ${ctx.season} ${shortCompetition}, beating ${b(runnerUp)} in the final.` };
+            }
+            const leader = ctx.table && ctx.table[0];
+            if (!leader) return null;
+            // A home / away / one-weekday table
+            const kindOfTable = [location, day !== null && day !== '' ? capitalize(WEEKDAYS[Number(day)]) : ''].filter(Boolean).join(' ');
+            const points = `${formatNumber(leader.points)} points`;
+            if (ctx.season) {
+                if (ctx.season === seasonKey(currentSeasonStart())) {
+                    return { crestTeam: leader.team, html: `${b(leader.team)} are top of the ${ctx.season} ${shortCompetition}${kindOfTable ? ` ${kindOfTable} table` : ''} with ${points} from ${leader.played} games.` };
+                }
+                return {
+                    crestTeam: leader.team,
+                    html: kindOfTable
+                        ? `${b(leader.team)} topped the ${ctx.season} ${shortCompetition} ${kindOfTable} table with ${points}.`
+                        : `${b(leader.team)} won the ${ctx.season} ${shortCompetition} with ${points}.`
+                };
+            }
+            return {
+                crestTeam: leader.team,
+                html: `${b(leader.team)} have the most ${kindOfTable ? `${kindOfTable} ` : ''}points ${[where, when].filter(Boolean).join(' ')}: ${formatNumber(leader.points)} from ${formatNumber(leader.played)} games.`
+            };
+        }
+        return null;
+    }
+
     // --- Search bar ---
 
     // Result kinds whose page has a search mode: the page opens with its
     // controls hidden and just the answer showing (?search=<kind>). The
     // rest still open the full page.
-    const SEARCH_MODE_KINDS = ['h2h'];
+    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table'];
 
     function resultHref(result, query, scope) {
         if (!SEARCH_MODE_KINDS.includes(result.kind)) return result.href;
@@ -1685,5 +2328,5 @@
         };
     }
 
-    window.LeagueSearch = { mount, searchFor };
+    window.LeagueSearch = { mount, searchFor, renderAnswer };
 })();

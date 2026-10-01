@@ -3619,7 +3619,7 @@ html.search-mode .header,
 html.search-mode #teamDashboardHeader,
 html.search-mode #teamDashboardSearch,
 html.search-mode #controlsSection,
-html.search-mode #tableInfo,
+html.search-mode:not([data-search-view="table"]) #tableInfo,
 html.search-mode #collapseControlsBtn {
     display: none !important;
 }
@@ -3631,8 +3631,17 @@ html.search-mode .search-mode-hidden:not(#search-mode-none):not(#search-mode-non
     display: none !important;
 }
 
-/* Head to head: the two teams' table, the record box and the match list */
-html.search-mode[data-search-view="h2h"] #matchHistorySection {
+/* What each kind of question shows (the page's own logic decides
+   what's filled in; these just keep the other boxes out):
+   h2h   - the two teams' table, the record box and the match list
+   team  - the team's table row, record box and match history
+   table - the league table and its info line */
+html.search-mode[data-search-view="h2h"] #matchHistorySection,
+html.search-mode[data-search-view="team"] #h2hSection,
+html.search-mode[data-search-view="team"] #h2hMatchesTable,
+html.search-mode[data-search-view="table"] #h2hSection,
+html.search-mode[data-search-view="table"] #h2hMatchesTable,
+html.search-mode[data-search-view="table"] #matchHistorySection {
     display: none !important;
 }
 

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="ContinentalEurope.css">
     <link rel="stylesheet" href="search.css">
     <script>
-        // Search mode (?search=h2h, from the search bar): flag it before the
+        // Search mode (?search=h2h|team|table, from the search bar): flag it before the
         // first paint so the controls never flash up (see ContinentalEurope.css)
         (function() {
             const searchView = new URLSearchParams(window.location.search).get('search');
@@ -1258,25 +1258,25 @@
                         <div class="flex items-center gap-6">
                             <h3 class="text-lg font-semibold text-gray-700">Match History</h3>
                             
-                            <label class="flex items-center cursor-pointer">
+                            <label class="flex items-center cursor-pointer search-mode-hidden">
                                 <div id="matchHistoryHomeCheckbox" class="checkbox checked"></div>
                                 <span class="icon-home mr-1"></span>
                                 <span class="text-sm font-medium">Home</span>
                             </label>
                             
-                            <label class="flex items-center cursor-pointer">
+                            <label class="flex items-center cursor-pointer search-mode-hidden">
                                 <div id="matchHistoryAwayCheckbox" class="checkbox checked"></div>
                                 <span class="icon-plane mr-1"></span>
                                 <span class="text-sm font-medium">Away</span>
                             </label>
                             
-                            <label class="flex items-center cursor-pointer">
+                            <label class="flex items-center cursor-pointer search-mode-hidden">
                                 <div id="matchHistoryPenaltyCheckbox" class="checkbox"></div>
                                 <span class="mr-1">⚽</span>
                                 <span class="text-sm font-medium">Penalty Shootouts</span>
                             </label>
                         </div>
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 search-mode-hidden">
                             <label class="text-sm font-medium text-gray-700">Competition Stage</label>
                             <select id="matchHistoryStageSelect" class="px-3 py-1 border border-gray-300 rounded focus:border-green-500 focus:outline-none text-sm">
                                 <option value="">All</option>
@@ -1303,7 +1303,7 @@
                             <span class="text-sm text-gray-600" id="matchHistoryMatchCount"></span>
                         </div>
                     </div>
-                    <div class="flex items-center mb-4 gap-2" style="justify-content: flex-end;">
+                    <div class="flex items-center mb-4 gap-2 search-mode-hidden" style="justify-content: flex-end;">
                         <label class="text-sm font-medium text-gray-700">Most Recent Matches</label>
                         <input type="text" id="recentMatchesSelect" placeholder="Enter number or 'All'" class="px-2 py-1 border border-gray-300 rounded-full focus:border-green-500 focus:outline-none text-xs w-32 text-center">
                     </div>
@@ -4980,7 +4980,7 @@
         }
 
         // Initialize the application
-        // --- Search mode (?search=h2h&q=&scope=, from the search bar) ---
+        // --- Search mode (?search=h2h|team|table&q=&scope=, from the search bar) ---
         // CSS (html.search-mode) hides the header, tabs and filters; the
         // page fills its filters from the link's Copy Link parameters as
         // usual, so its own calculations produce the answer, and only that
@@ -5002,43 +5002,35 @@
             });
         }
 
-        function escapeAnswerHtml(text) {
-            return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-        }
-
-        // "AFC Ajax have a W3 D2 L5 record against Real Madrid in the
-        // Champions League all-time." - from the same numbers the record box shows
-        function updateSearchAnswerH2H(h2hResult) {
-            if (SEARCH_MODE_VIEW !== 'h2h') return;
-            const answerEl = document.getElementById('searchAnswer');
+        // One-line answer above the results, worded by search.js from what
+        // this page just worked out (it reads the filters off the URL)
+        function updateSearchAnswer(tableResult, h2hResult, matchHistoryResult) {
+            if (!SEARCH_MODE_VIEW) return;
             const team1 = state.selectedTeam1;
-            const team2 = state.selectedTeam2;
-            if (!team1 || !team2) {
-                answerEl.innerHTML = '';
-                return;
-            }
-            const loaded = !state.h2hApiLoading && (state.h2hApiCacheKey || '').endsWith(`::${team1}::${team2}`);
-            if (!h2hResult || !loaded) {
-                answerEl.innerHTML = '<p class="search-answer-loading">Working out the answer...</p>';
-                return;
-            }
-
-            const league = SEARCH_ANSWER_LEAGUE_NAMES[state.selectedLeague] || '';
-            // The all-seasons era filter is this page's default, so it means all-time
-            const isSingleSeason = state.selectedSeason && !state.selectedSeason.startsWith('all-');
-            const seasonOption = isSingleSeason ? elements.seasonSelect.selectedOptions[0] : null;
-            const when = seasonOption ? `in ${escapeAnswerHtml(seasonOption.text)}` : 'all‑time'; // non-breaking hyphen
-            const t1 = escapeAnswerHtml(team1);
-            const t2 = escapeAnswerHtml(team2);
-            const { team1Wins, draws, team2Wins, total } = h2hResult.overallStats;
-            const logo = getTeamLogoUrl(team1, state.selectedLeague);
-
-            const sentence = total === 0
-                ? `<strong>${t1}</strong> and <strong>${t2}</strong> have never met in ${league} ${when}.`
-                : `<strong>${t1}</strong> have a <span class="search-answer-record">W${team1Wins} D${draws} L${team2Wins}</span> record against <strong>${t2}</strong> in ${league} ${when}.`;
-            answerEl.innerHTML = `
-                ${logo ? `<img src="${logo}" class="search-answer-crest" alt="">` : ''}
-                <p class="search-answer-text">${sentence}</p>`;
+            const grouped = !!(tableResult && tableResult.isGroupedByPhase);
+            const ready = {
+                h2h: () => !state.h2hApiLoading && (state.h2hApiCacheKey || '').includes(`::${team1}::`),
+                team: () => !state.teamHistoryApiLoading && (state.teamHistoryApiCacheKey || '').endsWith(`::${team1}`),
+                table: () => grouped
+                    ? !state.seasonMatchesApiLoading && !!state.seasonMatchesApiCacheKey
+                    : !state.standingsApiLoading && !!state.standingsApiCacheKey
+            }[SEARCH_MODE_VIEW];
+            const stats = h2hResult && h2hResult.overallStats;
+            LeagueSearch.renderAnswer(document.getElementById('searchAnswer'), {
+                view: SEARCH_MODE_VIEW,
+                ready: ready ? ready() : true,
+                league: state.selectedLeague,
+                competition: SEARCH_ANSWER_LEAGUE_NAMES[state.selectedLeague] || '',
+                // Only a single season counts ('' for all seasons or an era)
+                season: /^\d{4}-\d{2}$/.test(state.selectedSeason || '') ? state.selectedSeason : '',
+                team1,
+                opponents: [state.selectedTeam2, ...activeExtraTeam2s(team1, state.selectedTeam2, state.extraTeam2s)].filter(Boolean),
+                record: stats ? { w: stats.team1Wins, d: stats.draws, l: stats.team2Wins, total: stats.total } : null,
+                matches: matchHistoryResult ? matchHistoryResult.matches : null,
+                table: tableResult && !grouped ? tableResult.tableData : null,
+                seasonMatches: grouped ? state.seasonMatchesApiCache : null,
+                logo: name => getTeamLogoUrl(name, state.selectedLeague)
+            });
         }
 
         function init() {
@@ -11628,6 +11620,7 @@
             updateMatchHistoryDisplay(matchHistoryResult);
             updateTableInfo(tableResult);
             updateTeamDashboardHeader();
+            updateSearchAnswer(tableResult, h2hResult, matchHistoryResult);
 
             // Handle position colors for dark mode
             setTimeout(handlePositionColors, 50);
@@ -12829,7 +12822,6 @@
 
         // Update head-to-head display with custom team colors
         function updateHeadToHeadDisplay(h2hResult) {
-            updateSearchAnswerH2H(h2hResult);
             if (h2hResult && state.selectedTeam1 && state.selectedTeam2) {
                 elements.h2hSection.classList.remove('hidden');
                 
