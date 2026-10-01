@@ -3930,13 +3930,22 @@
             } else {
                 // Active: only teams in the latest season (a club relegated
                 // decades ago still has a "current" streak frozen at its last
-                // match, which isn't current in any useful sense)
+                // match, which isn't current in any useful sense). Who's
+                // current comes from every match, not just the filtered ones -
+                // e.g. with Knock-Out Stage picked in September no team has a
+                // knockout match this season yet, but PSG's knockout unbeaten
+                // run is still ongoing.
                 const latest = matches.length ? matches[matches.length - 1].dateObj : null;
                 if (latest) {
                     const seasonStartYear = latest.getMonth() >= 6 ? latest.getFullYear() : latest.getFullYear() - 1;
                     const seasonStart = new Date(seasonStartYear, 6, 1);
+                    const currentTeams = new Set();
+                    for (let i = matches.length - 1; i >= 0 && matches[i].dateObj >= seasonStart; i--) {
+                        currentTeams.add(matches[i].HomeTeam);
+                        currentTeams.add(matches[i].AwayTeam);
+                    }
                     byTeam.forEach((teamMatches, team) => {
-                        if (teamMatches[teamMatches.length - 1].dateObj < seasonStart) return;
+                        if (!currentTeams.has(team)) return;
                         const newestFirst = [...atLocation(teamMatches, team)].reverse();
                         const current = calculateStreak(newestFirst, team, streakType);
                         if (current.length === 0) return;
@@ -4056,7 +4065,7 @@
                 elements.teamStreaksResults.innerHTML = `
                     <div class="text-center py-8">
                         <p class="text-gray-600">${isActive
-                            ? `No team is currently on a ${streakName.toLowerCase()}${locationText}.`
+                            ? `No team is currently on ${/^[aeiou]/i.test(streakName) ? 'an' : 'a'} ${streakName.toLowerCase()}${locationText}.`
                             : `No ${streakName.toLowerCase()}s${locationText} of 3+ games found.`}</p>
                     </div>
                 `;
@@ -4070,7 +4079,7 @@
                 ? `Current ${streakName}s${locationText} - All Teams`
                 : `Longest ${streakName}s${locationText} - All Teams`;
             const subtitle = isActive
-                ? `${streaks.length} team${streaks.length === 1 ? '' : 's'} currently on a ${streakName.toLowerCase()}${range}`
+                ? `${streaks.length} team${streaks.length === 1 ? '' : 's'} currently on ${/^[aeiou]/i.test(streakName) ? 'an' : 'a'} ${streakName.toLowerCase()}${range}`
                 : `${streaks.length.toLocaleString()} streaks of 3+ games${range}`;
 
             const aggregateKeys = HISTORIC_STREAK_AGGREGATE_COLUMNS[streakType] || [];

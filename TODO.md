@@ -123,7 +123,12 @@ Feature ideas, not yet scheduled.
     it; Arsenal's 49 heads unbeaten).
   - Active: every team in the latest season on a streak of that type now
     (clubs no longer in the league are left out - their "current" streak
-    is frozen at their last match); End Date is "Latest Match".
+    is frozen at their last match); End Date is "Latest Match". "In the
+    latest season" is judged on all of a team's matches, before stage
+    filters (fixed 2026-09-30: with Knock-Out Stage picked before any
+    knockout of the new season, the list came up empty). Old runs can
+    still head an active list - e.g. Crvena Zvezda's knockout unbeaten 17
+    dates from around 1991 and is genuinely unbroken; kept as-is.
   - Same columns/stats, sorting, chevron match lists (each row's own team
     highlighted) and Home/Away filter as the one-team table; Continental
     also applies Competition Stage and League Filters' Exclude Qualifiers
