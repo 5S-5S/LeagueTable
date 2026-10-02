@@ -3628,15 +3628,25 @@ html.search-mode .header {
     background: none;
 }
 
-html.search-mode .header-content > :not(.dark-mode-toggle) {
+html.search-mode .header-content > :not(.header-actions) {
     display: none !important;
 }
 
-html.search-mode .dark-mode-toggle {
+html.search-mode .header-actions {
     position: fixed;
     top: 1rem;
     right: 1rem;
     z-index: 1001;
+}
+
+/* Search mode before any question (?search=none, from the Search
+   button): the bar only - no answer, no results */
+html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header) {
+    display: none !important;
+}
+
+html.search-mode[data-search-view="none"] .search-mode-bar {
+    padding-bottom: 1.75rem;
 }
 
 html.search-mode #teamDashboardHeader,
@@ -3755,4 +3765,54 @@ html.search-mode .search-answer {
 
 .search-answer-text {
     font-size: 1.15rem;
+}
+
+/* Header: the Search / Filters switch beside the dark mode toggle */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.search-mode-switch {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-mode-switch:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* In search mode it sits on the light page, beside the pinned toggle */
+html.search-mode .search-mode-switch {
+    background: white;
+    border-color: #ccc;
+    color: #047857;
+}
+
+html.search-mode .search-mode-switch:hover {
+    background: #f0fdfa;
+}
+
+html.search-mode body[data-theme="dark"] .search-mode-switch {
+    background: #333333;
+    border-color: #555;
+    color: #6ee7b7;
+}
+
+/* Phone width: the title needs the row, so the toggle and the Search
+   button stack (toggle on top, where it always was) */
+html:not(.search-mode) .header-actions {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    align-self: flex-end; /* low in the header, clear of the pinned ▼ button */
 }

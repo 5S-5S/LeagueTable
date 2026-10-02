@@ -1813,7 +1813,8 @@ body {
 
 html.search-mode .search-mode-bar {
     display: block;
-    padding: 1.5rem 2rem 0;
+    /* clear of the Filters button and dark mode toggle pinned top-right */
+    padding: 3.25rem 2rem 0;
 }
 
 html.search-mode .search-answer {
@@ -1840,15 +1841,25 @@ html.search-mode .header {
     background: none;
 }
 
-html.search-mode .header-content > :not(.dark-mode-toggle) {
+html.search-mode .header-content > :not(.header-actions) {
     display: none !important;
 }
 
-html.search-mode .dark-mode-toggle {
+html.search-mode .header-actions {
     position: fixed;
     top: 1rem;
     right: 1rem;
     z-index: 1001;
+}
+
+/* Search mode before any question (?search=none, from the Search
+   button): the bar only - no answer, no results */
+html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header) {
+    display: none !important;
+}
+
+html.search-mode[data-search-view="none"] .search-mode-bar {
+    padding-bottom: 1.75rem;
 }
 
 html.search-mode #teamDashboardHeader,
@@ -1948,4 +1959,46 @@ html.search-mode .table-section {
 
 [data-theme="dark"] .search-answer-loading {
     color: #ccc;
+}
+
+/* Header: the Search / Filters switch beside the dark mode toggle */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.search-mode-switch {
+    padding: 0.45rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-mode-switch:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* In search mode it sits on the light page, beside the pinned toggle */
+html.search-mode .search-mode-switch {
+    background: white;
+    border-color: #ccc;
+    color: #047857;
+}
+
+html.search-mode .search-mode-switch:hover {
+    background: #f0fdfa;
+}
+
+html.search-mode body[data-theme="dark"] .search-mode-switch {
+    background: #333333;
+    border-color: #555;
+    color: #6ee7b7;
 }

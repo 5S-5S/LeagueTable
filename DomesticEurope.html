@@ -154,11 +154,15 @@
                         <h1 class="text-4xl font-bold mb-2">Domestic League Filters</h1>
                         <p class="text-lg opacity-90" id="lastDataUpdate">Last Data Update: Loading...</p>
                     </div>
-                    <div class="dark-mode-toggle">
-                        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
-                        <label for="darkModeToggle" class="toggle-label">
-                            <span class="toggle-button"></span>
-                        </label>
+                    <div class="header-actions">
+                        <!-- Search <-> filters: one page, two ways in -->
+                        <button type="button" id="searchModeSwitch" class="search-mode-switch">🔍 Search</button>
+                        <div class="dark-mode-toggle">
+                            <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                            <label for="darkModeToggle" class="toggle-label">
+                                <span class="toggle-button"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4243,7 +4247,9 @@
         // page fills its filters from the link's Copy Link parameters as
         // usual, so its own calculations produce the answer, and only that
         // answer shows under the search bar.
-        const SEARCH_MODE_VIEW = new URLSearchParams(window.location.search).get('search');
+        // 'none' = search mode before any question (the bar only); null =
+        // the normal page. The Search / Filters button switches between them.
+        let SEARCH_MODE_VIEW = new URLSearchParams(window.location.search).get('search');
 
         const SEARCH_ANSWER_LEAGUE_NAMES = {
             'premier-league': 'the Premier League',
@@ -4253,13 +4259,55 @@
             'ligue-1': 'Ligue 1'
         };
 
+        let searchBar = null;
+        function mountSearchBar(query, scope) {
+            if (searchBar) return searchBar;
+            searchBar = LeagueSearch.mount(document.getElementById('searchModeBar'), { query, scope });
+            return searchBar;
+        }
+
         function initSearchMode() {
+            const switchButton = document.getElementById('searchModeSwitch');
+            if (switchButton) switchButton.addEventListener('click', () => setSearchMode(!SEARCH_MODE_VIEW));
+            updateSearchModeSwitch();
             if (!SEARCH_MODE_VIEW) return;
             const params = new URLSearchParams(window.location.search);
-            LeagueSearch.mount(document.getElementById('searchModeBar'), {
-                query: params.get('q') || '',
-                scope: params.get('scope') || ''
-            });
+            mountSearchBar(params.get('q') || '', params.get('scope') || '');
+        }
+
+        function updateSearchModeSwitch() {
+            const switchButton = document.getElementById('searchModeSwitch');
+            if (!switchButton) return;
+            switchButton.textContent = SEARCH_MODE_VIEW ? '⚙️ Filters' : '🔍 Search';
+            switchButton.title = SEARCH_MODE_VIEW ? 'Show the tabs and filters' : 'Ask a question instead';
+        }
+
+        // Switch without reloading. Search -> filters: the page already
+        // holds the question's filters (applied from the link), so the tabs
+        // come back set to it. Filters -> search: an empty bar for a new
+        // question. The address follows, so a refresh keeps the mode.
+        function setSearchMode(on) {
+            const root = document.documentElement;
+            if (on) {
+                SEARCH_MODE_VIEW = 'none';
+                root.classList.add('search-mode');
+                root.dataset.searchView = 'none';
+                document.getElementById('searchAnswer').innerHTML = '';
+                const scope = state.selectedLeague || 'domestic';
+                const bar = mountSearchBar('', scope);
+                bar.setQuery('');
+                history.replaceState(null, '', `${window.location.pathname}?search=none&scope=${encodeURIComponent(bar.scope())}`);
+                window.scrollTo(0, 0);
+                const input = document.querySelector('#searchModeBar input');
+                if (input) input.focus();
+            } else {
+                SEARCH_MODE_VIEW = null;
+                root.classList.remove('search-mode');
+                delete root.dataset.searchView;
+                history.replaceState(null, '', window.location.pathname);
+                window.scrollTo(0, 0);
+            }
+            updateSearchModeSwitch();
         }
 
         // One-line answer above the results, worded by search.js from what
@@ -4269,7 +4317,7 @@
         // updateTable(), { finder } from Match Finder, { seasons } from
         // Team Seasons' rows, { lastTime } from Last Time When's results.
         function updateSearchAnswer(from) {
-            if (!SEARCH_MODE_VIEW) return;
+            if (!SEARCH_MODE_VIEW || SEARCH_MODE_VIEW === 'none') return;
             const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'last-time-when': 'lastTime', 'team-streaks': 'streaks' }[SEARCH_MODE_VIEW] || 'table';
             if (!(source in from)) return;
             const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, lastTime, streaks } = from;
