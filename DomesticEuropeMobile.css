@@ -3730,3 +3730,113 @@ html:not(.search-mode) .header-actions {
 [data-theme="dark"] .streak-ended-note {
     color: #ccc;
 }
+
+/* Match Finder - Most Recent: Team 1's last win / draw / loss cards above
+   the table (Last Time When's overview). A card filters to its result. */
+.match-finder-last-results {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.match-finder-last-results.hidden {
+    display: none;
+}
+
+.mf-last-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.75rem 0.5rem;
+    border-radius: 0.75rem;
+    border: 2px solid transparent;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.mf-last-card:hover {
+    transform: translateY(-1px);
+}
+
+.mf-last-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.mf-last-win .mf-last-label { color: #047857; }
+.mf-last-draw .mf-last-label { color: #6b7280; }
+.mf-last-loss .mf-last-label { color: #dc2626; }
+
+.mf-last-win.active { border-color: #059669; background: #f0fdf4; }
+.mf-last-draw.active { border-color: #9ca3af; background: #f9fafb; }
+.mf-last-loss.active { border-color: #dc2626; background: #fef2f2; }
+
+.mf-last-score {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.9rem;
+}
+
+.mf-last-date,
+.mf-last-none {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .mf-last-card {
+    background: #333333;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .mf-last-score {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] .mf-last-date,
+[data-theme="dark"] .mf-last-none,
+[data-theme="dark"] .mf-last-draw .mf-last-label {
+    color: #ccc;
+}
+
+[data-theme="dark"] .mf-last-win .mf-last-label { color: #6ee7b7; }
+[data-theme="dark"] .mf-last-loss .mf-last-label { color: #fca5a5; }
+[data-theme="dark"] .mf-last-card.active { background: #2a2a2a; }
+
+/* Phone width: three narrow cards - smaller type, tighter padding */
+.match-finder-last-results {
+    gap: 0.4rem;
+}
+
+.mf-last-card {
+    padding: 0.5rem 0.3rem;
+    border-radius: 0.6rem;
+}
+
+.mf-last-label {
+    font-size: 0.58rem;
+}
+
+.mf-last-score {
+    font-size: 0.66rem;
+    line-height: 1.25;
+}
+
+.mf-last-date,
+.mf-last-none {
+    font-size: 0.58rem;
+}
+
+/* Most Recent's Result dropdown and Team 1 - Opponent score, side by side */
+.match-finder-recent-filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: end;
+}

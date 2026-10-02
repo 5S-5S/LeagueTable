@@ -998,7 +998,8 @@
     ];
     const MATCH_FINDER_LABELS = {
         'victories': 'Biggest victories', 'defeats': 'Biggest defeats', 'draws': 'Highest-scoring draws',
-        'totalGoals': 'Most total goals', 'leastGoals': 'Least total goals', 'scoreline': 'Scoreline'
+        'totalGoals': 'Most total goals', 'leastGoals': 'Least total goals', 'scoreline': 'Scoreline',
+        'recent': 'Most recent'
     };
     // Team Seasons' Champions League progressions ("how far they got")
     const CONTINENTAL_STAGE_PATTERNS = [
@@ -1503,12 +1504,18 @@
                 /\b(finish(ed)?|top \d|runners? up|relegated|titles?)\b/.test(text)) {
                 return { view: 'team-seasons', finish: detectFinish(text.replace(/·/g, 'league')), location };
             }
-            // Which result: lost first ("were beaten by"), then drew, then won
+            // Which result: "didn't win" / "didn't lose" first, then lost
+            // ("were beaten by"), drew, won. Answered by Match Finder's Most
+            // Recent (newest first); a scoreline becomes its Team 1 -
+            // Opponent score ("lost 5-0" = 0-5 from Team 1's side).
             let result = 'any';
-            if (/\b(lost|lose|loses|losing|loss|defeat(ed)? by|beaten by|were beaten|was beaten)\b/.test(text)) result = 'loss';
+            // ("didn't" can arrive as "didnt" or "didn t" once punctuation goes)
+            if (/\b(didn\W?\s?t|did not|failed to|fail to|without|not) (win|beat|winning|beating)\b|\bwinless\b/.test(text)) result = 'not-win';
+            else if (/\b(didn\W?\s?t|did not|without|not) (lose|losing)\b|\b(avoided|avoid) defeat\b|\bunbeaten\b/.test(text)) result = 'not-loss';
+            else if (/\b(lost|lose|loses|losing|loss|defeat(ed)? by|beaten by|were beaten|was beaten)\b/.test(text)) result = 'loss';
             else if (/\b(drew|draws?|drawn|tied|level)\b/.test(text)) result = 'draw';
             else if (/\b(beat|beaten|won|wins?|winning|victory|defeated|thrashed)\b/.test(text)) result = 'win';
-            return { view: 'last-time-when', result, location };
+            return { view: 'match-finder', category: 'recent', result, lastTime: true, location };
         }
         let category = null;
         if (scoreline) category = 'scoreline';
@@ -2023,16 +2030,30 @@
     const MATCH_FINDER_TIE_LABELS = {
         'victories': 'Biggest aggregate wins', 'defeats': 'Biggest aggregate defeats',
         'draws': 'Highest-scoring aggregate draws', 'totalGoals': 'Most aggregate goals',
-        'leastGoals': 'Fewest aggregate goals', 'scoreline': 'Aggregate scoreline'
+        'leastGoals': 'Fewest aggregate goals', 'scoreline': 'Aggregate scoreline',
+        'recent': 'Most recent ties'
     };
 
     // Match Finder (needs Team 1). Single matches, or two-legged ties on
     // aggregate (Champions League, "aggregate" / "two-legged"). A
     // scoreline is home-away for single matches, Team 1-opponent for ties.
-    function matchFinderResult(comp, t1, opponents, parsed, category) {
+    function matchFinderResult(comp, t1, opponents, parsed, category, lastTime) {
         const f = parsed.filters;
         const tie = comp.continental && f.tieMode;
         const params = { t1, t2: opponents };
+        // Most Recent's result, relative to Team 1. A match decided on
+        // penalties is a draw at full time, so with penalties it's left out.
+        const result = lastTime && lastTime.result !== 'any' && category === 'recent' && !f.penalties ? lastTime.result : '';
+        if (result) params.res = result;
+        // A score from Team 1's side: the bigger number is the winner's
+        let recentScore = null;
+        if (lastTime && category === 'recent' && parsed.scoreline) {
+            const { home, away } = parsed.scoreline;
+            const hi = Math.max(home, away), lo = Math.min(home, away);
+            recentScore = lastTime.result === 'loss' ? [lo, hi] : (lastTime.result === 'win' ? [hi, lo] : [home, away]);
+            params.t1g = recentScore[0];
+            params.og = recentScore[1];
+        }
         if (parsed.season !== null) params.season = seasonKey(parsed.season);
         else if (parsed.eras[comp.key]) params.season = parsed.eras[comp.key];
         else {
@@ -2062,9 +2083,20 @@
             : (tie ? MATCH_FINDER_TIE_LABELS : MATCH_FINDER_LABELS)[category];
         const who = opponents.length ? `${t1} vs ${opponentLabel(opponents).replace(/^the /, '')}` : t1;
         const parts = filterDetailParts(parsed, comp, 'match-finder');
+        // "Last time Arsenal FC beat Chelsea FC"
+        const lastTimeTitle = () => {
+            const opponent = opponents.length ? ` ${opponentLabel(opponents)}` : '';
+            const verb = {
+                win: opponent ? `beat${opponent}` : 'won', loss: opponent ? `lost to${opponent}` : 'lost',
+                draw: opponent ? `drew with${opponent}` : 'drew', any: opponent ? `played${opponent}` : 'played',
+                'not-win': opponent ? `didn't beat${opponent}` : "didn't win",
+                'not-loss': opponent ? `didn't lose to${opponent}` : "didn't lose"
+            }[lastTime.result || 'any'];
+            return `Last time ${t1} ${verb}${scoreline ? ` ${scoreline.home}-${scoreline.away}` : ''}`;
+        };
         return {
-            kind: 'match-finder', icon: '🎯', comp,
-            title: `${who} · ${label}`,
+            kind: 'match-finder', icon: lastTime ? '🔍' : '🎯', comp,
+            title: lastTime ? lastTimeTitle() : `${who} · ${label}`,
             detail: joinDetail([
                 category === 'scoreline' && !tie ? 'Home score - away score' : (tie ? 'Two-legged ties' : 'Match Finder'),
                 ...parts
@@ -2106,7 +2138,7 @@
                 break;
             case 'match-finder':
                 // Match Finder needs a team to look from
-                if (t1) primary.push(matchFinderResult(comp, t1, opponents, parsed, intent.category));
+                if (t1) primary.push(matchFinderResult(comp, t1, opponents, parsed, intent.category, intent.lastTime ? intent : null));
                 break;
             case 'team-seasons': {
                 const { rank, stage } = intent.finish;
@@ -2232,6 +2264,9 @@
         if (results.length === 0) {
             if (parsed.intent.view === 'last-time-when' && parsed.mentions.length === 0) {
                 return { results: [], message: 'Last Time When looks from one team\'s side - add a team, e.g. "last time Arsenal beat Chelsea".' };
+            }
+            if (parsed.intent.view === 'match-finder' && parsed.intent.lastTime && parsed.mentions.length === 0) {
+                return { results: [], message: 'Last time questions look from one team\'s side - add a team, e.g. "last time Arsenal beat Chelsea".' };
             }
             if (parsed.intent.view === 'match-finder' && parsed.mentions.length === 0) {
                 return { results: [], message: 'Match Finder looks from one team\'s side - add a team, e.g. "Arsenal biggest wins".' };
@@ -2435,6 +2470,56 @@
             return `${score} ${where} ${b(opponentOf(entry))} ${when}`;
         };
         const nothing = what => ({ crestTeam: ctx.team1, html: `No ${what} found for ${team1}${scope}.` });
+
+        // Most Recent: "The last time Arsenal FC beat Chelsea FC at home in
+        // the Premier League was ..." (Last Time When's answer)
+        if (finder.category === 'recent') {
+            // The page's filters now, not the question's: a card or the
+            // Result dropdown may have changed them since
+            const res = finder.result || params.get('res') || 'any';
+            const opp = ctx.opponents.length
+                ? ` ${singleOpponent ? b(ctx.opponents[0]) : escapeSearchHtml(opponentLabel(ctx.opponents))}` : '';
+            const tieWord = tie ? ' a tie' : '';
+            const action = {
+                win: opp ? `beat${opp}${tie ? ' in a tie' : ''}` : `won${tieWord}`,
+                loss: opp ? `lost${tieWord} to${opp}` : `lost${tieWord}`,
+                draw: opp ? `drew${tieWord} with${opp}` : `drew${tieWord}`,
+                any: opp ? `played${opp}` : `played${tieWord}`,
+                'not-win': opp ? `failed to beat${opp}` : 'failed to win',
+                'not-loss': opp ? `avoided defeat against${opp}` : 'avoided defeat'
+            }[res] || 'played';
+            // "lost 5-0" (winner's goals first), "won 4-1", "drew 2-2"
+            const goals = (now, asked) => (now === undefined ? asked : (now === '' ? null : now));
+            const t1g = goals(finder.team1Goals, params.get('t1g')), og = goals(finder.opponentGoals, params.get('og'));
+            const score = t1g !== null || og !== null
+                ? ` ${res === 'loss' ? `${og ?? 'any'}-${t1g ?? 'any'}` : `${t1g ?? 'any'}-${og ?? 'any'}`}` : '';
+            // "... in a game decided on penalties"
+            const where = `${score}${venue ? ` ${venue.trim() === 'home' ? 'at home' : 'away'}` : ''}${how ? ` in a ${unit} ${how}` : ''} ${span.replace(/ all‑time$/, '')}`;
+            const latest = results[0];
+            if (!latest) {
+                const never = {
+                    win: opp ? `beaten${opp}` : 'won', loss: opp ? `lost to${opp}` : 'lost',
+                    draw: opp ? `drawn with${opp}` : 'drawn', any: opp ? `played${opp}` : 'played',
+                    'not-win': opp ? `failed to beat${opp}` : 'failed to win',
+                    'not-loss': opp ? `avoided defeat against${opp}` : 'avoided defeat'
+                }[res] || 'played';
+                return { crestTeam: ctx.team1, html: `${team1} have never ${never}${where}.` };
+            }
+            const date = new Date(tie ? latest.lastLegDate : latest.match.dateObj);
+            const days = Math.floor((Date.now() - date) / 86400000);
+            const ago = days === 0 ? 'today' : (days === 1 ? 'yesterday'
+                : (days < 730 ? `${formatNumber(days)} days ago` : `${Math.floor(days / 365.25)} years ago`));
+            const outcomeWord = { win: 'win', draw: 'draw', loss: 'defeat' }[latest.result];
+            const outcome = res === 'win' || res === 'loss' || res === 'draw' ? '' : `, a ${tie ? `${outcomeWord} on aggregate` : outcomeWord}`;
+            const m = tie ? null : latest.match;
+            const detail = tie
+                ? `${latest.team1Goals}-${latest.opponentGoals} on aggregate against ${b(opponentOf(latest))} in the ${tieRound(latest)}`
+                : `${b(m.HomeTeam)} ${m.FTHG}-${m.FTAG} ${b(m.AwayTeam)}`;
+            return {
+                crestTeam: ctx.team1,
+                html: `The last time ${team1} ${action}${where} was ${longDate(date)}: ${detail}${outcome} (${ago}).`
+            };
+        }
 
         if (results.length === 0) {
             return nothing({

@@ -583,8 +583,40 @@
                         </div>
                     </div>
 
+                    <!-- Most Recent's Result filter - only shown for that category.
+                         Relative to Team 1, so "Didn't Win" = drew or lost. -->
+                    <div id="matchFinderResultContainer" class="mb-8 collapsible-control hidden">
+                        <div class="match-finder-recent-filters">
+                        <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Result</label>
+                        <select id="matchFinderResultSelect" class="form-input">
+                            <option value="">Any Result</option>
+                            <option value="win">Win</option>
+                            <option value="draw">Draw</option>
+                            <option value="loss">Loss</option>
+                            <option value="not-win">Didn't Win (Draw or Loss)</option>
+                            <option value="not-loss">Didn't Lose (Win or Draw)</option>
+                        </select>
+                        </div>
+                        <!-- An exact score from Team 1's side, at either venue
+                             ("won 4-0", "lost 0-5"); blank = any. In tie mode,
+                             the aggregate. -->
+                        <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Score (Team 1 - Opponent)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="matchFinderRecentTeam1GoalsInput" class="form-input" style="width: 5rem; flex: none;" min="0" placeholder="Any">
+                            <span class="text-gray-500 font-bold">-</span>
+                            <input type="number" id="matchFinderRecentOpponentGoalsInput" class="form-input" style="width: 5rem; flex: none;" min="0" placeholder="Any">
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+
                     <!-- Results -->
                     <div id="matchFinderResults" class="hidden">
+                        <!-- Most Recent: Team 1's last win, draw and loss at a glance
+                             (click one to filter to it) -->
+                        <div id="matchFinderLastResults" class="match-finder-last-results hidden"></div>
                         <!-- Single Match mode: one flat sortable table -->
                         <div class="league-table" id="matchFinderSingleMatchCard">
                             <div class="text-center py-4 bg-white border-b">
@@ -1488,6 +1520,9 @@
             matchFinderAwayGoalsOnlyFilter: false,
             matchFinderExcludeQualifiers: false,
             matchFinderExcludeMainStage: false,
+            matchFinderResult: '', // Most Recent's result filter: '' | 'win' | 'draw' | 'loss' | 'not-win' | 'not-loss'
+            matchFinderRecentTeam1Goals: '', // Most Recent's exact score, Team 1's side ('' = any)
+            matchFinderRecentOpponentGoals: '',
             matchFinderHomeScoreOp: 'at-least',
             matchFinderHomeScoreValue: '',
             matchFinderAwayScoreOp: 'at-least',
@@ -2892,6 +2927,9 @@
                 if (state.matchFinderExcludeQualifiers) params.set('exQ', '1');
                 if (state.matchFinderExcludeMainStage) params.set('exM', '1');
                 if (state.matchFinderCategory) params.set('cat', state.matchFinderCategory);
+                if (state.matchFinderCategory === 'recent' && state.matchFinderResult) params.set('res', state.matchFinderResult);
+                if (state.matchFinderCategory === 'recent' && state.matchFinderRecentTeam1Goals !== '') params.set('t1g', state.matchFinderRecentTeam1Goals);
+                if (state.matchFinderCategory === 'recent' && state.matchFinderRecentOpponentGoals !== '') params.set('og', state.matchFinderRecentOpponentGoals);
                 if (state.matchFinderCategory === 'scoreline') {
                     if (state.matchFinderHomeScoreValue !== '') {
                         params.set('hsOp', state.matchFinderHomeScoreOp);
@@ -3188,9 +3226,22 @@
                             elements.matchFinderOpponentScoreValueInput.value = osVal;
                         }
                     }
+                    if (cat === 'recent' && MATCH_FINDER_RESULTS[params.get('res')]) {
+                        state.matchFinderResult = params.get('res');
+                        elements.matchFinderResultSelect.value = state.matchFinderResult;
+                    }
+                    if (cat === 'recent' && /^\d+$/.test(params.get('t1g') || '')) {
+                        state.matchFinderRecentTeam1Goals = params.get('t1g');
+                        elements.matchFinderRecentTeam1GoalsInput.value = state.matchFinderRecentTeam1Goals;
+                    }
+                    if (cat === 'recent' && /^\d+$/.test(params.get('og') || '')) {
+                        state.matchFinderRecentOpponentGoals = params.get('og');
+                        elements.matchFinderRecentOpponentGoalsInput.value = state.matchFinderRecentOpponentGoals;
+                    }
                     renderMatchFinderCategoryButtons();
                     updateMatchFinderScorelineVisibility();
                     updateMatchFinderScorelineLabels();
+                    updateMatchFinderResultVisibility();
                     calculateMatchFinder();
                 }
             }
@@ -3517,6 +3568,11 @@
             matchFinderCategoryContainer: document.getElementById('matchFinderCategoryContainer'),
             matchFinderCategoryButtons: document.getElementById('matchFinderCategoryButtons'),
             matchFinderScorelineContainer: document.getElementById('matchFinderScorelineContainer'),
+            matchFinderResultContainer: document.getElementById('matchFinderResultContainer'),
+            matchFinderResultSelect: document.getElementById('matchFinderResultSelect'),
+            matchFinderRecentTeam1GoalsInput: document.getElementById('matchFinderRecentTeam1GoalsInput'),
+            matchFinderRecentOpponentGoalsInput: document.getElementById('matchFinderRecentOpponentGoalsInput'),
+            matchFinderLastResults: document.getElementById('matchFinderLastResults'),
             matchFinderScorelineSingleControls: document.getElementById('matchFinderScorelineSingleControls'),
             matchFinderScorelineTieControls: document.getElementById('matchFinderScorelineTieControls'),
             matchFinderHomeScoreOpSelect: document.getElementById('matchFinderHomeScoreOpSelect'),
@@ -5047,7 +5103,13 @@
                 matches: matchHistoryResult ? matchHistoryResult.matches : null,
                 table: tableResult && !grouped ? tableResult.tableData : null,
                 seasonMatches: grouped ? state.seasonMatchesApiCache : null,
-                finder: isFinder ? { mode: state.matchFinderMode || 'single', category: state.matchFinderCategory, results: finderResults } : null,
+                finder: isFinder ? {
+                    mode: state.matchFinderMode || 'single', category: state.matchFinderCategory, results: finderResults,
+                    // Most Recent's filters as they are now - a last win / draw /
+                    // loss card or the dropdowns can change them after the search
+                    result: state.matchFinderResult || 'any',
+                    team1Goals: state.matchFinderRecentTeam1Goals, opponentGoals: state.matchFinderRecentOpponentGoals
+                } : null,
                 lastTime: isLastTime ? lastTime : null,
                 streaks: isStreaks ? streaks : null,
                 // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
@@ -6910,8 +6972,29 @@
                     state.matchFinderTieSortConfig = { key: null, direction: null };
                     renderMatchFinderCategoryButtons();
                     updateMatchFinderScorelineVisibility();
+                    updateMatchFinderResultVisibility();
                     calculateMatchFinder();
                 }
+            });
+            elements.matchFinderResultSelect.addEventListener('change', (e) => {
+                state.matchFinderResult = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderRecentTeam1GoalsInput.addEventListener('input', (e) => {
+                state.matchFinderRecentTeam1Goals = e.target.value;
+                calculateMatchFinder();
+            });
+            elements.matchFinderRecentOpponentGoalsInput.addEventListener('input', (e) => {
+                state.matchFinderRecentOpponentGoals = e.target.value;
+                calculateMatchFinder();
+            });
+            // A last win / draw / loss card filters to that result (again: all)
+            elements.matchFinderLastResults.addEventListener('click', (e) => {
+                const card = e.target.closest('[data-result]');
+                if (!card) return;
+                state.matchFinderResult = state.matchFinderResult === card.dataset.result ? '' : card.dataset.result;
+                elements.matchFinderResultSelect.value = state.matchFinderResult;
+                calculateMatchFinder();
             });
             elements.matchFinderModeButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -7794,8 +7877,15 @@
             { key: 'draws', label: 'Highest-Scoring Draws' },
             { key: 'totalGoals', label: 'Most Total Goals' },
             { key: 'leastGoals', label: 'Least Total Goals' },
-            { key: 'scoreline', label: 'Specific Scoreline' }
+            { key: 'scoreline', label: 'Specific Scoreline' },
+            { key: 'recent', label: 'Most Recent' }
         ];
+
+        // Most Recent's Result filter, relative to Team 1
+        const MATCH_FINDER_RESULTS = {
+            'win': ['win'], 'draw': ['draw'], 'loss': ['loss'],
+            'not-win': ['draw', 'loss'], 'not-loss': ['win', 'draw']
+        };
 
         // Double-Legged Tie mode display labels for the same 6 category
         // keys - underlying classification logic is identical, only the
@@ -7806,7 +7896,8 @@
             draws: 'Highest-Scoring Aggregate Ties',
             totalGoals: 'Most Total Aggregate Goals',
             leastGoals: 'Fewest Aggregate Goals',
-            scoreline: 'Specific Aggregate Scoreline'
+            scoreline: 'Specific Aggregate Scoreline',
+            recent: 'Most Recent Ties'
         };
 
         const MATCH_FINDER_MODES = [
@@ -7857,6 +7948,11 @@
             }
         }
 
+        // Most Recent's Result dropdown - only shown for that category
+        function updateMatchFinderResultVisibility() {
+            elements.matchFinderResultContainer.classList.toggle('hidden', state.matchFinderCategory !== 'recent');
+        }
+
         // Team 1/Opponent labels for the Tie mode scoreline inputs - shows
         // the actual team names once known instead of a generic "Team 1"/
         // "Opponent", same as the rest of Match Finder already does (e.g.
@@ -7902,6 +7998,7 @@
             state.matchFinderOpponentScoreOp = 'at-least';
             state.matchFinderOpponentScoreValue = '';
             state.matchFinderCategory = 'victories';
+            state.matchFinderResult = '';
             state.matchFinderSortConfig = { key: null, direction: null };
             state.matchFinderTieSortConfig = { key: null, direction: null };
             state.matchFinderPage = 1;
@@ -7933,7 +8030,13 @@
             elements.matchFinderTeam1ScoreValueInput.value = '';
             elements.matchFinderOpponentScoreOpSelect.value = 'at-least';
             elements.matchFinderOpponentScoreValueInput.value = '';
+            elements.matchFinderResultSelect.value = '';
+            state.matchFinderRecentTeam1Goals = '';
+            state.matchFinderRecentOpponentGoals = '';
+            elements.matchFinderRecentTeam1GoalsInput.value = '';
+            elements.matchFinderRecentOpponentGoalsInput.value = '';
             updateMatchFinderScorelineVisibility();
+            updateMatchFinderResultVisibility();
             updateMatchFinderScorelineLabels();
             renderMatchFinderModeButtons();
             renderMatchFinderCategoryButtons();
@@ -8164,9 +8267,59 @@
                     });
                 }
                 classified.sort((a, b) => b.match.dateObj - a.match.dateObj);
+            } else if (state.matchFinderCategory === 'recent') {
+                // Newest first; the cards come from every result, the table
+                // from the Result filter
+                classified.sort((a, b) => b.match.dateObj - a.match.dateObj);
+                renderMatchFinderLastResults(classified);
+                const wanted = MATCH_FINDER_RESULTS[state.matchFinderResult];
+                if (wanted) classified = classified.filter(entry => wanted.includes(entry.result));
+                if (state.matchFinderRecentTeam1Goals !== '') classified = classified.filter(entry => entry.team1Goals === parseInt(state.matchFinderRecentTeam1Goals));
+                if (state.matchFinderRecentOpponentGoals !== '') classified = classified.filter(entry => entry.opponentGoals === parseInt(state.matchFinderRecentOpponentGoals));
             }
+            if (state.matchFinderCategory !== 'recent') elements.matchFinderLastResults.classList.add('hidden');
 
             updateMatchFinderTable(classified);
+        }
+
+        // Most Recent: Team 1's last win, draw and loss (newest-first
+        // entries in), each with how long ago - Last Time When's overview
+        function renderMatchFinderLastResults(classified, isTie) {
+            const el = elements.matchFinderLastResults;
+            const labels = isTie
+                ? [['win', 'Last Tie Won'], ['draw', 'Last Level Tie'], ['loss', 'Last Tie Lost']]
+                : [['win', 'Last Win'], ['draw', 'Last Draw'], ['loss', 'Last Loss']];
+            const cards = labels.map(([result, label]) => {
+                const entry = classified.find(e => e.result === result);
+                const active = state.matchFinderResult === result ? ' active' : '';
+                if (!entry) {
+                    return `<button type="button" class="mf-last-card mf-last-${result}${active}" data-result="${result}">
+                        <span class="mf-last-label">${label}</span>
+                        <span class="mf-last-none">None found</span>
+                    </button>`;
+                }
+                // A tie: Team 1's aggregate against the opponent, dated by its last leg
+                let score, date;
+                if (isTie) {
+                    const b = entry.breakdown;
+                    const opponent = b.teamA === state.matchFinderTeam1 ? b.teamB : b.teamA;
+                    score = `${state.matchFinderTeam1} ${entry.team1Goals}-${entry.opponentGoals} ${opponent} (agg.)`;
+                    date = entry.lastLegDate;
+                } else {
+                    const m = entry.match;
+                    score = `${m.HomeTeam} ${parseInt(m.FTHG) || 0}-${parseInt(m.FTAG) || 0} ${m.AwayTeam}`;
+                    date = m.dateObj;
+                }
+                const days = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
+                const ago = days === 0 ? 'today' : `${days.toLocaleString()} day${days === 1 ? '' : 's'} ago`;
+                return `<button type="button" class="mf-last-card mf-last-${result}${active}" data-result="${result}" title="Show only these">
+                    <span class="mf-last-label">${label}</span>
+                    <span class="mf-last-score">${score}</span>
+                    <span class="mf-last-date">${date.toLocaleDateString()} · ${ago}</span>
+                </button>`;
+            });
+            el.innerHTML = cards.join('');
+            el.classList.remove('hidden');
         }
 
         function matchFinderSubtitle(count) {
@@ -8449,7 +8602,15 @@
                     });
                 }
                 classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'recent') {
+                classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
+                renderMatchFinderLastResults(classified, true);
+                const wanted = MATCH_FINDER_RESULTS[state.matchFinderResult];
+                if (wanted) classified = classified.filter(t => wanted.includes(t.result));
+                if (state.matchFinderRecentTeam1Goals !== '') classified = classified.filter(t => t.team1Goals === parseInt(state.matchFinderRecentTeam1Goals));
+                if (state.matchFinderRecentOpponentGoals !== '') classified = classified.filter(t => t.opponentGoals === parseInt(state.matchFinderRecentOpponentGoals));
             }
+            if (state.matchFinderCategory !== 'recent') elements.matchFinderLastResults.classList.add('hidden');
 
             updateMatchFinderTieResults(classified);
         }
@@ -8472,7 +8633,8 @@
             elements.matchFinderTieResultsTitle.textContent = matchFinderTieSubtitle(classified.length);
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
-            const valueLabel = isMarginCategory ? 'Agg. Margin' : 'Agg. Goals';
+            const isRecent = state.matchFinderCategory === 'recent';
+            const valueLabel = isRecent ? 'Result' : (isMarginCategory ? 'Agg. Margin' : 'Agg. Goals');
             const team1 = state.matchFinderTeam1;
 
             elements.matchFinderTieTableHeader.innerHTML = `
@@ -8490,7 +8652,11 @@
                 const firstLeg = t.legMatches[0];
 
                 let valueClass, valueText, valueSort;
-                if (isMarginCategory) {
+                if (isRecent) {
+                    valueClass = t.result === 'win' ? 'win-score' : t.result === 'loss' ? 'text-red-600' : 'text-gray-400';
+                    valueText = t.result === 'win' ? 'W' : t.result === 'loss' ? 'L' : 'D';
+                    valueSort = t.result === 'win' ? 2 : t.result === 'draw' ? 1 : 0;
+                } else if (isMarginCategory) {
                     valueClass = t.margin > 0 ? 'win-score' : t.margin < 0 ? 'text-red-600' : 'text-gray-400';
                     valueText = `${t.margin > 0 ? '+' : ''}${t.margin}`;
                     valueSort = t.margin;
@@ -8707,7 +8873,8 @@
             elements.matchFinderTableTitle.textContent = matchFinderSubtitle(classified.length);
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
-            const valueLabel = isMarginCategory ? 'Margin' : 'Goals';
+            const isRecent = state.matchFinderCategory === 'recent';
+            const valueLabel = isRecent ? 'Result' : (isMarginCategory ? 'Margin' : 'Goals');
 
             elements.matchFinderTableHeader.innerHTML = `
                 <th class="text-center cursor-pointer" onclick="handleMatchFinderSort('date')">Date</th>
@@ -8738,7 +8905,11 @@
                 }
 
                 let valueClass, valueText, valueSort;
-                if (isMarginCategory) {
+                if (isRecent) {
+                    valueClass = entry.result === 'win' ? 'win-score' : entry.result === 'loss' ? 'text-red-600' : 'text-gray-400';
+                    valueText = entry.result === 'win' ? 'W' : entry.result === 'loss' ? 'L' : 'D';
+                    valueSort = entry.result === 'win' ? 2 : entry.result === 'draw' ? 1 : 0;
+                } else if (isMarginCategory) {
                     valueClass = entry.margin > 0 ? 'win-score' : entry.margin < 0 ? 'text-red-600' : 'text-gray-400';
                     valueText = `${entry.margin > 0 ? '+' : ''}${entry.margin}`;
                     valueSort = entry.margin;
