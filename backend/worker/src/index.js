@@ -102,6 +102,19 @@ async function getCacheVersion(env) {
     return (await env.CACHE.get('cache-version')) || '0';
 }
 
+// KV keys are capped at 512 bytes; a long team list (head-to-head against
+// every club from a country - 30 German clubs) goes past it and KV throws.
+// Over the cap, the key becomes a SHA-256 of itself: still unique per
+// request, and shorter keys are left alone so existing entries still hit.
+const KV_KEY_MAX_BYTES = 512;
+async function kvSafeKey(key) {
+    const bytes = new TextEncoder().encode(key);
+    if (bytes.length <= KV_KEY_MAX_BYTES) return key;
+    const digest = await crypto.subtle.digest('SHA-256', bytes);
+    const hex = [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, '0')).join('');
+    return `${key.slice(0, key.indexOf(':', key.indexOf(':') + 1) + 1)}sha256:${hex}`;
+}
+
 // Wraps an expensive compute step with a KV cache keyed by an endpoint
 // name plus caller-supplied key parts (which must include every request
 // parameter that affects the result - the classic caching bug is a
@@ -111,7 +124,7 @@ async function getCacheVersion(env) {
 // requirement, so the response is still returned either way.
 async function withCache(env, keyParts, compute) {
     const version = await getCacheVersion(env);
-    const key = `v${version}:${keyParts.join(':')}`;
+    const key = await kvSafeKey(`v${version}:${keyParts.join(':')}`);
 
     const cached = await env.CACHE.get(key);
     if (cached !== null) {
