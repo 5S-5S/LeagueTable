@@ -378,303 +378,80 @@ body {
     left: 32px;
 }
 
-/* Landing Page Specific Styles */
-.hero-section {
+/* Search Page */
+.search-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+    padding: 1.25rem;
+}
+
+/* Same place and width as the sport pages' card, so the search bar
+   doesn't move between the home page and an answer */
+.search-card {
+    max-width: 72rem;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 2rem;
     text-align: center;
-    padding: 4rem 2rem;
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 900;
-    margin-bottom: 1rem;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
     background: linear-gradient(135deg, #059669, #047857);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
 
-.hero-subtitle {
-    font-size: 1.5rem;
+.search-examples {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.search-examples-label {
     color: #6b7280;
-    margin-bottom: 3rem;
-    max-width: 48rem;
-    margin-left: auto;
-    margin-right: auto;
+    font-size: 0.875rem;
 }
 
-.team-search-wrapper {
-    position: relative;
-    max-width: 36rem;
-    margin: 0 auto 2rem;
-}
-
-.team-search-box {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+.search-example {
+    border: 1px solid #d1d5db;
     background: white;
-    border-radius: 0.75rem;
-    padding: 0.5rem 1.25rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border: 2px solid transparent;
-    transition: border-color 0.3s ease;
+    color: #374151;
+    border-radius: 999px;
+    padding: 0.3rem 0.85rem;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.team-search-box:focus-within {
+.search-example:hover {
     border-color: #059669;
-}
-
-.team-search-icon {
-    font-size: 1.1rem;
-    opacity: 0.6;
-}
-
-.team-search-input {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    padding: 0.75rem 0;
-    font-size: 1.1rem;
-    color: #374151;
-}
-
-.team-search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    margin-top: 0.5rem;
-    background: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    max-height: 20rem;
-    overflow-y: auto;
-    text-align: left;
-    z-index: 10;
-}
-
-.team-search-result {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.75rem 1.25rem;
-    text-decoration: none;
-    color: #374151;
-    border-bottom: 1px solid #f3f4f6;
-    transition: background-color 0.2s ease;
-}
-
-.team-search-result:last-child {
-    border-bottom: none;
-}
-
-.team-search-result:hover {
-    background: #f0fdfa;
     color: #047857;
 }
 
-.team-search-result-logo {
-    width: 1.75rem;
-    height: 1.75rem;
-    object-fit: contain;
-    flex-shrink: 0;
-}
+@media (max-width: 640px) {
+    .search-page {
+            padding: 1.25rem;
+        }
 
-.team-search-result-name {
-    font-weight: 600;
-    flex: 1;
-}
+    /* Clear of the fixed menu button and dark mode switch */
+    .search-card {
+            padding: 4.25rem 1rem 1.5rem;
+        }
 
-.team-search-result-league {
-    font-size: 0.8rem;
-    color: #6b7280;
-    white-space: nowrap;
-}
-
-.team-search-empty {
-    padding: 1rem 1.25rem;
-    color: #6b7280;
-    font-style: italic;
-    text-align: center;
-}
-
-[data-theme="dark"] .team-search-box {
-    background: var(--bg-white);
-}
-
-[data-theme="dark"] .team-search-input {
-    color: white;
-}
-
-[data-theme="dark"] .team-search-input::placeholder {
-    color: #9ca3af;
-}
-
-[data-theme="dark"] .team-search-results {
-    background: var(--bg-white);
-}
-
-[data-theme="dark"] .team-search-result {
-    color: white;
-    border-bottom-color: #444;
-}
-
-[data-theme="dark"] .team-search-result:hover {
-    background: var(--bg-gray-50);
-    color: #10b981;
-}
-
-[data-theme="dark"] .team-search-result-league {
-    color: #9ca3af;
-}
-
-.cta-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 2rem;
-    background: linear-gradient(135deg, #059669, #047857);
-    color: white;
-    text-decoration: none;
-    border-radius: 0.75rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
-}
-
-.cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
-    background: linear-gradient(135deg, #047857, #059669);
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 2rem;
-    margin-top: 4rem;
-}
-
-@media (min-width: 768px) {
-    .features-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (min-width: 1024px) {
-    .features-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-}
-
-.feature-card {
-    background: white;
-    border-radius: 0.75rem;
-    padding: 2rem;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    border-color: #059669;
-}
-
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.feature-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 0.75rem;
-}
-
-.feature-description {
-    color: #6b7280;
-    line-height: 1.6;
-}
-
-.leagues-section {
-    background: #f9fafb;
-    border-radius: 0.75rem;
-    padding: 3rem 2rem;
-    margin-top: 4rem;
-    text-align: center;
-}
-
-.leagues-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-    margin-top: 2rem;
-}
-
-@media (min-width: 768px) {
-    .leagues-grid {
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
-}
-
-.league-badge {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    color: #374151;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.league-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-}
-
-.stats-section {
-    margin-top: 4rem;
-    text-align: center;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-@media (min-width: 768px) {
-    .stats-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-.stat-item {
-    padding: 1.5rem;
-}
-
-.stat-number {
-    font-size: 3rem;
-    font-weight: 900;
-    color: #059669;
-    display: block;
-}
-
-.stat-label {
-    color: #6b7280;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-size: 0.875rem;
+    .hero-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
 }
 
 /* Dark Mode Styles */
@@ -714,34 +491,24 @@ body {
     color: #9ca3af;
 }
 
-/* Landing page specific dark mode styles */
-[data-theme="dark"] .hero-subtitle {
-    color: #ccc;
-}
-
-[data-theme="dark"] .feature-card {
-    background: var(--bg-white);
-}
-
-[data-theme="dark"] .feature-title {
-    color: white;
-}
-
-[data-theme="dark"] .feature-description {
-    color: #ccc;
-}
-
-[data-theme="dark"] .leagues-section {
+/* Search page dark mode styles */
+[data-theme="dark"] .search-card {
     background: var(--bg-gray-50);
 }
 
-[data-theme="dark"] .league-badge {
+[data-theme="dark"] .search-example {
     background: var(--bg-white);
+    border-color: #555;
     color: white;
 }
 
-[data-theme="dark"] .stat-label {
+[data-theme="dark"] .search-examples-label {
     color: #ccc;
+}
+
+[data-theme="dark"] .search-example:hover {
+    border-color: #10b981;
+    color: #10b981;
 }
 
 /* Dark mode text colors */

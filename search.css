@@ -1,0 +1,310 @@
+/* Shared search bar (search.js) - index.html and the sport pages' search mode */
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 2px solid #e5e7eb;
+    transition: border-color 0.3s ease;
+    overflow: hidden;
+}
+
+.search-bar:focus-within {
+    border-color: #059669;
+}
+
+/* The sport/competition dropdown, sitting in the bar's left corner */
+.search-scope {
+    flex: none;
+    max-width: 11rem;
+    align-self: stretch;
+    border: none;
+    border-right: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #047857;
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0 0.75rem;
+    cursor: pointer;
+    outline: none;
+    text-overflow: ellipsis;
+}
+
+.search-scope:focus-visible {
+    background: #ecfdf5;
+}
+
+.search-input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0.9rem 1rem;
+    font-size: 1.1rem;
+    color: #374151;
+}
+
+.search-submit {
+    flex: none;
+    border: none;
+    background: transparent;
+    font-size: 1.1rem;
+    padding: 0 1rem;
+    align-self: stretch;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.search-submit:hover {
+    opacity: 1;
+}
+
+.search-mount {
+    position: relative;
+    text-align: left;
+}
+
+/* Floats over whatever is under the bar (the examples, or an answer) */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin-top: 0.5rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+    text-align: left;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.search-result {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.75rem 1.25rem;
+    text-decoration: none;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+}
+
+.search-result:last-child {
+    border-bottom: none;
+}
+
+.search-result:hover,
+.search-result.active {
+    background: #f0fdfa;
+    color: #047857;
+}
+
+.search-result-crest,
+.search-result-icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+}
+
+.search-result-crest {
+    object-fit: contain;
+}
+
+.search-result-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.search-result-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-result-title {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.search-result-detail {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.search-result-comp {
+    font-size: 0.8rem;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+.search-empty {
+    padding: 1rem 1.25rem;
+    color: #6b7280;
+    font-style: italic;
+    text-align: center;
+}
+
+@media (max-width: 640px) {
+    .search-scope {
+            max-width: 7.5rem;
+            font-size: 0.85rem;
+            padding: 0 0.5rem;
+        }
+
+    .search-input {
+            font-size: 1rem;
+            padding: 0.8rem 0.75rem;
+        }
+
+    .search-submit {
+            padding: 0 0.75rem;
+        }
+
+    .search-result {
+            padding: 0.7rem 0.9rem;
+            flex-wrap: wrap;
+        }
+
+    /* The competition drops under the title on narrow screens */
+        .search-result-comp {
+            flex-basis: 100%;
+            padding-left: 2.65rem;
+            margin-top: -0.25rem;
+        }
+}
+
+/* The empty search bar's guide: example questions by kind, and words to
+   add to any question */
+.search-guide-group {
+    padding: 0.6rem 1.25rem 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.search-guide-icon {
+    display: inline-block;
+    width: 1.35rem;
+    letter-spacing: 0;
+}
+
+.search-result.search-guide-item {
+    padding: 0.45rem 1.25rem 0.45rem 2.6rem;
+    border-bottom: none;
+}
+
+.search-guide-item .search-result-title {
+    font-weight: 500;
+}
+
+.search-guide-tips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid #f3f4f6;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.search-guide-tips-label {
+    font-weight: 600;
+    margin-right: 0.25rem;
+}
+
+.search-guide-tip {
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* The answer line's small print (search mode on the sport pages), e.g.
+   pointing "Schalke Bundesliga titles" to "Schalke titles" */
+.search-answer-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-answer-note {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #6b7280;
+}
+
+.search-answer-note a {
+    color: #047857;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+/* Dark mode - fixed colors rather than the pages' --bg-* variables,
+   which index.css and DomesticEurope.css define the other way round */
+[data-theme="dark"] .search-bar,
+[data-theme="dark"] .search-results {
+    background: #333333;
+    border-color: #555;
+}
+
+[data-theme="dark"] .search-scope {
+    background: #2a2a2a;
+    color: #10b981;
+    border-right-color: #555;
+}
+
+[data-theme="dark"] .search-input,
+[data-theme="dark"] .search-result {
+    color: white;
+}
+
+[data-theme="dark"] .search-input::placeholder {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .search-result {
+    border-bottom-color: #444;
+}
+
+[data-theme="dark"] .search-result:hover,
+[data-theme="dark"] .search-result.active {
+    background: #222222;
+    color: #10b981;
+}
+
+[data-theme="dark"] .search-guide-group,
+[data-theme="dark"] .search-guide-tips {
+    color: #ccc;
+}
+
+[data-theme="dark"] .search-guide-tips {
+    border-top-color: #444;
+}
+
+[data-theme="dark"] .search-guide-tip {
+    background: #222222;
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .search-result-detail,
+[data-theme="dark"] .search-result-comp,
+[data-theme="dark"] .search-empty,
+[data-theme="dark"] .search-answer-note {
+    color: #ccc;
+}
+
+[data-theme="dark"] .search-answer-note a {
+    color: #10b981;
+}

@@ -6,6 +6,18 @@
     <title>Continental Football - League Table Statistics</title>
     <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
     <link rel="stylesheet" href="ContinentalEuropeMobile.css">
+    <link rel="stylesheet" href="search.css">
+    <script>
+        // Search mode (?search=<kind>, from the search bar): flag it before the
+        // first paint so the controls never flash up (see ContinentalEuropeMobile.css)
+        (function() {
+            const searchView = new URLSearchParams(window.location.search).get('search');
+            if (searchView) {
+                document.documentElement.classList.add('search-mode');
+                document.documentElement.dataset.searchView = searchView;
+            }
+        })();
+    </script>
 <body>
     <!-- Hamburger Menu Button -->
     <button id="hamburgerBtn" class="hamburger-btn" style="position: fixed; top: 1rem; left: 1rem; z-index: 1001; background: white; border: 1px solid #ccc; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; display: flex; flex-direction: column; gap: 0.25rem;">
@@ -83,6 +95,11 @@
 
     <div class="league-table-container">
         <div class="main-card">
+            <!-- Search mode: the search bar and a one-line answer, in place
+                 of the header and controls -->
+            <div id="searchModeBar" class="search-mode-bar"></div>
+            <div id="searchAnswer" class="search-answer"></div>
+
             <!-- Header -->
             <div class="header">
                 <div class="header-content">
@@ -90,11 +107,15 @@
                         <h1 class="text-4xl font-bold mb-2">Continental Football Filters</h1>
                         <p class="text-lg opacity-90" id="lastDataUpdate">Last Data Update: Loading...</p>
                     </div>
-                    <div class="dark-mode-toggle">
-                        <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
-                        <label for="darkModeToggle" class="toggle-label">
-                            <span class="toggle-button"></span>
-                        </label>
+                    <div class="header-actions">
+                        <!-- Search <-> filters: one page, two ways in -->
+                        <button type="button" id="searchModeSwitch" class="search-mode-switch">🔍 Search</button>
+                        <div class="dark-mode-toggle">
+                            <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
+                            <label for="darkModeToggle" class="toggle-label">
+                                <span class="toggle-button"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1101,7 +1122,7 @@
                 <div class="mb-4">
                     <h3 class="text-lg font-semibold text-gray-700 mb-3">Head-to-Head Record</h3>
 
-                    <div class="flex flex-col gap-3">
+                    <div class="flex flex-col gap-3 search-mode-hidden">
                         <div class="flex items-center gap-4">
                             <label class="flex items-center cursor-pointer">
                                 <div id="h2hHomeCheckbox" class="checkbox checked"></div>
@@ -1191,7 +1212,7 @@
                     <div class="mb-4 px-6">
                         <h3 class="text-lg font-semibold text-gray-700 mb-3">Match History</h3>
 
-                        <div class="flex flex-col gap-3">
+                        <div class="flex flex-col gap-3 search-mode-hidden">
                             <div class="flex items-center gap-4">
                                 <label class="flex items-center cursor-pointer">
                                     <div id="matchHistoryHomeCheckbox" class="checkbox checked"></div>
@@ -1278,6 +1299,7 @@
         </div>
     </div>
 
+    <script src="search.js"></script>
     <script>
         // Application state
         const state = {
@@ -3173,7 +3195,9 @@
                 }
             }
 
-            history.replaceState(null, '', window.location.pathname);
+            // In search mode the URL is the question - keep it so a reload
+            // or a shared link still shows the answer
+            if (!SEARCH_MODE_VIEW) history.replaceState(null, '', window.location.pathname);
         }
 
         // Get contrasting text color (white or black) based on background color
@@ -3997,6 +4021,7 @@
         }
 
         function displayLeagueStreaks(streaks, status, streakType, location) {
+            updateSearchAnswer({ streaks: { mode: 'league', streaks } });
             const streakName = getStreakDisplayName(streakType);
             const locationText = location === 'both' ? '' : ` (${location.charAt(0).toUpperCase() + location.slice(1)})`;
             const isActive = status === 'active';
@@ -4327,6 +4352,7 @@
         }
 
         function displayHistoricStreaksResults(streaks, team1, team2, streakType, location) {
+            updateSearchAnswer({ streaks: { mode: 'historic', streaks } });
             if (streaks.length === 0) {
                 elements.teamStreaksResults.innerHTML = `
                     <div class="text-center py-8">
@@ -4577,6 +4603,7 @@
 
         // Display streak results in table format
         function displayStreakResults(streak, team1, team2, streakType, location) {
+            updateSearchAnswer({ streaks: { mode: 'active', streak } });
             if (streak.length === 0) {
                 elements.teamStreaksResults.innerHTML = `
                     <div class="text-center py-8">
@@ -4870,7 +4897,162 @@
         }
 
         // Initialize the application
+        // --- Search mode (?search=<kind>&q=&scope=, from the search bar: h2h, team, table, match-finder, team-seasons) ---
+        // CSS (html.search-mode) hides the header, tabs and filters; the
+        // page fills its filters from the link's Copy Link parameters as
+        // usual, so its own calculations produce the answer, and only that
+        // answer shows under the search bar.
+        // 'none' = search mode before any question (the bar only); null =
+        // the normal page. The Search / Filters button switches between them.
+        let SEARCH_MODE_VIEW = new URLSearchParams(window.location.search).get('search');
+
+        const SEARCH_ANSWER_LEAGUE_NAMES = {
+            'champions-league': 'the Champions League',
+            'europa-league': 'the Europa League',
+            'conference-league': 'the Conference League'
+        };
+
+        let searchBar = null;
+        function mountSearchBar(query, scope) {
+            if (searchBar) return searchBar;
+            searchBar = LeagueSearch.mount(document.getElementById('searchModeBar'), { query, scope });
+            return searchBar;
+        }
+
+        function initSearchMode() {
+            const switchButton = document.getElementById('searchModeSwitch');
+            if (switchButton) switchButton.addEventListener('click', () => setSearchMode(!SEARCH_MODE_VIEW));
+            updateSearchModeSwitch();
+            if (!SEARCH_MODE_VIEW) return;
+            const params = new URLSearchParams(window.location.search);
+            mountSearchBar(params.get('q') || '', params.get('scope') || '');
+        }
+
+        function updateSearchModeSwitch() {
+            const switchButton = document.getElementById('searchModeSwitch');
+            if (!switchButton) return;
+            switchButton.textContent = SEARCH_MODE_VIEW ? '⚙️ Filters' : '🔍 Search';
+            switchButton.title = SEARCH_MODE_VIEW ? 'Show the tabs and filters' : 'Ask a question instead';
+        }
+
+        // Switch without reloading. Search -> filters: the page already
+        // holds the question's filters (applied from the link), so the tabs
+        // come back set to it. Filters -> search: an empty bar for a new
+        // question. The address follows, so a refresh keeps the mode.
+        function setSearchMode(on) {
+            const root = document.documentElement;
+            if (on) {
+                SEARCH_MODE_VIEW = 'none';
+                root.classList.add('search-mode');
+                root.dataset.searchView = 'none';
+                document.getElementById('searchAnswer').innerHTML = '';
+                const scope = 'champions-league';
+                const bar = mountSearchBar('', scope);
+                bar.setQuery('');
+                history.replaceState(null, '', `${window.location.pathname}?search=none&scope=${encodeURIComponent(bar.scope())}`);
+                window.scrollTo(0, 0);
+                const input = document.querySelector('#searchModeBar input');
+                if (input) input.focus();
+            } else {
+                SEARCH_MODE_VIEW = null;
+                root.classList.remove('search-mode');
+                delete root.dataset.searchView;
+                history.replaceState(null, '', window.location.pathname);
+                window.scrollTo(0, 0);
+            }
+            updateSearchModeSwitch();
+        }
+
+        // One-line answer above the results, worded by search.js from what
+        // this page just worked out (it reads the filters off the URL).
+        // Each tab passes what it just worked out, and only the search's
+        // own view is answered: from = { table, h2h, matchHistory } from
+        // updateTable(), { finder } from Match Finder, { seasons } from
+        // Team Seasons' rows, { lastTime } from Last Time When's results.
+        function updateSearchAnswer(from) {
+            if (!SEARCH_MODE_VIEW || SEARCH_MODE_VIEW === 'none') return;
+            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'last-time-when': 'lastTime', 'team-streaks': 'streaks' }[SEARCH_MODE_VIEW] || 'table';
+            if (!(source in from)) return;
+            const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, lastTime, streaks } = from;
+            const isFinder = SEARCH_MODE_VIEW === 'match-finder';
+            const isSeasons = SEARCH_MODE_VIEW === 'team-seasons';
+            const isLastTime = SEARCH_MODE_VIEW === 'last-time-when';
+            const isStreaks = SEARCH_MODE_VIEW === 'team-streaks';
+            const team1 = isSeasons ? state.teamSeasonsSelectedTeam
+                : (isFinder ? state.matchFinderTeam1 : (isLastTime ? state.lastTimeTeam1
+                    : (isStreaks ? elements.teamStreaksTeam1Select.value : state.selectedTeam1)));
+            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2 : (isLastTime ? state.lastTimeTeam2
+                : (isStreaks ? elements.teamStreaksTeam2Select.value : state.selectedTeam2)));
+            const extraTeam2s = isSeasons || isLastTime || isStreaks ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
+            const season = isSeasons ? state.teamSeasonsSelectedSeason
+                : (isFinder ? state.matchFinderSeason : (isLastTime || isStreaks ? '' : state.selectedSeason));
+            const league = isSeasons ? state.teamSeasonsSelectedLeague : state.selectedLeague;
+            // Season standings load as one batch (a flag per cache entry on
+            // Continental, one flag on Domestic)
+            const seasonsLoading = typeof state.seasonStandingsApiLoading === 'object' && state.seasonStandingsApiLoading
+                ? Object.values(state.seasonStandingsApiLoading).some(Boolean)
+                : !!state.seasonStandingsApiLoading;
+            const seasonsLoaded = state.seasonStandingsApiCacheKey !== undefined
+                ? !!state.seasonStandingsApiCacheKey
+                : Object.keys(state.seasonStandingsApiCache || {}).length > 0;
+            const grouped = !!(tableResult && tableResult.isGroupedByPhase);
+            const ready = {
+                'team-seasons': () => !seasonsLoading && seasonsLoaded,
+                'last-time-when': () => !state.lastTimeApiLoading && (state.lastTimeApiCacheKey || '').includes(`::${team1}`),
+                // The all-teams list only shows once its data is in
+                'team-streaks': () => !team1 || (!state.teamStreaksApiLoading && (state.teamStreaksApiCacheKey || '').includes(`::${team1}`)),
+                'match-finder': () => !state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`),
+                h2h: () => !state.h2hApiLoading && (state.h2hApiCacheKey || '').includes(`::${team1}::`),
+                team: () => !state.teamHistoryApiLoading && (state.teamHistoryApiCacheKey || '').endsWith(`::${team1}`),
+                table: () => grouped
+                    ? !state.seasonMatchesApiLoading && !!state.seasonMatchesApiCacheKey
+                    : !state.standingsApiLoading && !!state.standingsApiCacheKey
+            }[SEARCH_MODE_VIEW];
+            const stats = h2hResult && h2hResult.overallStats;
+            LeagueSearch.renderAnswer(document.getElementById('searchAnswer'), {
+                view: SEARCH_MODE_VIEW,
+                ready: ready ? ready() : true,
+                league,
+                competition: SEARCH_ANSWER_LEAGUE_NAMES[league] || '',
+                // Only a single season counts ('' for all seasons or an era)
+                season: /^\d{4}-\d{2}$/.test(season || '') ? season : '',
+                team1,
+                opponents: [team2, ...activeExtraTeam2s(team1, team2, extraTeam2s)].filter(Boolean),
+                record: stats ? { w: stats.team1Wins, d: stats.draws, l: stats.team2Wins, total: stats.total } : null,
+                matches: matchHistoryResult ? matchHistoryResult.matches : null,
+                table: tableResult && !grouped ? tableResult.tableData : null,
+                seasonMatches: grouped ? state.seasonMatchesApiCache : null,
+                finder: isFinder ? { mode: state.matchFinderMode || 'single', category: state.matchFinderCategory, results: finderResults } : null,
+                lastTime: isLastTime ? lastTime : null,
+                streaks: isStreaks ? streaks : null,
+                // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
+                historicTitles: isSeasons && team1 && typeof historicSeasonsData !== 'undefined'
+                    ? historicSeasonsData.filter(([s, div, pos, team]) => team === team1 && pos === 1 &&
+                        div === { 'serie-a': 'I1', 'bundesliga': 'D1' }[league]).length
+                    : 0,
+                seasons: isSeasons ? {
+                    rows: seasonsRows,
+                    position: state.teamSeasonsSelectedPosition,
+                    better: state.includeBetterResults,
+                    first: state.firstOccurrenceOnly,
+                    // A title that was stripped (Marseille 1992-93, Juventus
+                    // 2004-05) - the page shows it as NR, awarded to no one
+                    revoked: (team, seasonName, position) => {
+                        const div = { 'premier-league': 'E0', 'la-liga': 'SP1', 'serie-a': 'I1', 'bundesliga': 'D1', 'ligue-1': 'F1' }[league];
+                        return !!div && strippedChampions.some(([t, d, s, pos]) => t === team && d === div && s === seasonName && pos === Number(position));
+                    }
+                } : null,
+                logo: name => getTeamLogoUrl(name, league),
+                // A team's colour, lightened for dark mode by the page
+                teamColor: name => {
+                    const color = getTeamColor(name, league);
+                    return color ? pickTeamTextColor(color) : null;
+                }
+            });
+        }
+
         function init() {
+            initSearchMode();
             applyTeamDashboardUrlParams();
             applyShareableFilterUrlParams();
             setupEventListeners();
@@ -5234,6 +5416,10 @@
                 // Show First Occurrence Only toggle when any progression is selected
                 updateFirstOccurrenceOnlyVisibility();
 
+                // Include Better Results ("reached the final") works for every team too
+                elements.includeBetterResultsContainer.classList.remove('hidden');
+                elements.includeBetterResultsContainer.style.display = 'flex';
+
                 showAllTeamsAtProgression(selectedPosition, state.teamSeasonsSelectedLeague);
             } else if (state.teamSeasonsSelectedSeason && !isEraSeasonKey(state.teamSeasonsSelectedSeason)) {
                 // Progression cleared but one season is still picked - back to its standings
@@ -5353,7 +5539,9 @@
                         const teamProgression = calculateTournamentProgression(row.team, lastMatchForProgression);
 
                         // Only include teams that reached the selected progression
-                        if (teamProgression === progression) {
+                        // - or, with Include Better Results, went further
+                        if (teamProgression === progression ||
+                            (state.includeBetterResults && isProgressionEqualOrBetter(teamProgression, progression))) {
                             const goalDifference = row.goalsFor - row.goalsAgainst;
                             const winPoints = 3; // Standard 3 points for win
                             const points = row.won * winPoints + row.drawn;
@@ -5384,6 +5572,9 @@
                 const yearA = parseInt(a.season.split('-')[0]);
                 const yearB = parseInt(b.season.split('-')[0]);
                 if (yearB !== yearA) return yearB - yearA;
+                const rankA = getProgressionRank(a.tournamentProgression);
+                const rankB = getProgressionRank(b.tournamentProgression);
+                if (rankA !== rankB) return rankA - rankB;
                 return a.team.localeCompare(b.team);
             });
             
@@ -5406,6 +5597,7 @@
             });
             
             // Update progression info
+            const orBetter = state.includeBetterResults && progression !== 'Champions' ? ' or better' : '';
             const totalCount = allProgressionData.length;
             const uniqueTeamCount = Object.keys(teamCounts).length;
             if (totalCount === 0) {
@@ -5413,10 +5605,10 @@
             } else if (state.firstOccurrenceOnly) {
                 const teamText = uniqueTeamCount === 1 ? 'team' : 'teams';
                 const countText = totalCount === 1 ? 'time' : 'times';
-                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} unique ${teamText} reached ${progression} (${totalCount} ${countText} total)`;
+                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} unique ${teamText} reached ${progression}${orBetter} (${totalCount} ${countText} total)`;
             } else {
                 const countText = totalCount === 1 ? 'time' : 'times';
-                elements.teamSeasonsPositionInfo.textContent = `${totalCount} teams reached ${progression} a total of ${totalCount} ${countText}`;
+                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} ${uniqueTeamCount === 1 ? 'team' : 'teams'} reached ${progression}${orBetter} a total of ${totalCount} ${countText}`;
             }
 
             // Apply First Occurrence Only filter if enabled - keeps only
@@ -5431,6 +5623,7 @@
 
         // Display progression-only table
         function displayAllTeamsAtProgression(allProgressionData, progression, league) {
+            updateSearchAnswer({ seasons: allProgressionData });
             window.currentSeasonStandingsView = null;
             pendingTeamSeasonsPositionInfo = '';
             elements.teamHistoryTable.classList.remove('single-team-mode');
@@ -5459,7 +5652,7 @@
 
             // Update title for progression-only view
             const progressionStyle = progression === 'Champions' ? 'color: #d97706; font-weight: bold;' : 'color: #374151; font-weight: bold;';
-            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>)`;
+            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})`;
 
             // Store data globally for sorting
             window.currentTeamHistoryData = [...allProgressionData];
@@ -5559,7 +5752,7 @@
 
             // Update title for progression-only view
             const progressionStyle = progression === 'Champions' ? 'color: #d97706; font-weight: bold;' : 'color: #374151; font-weight: bold;';
-            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>)`;
+            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})`;
 
             // Store data globally for sorting
             window.currentTeamHistoryData = [...allProgressionData];
@@ -5684,7 +5877,11 @@
                         <td class="px-3 py-4 text-center">${season.played}</td>
                         <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.won}-${season.drawn}-${season.lost}</td>
                         <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.goalsFor}:${season.goalsAgainst}</td>
-                        <td class="px-3 py-4 text-center ${season.goalDifference >= 0 ? 'text-green-600' : 'text-red-600'}">${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}</td>
+                        <td class="px-3 py-4 text-center">
+                            <span class="font-bold ${season.goalDifference > 0 ? 'text-green-700' : season.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
+                                ${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}
+                            </span>
+                        </td>
                         <td class="px-3 py-4 text-center">
                             <span class="points-badge">
                                 ${season.points}
@@ -6521,6 +6718,13 @@
                             }
                         }
                     }, 100);
+                } else if (state.teamSeasonsSelectedPosition) {
+                    // Every team: "lost in the final" <-> "reached the final"
+                    // The checked class draws the tick - clear any drawn by the
+                    // one-team view above, or it shows twice
+                    elements.includeBetterResultsCheckbox.removeAttribute('style');
+                    elements.includeBetterResultsCheckbox.innerHTML = '';
+                    showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
                 }
             });
 
@@ -7486,8 +7690,10 @@
             matchFinderTeam1Combobox.setOptions(matchFinderTeam1ComboOptions);
             matchFinderTeam2Combobox.setOptions(matchFinderTeam2ComboOptions);
 
-            // Team Dashboard: consume a pending team lock from the URL (once)
-            if (state.pendingTeamLock) {
+            // Team Dashboard: consume a pending team lock from the URL (once),
+            // only once the roster from /api/teams has loaded - this runs
+            // again when it lands, and an empty first pass would drop the lock
+            if (state.pendingTeamLock && leagueTeams.length > 0) {
                 const lockedTeam = state.pendingTeamLock;
                 state.pendingTeamLock = '';
                 if (leagueTeams.includes(lockedTeam)) {
@@ -8076,9 +8282,12 @@
             // Ties only exist in knockout and qualifying rounds - group-stage
             // matches are round-robin and can legitimately feature the same
             // two teams twice in one season without that being an aggregate
-            // "tie". (Exclude Qualifiers is applied by the caller.)
+            // "tie". The final is a single match (a replay included), never
+            // a two-legged tie, so it's left out too. (Exclude Qualifiers is
+            // applied by the caller.)
             let tieEligible = matches.filter(row =>
-                MAIN_KNOCKOUT_PHASES.includes(row.CompetitionPhase || '') || qualifierRoundLabel(row.CompetitionPhase) !== null);
+                (MAIN_KNOCKOUT_PHASES.includes(row.CompetitionPhase || '') && row.CompetitionPhase !== 'Final') ||
+                qualifierRoundLabel(row.CompetitionPhase) !== null);
 
             // Stage filter is safe to apply per-leg before pairing here -
             // both legs of a real tie always share the same CompetitionPhase.
@@ -8229,6 +8438,7 @@
         // tie's aggregate, never a per-leg number, rendered once per tie via
         // a rowspan-merged cell so a tie's legs can never be sorted apart.
         function updateMatchFinderTieResults(classified) {
+            updateSearchAnswer({ finder: classified });
             elements.matchFinderResults.classList.remove('hidden');
             elements.matchFinderSingleMatchCard.classList.add('hidden');
             elements.matchFinderTieResultsCard.classList.remove('hidden');
@@ -8464,6 +8674,7 @@
         // abbreviated stage labels via abbreviateProgression() - NOT
         // desktop's wide 7-column layout with visible team names.
         function updateMatchFinderTable(classified) {
+            updateSearchAnswer({ finder: classified });
             elements.matchFinderResults.classList.remove('hidden');
 
             const cat = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
@@ -8956,6 +9167,7 @@
             
             // Show results
             elements.lastTimeResults.classList.remove('hidden');
+            updateSearchAnswer({ lastTime: results });
         }
 
         // Calculate single team results (Team 1 vs all opponents)
@@ -9117,6 +9329,7 @@
             
             // Show results
             elements.lastTimeResults.classList.remove('hidden');
+            updateSearchAnswer({ lastTime: results });
         }
 
         // Qualifying rounds are "Qualification ..." in the data, but share
@@ -11386,6 +11599,7 @@
             updateMatchHistoryDisplay(matchHistoryResult);
             updateTableInfo(tableResult);
             updateTeamDashboardHeader();
+            updateSearchAnswer({ table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult });
 
             // Handle position colors for dark mode
             setTimeout(handlePositionColors, 50);
@@ -13732,6 +13946,7 @@
             window.currentTeamHistoryData = null;
             window.currentTeamHistoryName = null;
             window.currentSeasonStandingsView = { seasonKey, league, rows };
+            updateSearchAnswer({ seasons: rows });
             elements.teamSeasonsPositionInfo.textContent = '';
             pendingTeamSeasonsPositionInfo = '';
             renderSeasonStandingsTable();
@@ -13884,6 +14099,7 @@
             
             // Update progression info display and ensure it persists
             elements.teamSeasonsPositionInfo.innerHTML = positionInfo || 'NO POSITION INFO';
+            updateSearchAnswer({ seasons: filteredData });
 
             // Apply proper styling for the position info text
             elements.teamSeasonsPositionInfo.style.cssText = 'margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280; line-height: 1.25;';
@@ -13906,6 +14122,30 @@
             elements.teamHistoryTitle.textContent = `${teamName} - Season History`;
             
             // Apply sorting if active
+            // Count: the nth time the team reached this stage, oldest
+            // season first (as the all-teams table's Count) - a stripped
+            // title or an unfinished current season isn't counted
+            const finishCounts = {};
+            [...filteredData]
+                .sort((x, y) => parseInt(x.season) - parseInt(y.season))
+                .forEach(row => {
+                    const revoked = false;
+                    // The current season isn't a finish yet (as the position
+                    // filter's own 34-game rule)
+                    const now = new Date();
+                    const currentStart = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+                    const unfinished = parseInt(row.season) === currentStart && row.tournamentProgression !== 'Champions' && row.tournamentProgression !== 'Final';
+                    if (revoked || unfinished) {
+                        row.count = '–';
+                        return;
+                    }
+                    // With Include Better Results the rows are one question
+                    // ("2nd or better"), so they're counted together
+                    const countKey = state.teamSeasonsSelectedPosition && state.includeBetterResults ? 'or-better' : row.tournamentProgression;
+                    finishCounts[countKey] = (finishCounts[countKey] || 0) + 1;
+                    row.count = finishCounts[countKey];
+                });
+
             let sortedData = [...filteredData];
             if (state.teamHistorySortConfig.key && state.teamHistorySortConfig.direction) {
                 const key = state.teamHistorySortConfig.key;
@@ -13942,6 +14182,7 @@
 
             elements.teamHistoryHeader.innerHTML = `
                 <th class="px-3 py-4 text-left font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('season')" style="text-align: left;">Season</th>
+                <th class="px-2 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('count')" style="text-align: center;">#</th>
                 <th class="px-4 py-4 font-bold text-sm" style="text-align: left;"></th>
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('played')" style="text-align: center;">P</th>
                 <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
@@ -13967,6 +14208,7 @@
                             ${renderTeamSeasonExpandButton(seasonRef, leagueToUse)}
                             ${season.season}
                         </td>
+                        <td class="px-2 py-4 text-center font-semibold">${season.count}</td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -14001,7 +14243,7 @@
                             'color: #6b7280; background-color: #f9fafb;'
                         }">${abbreviateProgression(season.tournamentProgression || 'Group Stage')}</td>
                     </tr>
-                    ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 9)}
+                    ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 10)}
                 `;
             }).join('');
 
@@ -14483,11 +14725,13 @@
 
             document.querySelectorAll('.league-table').forEach(table => {
                 if (!isDark) {
-                    // Remove all inline styles in light mode, but preserve win-score and draw-score classes
-                    table.querySelectorAll('tbody tr td').forEach(cell => {
-                        if (!cell.classList.contains('win-score') && !cell.classList.contains('draw-score')) {
-                            cell.style.color = '';
-                        }
+                    // Undo only the white text dark mode set (marked below) -
+                    // a table's own colors, like the gold 1st place in Team
+                    // Seasons, stay. This runs after every League Tables
+                    // update, which can land after another tab's table drew.
+                    table.querySelectorAll('tbody tr td[data-dark-text]').forEach(cell => {
+                        cell.style.color = '';
+                        delete cell.dataset.darkText;
                     });
                     return;
                 }
@@ -14521,6 +14765,7 @@
 
                             if (rule === 'white') {
                                 cell.style.color = 'white';
+                                cell.dataset.darkText = '1';
                             } else if (rule === 'default') {
                                 cell.style.color = '';
                                 cell.style.removeProperty('color');
@@ -14531,6 +14776,7 @@
                                     cell.style.removeProperty('color');
                                 } else {
                                     cell.style.color = 'white';
+                                    cell.dataset.darkText = '1';
                                 }
                             }
                         });

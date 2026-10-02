@@ -2235,6 +2235,33 @@ body {
         width: 44px !important;
     }
 
+    /* Include Better Results ("top 4"): P makes way for Pos at the end -
+       Season, #, Team, W-D-L, GF:GA, GD, Pts, Pos */
+    #teamHistoryTable.position-only-mode.better-range .league-table th:nth-child(4),
+    #teamHistoryTable.position-only-mode.better-range .league-table td:nth-child(4) {
+        width: 70px !important;
+    }
+
+    #teamHistoryTable.position-only-mode.better-range .league-table th:nth-child(5),
+    #teamHistoryTable.position-only-mode.better-range .league-table td:nth-child(5) {
+        width: 57px !important;
+    }
+
+    #teamHistoryTable.position-only-mode.better-range .league-table th:nth-child(6),
+    #teamHistoryTable.position-only-mode.better-range .league-table td:nth-child(6) {
+        width: 40px !important;
+    }
+
+    #teamHistoryTable.position-only-mode.better-range .league-table th:nth-child(7),
+    #teamHistoryTable.position-only-mode.better-range .league-table td:nth-child(7) {
+        width: 44px !important;
+    }
+
+    #teamHistoryTable.position-only-mode.better-range .league-table th:nth-child(8),
+    #teamHistoryTable.position-only-mode.better-range .league-table td:nth-child(8) {
+        width: 30px !important;
+    }
+
     /* Header cells need their own explicit background (can't inherit
        a solid color from thead), matching the League Table's header */
     #teamHistoryTable.single-team-mode .league-table th:nth-child(1),
@@ -3435,4 +3462,231 @@ body {
     #teamStreaksResults .streak-matches-row .season-matches td:nth-child(n+2) {
         width: 18.5% !important;
     }
+}
+
+/* Search mode (?search=..., from the search bar): the search bar and a
+   one-line answer replace the header, team search, tabs and filters, and
+   only the results for that kind of question show. html.search-mode and
+   data-search-view are set in <head> before the first paint. */
+.search-mode-bar,
+.search-answer {
+    display: none;
+}
+
+html.search-mode .search-mode-bar {
+    display: block;
+    padding: 1.5rem 2rem 0;
+}
+
+html.search-mode .search-answer {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 1.5rem 2rem 0;
+}
+
+html.search-mode .main-card {
+    overflow: visible; /* the search results float out of the card */
+    /* One background top to bottom: the search bar and answer sit on the
+       card itself, the results on sections in --bg-gray-50 (the card's
+       95% white over the blue page reads as a slightly different grey) */
+    background: var(--bg-gray-50);
+}
+
+/* The header goes, except its dark mode switch - pinned top-right, where
+   the home page has it */
+html.search-mode .header {
+    padding: 0;
+    height: 0;
+    overflow: visible;
+    background: none;
+}
+
+html.search-mode .header-content > :not(.header-actions) {
+    display: none !important;
+}
+
+html.search-mode .header-actions {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1001;
+}
+
+/* Search mode before any question (?search=none, from the Search
+   button): the bar only - no answer, no results */
+html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header) {
+    display: none !important;
+}
+
+html.search-mode[data-search-view="none"] .search-mode-bar {
+    padding-bottom: 1.75rem;
+}
+
+html.search-mode #teamDashboardHeader,
+html.search-mode #teamDashboardSearch,
+html.search-mode #controlsSection,
+html.search-mode:not([data-search-view="table"]) #tableInfo,
+html.search-mode #collapseControlsBtn {
+    display: none !important;
+}
+
+/* Filters inside the result boxes. Each :not(#search-mode-none) only adds an
+   ID's weight, to beat the pages' own two-ID !important display rules (e.g.
+   #h2hSection div:has(#recentH2HSelect) on mobile) */
+html.search-mode .search-mode-hidden:not(#search-mode-none):not(#search-mode-none) {
+    display: none !important;
+}
+
+/* What each kind of question shows (the page's own logic decides
+   what's filled in; these just keep the other boxes out):
+   h2h   - the two teams' table, the record box and the match list
+   team  - the team's table row, record box and match history
+   table - the league table and its info line */
+html.search-mode[data-search-view="h2h"] #matchHistorySection,
+html.search-mode[data-search-view="team"] #h2hSection,
+html.search-mode[data-search-view="team"] #h2hMatchesTable,
+html.search-mode[data-search-view="table"] #h2hSection,
+html.search-mode[data-search-view="table"] #h2hMatchesTable,
+html.search-mode[data-search-view="table"] #matchHistorySection {
+    display: none !important;
+}
+
+/* Match Finder, Team Seasons, Last Time When and Team Streaks: their results live inside the tabs
+   area, so show that area with only the results box (no tab buttons,
+   description or filters), and none of the League Tables boxes below */
+html.search-mode[data-search-view="match-finder"] #controlsSection,
+html.search-mode[data-search-view="team-seasons"] #controlsSection,
+html.search-mode[data-search-view="last-time-when"] #controlsSection,
+html.search-mode[data-search-view="team-streaks"] #controlsSection {
+    display: block !important;
+}
+
+html.search-mode[data-search-view="match-finder"] #controlsSection .tab-container,
+html.search-mode[data-search-view="match-finder"] #controlsSection .tab-content:not(#matchFinderContent),
+html.search-mode[data-search-view="match-finder"] #matchFinderContent > :not(#matchFinderResults),
+html.search-mode[data-search-view="match-finder"] .table-section,
+html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-container,
+html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-content:not(#teamSeasonsContent),
+html.search-mode[data-search-view="team-seasons"] #teamSeasonsContent > :not(#teamHistoryTable),
+html.search-mode[data-search-view="team-seasons"] #teamHistoryBackArrow,
+html.search-mode[data-search-view="team-seasons"] .table-section,
+html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-container,
+html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-content:not(#lastTimeWhenContent),
+html.search-mode[data-search-view="last-time-when"] #lastTimeWhenContent > :not(#lastTimeResults),
+html.search-mode[data-search-view="last-time-when"] .table-section,
+html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-container,
+html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-content:not(#teamStreaksContent),
+html.search-mode[data-search-view="team-streaks"] #teamStreaksContent > :not(#teamStreaksResults),
+html.search-mode[data-search-view="team-streaks"] .table-section {
+    display: none !important;
+}
+
+html.search-mode .table-section {
+    padding-top: 1.5rem;
+}
+
+.search-answer-crest {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.search-answer-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: #1f2937;
+}
+
+.search-answer-record {
+    color: #047857;
+    white-space: nowrap;
+}
+
+.search-answer-loading {
+    font-size: 1.1rem;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .search-answer-text {
+    color: white;
+}
+
+[data-theme="dark"] .search-answer-record {
+    color: #10b981;
+}
+
+[data-theme="dark"] .search-answer-loading {
+    color: #ccc;
+}
+
+/* Phone sizes for the search bar and answer */
+html.search-mode .search-mode-bar {
+    padding: 4.25rem 1rem 0; /* clear of the fixed menu button */
+}
+
+html.search-mode .search-answer {
+    margin: 1rem 1rem 0;
+    gap: 0.75rem;
+}
+
+.search-answer-crest {
+    width: 2.75rem;
+    height: 2.75rem;
+}
+
+.search-answer-text {
+    font-size: 1.15rem;
+}
+
+/* Header: the Search / Filters switch beside the dark mode toggle */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.search-mode-switch {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-mode-switch:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* In search mode it sits on the light page, beside the pinned toggle */
+html.search-mode .search-mode-switch {
+    background: white;
+    border-color: #ccc;
+    color: #047857;
+}
+
+html.search-mode .search-mode-switch:hover {
+    background: #f0fdfa;
+}
+
+html.search-mode body[data-theme="dark"] .search-mode-switch {
+    background: #333333;
+    border-color: #555;
+    color: #6ee7b7;
+}
+
+/* Phone width: the title needs the row, so the toggle and the Search
+   button stack (toggle on top, where it always was) */
+html:not(.search-mode) .header-actions {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    align-self: flex-end; /* low in the header, clear of the pinned ▼ button */
 }
