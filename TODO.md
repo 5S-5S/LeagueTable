@@ -2,91 +2,6 @@
 
 Feature ideas, not yet scheduled.
 
-- In progress: **Search page** — on the `search-bar` branch (2026-10-01).
-  `index.html` is now a plain search page (title, search bar with a
-  sport/competition dropdown: Top 5 Leagues, each league, Champions
-  League; NFL/NBA greyed out). The search itself lives in `search.js` /
-  `search.css`, shared with the sport pages: it reads a plain-English
-  query for teams, a season and what's being asked, and links to that
-  view through the pages' Copy Link parameters.
-  - Search mode (`?search=<kind>&q=&scope=` on top of a Copy Link URL):
-    the page hides its header, tabs and filters, shows the search bar and
-    a one-line answer, and only the results for that question - worked
-    out by the page's own functions; search.js words the answer line
-    (renderAnswer) from what the page passes in plus the URL's filters.
-  - Going tab by tab, covering every kind of question each tab answers.
-    League Tables & Head to Head is done (2026-10-01), all four pages:
-    - `h2h`: home / away / "X at Y", a season, since / before / between
-      years, "last 5 seasons", a weekday, "last 10 meetings", several
-      opponents ("vs Chelsea and Liverpool"), the Big 6; Continental also
-      a stage ("semi finals", "knockouts"), penalty shootouts, main stage
-      / qualifiers only, and a country ("vs English clubs").
-    - `team` (one team): the same filters, with its record and match
-      history ("arsenal away since 2010", "arsenal last 20 games").
-    - `table` (no team): dates, home / away / weekday tables, 2 or 3
-      points for a win, without deductions, Continental stages. A plain
-      single season ("2025-26 Serie A") opens Team Seasons' final
-      standings instead (medal colors, each club's matches a click away)
-      - "Inter won the 2025-26 Serie A with 87 points, 11 ahead of SSC
-      Napoli"; Continental: the winner and the beaten finalist. Stripped
-      titles (Marseille 1992-93, Juventus 2004-05 - shown as NR) are never
-      counted: "finished top ... but were stripped of the title - it
-      wasn't awarded".
-    - Dates as well as years in ranges ("since 01/01/1991", "between 1
-      Jan 1990 and 31/12/2000", "on 10/05/2026", "January 2010"); slashed
-      dates follow the visitor's language (US: month first). A typed date
-      is spelled out in the answer ("since January 1, 1991").
-    - Eras: typing "Premier League"/"EPL" or "Champions League"/"UCL"/"CL"
-      means 1992 onwards, "First Division" / "European Cup" the older era;
-      no name (or "all-time") means every season, and a season or dates
-      beat an era. Answers name the era: "the English top flight", "the
-      European Cup and Champions League" for all-time. Ligue 1 left out -
-      Division 1 to Ligue 1 was only a rename.
-  - Match Finder done (2026-10-01), all four pages (`match-finder`):
-    biggest wins / defeats, highest-scoring draws, most / fewest goals
-    (goalless), a scoreline (home-away), against a team / several / the
-    Big 6 / a country, with seasons, eras, dates, weekdays, home / away.
-    Continental: two-legged ties on aggregate ("aggregate", "two-legged";
-    aggregate scorelines are Team 1-opponent), after extra time, on away
-    goals (counts ties won / lost), penalties, stages, qualifiers. Needs a
-    team - "biggest wins" alone asks for one. Answer names the top result
-    and how many share it.
-  - Team Seasons done (2026-10-01), all four pages (`team-seasons`): a
-    team's seasons ("arsenal seasons" / "history"), a finish ("titles",
-    "3rd", "top 4", "runners up"; Continental "finals" / "semi finals" =
-    reached, "lost in the final" / "knocked out in the quarter finals" =
-    went out there), one season ("where did arsenal finish in 2003-04"),
-    every club at a finish ("premier league champions", "first time
-    champions"), eras, and "including historic" (the pre-Serie A /
-    pre-Bundesliga champions - answers then say "the German / Italian
-    championship"). Title questions in Serie A / the Bundesliga include
-    those by default ("Schalke titles" = 7); naming the league ("Schalke
-    Bundesliga titles") means that league only, with a small-print link
-    under the answer to the full count. "German / Italian champions" work
-    as searches. Only titles - seasons, top 4 etc. stay league-only (the
-    historic list only has champions). Titles narrowed to one era ("Man
-    Utd premier league titles", "Ajax european cup titles", "premier
-    league champions") get a link to the all-eras search too, naming the
-    other era (no count - the page only works out the era asked about).
-  - Last Time When done (2026-10-01), all four pages (`last-time-when`):
-    "last time X beat / lost to / drew with / played Y", one team ("last
-    time arsenal won away"), the Big 6, a country's clubs, home / away, a
-    weekday, Continental stages ("won a final"). Which result was asked
-    rides in the link as res= (the page ignores it). Season questions
-    worded this way ("when did arsenal last win the league") go to Team
-    Seasons. The tab has no season / date filters, so none are applied.
-  - Team Streaks done (2026-10-01), all four pages (`team-streaks`): a
-    team's current run ("liverpool unbeaten streak", "games without a
-    win", "clean sheets in a row") or longest ("arsenal longest unbeaten
-    run" - 49 games), against a team / the Big 6 / a country's clubs, home
-    / away, Continental stages; every team's longest or current runs
-    ("longest winning streaks" - ties named). A 1-game run is worded as
-    what happened in that game. The tab has no season / date filters.
-  - Every tab now answers in search mode.
-    Until each is done, its results open the full page.
-  - Also fixed on the way: Continental `?team=` dashboard links never
-    locked the team (the lock was consumed before /api/teams loaded).
-
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
   needed before it's release-worthy. Adds a List View/Bracket View
@@ -98,7 +13,7 @@ Feature ideas, not yet scheduled.
   extension. See that branch's own TODO.md for the full build/fix
   history.
 
-- Later: **Last Time When rework** — noted 2026-10-02 while testing the
+- Later: **Last Time When rework** — noted 2026-10-01 while testing the
   search bar. The tab only knows a result (win / draw / loss / any), a
   venue, a weekday, an opponent and a stage, so these questions can't be
   answered yet:
@@ -116,14 +31,14 @@ Feature ideas, not yet scheduled.
   then only has to pass them through (it already parses scorelines and
   penalties for Match Finder).
 
-- Later: **Match Finder without a team** — noted 2026-10-02 while testing
+- Later: **Match Finder without a team** — noted 2026-10-01 while testing
   the search bar. Match Finder needs at least one team picked, so
   league-wide questions can't be answered: "biggest win in La Liga
   history", "highest scoring game ever in the Premier League". Needs an
   all-clubs mode on all four pages (each match listed once, not once per
   side); the search then sends these there instead of asking for a team.
 
-- Later: **Comebacks** — noted 2026-10-02 ("Barcelona comebacks" in the
+- Later: **Comebacks** — noted 2026-10-01 ("Barcelona comebacks" in the
   search). No concept of a comeback yet. Possible meanings: a match won
   or drawn from behind (needs half-time / goal-time data - check what the
   match rows have), or a Continental two-legged tie won after losing the
@@ -231,6 +146,122 @@ Feature ideas, not yet scheduled.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Search page~~ — done (2026-10-01), on the `search-bar` branch (merge
+  to main pending). `index.html` is now a plain search page (title, a
+  search bar with a sport/competition dropdown: Top 5 Leagues, each
+  league, Champions League; NFL/NBA greyed out). The search lives in
+  `search.js` / `search.css`, shared with the sport pages: it reads a
+  plain-English query for teams, a season and what's being asked, and
+  links to that view through the pages' Copy Link parameters.
+  - Search mode (`?search=<kind>&q=&scope=` on top of a Copy Link URL):
+    the page hides its header, tabs and filters, shows the search bar and
+    a one-line answer (team names in team colors), and only the results
+    for that question - worked out by the page's own functions; search.js
+    words the answer line (renderAnswer) from what the page passes in
+    plus the URL's filters. Every tab answers this way, on all four
+    pages; mobile links redirect with the search intact.
+  - Empty search bar: clicking into it shows example questions for the
+    dropdown's competition, grouped by kind (head to head, seasons &
+    tables, titles, streaks, last time, biggest wins), each opening its
+    answer, plus words to add to any question ("at home", "since 2010",
+    "last 10 meetings", "semi final exits"...). Arrow keys / Enter work on
+    them. The home page's "Try" chips are the same list (SEARCH_EXAMPLES
+    in search.js) - every example checked to give an answer.
+  - Ways to ask, beyond each tab's own filters: nicknames and club
+    abbreviations (Barca, Atleti, Gladbach, OM, S04, BMG, LFC, MUFC...),
+    named derbies (El Clasico, Der Klassiker, Le Classique, North London,
+    Merseyside, Madrid, Milan, Revierderby, Borussen-Derby, Rheinderby...),
+    "last 5" on its own, "1990 to 2000", decades ("in the 90s" - answered
+    as "in the 1990s"), "1st time" / "maiden" for first-time winners,
+    "finalists" / "semi finalists". Weekdays never complete to a team
+    ("drew on a Wednesday" isn't Sheffield Wednesday).
+  - League Tables & Head to Head, all four pages:
+    - `h2h`: home / away / "X at Y", a season, since / before / between
+      years, "last 5 seasons", a weekday, "last 10 meetings", several
+      opponents ("vs Chelsea and Liverpool"), the Big 6; Continental also
+      a stage ("semi finals", "knockouts"), penalty shootouts, main stage
+      / qualifiers only, and a country ("vs English clubs").
+    - `team` (one team): the same filters, with its record and match
+      history ("arsenal away since 2010", "arsenal last 20 games").
+    - `table` (no team): dates, home / away / weekday tables, 2 or 3
+      points for a win, without deductions, Continental stages. A plain
+      single season ("2025-26 Serie A") opens Team Seasons' final
+      standings instead (medal colors, each club's matches a click away)
+      - "Inter won the 2025-26 Serie A with 87 points, 11 ahead of SSC
+      Napoli"; Continental: the winner and the beaten finalist. Stripped
+      titles (Marseille 1992-93, Juventus 2004-05 - shown as NR) are never
+      counted: "finished top ... but were stripped of the title - it
+      wasn't awarded".
+    - Dates as well as years in ranges ("since 01/01/1991", "between 1
+      Jan 1990 and 31/12/2000", "on 10/05/2026", "January 2010"); slashed
+      dates follow the visitor's language (US: month first). A typed date
+      is spelled out in the answer ("since January 1, 1991").
+    - Eras: typing "Premier League"/"EPL" or "Champions League"/"UCL"/"CL"
+      means 1992 onwards, "First Division" / "European Cup" the older era;
+      no name (or "all-time") means every season, and a season or dates
+      beat an era. Answers name the era: "the English top flight", "the
+      European Cup and Champions League" for all-time. Ligue 1 left out -
+      Division 1 to Ligue 1 was only a rename.
+  - Match Finder, all four pages (`match-finder`):
+    biggest wins / defeats, highest-scoring draws, most / fewest goals
+    (goalless), a scoreline (home-away), against a team / several / the
+    Big 6 / a country, with seasons, eras, dates, weekdays, home / away.
+    Continental: two-legged ties on aggregate ("aggregate", "two-legged";
+    aggregate scorelines are Team 1-opponent), after extra time, on away
+    goals (counts ties won / lost), penalties, stages, qualifiers. Needs a
+    team - "biggest wins" alone asks for one. Answer names the top result
+    and how many share it.
+  - Team Seasons, all four pages (`team-seasons`): a
+    team's seasons ("arsenal seasons" / "history"), a finish ("titles",
+    "3rd", "top 4", "runners up"; Continental "finals" / "semi finals" =
+    reached, "lost in the final" / "knocked out in the quarter finals" /
+    "semi final exits" / "exactly the semi finals" = went out there), one season ("where did arsenal finish in 2003-04"),
+    every club at a finish ("premier league champions", "first time
+    champions"), eras, and "including historic" (the pre-Serie A /
+    pre-Bundesliga champions - answers then say "the German / Italian
+    championship"). Title questions in Serie A / the Bundesliga include
+    those by default ("Schalke titles" = 7); naming the league ("Schalke
+    Bundesliga titles") means that league only, with a small-print link
+    under the answer to the full count. "German / Italian champions" work
+    as searches. Only titles - seasons, top 4 etc. stay league-only (the
+    historic list only has champions). Titles narrowed to one era ("Man
+    Utd premier league titles", "Ajax european cup titles", "premier
+    league champions") get a link to the all-eras search too, naming the
+    other era (no count - the page only works out the era asked about).
+  - Last Time When, all four pages (`last-time-when`):
+    "last time X beat / lost to / drew with / played Y", one team ("last
+    time arsenal won away"), the Big 6, a country's clubs, home / away, a
+    weekday, Continental stages ("won a final"). Which result was asked
+    rides in the link as res= (the page ignores it). Season questions
+    worded this way ("when did arsenal last win the league") go to Team
+    Seasons. The tab has no season / date filters, so none are applied.
+  - Team Streaks, all four pages (`team-streaks`): a
+    team's current run ("liverpool unbeaten streak", "games without a
+    win", "clean sheets in a row") or longest ("arsenal longest unbeaten
+    run" - 49 games), against a team / the Big 6 / a country's clubs, home
+    / away, Continental stages; every team's longest or current runs
+    ("longest winning streaks" - ties named). A 1-game run is worded as
+    what happened in that game. The tab has no season / date filters.
+  - Team Seasons' Include Better Results now works with no team picked
+    too, on all four pages: "top 4" lists every 1st-4th finish (Domestic
+    adds a Pos column - on mobile in place of P), "reached the final"
+    every finalist and winner, sorted by finish within a season; before,
+    the all-teams view only ever showed the exact finish. With it ticked,
+    a team's Count column counts the qualifying finishes together (26th
+    time 2nd or better), matching the summary line. First Occurrence Only
+    then means each club's first finish in that range ("first time top 4"
+    - Leicester 2015-16).
+  - Also fixed on the way: Continental `?team=` dashboard links never
+    locked the team (the lock was consumed before /api/teams loaded); the
+    Worker's KV cache keys broke past 512 bytes - head to head against
+    every club from a big country (Real Madrid vs Germany, 30 clubs)
+    returned a 500 and showed no matches; long keys are now hashed
+    (deployed 2026-10-01).
+  - Not covered yet (own TODO items): Last Time When negation /
+    scorelines / penalties, Match Finder without a team, comebacks.
+    League relegations aren't searchable (the number relegated changed
+    over the years).
 
 - ~~Team Streaks for all teams~~ — done (2026-09-30), all four pages.
   With no Team 1 picked, Team Streaks lists every team's streaks of the
