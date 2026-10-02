@@ -13,23 +13,31 @@ Feature ideas, not yet scheduled.
   extension. See that branch's own TODO.md for the full build/fix
   history.
 
-- Later: **Last Time When rework** — noted 2026-10-01 while testing the
-  search bar. The tab only knows a result (win / draw / loss / any), a
-  venue, a weekday, an opponent and a stage, so these questions can't be
-  answered yet:
-  - negation: "last time Juventus didn't win" (today the search drops
-    "didn't" and gives their last *win* - the opposite)
-  - an exact scoreline: "last time Arsenal drew 0-0", "PSG lost 5-0"
-  - a margin: "lost to Real Madrid by 4 goals"
-  - goals scored: "last time Arsenal scored 5"
-  - Continental: decided on penalties ("won on penalties")
-  - any club from a country, as the subject: "last time an English club
-    won the UCL"
-  - "City" / "United" alone as the opponent ("when did Man Utd last lose
-    to City" reads City as Hull City)
-  Needs new Last Time When filters on all four pages first; the search
-  then only has to pass them through (it already parses scorelines and
-  penalties for Match Finder).
+- Later: **Merge Last Time When into Match Finder** — noted 2026-10-02.
+  Last Time When is Match Finder sorted by date, keeping the top row: Team 1
+  (vs a team / the Big 6 / a country), home / away, weekday, Continental
+  stage - all filters Match Finder already has, plus seasons, dates,
+  scorelines, penalties / extra time / away goals that Last Time When
+  lacks. Merging replaces the old "Last Time When rework" item - the
+  questions it couldn't answer come almost free in Match Finder:
+  - "last time Juventus didn't win" (today the search drops "didn't" and
+    gives their last *win* - the opposite) -> a "didn't win" result
+  - an exact scoreline ("last time Arsenal drew 0-0", "PSG lost 5-0") ->
+    Scoreline category, newest first
+  - a margin ("lost to Real Madrid by 4 goals"), goals scored ("Arsenal
+    scored 5"), Continental "won on penalties" -> existing filters
+  Still separate: a country's clubs as the subject ("last time an English
+  club won the UCL") and "City" / "United" alone as the opponent ("when
+  did Man Utd last lose to City" reads City as Hull City).
+  Steps, all four pages:
+  1. A "Most recent" sort in Match Finder beside its size-based categories.
+  2. A result filter: win / draw / loss / any / didn't win.
+  3. Above the table, a "last win · last draw · last loss" strip with days
+     ago - Last Time When's at-a-glance view, its one real extra.
+  4. Old `view=last-time-when` links (Copy Link, search, dashboards) open
+     Match Finder with the same filters, newest first.
+  5. Remove the Last Time When tab; the search's "last time ..." answers
+     go to Match Finder (and can then use seasons / dates too).
 
 - Later: **Match Finder without a team** — noted 2026-10-01 while testing
   the search bar. Match Finder needs at least one team picked, so
@@ -281,7 +289,8 @@ Feature ideas, not yet scheduled.
     returned a 500 and showed no matches; long keys are now hashed
     (deployed 2026-10-01).
   - Not covered yet (own TODO items): Last Time When negation /
-    scorelines / penalties, Match Finder without a team, comebacks.
+    scorelines / penalties (now part of merging Last Time When into
+    Match Finder), Match Finder without a team, comebacks.
     League relegations aren't searchable (the number relegated changed
     over the years).
 
