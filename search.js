@@ -2200,8 +2200,57 @@
     // opponents (Team 2 values), record ({ w, d, l, total }, h2h), matches
     // (team's match rows, newest first), table (rows, by position),
     // seasonMatches (one Champions League season's match rows), logo(name) }
+    // Team colours in the answer line: the page's colour (already made
+    // readable on dark), darkened here just enough to read on the light
+    // background when it's too pale (Real Madrid's gold, City's sky blue)
+    const LIGHT_ANSWER_BG = [243, 244, 246];
+
+    function luminance([r, g, b]) {
+        const channel = c => {
+            const v = c / 255;
+            return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        };
+        return 0.2126 * channel(r) + 0.7152 * channel(g) + 0.0722 * channel(b);
+    }
+
+    function readableOnLight(hex) {
+        const clean = hex.replace('#', '');
+        if (!/^[0-9a-f]{3}([0-9a-f]{3})?$/i.test(clean)) return hex;
+        const full = clean.length === 3 ? clean.split('').map(c => c + c).join('') : clean;
+        const rgb = [0, 2, 4].map(i => parseInt(full.slice(i, i + 2), 16));
+        const contrast = color => (luminance(LIGHT_ANSWER_BG) + 0.05) / (luminance(color) + 0.05);
+        // 3:1 is enough for large bold text; mix toward black until it is
+        for (let mix = 0; mix <= 1; mix += 0.05) {
+            const color = rgb.map(c => Math.round(c * (1 - mix)));
+            if (contrast(color) >= 3) return `rgb(${color.join(', ')})`;
+        }
+        return '#000000';
+    }
+
+    function teamColor(ctx, name) {
+        if (!ctx.teamColor) return '';
+        // "Arsenal FC's" / "Wolves'" -> the team's own name
+        const color = ctx.teamColor(name) || ctx.teamColor(name.replace(/'s?$/, ''));
+        if (!color) return '';
+        return document.body.getAttribute('data-theme') === 'dark' ? color : readableOnLight(color);
+    }
+
+    // Redraw the last answer when dark mode is switched, so team colours
+    // follow the background
+    let lastAnswer = null;
+    let themeWatcher = null;
+    function watchTheme() {
+        if (themeWatcher || typeof MutationObserver === 'undefined') return;
+        themeWatcher = new MutationObserver(() => {
+            if (lastAnswer) renderAnswer(lastAnswer.el, lastAnswer.ctx);
+        });
+        themeWatcher.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+    }
+
     function renderAnswer(el, ctx) {
         if (!el) return;
+        lastAnswer = { el, ctx };
+        watchTheme();
         if (!ctx.ready) {
             el.innerHTML = '<p class="search-answer-loading">Working out the answer...</p>';
             return;
@@ -2711,7 +2760,11 @@
 
     // { html, crestTeam } for the answer, or null when there's nothing to say
     function describeAnswer(ctx, params) {
-        const b = text => `<strong>${escapeSearchHtml(text)}</strong>`;
+        // Bold names are teams: in the team's colour
+        const b = text => {
+            const color = teamColor(ctx, String(text));
+            return `<strong${color ? ` style="color: ${color}"` : ''}>${escapeSearchHtml(text)}</strong>`;
+        };
         const location = params.get('home') === '0' ? 'away' : (params.get('away') === '0' ? 'home' : '');
         const lastN = Number(params.get(ctx.view === 'h2h' ? 'h2hN' : 'mhN')) || 0;
         const competition = competitionName(ctx, params, !!lastN);

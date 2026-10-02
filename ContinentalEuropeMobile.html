@@ -4994,7 +4994,12 @@
                         return !!div && strippedChampions.some(([t, d, s, pos]) => t === team && d === div && s === seasonName && pos === Number(position));
                     }
                 } : null,
-                logo: name => getTeamLogoUrl(name, league)
+                logo: name => getTeamLogoUrl(name, league),
+                // A team's colour, lightened for dark mode by the page
+                teamColor: name => {
+                    const color = getTeamColor(name, league);
+                    return color ? pickTeamTextColor(color) : null;
+                }
             });
         }
 
