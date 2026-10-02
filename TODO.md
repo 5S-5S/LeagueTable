@@ -127,7 +127,9 @@ Feature ideas, not yet scheduled.
     pages, the Continental Team Seasons qualifier fixes, the Main Stage /
     Qualifiers Competition Stage dropdowns with their Worker change, and
     the Match History stage fix, the all-teams Team Streaks lists and
-    streak pagination), so the branch's copies of those pages
+    streak pagination; merged in 2026-10-01, but since then the search
+    page / search mode, Include Better Results for every team and the
+    Worker cache key fix), so the branch's copies of those pages
     are stale until it's brought up to date. One `git merge main` on the
     branch brings all of it over - nothing needs reapplying by hand.
     (The Worker is already deployed with the stage change; the branch
@@ -147,8 +149,7 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
-- ~~Search page~~ — done (2026-10-01), on the `search-bar` branch (merge
-  to main pending). `index.html` is now a plain search page (title, a
+- ~~Search page~~ — done (2026-10-01), merged to main 2026-10-02. `index.html` is now a plain search page (title, a
   search bar with a sport/competition dropdown: Top 5 Leagues, each
   league, Champions League; NFL/NBA greyed out). The search lives in
   `search.js` / `search.css`, shared with the sport pages: it reads a
@@ -161,6 +162,14 @@ Feature ideas, not yet scheduled.
     words the answer line (renderAnswer) from what the page passes in
     plus the URL's filters. Every tab answers this way, on all four
     pages; mobile links redirect with the search intact.
+  - Search / Filters switch (2026-10-02): a button beside the dark mode
+    toggle on all four pages switches between the tabs and filters and
+    the search bar, without reloading. Search -> Filters keeps the
+    question's filters (the tab comes back set to it); Filters -> Search
+    shows an empty bar (`?search=none`) preset to the page's league. The
+    address follows the mode, so a refresh keeps it. Mobile stacks the
+    toggle and the button in the header. Manual filters don't turn into
+    a question - the bar starts empty.
   - Empty search bar: clicking into it shows example questions for the
     dropdown's competition, grouped by kind (head to head, seasons &
     tables, titles, streaks, last time, biggest wins), each opening its
