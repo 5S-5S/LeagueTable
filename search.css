@@ -181,6 +181,50 @@
         }
 }
 
+/* The empty search bar's guide: example questions by kind, and words to
+   add to any question */
+.search-guide-group {
+    padding: 0.6rem 1.25rem 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.search-result.search-guide-item {
+    padding: 0.45rem 1.25rem 0.45rem 2.6rem;
+    border-bottom: none;
+}
+
+.search-guide-item .search-result-title {
+    font-weight: 500;
+}
+
+.search-guide-tips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.4rem;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid #f3f4f6;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.search-guide-tips-label {
+    font-weight: 600;
+    margin-right: 0.25rem;
+}
+
+.search-guide-tip {
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+}
+
 /* The answer line's small print (search mode on the sport pages), e.g.
    pointing "Schalke Bundesliga titles" to "Schalke titles" */
 .search-answer-body {
@@ -232,6 +276,20 @@
 [data-theme="dark"] .search-result.active {
     background: #222222;
     color: #10b981;
+}
+
+[data-theme="dark"] .search-guide-group,
+[data-theme="dark"] .search-guide-tips {
+    color: #ccc;
+}
+
+[data-theme="dark"] .search-guide-tips {
+    border-top-color: #444;
+}
+
+[data-theme="dark"] .search-guide-tip {
+    background: #222222;
+    color: #e5e7eb;
 }
 
 [data-theme="dark"] .search-result-detail,

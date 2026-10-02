@@ -969,7 +969,14 @@
         'basel': 'FC Basel 1893', 'young boys': 'BSC Young Boys', 'red star': 'Crvena Zvezda',
         'red star belgrade': 'Crvena Zvezda', 'steaua': 'FC Steaua Bucureşti', 'dynamo kyiv': 'Dinamo Kiev',
         'dynamo kiev': 'Dinamo Kiev', 'cska moscow': 'CSKA Moskva', 'spartak moscow': 'Spartak Moskva',
-        'zenit': 'Zenit St. Petersburg', 'olympiakos': 'Olympiacos FC', 'braga': 'S.C. Braga'
+        'zenit': 'Zenit St. Petersburg', 'olympiakos': 'Olympiacos FC', 'braga': 'S.C. Braga',
+        // Club abbreviations fans use
+        'om': 'Olympique Marseille', 's04': 'FC Schalke 04', 'b04': 'Bayer Leverkusen', 'svw': 'Werder Bremen',
+        'mufc': 'Manchester United', 'mcfc': 'Manchester City', 'lfc': 'Liverpool FC', 'cfc': 'Chelsea FC',
+        'thfc': 'Tottenham Hotspur', 'nufc': 'Newcastle United', 'avfc': 'Aston Villa', 'whufc': 'West Ham United',
+        'efc': 'Everton FC', 'lufc': 'Leeds United', 'ol': 'Olympique Lyonnais',
+        'bmg': 'Bor. Mönchengladbach', 'die fohlen': 'Bor. Mönchengladbach', 'atm': 'Atlético Madrid',
+        'atletico de madrid': 'Atlético Madrid'
     };
 
     const STREAK_TYPE_LABELS = {
@@ -995,12 +1002,12 @@
     };
     // Team Seasons' Champions League progressions ("how far they got")
     const CONTINENTAL_STAGE_PATTERNS = [
-        ['Semi-Finals', /\b(semi ?finals?|semis)\b/],
-        ['Quarter-Finals', /\b(quarter ?finals?|quarters)\b/],
+        ['Semi-Finals', /\b(semi ?finals?|semi ?finalists?|semis)\b/],
+        ['Quarter-Finals', /\b(quarter ?finals?|quarter ?finalists?|quarters)\b/],
         ['Round Of 16', /\b(round of 16|last 16)\b/],
         ['Play-Offs', /\bplay ?offs?\b/],
         ['Group Stage', /\b(group stages?|groups|league phase)\b/],
-        ['Final', /\b(finals?|runners? up|beaten finalists?)\b/]
+        ['Final', /\b(finals?|finalists?|runners? up)\b/]
     ];
     // Words the query parser understands, so a trailing one is never
     // mistaken for the start of a team name still being typed
@@ -1269,6 +1276,21 @@
             if (first.start > last.start) [first, last] = [last, first];
             return result(m, first.start, last.end);
         }
+        // "1990 to 2000", "1990-2000" - two years, no "from" / "between".
+        // Back-to-back years with a dash are a season ("2003-2004"), not this.
+        m = marked.match(new RegExp(`\\b${BOUND}\\s*(to|until|till|-|–)\\s*${BOUND}`));
+        if (m && /^\d{4}$/.test(m[1]) && /^\d{4}$/.test(m[3]) &&
+            !(/[-–]/.test(m[2]) && Number(m[3]) === Number(m[1]) + 1)) {
+            const first = Math.min(Number(m[1]), Number(m[3]));
+            const last = Math.max(Number(m[1]), Number(m[3]));
+            return result(m, `${first}-01-01`, `${last}-12-31`);
+        }
+        // Decades: "the 90s", "the 1990s", "in the 2010s"
+        m = marked.match(/\b(?:in\s+)?(?:the\s+)?(?:(1[89]|20)(\d)0'?s|'?(\d)0'?s)\b/);
+        if (m) {
+            const decade = m[1] ? Number(`${m[1]}${m[2]}0`) : (Number(m[3]) >= 3 ? 1900 + Number(m[3]) * 10 : 2000 + Number(m[3]) * 10);
+            return result(m, `${decade}-01-01`, `${decade + 9}-12-31`);
+        }
         m = marked.match(new RegExp(`\\b(since|after)\\s+(?:the\\s+)?${BOUND}(?:\\s*[-\\/–]\\s*(\\d{4}|\\d{2})\\b)?(?:\\s+season)?`));
         if (m) {
             const isSeason = m[3] !== undefined && /^\d{4}$/.test(m[2]) && Number(m[3]) % 100 === (Number(m[2]) + 1) % 100;
@@ -1295,7 +1317,12 @@
     // stage like "last 16" is never read as a count)
     function extractLastN(text) {
         const m = text.match(new RegExp(`\\b(?:last|past|previous|most recent)\\s+${NUMBER_PATTERN}\\s+(?:meetings?|games?|matches|fixtures|results|h2hs?|head to heads?|times?|encounters?)\\b`));
-        return m ? { n: toNumber(m[1]), text: m[0] } : null;
+        if (m) return { n: toNumber(m[1]), text: m[0] };
+        // "arsenal vs chelsea last 5" - a bare count, except the stage
+        // "last 16" and spans of seasons / years
+        const bare = text.match(new RegExp(`\\b(?:last|past|previous|most recent)\\s+${NUMBER_PATTERN}\\b(?!\\s*(?:seasons?|years?|-|/))`));
+        if (bare && toNumber(bare[1]) !== 16) return { n: toNumber(bare[1]), text: bare[0] };
+        return null;
     }
 
     // A scoreline like "5-0" or "3:3" -> { home, away }
@@ -1328,11 +1355,11 @@
     const STAGE_PATTERNS = [
         ['group', /\b(group stages?|group phase|groups|league phase|league stage)\b/],
         ['knockout', /\b(knock ?outs?|knock ?out stage|ko stage)\b/],
-        ['Semi-Finals', /\b(semi ?finals?|semis)\b/],
-        ['Quarter-Finals', /\b(quarter ?finals?|quarters)\b/],
+        ['Semi-Finals', /\b(semi ?finals?|semi ?finalists?|semis)\b/],
+        ['Quarter-Finals', /\b(quarter ?finals?|quarter ?finalists?|quarters)\b/],
         ['Round Of 16', /\b(round of 16|last 16)\b/],
         ['Play-Offs', /\bplay ?offs?\b/],
-        ['Final', /\bfinals?\b/],
+        ['Final', /\b(finals?|finalists?)\b/],
         ['Qualifiers', /\b(qualifiers?|qualifying)\b/]
     ];
     // League table stage (?stage=) and the H2H / match history boxes'
@@ -1417,8 +1444,11 @@
         const has = pattern => pattern.test(text);
         const finish = {
             rank: '', stage: '', better: false,
-            first: has(/\b(first (time|title|ever|win)|for the first time|first time (champions|winners))\b/),
-            historic: has(/\b(historic|pre (serie a|bundesliga)|before the (serie a|bundesliga)|old championships?)\b/)
+            first: has(/\b(first[ -](· )*(time|titles?|ever|win|final|trophy|scudetto|championship)|for the first time|first[ -]time (champions|winners)|maiden)\b/),
+            historic: has(/\b(historic|pre (serie a|bundesliga)|before the (serie a|bundesliga)|old championships?)\b/),
+            // About clubs reaching a stage, not the stage's matches
+            // ("first time finalists", "who reached the semi finals")
+            clubs: has(/\b(finalists?|first|maiden|reached|reach|made it|who|which|clubs|teams|knocked out|went out|out in|eliminated|exits?|exited|how far)\b/)
         };
         const top = text.match(/\btop (\d{1,2}|two|three|four|five|six|seven|eight|ten)\b/);
         const ordinal = text.match(/\b(\d{1,2})(st|nd|rd|th)\b/);
@@ -1439,8 +1469,9 @@
             if (stage) {
                 finish.stage = stage[0];
                 // "semi finals" / "reached the final" = that far or further;
-                // "knocked out in the semis" / "lost the final" = out there
-                const wentOut = runnersUp || has(/\b(knocked out|went out|go out|out in|eliminated|lost in|exit(ed)?)\b/);
+                // "knocked out in the semis" / "semi final exits" / "lost the
+                // final" / "exactly the quarter finals" = out at that stage
+                const wentOut = runnersUp || has(/\b(knocked out|went out|go out|goes out|out in|out at|bowed out|eliminated|eliminations?|lost|lose|loses|losing|loss|losses|defeats?|defeated|exits?|exited|exactly|only|just)\b/);
                 finish.better = !wentOut;
             }
         }
@@ -1492,7 +1523,7 @@
         // A table asked for by name wins over the stage words in it
         // ("2004-05 group stage table")
         if (has(/\b(tables?|standings?|classification|rankings?)\b/)) return { view: 'table', location };
-        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semis|quarter ?finals?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
+        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semi ?finalists?|semis|quarter ?finals?|quarter ?finalists?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
             return { view: 'team-seasons', finish: detectFinish(text), location };
         }
         if (has(/\b(vs|v|versus|against|h2h|head to head|head 2 head|meetings?|record)\b/)) return { view: 'h2h', location };
@@ -1566,8 +1597,37 @@
         return null;
     }
 
+    // Named derbies, read as the two teams ("el clasico" = Barcelona vs
+    // Real Madrid). Written as the clubs' full names so the team lookup
+    // finds them; the word "derby" goes with them (not Derby County).
+    const DERBIES = [
+        [/\b(el )?cl[aá]sico\b/, 'FC Barcelona vs Real Madrid'],
+        [/\b(der )?klassiker\b/, 'Bayern München vs Borussia Dortmund'],
+        [/\b(le )?classique\b/, 'Paris Saint-Germain vs Olympique Marseille'],
+        [/\brevierderby\b|\bruhr derby\b/, 'Borussia Dortmund vs FC Schalke 04'],
+        [/\bborussen[ -]?derby\b|\bborussia derby\b/, 'Borussia Dortmund vs Bor. Mönchengladbach'],
+        [/\brhein[ -]?derby\b|\brhine derby\b/, '1. FC Köln vs Bor. Mönchengladbach'],
+        [/\bderby d'?italia\b/, 'Juventus vs Inter'],
+        [/\b(derby della madonnina|milan derby|milano derby)\b/, 'Inter vs AC Milan'],
+        [/\b(derby della capitale|rome derby|roma derby)\b/, 'AS Roma vs Lazio Roma'],
+        [/\b(derby della mole|turin derby|torino derby)\b/, 'Juventus vs Torino FC'],
+        [/\b(madrid derby|derbi madrile[nñ]o)\b/, 'Real Madrid vs Atlético Madrid'],
+        [/\b(seville derby|sevilla derby|gran derbi)\b/, 'Sevilla FC vs Real Betis'],
+        [/\bbasque derby\b/, 'Athletic Club vs Real Sociedad'],
+        [/\bmerseyside derby\b/, 'Liverpool FC vs Everton FC'],
+        [/\bmanchester derby\b/, 'Manchester United vs Manchester City'],
+        [/\bnorth london derby\b/, 'Arsenal FC vs Tottenham Hotspur'],
+        [/\bnorth west derby\b|\bnorthwest derby\b/, 'Liverpool FC vs Manchester United'],
+        [/\b(tyne[ -]wear derby|tyne-tees derby)\b/, 'Newcastle United vs Sunderland AFC']
+    ];
+
     function parseSearchQuery(query) {
         let text = ' ' + query.toLowerCase() + ' ';
+        // "1st time champions" = "first time", not a 1st-place finish
+        text = text.replace(/\b1st(?=[ -](time|title|ever|win|final|league|trophy|scudetto|championship)| (european|champions|bundesliga|serie|la liga|ligue|premier))/g, 'first');
+        text = text.replace(/\bfor the 1st\b/g, 'for the first');
+        text = text.replace(/\bthe (?=[a-z ]*derby\b)/, ' ');
+        DERBIES.forEach(([pattern, teams]) => { text = text.replace(pattern, ` ${teams.toLowerCase()} `); });
         const filters = {
             dateFrom: '', dateTo: '', day: '', location: '', lastN: '', points: '', deductions: '',
             stage: '', penalties: false, excludeQualifiers: false, excludeMainStage: false,
@@ -1738,6 +1798,8 @@
             if (/-01$/.test(from) && to === addDays(addDays(`${from.slice(0, 7)}-28`, 4).slice(0, 7) + '-01', -1)) {
                 return `in ${new Date(`${from}T00:00:00`).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}`;
             }
+            // A whole decade: "in the 1990s"
+            if (yearStart(from) && yearEnd(to) && year(from) % 10 === 0 && year(to) === year(from) + 9) return `in the ${year(from)}s`;
             if (yearStart(from) && yearEnd(to)) return year(from) === year(to) ? `in ${year(from)}` : `between ${year(from)} and ${year(to)}`;
             return `between ${day(from)} and ${day(to)}`;
         }
@@ -2050,7 +2112,7 @@
                 const { rank, stage } = intent.finish;
                 // A stage on its own with no team is a stage of the table
                 // ("champions league 2004-05 group stage")
-                if (!t1 && stage && !rank) {
+                if (!t1 && stage && !rank && !intent.finish.clubs) {
                     primary.push(tableResult(comp, parsed));
                     break;
                 }
@@ -2741,10 +2803,15 @@
         rows.forEach(r => { counts[r.team] = (counts[r.team] || 0) + 1; });
         const clubs = Object.keys(counts).length;
         if (data.first) {
+            // The page may pass every season, not just each club's first:
+            // the newest first-timer is the club whose first time is latest
+            const firstTimes = {};
+            [...rows].reverse().forEach(r => { if (!(r.team in firstTimes)) firstTimes[r.team] = r; });
+            const newest = Object.values(firstTimes).sort((x, y) => startYear(y) - startYear(x))[0];
             const label = what.verb === 'won' ? `won ${competition}` : `${what.noun} ${competition}`;
             return {
-                crestTeam: latest.team,
-                html: `${formatNumber(clubs)} club${clubs === 1 ? ' has' : 's have'} ${label}; the most recent first-timer was ${b(latest.team)} in ${latest.season}.`
+                crestTeam: newest.team,
+                html: `${formatNumber(clubs)} club${clubs === 1 ? ' has' : 's have'} ${label}; the most recent first-timer was ${b(newest.team)} in ${newest.season}.`
             };
         }
         const ranked = Object.entries(counts).sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1));
@@ -2926,6 +2993,94 @@
         return null;
     }
 
+    // --- Suggestions (the empty search bar's guide, the home page's chips) ---
+
+    // Example questions per dropdown choice, grouped by kind of question -
+    // every one opens an answer. The home page's "Try" chips are these too.
+    const SEARCH_EXAMPLES = {
+        'domestic': [
+            ['Head to head', ['Barcelona vs Real Madrid at home', 'Arsenal vs Chelsea since 2010']],
+            ['Seasons & tables', ['Serie A 2005-06', 'Bundesliga table since 2010']],
+            ['Titles & finishes', ['Juventus titles', 'Arsenal top 4', 'First time champions Bundesliga']],
+            ['Streaks', ['Bayern longest unbeaten run']],
+            ['Last time', ['Last time Liverpool beat Manchester United away']],
+            ['Biggest wins & matches', ['PSG biggest wins']]
+        ],
+        'premier-league': [
+            ['Head to head', ['Arsenal vs Chelsea', 'Arsenal vs the Big 6 at home']],
+            ['Seasons & tables', ['Premier League 2003-04']],
+            ['Titles & finishes', ['Manchester United Premier League titles', 'Premier League champions']],
+            ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks']],
+            ['Last time', ['Last time Liverpool beat Everton away']],
+            ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws']]
+        ],
+        'la-liga': [
+            ['Head to head', ['Barcelona vs Real Madrid']],
+            ['Seasons & tables', ['La Liga 2010-11', 'La Liga home table 2010-11']],
+            ['Titles & finishes', ['Real Madrid titles', 'Sevilla top 4', 'First time champions La Liga', 'Athletic Club seasons']],
+            ['Streaks', ['Barcelona longest unbeaten run']],
+            ['Last time', ['Last time Barcelona beat Real Madrid away']],
+            ['Biggest wins & matches', ['Atletico Madrid biggest wins']]
+        ],
+        'serie-a': [
+            ['Head to head', ['Juventus vs Inter', 'Inter vs AC Milan since 2010']],
+            ['Seasons & tables', ['Serie A 2005-06']],
+            ['Titles & finishes', ['Juventus titles', 'Napoli titles', 'Serie A champions', 'Atalanta top 4']],
+            ['Streaks', ['AC Milan longest unbeaten run']],
+            ['Last time', ['Last time Roma beat Lazio']],
+            ['Biggest wins & matches', ['Juventus biggest wins']]
+        ],
+        'bundesliga': [
+            ['Head to head', ['Bayern vs Dortmund']],
+            ['Seasons & tables', ['Bundesliga 2023-24', 'Bundesliga table since 2010', 'Bayer Leverkusen 2023-24']],
+            ['Titles & finishes', ['Bayern titles', 'Werder Bremen titles', 'First time champions Bundesliga']],
+            ['Streaks', ['Dortmund longest winning streak']],
+            ['Last time', ['Last time Schalke beat Dortmund']],
+            ['Biggest wins & matches', ['Bayern biggest wins']]
+        ],
+        'ligue-1': [
+            ['Head to head', ['PSG vs Marseille', 'PSG vs Lyon since 2012']],
+            ['Seasons & tables', ['Ligue 1 1992-93', 'Lille 2010-11']],
+            ['Titles & finishes', ['Saint-Etienne titles', 'Lyon titles', 'Ligue 1 champions']],
+            ['Streaks', ['PSG longest unbeaten run']],
+            ['Last time', ['Last time Marseille beat PSG away']],
+            ['Biggest wins & matches', ['Monaco biggest wins']]
+        ],
+        'champions-league': [
+            ['Head to head', ['Real Madrid vs Bayern', 'Arsenal vs Spain']],
+            ['Seasons & tables', ['Champions League 2004-05']],
+            ['Titles & finishes', ['Real Madrid titles', 'Champions League winners', 'Liverpool lost in the final', 'Ajax European Cup titles']],
+            ['Streaks', ['Bayern longest winning streak in the knockouts']],
+            ['Last time', ['Last time Real Madrid lost to English clubs']],
+            ['Biggest wins & matches', ['Real Madrid biggest aggregate wins']]
+        ]
+    };
+
+    // Words that can be added to any question, per dropdown choice
+    const DOMESTIC_MODIFIERS = ['at home / away', 'since 2010', 'between 1990 and 2000', 'since 01/01/1991',
+        'last 10 meetings', 'on a Sunday', '2 points for a win', 'without deductions'];
+    const SEARCH_MODIFIERS = {
+        'domestic': DOMESTIC_MODIFIERS,
+        'premier-league': ['at home / away', 'vs the Big 6', 'Premier League / First Division', 'since 2010',
+            'last 10 meetings', 'on a Sunday', '2 points for a win'],
+        'la-liga': DOMESTIC_MODIFIERS,
+        'serie-a': [...DOMESTIC_MODIFIERS.slice(0, 6), 'Serie A titles (no pre-1929)'],
+        'bundesliga': [...DOMESTIC_MODIFIERS.slice(0, 6), 'Bundesliga titles (no pre-1963)'],
+        'ligue-1': DOMESTIC_MODIFIERS,
+        'champions-league': ['at home / away', 'semi finals / semi final exits', 'knockouts', 'on aggregate', 'on penalties',
+            'after extra time', 'vs English clubs', 'Champions League / European Cup', 'since 2010']
+    };
+
+    const GUIDE_ICONS = {
+        'Head to head': '⚔️', 'Seasons & tables': '📊', 'Titles & finishes': '🏆',
+        'Streaks': '⚡', 'Last time': '🔍', 'Biggest wins & matches': '🎯'
+    };
+
+    // The example questions for a dropdown choice, as one list
+    function examples(scope) {
+        return (SEARCH_EXAMPLES[scope] || SEARCH_EXAMPLES.domestic).flatMap(([, items]) => items);
+    }
+
     // --- Search bar ---
 
     // Result kinds whose page has a search mode: the page opens with its
@@ -3018,7 +3173,37 @@
             resultsEl.classList.remove('hidden');
         }
 
+        // The empty bar's guide: this dropdown choice's example questions,
+        // grouped, each opening its answer, then words to add to any question
+        function renderGuide() {
+            const scope = scopeSelect.value;
+            const groups = SEARCH_EXAMPLES[scope] || SEARCH_EXAMPLES.domestic;
+            activeIndex = -1;
+            resultsEl.innerHTML = groups.map(([label, items]) => `
+                <div class="search-guide-group">${GUIDE_ICONS[label] || ''} ${escapeSearchHtml(label)}</div>
+                ${items.map(text => {
+                    const top = searchFor(text, scope).results[0];
+                    if (!top) return '';
+                    return `
+                        <a class="search-result search-guide-item" role="option" href="${escapeSearchHtml(resultHref(top, text, scope))}">
+                            <span class="search-result-title">${escapeSearchHtml(text)}</span>
+                            <span class="search-result-comp">${top.comp.badge}</span>
+                        </a>`;
+                }).join('')}`).join('') + `
+                <div class="search-guide-tips">
+                    <span class="search-guide-tips-label">Add to any question:</span>
+                    ${(SEARCH_MODIFIERS[scope] || DOMESTIC_MODIFIERS).map(tip => `<span class="search-guide-tip">${escapeSearchHtml(tip)}</span>`).join('')}
+                </div>`;
+            resultsEl.classList.remove('hidden');
+        }
+
         function run() {
+            // Nothing typed: the guide while the bar has focus
+            if (!input.value.trim()) {
+                if (document.activeElement === input) renderGuide();
+                else render([], '');
+                return;
+            }
             const { results, message } = searchFor(input.value, scopeSelect.value);
             render(results, message);
         }
@@ -3039,7 +3224,12 @@
         });
         input.addEventListener('input', run);
         input.addEventListener('focus', () => {
-            if (input.value.trim() && resultsEl.classList.contains('hidden')) run();
+            if (resultsEl.classList.contains('hidden')) run();
+        });
+        // Already focused (the home page focuses the bar on load): a click
+        // opens the guide or the results again
+        input.addEventListener('click', () => {
+            if (resultsEl.classList.contains('hidden')) run();
         });
         input.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowDown') {
@@ -3055,6 +3245,12 @@
         // Enter opens the highlighted result, or the top one
         form.addEventListener('submit', (e) => {
             e.preventDefault();
+            // Empty bar: only an example picked with the arrow keys opens
+            if (!input.value.trim()) {
+                const picked = resultsEl.querySelectorAll('.search-result')[activeIndex];
+                if (picked) window.location.href = picked.getAttribute('href');
+                return;
+            }
             run();
             const items = resultsEl.querySelectorAll('.search-result');
             const target = items[activeIndex >= 0 ? activeIndex : 0];
@@ -3077,5 +3273,5 @@
         };
     }
 
-    window.LeagueSearch = { mount, searchFor, renderAnswer };
+    window.LeagueSearch = { mount, searchFor, renderAnswer, examples };
 })();

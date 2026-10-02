@@ -98,6 +98,38 @@ Feature ideas, not yet scheduled.
   extension. See that branch's own TODO.md for the full build/fix
   history.
 
+- Later: **Last Time When rework** — noted 2026-10-02 while testing the
+  search bar. The tab only knows a result (win / draw / loss / any), a
+  venue, a weekday, an opponent and a stage, so these questions can't be
+  answered yet:
+  - negation: "last time Juventus didn't win" (today the search drops
+    "didn't" and gives their last *win* - the opposite)
+  - an exact scoreline: "last time Arsenal drew 0-0", "PSG lost 5-0"
+  - a margin: "lost to Real Madrid by 4 goals"
+  - goals scored: "last time Arsenal scored 5"
+  - Continental: decided on penalties ("won on penalties")
+  - any club from a country, as the subject: "last time an English club
+    won the UCL"
+  - "City" / "United" alone as the opponent ("when did Man Utd last lose
+    to City" reads City as Hull City)
+  Needs new Last Time When filters on all four pages first; the search
+  then only has to pass them through (it already parses scorelines and
+  penalties for Match Finder).
+
+- Later: **Match Finder without a team** — noted 2026-10-02 while testing
+  the search bar. Match Finder needs at least one team picked, so
+  league-wide questions can't be answered: "biggest win in La Liga
+  history", "highest scoring game ever in the Premier League". Needs an
+  all-clubs mode on all four pages (each match listed once, not once per
+  side); the search then sends these there instead of asking for a team.
+
+- Later: **Comebacks** — noted 2026-10-02 ("Barcelona comebacks" in the
+  search). No concept of a comeback yet. Possible meanings: a match won
+  or drawn from behind (needs half-time / goal-time data - check what the
+  match rows have), or a Continental two-legged tie won after losing the
+  first leg (the 6-1 vs PSG) - doable from the existing tie data. Decide
+  which first, then a Match Finder category and the search words for it.
+
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
   one-team-at-a-time view.
