@@ -192,6 +192,12 @@
     color: #6b7280;
 }
 
+.search-guide-icon {
+    display: inline-block;
+    width: 1.35rem;
+    letter-spacing: 0;
+}
+
 .search-result.search-guide-item {
     padding: 0.45rem 1.25rem 0.45rem 2.6rem;
     border-bottom: none;

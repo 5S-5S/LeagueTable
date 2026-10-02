@@ -5458,6 +5458,10 @@
                 // Show First Occurrence Only toggle when any progression is selected
                 updateFirstOccurrenceOnlyVisibility();
 
+                // Include Better Results ("reached the final") works for every team too
+                elements.includeBetterResultsContainer.classList.remove('hidden');
+                elements.includeBetterResultsContainer.style.display = 'flex';
+
                 showAllTeamsAtProgression(selectedPosition, state.teamSeasonsSelectedLeague);
             } else if (state.teamSeasonsSelectedSeason && !isEraSeasonKey(state.teamSeasonsSelectedSeason)) {
                 // Progression cleared but one season is still picked - back to its standings
@@ -5577,7 +5581,9 @@
                         const teamProgression = calculateTournamentProgression(row.team, lastMatchForProgression);
 
                         // Only include teams that reached the selected progression
-                        if (teamProgression === progression) {
+                        // - or, with Include Better Results, went further
+                        if (teamProgression === progression ||
+                            (state.includeBetterResults && isProgressionEqualOrBetter(teamProgression, progression))) {
                             const goalDifference = row.goalsFor - row.goalsAgainst;
                             const winPoints = 3; // Standard 3 points for win
                             const points = row.won * winPoints + row.drawn;
@@ -5608,6 +5614,9 @@
                 const yearA = parseInt(a.season.split('-')[0]);
                 const yearB = parseInt(b.season.split('-')[0]);
                 if (yearB !== yearA) return yearB - yearA;
+                const rankA = getProgressionRank(a.tournamentProgression);
+                const rankB = getProgressionRank(b.tournamentProgression);
+                if (rankA !== rankB) return rankA - rankB;
                 return a.team.localeCompare(b.team);
             });
             
@@ -5630,6 +5639,7 @@
             });
             
             // Update progression info
+            const orBetter = state.includeBetterResults && progression !== 'Champions' ? ' or better' : '';
             const totalCount = allProgressionData.length;
             const uniqueTeamCount = Object.keys(teamCounts).length;
             if (totalCount === 0) {
@@ -5637,10 +5647,10 @@
             } else if (state.firstOccurrenceOnly) {
                 const teamText = uniqueTeamCount === 1 ? 'team' : 'teams';
                 const countText = totalCount === 1 ? 'time' : 'times';
-                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} unique ${teamText} reached ${progression} (${totalCount} ${countText} total)`;
+                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} unique ${teamText} reached ${progression}${orBetter} (${totalCount} ${countText} total)`;
             } else {
                 const countText = totalCount === 1 ? 'time' : 'times';
-                elements.teamSeasonsPositionInfo.textContent = `${totalCount} teams reached ${progression} a total of ${totalCount} ${countText}`;
+                elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} ${uniqueTeamCount === 1 ? 'team' : 'teams'} reached ${progression}${orBetter} a total of ${totalCount} ${countText}`;
             }
 
             // Apply First Occurrence Only filter if enabled - keeps only
@@ -5681,7 +5691,7 @@
             
             // Update title for progression-only view
             const progressionStyle = progression === 'Champions' ? 'color: #d97706; font-weight: bold;' : 'color: #374151; font-weight: bold;';
-            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>)`;
+            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})`;
             
             // Store data globally for sorting
             window.currentTeamHistoryData = [...allProgressionData];
@@ -5788,7 +5798,7 @@
             
             // Update title for progression-only view
             const progressionStyle = progression === 'Champions' ? 'color: #d97706; font-weight: bold;' : 'color: #374151; font-weight: bold;';
-            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>)`;
+            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})`;
             
             // Store data globally for sorting
             window.currentTeamHistoryData = [...allProgressionData];
@@ -6899,6 +6909,13 @@
                             }
                         }
                     }, 100);
+                } else if (state.teamSeasonsSelectedPosition) {
+                    // Every team: "lost in the final" <-> "reached the final"
+                    // The checked class draws the tick - clear any drawn by the
+                    // one-team view above, or it shows twice
+                    elements.includeBetterResultsCheckbox.removeAttribute('style');
+                    elements.includeBetterResultsCheckbox.innerHTML = '';
+                    showAllTeamsAtProgression(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
                 }
             });
 
@@ -14278,8 +14295,11 @@
                         row.count = '–';
                         return;
                     }
-                    finishCounts[row.tournamentProgression] = (finishCounts[row.tournamentProgression] || 0) + 1;
-                    row.count = finishCounts[row.tournamentProgression];
+                    // With Include Better Results the rows are one question
+                    // ("2nd or better"), so they're counted together
+                    const countKey = state.teamSeasonsSelectedPosition && state.includeBetterResults ? 'or-better' : row.tournamentProgression;
+                    finishCounts[countKey] = (finishCounts[countKey] || 0) + 1;
+                    row.count = finishCounts[countKey];
                 });
 
             let sortedData = [...filteredData];

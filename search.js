@@ -2364,13 +2364,17 @@
 
     // A Champions League round in words: "1. Round" -> "first round",
     // "Play-Offs (Q)" -> "qualifying play-offs"
+    // A stage name in words: "Quarter-Finals" -> "quarter-finals",
+    // "3. Round (Q)" / "Qualification 3. Round" -> "third qualifying round"
     function phaseWords(phase) {
         if (!phase) return '';
-        const qualifying = /\(Q\)/.test(phase);
-        let words = phase.replace(/\s*\(Q\)/, '')
-            .replace(/^1\. Round$/, 'first round').replace(/^2\. Round$/, 'second round').replace(/^3\. Round$/, 'third round')
+        const qualifying = /\(Q\)|^Qualification\b|^Qualifying\b/i.test(phase);
+        const ordinals = { 1: 'first', 2: 'second', 3: 'third', 4: 'fourth' };
+        let words = phase.replace(/\s*\(Q\)/, '').replace(/^Qualification\s+|^Qualifying\s+/i, '')
+            .replace(/^(\d)\. Round$/, (m, n) => `${ordinals[n] || `${n}th`} round`)
             .toLowerCase();
-        return qualifying ? `qualifying ${words}` : words;
+        if (!qualifying || /preliminary/.test(words)) return words;
+        return /round$/.test(words) ? words.replace(/round$/, 'qualifying round') : `qualifying ${words}`;
     }
 
     function possessive(name) {
@@ -2723,7 +2727,7 @@
                         ? `${team} have never won ${competition}.`
                         : `${team} have never ${what.noun} ${competition}.` };
                 }
-                const span = rows.length > 1 ? `, first in ${earliest.season} and most recently in ${latest.season}` : ` in ${latest.season}`;
+                const span = rows.length > 1 ? `, first in ${earliest.season} and most recently in ${latest.season}` : `, in ${latest.season}`;
                 const html = what.verb === 'won'
                     ? `${team} have won ${competition} ${times(rows.length)}${span}.`
                     : `${team} have ${what.noun} ${competition} ${times(rows.length)}${span}.`;
@@ -2821,7 +2825,9 @@
         const label = what.verb === 'won' ? `won ${competition} the most` : `${what.noun} ${competition} the most`;
         return {
             crestTeam: leader,
-            html: `${b(leader)} have ${label} (${times(most)}${level.length ? `, level with ${level.map(b).join(' and ')}` : ''}), one of ${formatNumber(clubs)} club${clubs === 1 ? '' : 's'} to do it. The most recent was ${b(latest.team)} in ${latest.season}.`
+            // A range ("top 6", "reached the semis") has several clubs a
+            // season, so no single "most recent"
+            html: `${b(leader)} have ${label} (${times(most)}${level.length ? `, level with ${level.map(b).join(' and ')}` : ''}), one of ${formatNumber(clubs)} club${clubs === 1 ? '' : 's'} to do it.${better ? '' : ` The most recent was ${b(latest.team)} in ${latest.season}.`}`
         };
     }
 
@@ -2855,7 +2861,7 @@
         // "all-time" only when nothing else narrows it down
         const era = !!ERA_NAMES[params.get('season')];
         const narrowed = !!(ctx.season || era || dates || dayText || stage || penalties || qualifiersOnly || mainStageOnly ||
-            params.get('aet') === '1' || params.get('ag') === '1');
+            params.get('aet') === '1' || params.get('ag') === '1' || lastN > 0);
         const when = ctx.season ? `in ${ctx.season}` : (dates || (narrowed ? '' : 'all‑time')); // non-breaking hyphen
         const span = [where, when, dayText].filter(Boolean).join(' ');
         const onPenalties = penalties ? ', in matches decided on penalties' : '';
@@ -3180,7 +3186,7 @@
             const groups = SEARCH_EXAMPLES[scope] || SEARCH_EXAMPLES.domestic;
             activeIndex = -1;
             resultsEl.innerHTML = groups.map(([label, items]) => `
-                <div class="search-guide-group">${GUIDE_ICONS[label] || ''} ${escapeSearchHtml(label)}</div>
+                <div class="search-guide-group"><span class="search-guide-icon">${GUIDE_ICONS[label] || ''}</span>${escapeSearchHtml(label)}</div>
                 ${items.map(text => {
                     const top = searchFor(text, scope).results[0];
                     if (!top) return '';
