@@ -5923,7 +5923,11 @@
                         <td class="px-3 py-4 text-center">${season.lost}</td>
                         <td class="px-3 py-4 text-center">${season.goalsFor}</td>
                         <td class="px-3 py-4 text-center">${season.goalsAgainst}</td>
-                        <td class="px-3 py-4 text-center ${season.goalDifference >= 0 ? 'text-green-600' : 'text-red-600'}">${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}</td>
+                        <td class="px-3 py-4 text-center">
+                            <span class="font-bold ${season.goalDifference > 0 ? 'text-green-700' : season.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
+                                ${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}
+                            </span>
+                        </td>
                         <td class="px-3 py-4 text-center">
                             <span class="points-badge">
                                 ${season.points}
@@ -14252,6 +14256,27 @@
             elements.teamHistoryTitle.textContent = `${teamName} - Season History`;
             
             // Apply sorting if active
+            // Count: the nth time the team reached this stage, oldest
+            // season first (as the all-teams table's Count) - a stripped
+            // title or an unfinished current season isn't counted
+            const finishCounts = {};
+            [...filteredData]
+                .sort((x, y) => parseInt(x.season) - parseInt(y.season))
+                .forEach(row => {
+                    const revoked = false;
+                    // The current season isn't a finish yet (as the position
+                    // filter's own 34-game rule)
+                    const now = new Date();
+                    const currentStart = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+                    const unfinished = parseInt(row.season) === currentStart && row.tournamentProgression !== 'Champions' && row.tournamentProgression !== 'Final';
+                    if (revoked || unfinished) {
+                        row.count = '–';
+                        return;
+                    }
+                    finishCounts[row.tournamentProgression] = (finishCounts[row.tournamentProgression] || 0) + 1;
+                    row.count = finishCounts[row.tournamentProgression];
+                });
+
             let sortedData = [...filteredData];
             if (state.teamHistorySortConfig.key && state.teamHistorySortConfig.direction) {
                 const key = state.teamHistorySortConfig.key;
@@ -14282,6 +14307,7 @@
             
             const headers = [
                 { key: 'season', label: 'Season' },
+                { key: 'count', label: 'Count' },
                 { key: 'team', label: 'Team' },
                 { key: 'played', label: 'P' },
                 { key: 'won', label: 'W' },
@@ -14314,6 +14340,7 @@
                             ${renderTeamSeasonExpandButton(seasonRef, leagueToUse)}
                             ${season.season}
                         </td>
+                        <td class="px-3 py-4 text-center font-semibold">${season.count}</td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -14351,7 +14378,7 @@
                             'color: #6b7280; background-color: #f9fafb;'
                         }">${season.tournamentProgression || 'Group Stage'}</td>
                     </tr>
-                    ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 12)}
+                    ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 13)}
                 `;
             }).join('');
             

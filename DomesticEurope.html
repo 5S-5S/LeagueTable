@@ -5210,7 +5210,11 @@
                         <td class="px-3 py-4 text-center">${season.lost}</td>
                         <td class="px-3 py-4 text-center">${season.goalsFor}</td>
                         <td class="px-3 py-4 text-center">${season.goalsAgainst}</td>
-                        <td class="px-3 py-4 text-center ${season.goalDifference >= 0 ? 'text-green-600' : 'text-red-600'}">${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}</td>
+                        <td class="px-3 py-4 text-center">
+                            <span class="font-bold ${season.goalDifference > 0 ? 'text-green-700' : season.goalDifference < 0 ? 'text-red-600' : 'text-black'}">
+                                ${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}
+                            </span>
+                        </td>
                         <td class="px-3 py-4 text-center">
                             <span class="points-badge">
                                 ${season.points}
@@ -11605,6 +11609,29 @@
             elements.teamHistoryTitle.textContent = `${teamName} - Season History`;
             
             // Apply sorting if active
+            // Count: the nth time the team finished in this row's position, oldest
+            // season first (as the all-teams table's Count) - a stripped
+            // title or an unfinished current season isn't counted
+            const finishCounts = {};
+            [...filteredData]
+                .sort((x, y) => parseInt(x.season) - parseInt(y.season))
+                .forEach(row => {
+                    const revoked = { 'premier-league': 'E0', 'la-liga': 'SP1', 'serie-a': 'I1', 'bundesliga': 'D1', 'ligue-1': 'F1' }[leagueToUse] === undefined ? false
+                    : strippedChampions.some(([t, d, s, p]) => t === teamName && s === row.season && p === row.position &&
+                        d === { 'premier-league': 'E0', 'la-liga': 'SP1', 'serie-a': 'I1', 'bundesliga': 'D1', 'ligue-1': 'F1' }[leagueToUse]);
+                    // The current season isn't a finish yet (as the position
+                    // filter's own 34-game rule)
+                    const now = new Date();
+                    const currentStart = now.getMonth() >= 6 ? now.getFullYear() : now.getFullYear() - 1;
+                    const unfinished = parseInt(row.season) === currentStart && row.played < 34;
+                    if (revoked || unfinished) {
+                        row.count = '–';
+                        return;
+                    }
+                    finishCounts[row.position] = (finishCounts[row.position] || 0) + 1;
+                    row.count = finishCounts[row.position];
+                });
+
             let sortedData = [...filteredData];
             if (state.teamHistorySortConfig.key && state.teamHistorySortConfig.direction) {
                 const key = state.teamHistorySortConfig.key;
@@ -11635,6 +11662,7 @@
             
             const headers = [
                 { key: 'season', label: 'Season' },
+                { key: 'count', label: 'Count' },
                 { key: 'team', label: 'Team' },
                 { key: 'played', label: 'P' },
                 { key: 'won', label: 'W' },
@@ -11669,6 +11697,7 @@
                             ${season.season}
                             ${season.isHistoric ? '<span class="ml-2 px-2 py-1 text-xs bg-amber-100 text-amber-800 rounded-full">Historic</span>' : ''}
                         </td>
+                        <td class="px-3 py-4 text-center font-semibold">${season.count}</td>
                         <td class="px-4 py-4 font-semibold text-gray-900">
                             <div class="flex items-center">
                                 ${logoUrl ? `<img src="${logoUrl}" alt="${teamName} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
@@ -11698,7 +11727,7 @@
                             'color: #6b7280;'
                         }">${season.position}</td>
                     </tr>
-                    ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 11)}
+                    ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 12)}
                 `;
             }).join('');
             
