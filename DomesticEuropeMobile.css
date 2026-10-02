@@ -3713,3 +3713,20 @@ html:not(.search-mode) .header-actions {
     align-items: flex-end;
     align-self: flex-end; /* low in the header, clear of the pinned ▼ button */
 }
+
+/* Historic streak match lists: the match that ended the run, in its own
+   table above the run's matches (newest first), with a note under it */
+.streak-ended-by {
+    margin-top: 0;
+}
+
+.streak-ended-note {
+    text-align: center;
+    font-size: 0.68rem;
+    color: #6b7280;
+    margin: 0.4rem 0 0.75rem;
+}
+
+[data-theme="dark"] .streak-ended-note {
+    color: #ccc;
+}

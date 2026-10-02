@@ -149,6 +149,19 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Historic streaks: the match that ended each run~~ — done
+  (2026-10-02), all four pages. Expanding a historic streak's match list
+  now also shows the match that broke the run, in its own one-row table
+  above the run's matches (the list is newest first, and that match is
+  newer than the run's), with a note under it: "The match that ended this
+  49-game run". Recorded as `endedBy` when findAllHistoricStreaks closes a
+  run, so it follows the streak's own filters - against one opponent it's
+  the next meeting, home / away only the next home / away match, with a
+  Continental stage the next match in that stage; all-teams lists too. A
+  run nothing has broken (still going, or the club's last run in the
+  data) says "No later match has ended this run". E.g. Arsenal's 49
+  unbeaten: Manchester United 2-0 Arsenal, 24 October 2004.
+
 - ~~Search page~~ — done (2026-10-01), merged to main 2026-10-02. `index.html` is now a plain search page (title, a
   search bar with a sport/competition dropdown: Top 5 Leagues, each
   league, Champions League; NFL/NBA greyed out). The search lives in

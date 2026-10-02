@@ -4206,7 +4206,8 @@
                             startDate: startDate,
                             endDate: endDate,
                             lengthInDays: lengthInDays,
-                            streakType: streakType
+                            streakType: streakType,
+                            endedBy: match // the match that broke it
                         });
                     }
                     
@@ -4276,9 +4277,33 @@
             const rows = [...streak.matches]
                 .sort((a, b) => b.dateObj - a.dateObj)
                 .map(match => buildMatchHistoryRowData(match, team1, state.selectedLeague));
+            // The match that broke the run, in its own table above it - the
+            // list is newest first, and that match is newer than the run's
+            const endedBy = streak.endedBy ? buildMatchHistoryRowData(streak.endedBy, team1, state.selectedLeague) : null;
+            const endedByHtml = endedBy ? `
+                        <div class="league-table season-matches streak-ended-by">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Date</th>
+                                <th class="text-center">Stage</th>
+                                <th class="text-center">Home</th>
+                                <th class="text-center">H:A</th>
+                                <th class="text-center">Away</th>
+                                <th class="text-center">Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="team1-selected">
+                                    ${renderMatchHistoryRow(endedBy, 0, 1, team1, state.selectedLeague)}
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="streak-ended-note">The match that ended this ${streak.count}-game run</p>`
+                : `<p class="streak-ended-note">No later match has ended this run</p>`;
             return `
                 <tr class="season-matches-row streak-matches-row" data-streak="${historicStreakKey(streak)}">
                     <td colspan="${colspan}">
+                        ${endedByHtml}
                         <div class="league-table season-matches">
                             <table>
                                 <thead>
