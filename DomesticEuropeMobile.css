@@ -3460,6 +3460,10 @@ html.search-mode .search-answer {
 
 html.search-mode .main-card {
     overflow: visible; /* the search results float out of the card */
+    /* One background top to bottom: the search bar and answer sit on the
+       card itself, the results on sections in --bg-gray-50 (the card's
+       95% white over the blue page reads as a slightly different grey) */
+    background: var(--bg-gray-50);
 }
 
 /* The header goes, except its dark mode switch - pinned top-right, where
