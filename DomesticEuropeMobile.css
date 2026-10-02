@@ -2101,21 +2101,38 @@ body {
         word-break: normal !important;
     }
 
-    /* --- single-team-mode: Season, Team, P, W-D-L, GF:GA, GD, Pts, Pos --- */
+    /* --- single-team-mode: Season, #, Team, P, W-D-L, GF:GA, GD, Pts, Pos ---
+       (the # Count column came in 2026-10 - same layout as the all-teams
+       view, plus Pos) */
     #teamHistoryTable.single-team-mode .league-table th:nth-child(1),
     #teamHistoryTable.single-team-mode .league-table td:nth-child(1) {
-        width: 44px !important;
-        min-width: 44px !important;
-        max-width: 44px !important;
+        width: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
     }
 
-    /* Team column: sticky, pinned right after Season. Deliberately no
-       width/min-width/max-width - under table-layout:fixed that makes
-       it the sole flexible column in this mode. */
+    /* # column: sticky, pinned right after Season */
     #teamHistoryTable.single-team-mode .league-table th:nth-child(2),
     #teamHistoryTable.single-team-mode .league-table td:nth-child(2) {
         position: sticky !important;
-        left: 44px !important;
+        left: 40px !important;
+        z-index: 2 !important;
+        width: 22px !important;
+        min-width: 22px !important;
+        max-width: 22px !important;
+        font-size: 0.48rem !important;
+        padding: 0.35rem 0.1rem !important;
+        text-align: center !important;
+        background: inherit !important;
+    }
+
+    /* Team column: sticky, pinned right after #. Deliberately no
+       width/min-width/max-width - under table-layout:fixed that makes
+       it the sole flexible column in this mode. */
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(3),
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(3) {
+        position: sticky !important;
+        left: 62px !important;
         z-index: 2 !important;
         font-size: 0.48rem !important;
         padding: 0.35rem 0.1rem !important;
@@ -2126,41 +2143,41 @@ body {
 
     /* Stat columns: each gets its own fixed width sized to its actual
        content so none of them can steal space from Team above. */
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(n+3),
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(n+3) {
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(n+4),
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(n+4) {
         text-align: center !important;
         font-size: 0.5rem !important;
         padding: 0.35rem 0.16rem !important;
     }
 
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(3), /* P */
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(3) {
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(4), /* P */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(4) {
         width: 29px !important;
     }
 
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(4), /* W-D-L */
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(4) {
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(5), /* W-D-L */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(5) {
         width: 70px !important;
     }
 
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(5), /* GF:GA */
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(5) {
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(6), /* GF:GA */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(6) {
         width: 57px !important;
     }
 
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(6), /* GD */
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(6) {
-        width: 40px !important;
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(7), /* GD */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(7) {
+        width: 34px !important;
     }
 
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(7), /* Pts */
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(7) {
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(8), /* Pts */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(8) {
         width: 44px !important;
     }
 
-    #teamHistoryTable.single-team-mode .league-table th:nth-child(8), /* Pos */
-    #teamHistoryTable.single-team-mode .league-table td:nth-child(8) {
-        width: 33px !important;
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(9), /* Pos */
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(9) {
+        width: 26px !important;
     }
 
     /* --- position-only-mode: Season, #, Team, P, W-D-L, GF:GA, GD, Pts --- */
@@ -2266,6 +2283,7 @@ body {
        a solid color from thead), matching the League Table's header */
     #teamHistoryTable.single-team-mode .league-table th:nth-child(1),
     #teamHistoryTable.single-team-mode .league-table th:nth-child(2),
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(3),
     #teamHistoryTable.position-only-mode .league-table th:nth-child(1),
     #teamHistoryTable.position-only-mode .league-table th:nth-child(2),
     #teamHistoryTable.position-only-mode .league-table th:nth-child(3) {
@@ -3286,6 +3304,11 @@ body {
     #teamHistoryTable.single-team-mode .league-table th:nth-child(2),
     #teamHistoryTable.single-team-mode .league-table td:nth-child(2) {
         left: 56px !important;
+    }
+
+    #teamHistoryTable.single-team-mode .league-table th:nth-child(3),
+    #teamHistoryTable.single-team-mode .league-table td:nth-child(3) {
+        left: 78px !important;
     }
 
     /* Multi-team view (Season, #, Team, ...): same chevron room */
