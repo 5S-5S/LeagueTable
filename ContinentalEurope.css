@@ -668,7 +668,7 @@ body {
 }
 
 /* Winning scores are green everywhere they appear (Head-to-Head, Match
-   History, Team Streaks, Last Time When) - one rule via the shared
+   History, Team Streaks) - one rule via the shared
    --positive variable instead of a separate hardcoded copy per
    container id, so a new container using .win-score doesn't need its
    own dark-mode entry added by hand to work correctly. */
@@ -740,7 +740,6 @@ body {
 [data-theme="dark"] .league-table td[style*="#059669"] {
     color: var(--positive) !important;
 }
-
 
 .toggle-checkbox:checked + .toggle-label .toggle-button {
     left: 32px;
@@ -1419,7 +1418,6 @@ body {
     }
 }
 
-
 .h2h-viz-bar {
     display: flex;
     width: 100%;
@@ -1699,7 +1697,6 @@ body {
     position: relative;
 }
 
-
 /* Dark mode for transparent highlight */
 [data-theme="dark"] .team-transparent-highlight {
     background: transparent;
@@ -1707,38 +1704,6 @@ body {
 
 /* Dark mode for Match History */
 [data-theme="dark"] #matchHistoryTableBody td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
-    background: transparent !important;
-    color: white !important;
-}
-
-/* Apply same transparent highlighting to Last Time When section */
-#lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
-    /* Reset any conflicting styles */
-    font-family: inherit !important;
-    font-size: 1rem !important;
-    font-weight: 900 !important;
-    font-style: normal !important;
-    text-decoration: none !important;
-    text-transform: none !important;
-    letter-spacing: normal !important;
-    line-height: normal !important;
-    /* Apply transparent styling */
-    background: transparent !important;
-    border-radius: 0.5rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    /* Force consistent rendering */
-    -webkit-font-smoothing: antialiased !important;
-    -moz-osx-font-smoothing: grayscale !important;
-}
-
-/* Dark mode for Last Time When */
-[data-theme="dark"] #lastTimeResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight):not(.team-transparent-highlight) {
     background: transparent !important;
     color: white !important;
 }
@@ -1891,12 +1856,11 @@ html.search-mode[data-search-view="table"] #matchHistorySection {
     display: none !important;
 }
 
-/* Match Finder, Team Seasons, Last Time When and Team Streaks: their results live inside the tabs
+/* Match Finder, Team Seasons, Team Streaks: their results live inside the tabs
    area, so show that area with only the results box (no tab buttons,
    description or filters), and none of the League Tables boxes below */
 html.search-mode[data-search-view="match-finder"] #controlsSection,
 html.search-mode[data-search-view="team-seasons"] #controlsSection,
-html.search-mode[data-search-view="last-time-when"] #controlsSection,
 html.search-mode[data-search-view="team-streaks"] #controlsSection {
     display: block !important;
 }
@@ -1910,10 +1874,6 @@ html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-content:
 html.search-mode[data-search-view="team-seasons"] #teamSeasonsContent > :not(#teamHistoryTable),
 html.search-mode[data-search-view="team-seasons"] #teamHistoryBackArrow,
 html.search-mode[data-search-view="team-seasons"] .table-section,
-html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-container,
-html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-content:not(#lastTimeWhenContent),
-html.search-mode[data-search-view="last-time-when"] #lastTimeWhenContent > :not(#lastTimeResults),
-html.search-mode[data-search-view="last-time-when"] .table-section,
 html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-container,
 html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-content:not(#teamStreaksContent),
 html.search-mode[data-search-view="team-streaks"] #teamStreaksContent > :not(#teamStreaksResults),

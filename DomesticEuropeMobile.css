@@ -650,7 +650,7 @@ body {
 }
 
 /* Winning scores are green everywhere they appear (Head-to-Head, Match
-   History, Team Streaks, Last Time When) - one rule via the shared
+   History, Team Streaks) - one rule via the shared
    --positive variable instead of a separate hardcoded copy per
    container id, so a new container using .win-score doesn't need its
    own dark-mode entry added by hand to work correctly. */
@@ -1379,7 +1379,6 @@ body {
     .league-table,
     #matchHistoryTable,
     #h2hTable,
-    #lastTimeResults table,
     #teamStreaksResults table {
         font-size: 0.75rem !important;
         min-width: 100% !important;
@@ -1392,7 +1391,6 @@ body {
     #matchHistoryTable th,
     #matchHistoryTable td,
     #h2hTable td,
-    #lastTimeResults td,
     #teamStreaksResults td {
         padding: 0.2rem 0.05rem !important;
         font-size: 0.55rem !important;
@@ -1401,7 +1399,6 @@ body {
     }
 
     /* Separate rules for table cells (not headers) to maintain nowrap */
-    #lastTimeResults td,
     #teamStreaksResults td {
         white-space: nowrap !important;
     }
@@ -1415,13 +1412,11 @@ body {
     .league-table img,
     #matchHistoryTable img,
     #h2hTable img,
-    #lastTimeResults img,
     #teamStreaksResults img {
         width: 14px !important;
         height: 14px !important;
         margin-right: 0.1rem !important;
     }
-
 
     /* Reduce Points column font size for mobile */
     .points-badge {
@@ -1552,16 +1547,13 @@ body {
         text-align: center !important;
     }
 
-    /* Last Time When and Team Streaks tables adjustments */
-    #lastTimeResults table,
+    /* Team Streaks tables adjustments */
     #teamStreaksResults table {
         table-layout: fixed !important;
         width: 100% !important;
     }
 
-    /* Fix date column width overflow in Last Time When and Team Streaks */
-    #lastTimeResults table th:first-child,
-    #lastTimeResults table td:first-child,
+    /* Fix date column width overflow in Team Streaks */
     #teamStreaksResults table th:first-child,
     #teamStreaksResults table td:first-child {
         width: 65px !important;
@@ -1576,10 +1568,6 @@ body {
     }
 
     /* Make team columns narrower and force text wrapping */
-    #lastTimeResults table th:nth-child(2),
-    #lastTimeResults table td:nth-child(2),
-    #lastTimeResults table th:nth-child(4),
-    #lastTimeResults table td:nth-child(4),
     #teamStreaksResults table th:nth-child(2),
     #teamStreaksResults table td:nth-child(2),
     #teamStreaksResults table th:nth-child(4),
@@ -1595,17 +1583,13 @@ body {
         font-size: 0.5rem !important;
     }
 
-    /* Hide team name text in Last Time When and Team Streaks tables, show only logos */
-    #lastTimeResults table td:nth-child(2) span,
-    #lastTimeResults table td:nth-child(4) span,
+    /* Hide team name text in Team Streaks tables, show only logos */
     #teamStreaksResults table td:nth-child(2) span,
     #teamStreaksResults table td:nth-child(4) span {
         display: none !important;
     }
 
-    /* Ensure team logos are visible in Last Time When and Team Streaks tables */
-    #lastTimeResults table td:nth-child(2) img,
-    #lastTimeResults table td:nth-child(4) img,
+    /* Ensure team logos are visible in Team Streaks tables */
     #teamStreaksResults table td:nth-child(2) img,
     #teamStreaksResults table td:nth-child(4) img {
         display: inline-block !important;
@@ -1614,10 +1598,6 @@ body {
     }
 
     /* Score columns - make them smaller */
-    #lastTimeResults table th:nth-child(3),
-    #lastTimeResults table td:nth-child(3),
-    #lastTimeResults table th:nth-child(5),
-    #lastTimeResults table td:nth-child(5),
     #teamStreaksResults table th:nth-child(3),
     #teamStreaksResults table td:nth-child(3),
     #teamStreaksResults table th:nth-child(5),
@@ -1631,8 +1611,6 @@ body {
     }
 
     /* Result column */
-    #lastTimeResults table th:last-child,
-    #lastTimeResults table td:last-child,
     #teamStreaksResults table th:last-child,
     #teamStreaksResults table td:last-child {
         width: 25px !important;
@@ -1651,7 +1629,7 @@ body {
         padding-right: 0 !important;
     }
     /* Show team names in Team Streaks tables but hide them in main league table */
-    /* Team names will show in Team Streaks and Last Time When with text wrapping */
+    /* Team names will show in Team Streaks with text wrapping */
     /* Ensure team logos are visible in Team Streaks */
     #teamStreaksResults .league-table td img {
         display: inline-block !important;
@@ -1659,9 +1637,7 @@ body {
         height: 16px !important;
     }
 
-    /* Force header text wrapping for Last Time When and Team Streaks tables */
-    #lastTimeResults table thead tr th,
-    #lastTimeResults .league-table table thead tr th,
+    /* Force header text wrapping for Team Streaks tables */
     #teamStreaksResults table thead tr th,
     #teamStreaksResults .league-table table thead tr th {
         font-size: 0.55rem !important;
@@ -1682,7 +1658,6 @@ body {
     /* Ensure table containers don't overflow */
     #matchHistorySection .overflow-auto,
     #h2hSection .overflow-auto,
-    #lastTimeResults .overflow-auto,
     #teamStreaksResults .overflow-auto {
         overflow-x: visible !important;
     }
@@ -1770,7 +1745,7 @@ body {
    Replaces the shrink-everything-to-fit approach above with
    horizontal scroll + sticky Pos/Team columns, larger touch
    targets, and full team names. Scoped to #tableContainer so
-   Match History/H2H/Last Time/Team Streaks tables (which share
+   Match History/H2H/Team Streaks tables (which share
    the .league-table class) are untouched for now.
    ============================================================ */
 @media (max-width: 640px) {
@@ -2314,129 +2289,12 @@ body {
 }
 
 /* ============================================================
-   Mobile redesign: The Last Time When... results tables (same
-   concepts as Match History) - Home Score/Away Score merged into
-   one H:A column, smaller font. These tables never had sort
-   arrows (each section shows a single most-recent match), so
-   there's nothing to remove there. The header-font-size rule
-   below matches the old shared rule's selector depth
-   (#lastTimeResults .league-table table thead tr th) so source
-   order decides the winner instead of fighting specificity -
-   #teamStreaksResults, which shares that old rule, is untouched.
-   ============================================================ */
-@media (max-width: 640px) {
-    #lastTimeResults .league-table table {
-        table-layout: fixed !important;
-        width: 100% !important;
-    }
-
-    #lastTimeResults .league-table table thead tr th {
-        font-size: 0.55rem !important;
-        font-weight: 700 !important;
-        padding: 0.3rem 0.1rem !important;
-        white-space: nowrap !important;
-        word-wrap: normal !important;
-        overflow-wrap: normal !important;
-        line-height: 1.1 !important;
-        vertical-align: middle !important;
-        word-break: normal !important;
-        hyphens: none !important;
-        height: auto !important;
-        min-height: 0 !important;
-        text-align: center !important;
-    }
-
-    #lastTimeResults .league-table td {
-        font-size: 0.6rem !important;
-        padding: 0.3rem 0.15rem !important;
-        white-space: nowrap !important;
-    }
-
-    /* Reset the overflow/ellipsis that generic .league-table th/td
-       rules (written for the main League Table's Team column) would
-       otherwise leak onto this unrelated table's headers/cells. */
-    #lastTimeResults .league-table th,
-    #lastTimeResults .league-table td {
-        overflow: visible !important;
-        text-overflow: clip !important;
-    }
-
-    /* Date column */
-    #lastTimeResults .league-table th:nth-child(1),
-    #lastTimeResults .league-table td:nth-child(1) {
-        width: 64px !important;
-        min-width: 64px !important;
-        max-width: 64px !important;
-    }
-
-    /* Home/Away columns: logo only, name already hidden inline */
-    #lastTimeResults .league-table th:nth-child(2),
-    #lastTimeResults .league-table td:nth-child(2),
-    #lastTimeResults .league-table th:nth-child(4),
-    #lastTimeResults .league-table td:nth-child(4) {
-        width: 28px !important;
-        min-width: 28px !important;
-        max-width: 28px !important;
-    }
-
-    #lastTimeResults .league-table td:nth-child(2) img,
-    #lastTimeResults .league-table td:nth-child(4) img {
-        width: 16px !important;
-        height: 16px !important;
-    }
-
-    /* H:A merged score column - fixed (not auto) width so it can't
-       swallow all remaining table-layout:fixed space */
-    #lastTimeResults .league-table th:nth-child(3),
-    #lastTimeResults .league-table td:nth-child(3) {
-        width: 50px !important;
-        min-width: 50px !important;
-        max-width: 50px !important;
-        font-size: 0.75rem !important;
-    }
-
-    /* Result column */
-    #lastTimeResults .league-table th:nth-child(5),
-    #lastTimeResults .league-table td:nth-child(5) {
-        width: 30px !important;
-        min-width: 30px !important;
-        max-width: 30px !important;
-    }
-
-    #lastTimeResults .league-table td:nth-child(5) img {
-        width: 16px !important;
-        height: 16px !important;
-    }
-
-    /* "Days Since Last Match Results" - shrink to fit on one line */
-    #lastTimeResults > h3 {
-        font-size: 0.95rem !important;
-    }
-
-    /* Per-section titles ("Arsenal FC Last Win at Home") - smaller
-       than the main header above */
-    #lastTimeResults h4 {
-        font-size: 0.8rem !important;
-    }
-
-    /* "X days ago" */
-    #lastTimeResults p {
-        font-size: 0.7rem !important;
-    }
-
-    /* Tighten the gap between consecutive result tables */
-    #lastTimeResults > div {
-        margin-bottom: 0.75rem !important;
-    }
-}
-
-/* ============================================================
-   Mobile redesign: Team Streaks results (same concepts as The
-   Last Time When... above). Two very different table shapes share
+   Mobile redesign: Team Streaks results (same concepts as Match
+   History above). Two very different table shapes share
    #teamStreaksResults, distinguished by marker classes set in JS:
    .streak-match-table   - a per-match list (Date/Home/H:A/Away/
-                            Result), same H:A merge as Last Time
-                            When/Match History.
+                            Result), same H:A merge as Match
+                            History.
    .historic-streaks-table - streak metadata (Team(s)/Start->End/
                             Count/Length), Start Date + End Date
                             merged into one sortable "Start -> End"
@@ -3265,25 +3123,10 @@ body {
     font-weight: bold !important;
 }
 
-/* Score colors in Last Time When tables */
-#lastTimeResults .win-score {
-    color: var(--positive) !important;
-    font-weight: bold !important;
-}
-#lastTimeResults .text-red-600 {
-    color: var(--negative) !important;
-    font-weight: bold !important;
-}
-#lastTimeResults .draw-score {
-    color: #9ca3af !important;
-    font-weight: bold !important;
-}
-
 /* Controls Collapse Functionality - Simple Approach */
 .controls-collapsed .collapsible-control {
     display: none !important;
 }
-
 
 /* ============================================================
    Team Seasons expandable match lists - mobile. The Team Seasons
@@ -3413,7 +3256,6 @@ body {
         justify-content: center !important;
     }
 }
-
 
 /* ============================================================
    Historic streaks: expanded match lists - mobile. The streak
@@ -3575,12 +3417,11 @@ html.search-mode[data-search-view="table"] #matchHistorySection {
     display: none !important;
 }
 
-/* Match Finder, Team Seasons, Last Time When and Team Streaks: their results live inside the tabs
+/* Match Finder, Team Seasons, Team Streaks: their results live inside the tabs
    area, so show that area with only the results box (no tab buttons,
    description or filters), and none of the League Tables boxes below */
 html.search-mode[data-search-view="match-finder"] #controlsSection,
 html.search-mode[data-search-view="team-seasons"] #controlsSection,
-html.search-mode[data-search-view="last-time-when"] #controlsSection,
 html.search-mode[data-search-view="team-streaks"] #controlsSection {
     display: block !important;
 }
@@ -3594,10 +3435,6 @@ html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-content:
 html.search-mode[data-search-view="team-seasons"] #teamSeasonsContent > :not(#teamHistoryTable),
 html.search-mode[data-search-view="team-seasons"] #teamHistoryBackArrow,
 html.search-mode[data-search-view="team-seasons"] .table-section,
-html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-container,
-html.search-mode[data-search-view="last-time-when"] #controlsSection .tab-content:not(#lastTimeWhenContent),
-html.search-mode[data-search-view="last-time-when"] #lastTimeWhenContent > :not(#lastTimeResults),
-html.search-mode[data-search-view="last-time-when"] .table-section,
 html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-container,
 html.search-mode[data-search-view="team-streaks"] #controlsSection .tab-content:not(#teamStreaksContent),
 html.search-mode[data-search-view="team-streaks"] #teamStreaksContent > :not(#teamStreaksResults),

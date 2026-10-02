@@ -13,31 +13,36 @@ Feature ideas, not yet scheduled.
   extension. See that branch's own TODO.md for the full build/fix
   history.
 
-- Later: **Merge Last Time When into Match Finder** — noted 2026-10-02.
-  Last Time When is Match Finder sorted by date, keeping the top row: Team 1
-  (vs a team / the Big 6 / a country), home / away, weekday, Continental
-  stage - all filters Match Finder already has, plus seasons, dates,
-  scorelines, penalties / extra time / away goals that Last Time When
-  lacks. Merging replaces the old "Last Time When rework" item - the
-  questions it couldn't answer come almost free in Match Finder:
-  - "last time Juventus didn't win" (today the search drops "didn't" and
-    gives their last *win* - the opposite) -> a "didn't win" result
-  - an exact scoreline ("last time Arsenal drew 0-0", "PSG lost 5-0") ->
-    Scoreline category, newest first
-  - a margin ("lost to Real Madrid by 4 goals"), goals scored ("Arsenal
-    scored 5"), Continental "won on penalties" -> existing filters
-  Still separate: a country's clubs as the subject ("last time an English
-  club won the UCL") and "City" / "United" alone as the opponent ("when
-  did Man Utd last lose to City" reads City as Hull City).
-  Steps, all four pages:
-  1. A "Most recent" sort in Match Finder beside its size-based categories.
-  2. A result filter: win / draw / loss / any / didn't win.
-  3. Above the table, a "last win · last draw · last loss" strip with days
-     ago - Last Time When's at-a-glance view, its one real extra.
-  4. Old `view=last-time-when` links (Copy Link, search, dashboards) open
-     Match Finder with the same filters, newest first.
-  5. Remove the Last Time When tab; the search's "last time ..." answers
-     go to Match Finder (and can then use seasons / dates too).
+- Partly done: **Match Finder upgrades (Last Time When merged in)** —
+  merge done 2026-10-02, all four pages; more Match Finder work to come.
+  - Done: Last Time When was Match Finder sorted by date keeping the top
+    row, so it's now Match Finder's **Most Recent** category (Most Recent
+    Ties in Continental tie mode): newest first, a Result filter (win /
+    draw / loss / didn't win / didn't lose), a Team 1 - Opponent score at
+    either venue ("lost 5-0" = 0-5; the aggregate for ties), and last win /
+    draw / loss cards above the table with days ago (a card filters to its
+    result). Copy Link: `cat=recent`, `res`, `t1g`, `og`.
+  - Done: the Last Time When tab is gone (~4,500 lines of its code, CSS
+    and mobile layout). Old `view=last-time-when` / `search=last-time-when`
+    links are rewritten in each page's <head> to Match Finder with the
+    same teams, venue (`loc` -> home / away), weekday, stage (League/Group
+    Stage -> group-stage, Knock-Out Stage -> knockout-stage) and result.
+  - Done: the search's "last time ..." questions go to Most Recent, which
+    adds "didn't win" / "didn't lose", scorelines from Team 1's side, and
+    seasons / dates (Last Time When had none). The answer follows the
+    page's current filters, so clicking a card rewords it. Q&A: "The Last
+    Time When" section replaced by a Match Finder one (no screenshots yet).
+  - Still to do:
+    - "Won on penalties": a shootout game is a draw at full time, so
+      Match Finder can't tell a shootout win from a loss - the search
+      gives the last game decided on penalties.
+    - A country's clubs as the subject ("last time an English club won
+      the UCL") - Team 1 is always one club.
+    - "City" / "United" alone as the opponent ("when did Man Utd last lose
+      to City" reads City as Hull City).
+    - Q&A screenshots for Match Finder; the old QAImages/TheLastTimeWhen1/2
+      .png are no longer used.
+    - Related: "Match Finder without a team" and "Comebacks" below.
 
 - Later: **Match Finder without a team** — noted 2026-10-01 while testing
   the search bar. Match Finder needs at least one team picked, so
@@ -289,8 +294,9 @@ Feature ideas, not yet scheduled.
     returned a 500 and showed no matches; long keys are now hashed
     (deployed 2026-10-01).
   - Not covered yet (own TODO items): Last Time When negation /
-    scorelines / penalties (now part of merging Last Time When into
-    Match Finder), Match Finder without a team, comebacks.
+    scorelines / penalties (Last Time When is now Match Finder's Most
+    Recent - see Match Finder upgrades), Match Finder without a team,
+    comebacks.
     League relegations aren't searchable (the number relegated changed
     over the years).
 

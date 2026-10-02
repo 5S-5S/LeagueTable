@@ -11,6 +11,26 @@
         // Search mode (?search=<kind>, from the search bar): flag it before the
         // first paint so the controls never flash up (see ContinentalEuropeMobile.css)
         (function() {
+            // Last Time When is now Match Finder's Most Recent: an old link to
+            // it (Copy Link, search, bookmarks) opens that, with the same
+            // teams, venue, weekday, stage and result. Rewritten before
+            // anything else reads the address.
+            const old = new URLSearchParams(window.location.search);
+            if (old.get('view') === 'last-time-when' || old.get('search') === 'last-time-when') {
+                const next = new URLSearchParams();
+                next.set('view', 'match-finder');
+                ['lg', 'league', 't1', 't2', 'day'].forEach(key => { if (old.get(key)) next.set(key, old.get(key)); });
+                if (old.get('loc') === 'home') next.set('away', '0');
+                if (old.get('loc') === 'away') next.set('home', '0');
+                const stage = old.get('stage');
+                if (stage) next.set('stage', { 'League/Group Stage': 'group-stage', 'Knock-Out Stage': 'knockout-stage' }[stage] || stage);
+                next.set('cat', 'recent');
+                const res = old.get('res');
+                if (res && res !== 'any') next.set('res', res);
+                if (old.get('search')) next.set('search', 'match-finder');
+                ['q', 'scope'].forEach(key => { if (old.get(key)) next.set(key, old.get(key)); });
+                history.replaceState(null, '', `${window.location.pathname}?${next.toString()}${window.location.hash}`);
+            }
             const searchView = new URLSearchParams(window.location.search).get('search');
             if (searchView) {
                 document.documentElement.classList.add('search-mode');
@@ -140,7 +160,6 @@
                     <button class="tab-button active" id="leagueFiltersTab" data-mobile-text="Tables & H2H">League Tables & Head to Head Stats</button>
                     <button class="tab-button" id="matchFinderTab" data-mobile-text="Match Finder">Match Finder</button>
                     <button class="tab-button" id="teamSeasonsTab" data-mobile-text="Team Seasons">Team Seasons</button>
-                    <button class="tab-button" id="lastTimeWhenTab" data-mobile-text="Last Time">The Last Time When...</button>
                     <button class="tab-button" id="teamStreaksTab" data-mobile-text="Streaks">Team Streaks</button>
                 </div>
 
@@ -324,7 +343,7 @@
                     <!-- Description -->
                     <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
                         <p class="text-gray-700 text-sm leading-relaxed w-full">
-                            Select one or two teams and find standout matches that they played in. Biggest wins and defeats, highest-scoring draws, the most or fewest total goals, or just a specific scoreline too. Switch to Double-Legged Tie to get the same information for knock out matchups.
+                            Select one or two teams and find standout matches that they played in. Biggest wins and defeats, highest-scoring draws, the most or fewest total goals, or just a specific scoreline too. Most Recent shows the last time they won, drew or lost. Switch to Double-Legged Tie to get the same information for knock out matchups.
                         </p>
                         <button id="copyLinkBtnMatchFinder" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
@@ -780,228 +799,6 @@
                     </div>
                 </div>
 
-                <!-- Last Time When Tab Content -->
-                <div id="lastTimeWhenContent" class="tab-content">
-                    <!-- Description -->
-                    <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
-                        <p class="text-gray-700 text-sm leading-relaxed w-full">
-                            This tool allows you to find out the last time a team won, drew, or lost against an opponent. At home or away. Or in a particular stage. On the day of the week too, if you so choose.
-                        </p>
-                        <button id="copyLinkBtnLastTimeWhen" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
-                    </div>
-                    
-                    <!-- League Selection -->
-                    <div class="mb-8 collapsible-control">
-                        <label class="block text-sm font-semibold text-gray-700 mb-4">Select Competition:</label>
-                        <div class="league-buttons" id="lastTimeLeagueButtons">
-                            <!-- League buttons will be populated here -->
-                        </div>
-                    </div>
-
-                    <!-- Stage Selection -->
-                    <div class="mb-8 collapsible-control">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Competition Stage:</label>
-                        <select id="lastTimeStageSelect" class="form-input max-w-xs">
-                            <option value="">All</option>
-                            <optgroup label="Main Stage">
-                                <option value="League/Group Stage">League/Group Stage</option>
-                                <option value="Knock-Out Stage">Knock-Out Stage</option>
-                                <option value="Final">Final</option>
-                                <option value="Semi-Finals">Semi-Finals</option>
-                                <option value="Quarter-Finals">Quarter-Finals</option>
-                                <option value="Round Of 16">Round Of 16</option>
-                                <option value="Play-Offs">Play-Offs</option>
-                                <option value="2. Round">2. Round</option>
-                                <option value="1. Round">1. Round</option>
-                            </optgroup>
-                            <optgroup label="Qualifiers">
-                                <option value="Qualifiers">All Qualifiers</option>
-                                <option value="Play-Offs (Q)">Play-Offs (Q)</option>
-                                <option value="3. Round (Q)">3. Round (Q)</option>
-                                <option value="2. Round (Q)">2. Round (Q)</option>
-                                <option value="1. Round (Q)">1. Round (Q)</option>
-                                <option value="Preliminary Round (Q)">Preliminary Round (Q)</option>
-                            </optgroup>
-                        </select>
-                    </div>
-                    
-                    <!-- Controls -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 collapsible-control">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Day of Week</label>
-                            <select id="lastTimeDayOfWeekSelect" class="form-input">
-                                <option value="">All Days</option>
-                                <option value="0">Sunday</option>
-                                <option value="1">Monday</option>
-                                <option value="2">Tuesday</option>
-                                <option value="3">Wednesday</option>
-                                <option value="4">Thursday</option>
-                                <option value="5">Friday</option>
-                                <option value="6">Saturday</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
-                            <select id="lastTimeLocationSelect" class="form-input">
-                                <option value="">Both Home and Away</option>
-                                <option value="home">Home</option>
-                                <option value="away">Away</option>
-                            </select>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Team 1</label>
-                                <div class="combobox-container" id="lastTimeTeam1ComboboxContainer">
-                                    <input type="text" id="lastTimeTeam1ComboboxInput" class="combobox-input" placeholder="Select Team 1" autocomplete="off">
-                                    <span class="combobox-arrow">▼</span>
-                                    <div class="combobox-dropdown" id="lastTimeTeam1ComboboxDropdown"></div>
-                                </div>
-                                <select id="lastTimeTeam1Select" class="form-input" style="display: none;">
-                                    <option value="">Select Team 1</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2</label>
-                                <div class="combobox-container" id="lastTimeTeam2ComboboxContainer">
-                                    <input type="text" id="lastTimeTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
-                                    <span class="combobox-arrow">▼</span>
-                                    <div class="combobox-dropdown" id="lastTimeTeam2ComboboxDropdown"></div>
-                                </div>
-                                <select id="lastTimeTeam2Select" class="form-input" style="display: none;">
-                                    <option value="">Select Team 2</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Results Display -->
-                    <div id="lastTimeResults" class="hidden">
-                        <h3 class="text-xl font-bold text-gray-700 mb-6 text-center">Days Since Last Match Results</h3>
-                        
-                        <!-- Team 1 Won at Home -->
-                        <div id="team1HomeWinSection" class="mb-8 hidden">
-                            <h4 id="team1HomeWinTitle" class="text-lg font-semibold text-green-700 mb-3">Team 1 Won (at Home)</h4>
-                            <div class="league-table">
-                                <table>
-                                    <thead>
-                                        <tr id="team1HomeWinHeader">
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Date</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Home</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">H:A</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Away</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="team1HomeWinBody"></tbody>
-                                </table>
-                            </div>
-                            <p id="team1HomeWinDays" class="text-center text-sm text-gray-600 mt-2"></p>
-                        </div>
-
-                        <!-- Team 1 Won Away -->
-                        <div id="team1AwayWinSection" class="mb-8 hidden">
-                            <h4 id="team1AwayWinTitle" class="text-lg font-semibold text-green-700 mb-3">Team 1 Won (Away)</h4>
-                            <div class="league-table">
-                                <table>
-                                    <thead>
-                                        <tr id="team1AwayWinHeader">
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Date</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Home</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">H:A</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Away</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="team1AwayWinBody"></tbody>
-                                </table>
-                            </div>
-                            <p id="team1AwayWinDays" class="text-center text-sm text-gray-600 mt-2"></p>
-                        </div>
-
-                        <!-- Team 1 Drew at Home -->
-                        <div id="team1HomeDrawSection" class="mb-8 hidden">
-                            <h4 id="team1HomeDrawTitle" class="text-lg font-semibold text-gray-600 mb-3">Team 1 Drew (at Home)</h4>
-                            <div class="league-table">
-                                <table>
-                                    <thead>
-                                        <tr id="team1HomeDrawHeader">
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Date</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Home</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">H:A</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Away</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="team1HomeDrawBody"></tbody>
-                                </table>
-                            </div>
-                            <p id="team1HomeDrawDays" class="text-center text-sm text-gray-600 mt-2"></p>
-                        </div>
-
-                        <!-- Team 1 Drew Away -->
-                        <div id="team1AwayDrawSection" class="mb-8 hidden">
-                            <h4 id="team1AwayDrawTitle" class="text-lg font-semibold text-gray-600 mb-3">Team 1 Drew (Away)</h4>
-                            <div class="league-table">
-                                <table>
-                                    <thead>
-                                        <tr id="team1AwayDrawHeader">
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Date</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Home</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">H:A</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Away</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="team1AwayDrawBody"></tbody>
-                                </table>
-                            </div>
-                            <p id="team1AwayDrawDays" class="text-center text-sm text-gray-600 mt-2"></p>
-                        </div>
-
-                        <!-- Team 1 Lost at Home -->
-                        <div id="team1HomeLossSection" class="mb-8 hidden">
-                            <h4 id="team1HomeLossTitle" class="text-lg font-semibold text-red-600 mb-3">Team 1 Lost (at Home)</h4>
-                            <div class="league-table">
-                                <table>
-                                    <thead>
-                                        <tr id="team1HomeLossHeader">
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Date</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Home</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">H:A</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Away</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="team1HomeLossBody"></tbody>
-                                </table>
-                            </div>
-                            <p id="team1HomeLossDays" class="text-center text-sm text-gray-600 mt-2"></p>
-                        </div>
-
-                        <!-- Team 1 Lost Away -->
-                        <div id="team1AwayLossSection" class="mb-8 hidden">
-                            <h4 id="team1AwayLossTitle" class="text-lg font-semibold text-red-600 mb-3">Team 1 Lost (Away)</h4>
-                            <div class="league-table">
-                                <table>
-                                    <thead>
-                                        <tr id="team1AwayLossHeader">
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Date</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Home</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">H:A</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Away</th>
-                                            <th class="px-3 py-4 text-center font-bold text-sm">Result</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="team1AwayLossBody"></tbody>
-                                </table>
-                            </div>
-                            <p id="team1AwayLossDays" class="text-center text-sm text-gray-600 mt-2"></p>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Team Streaks Tab Content -->
                 <div id="teamStreaksContent" class="tab-content">
@@ -1389,13 +1186,6 @@
             teamStreaksApiCacheKey: null,
             teamStreaksApiLoading: false,
 
-            // The Last Time When... also has its own team selection,
-            // independent of League Filters and Team Streaks - same
-            // reasoning, own cache slot.
-            lastTimeApiCache: null,
-            lastTimeApiCacheKey: null,
-            lastTimeApiLoading: false,
-
             // League Table (no team selected, no specific season) comes
             // from the standings API - the one view that legitimately
             // needs many teams' data at once.
@@ -1457,13 +1247,6 @@
             h2hSortConfig: { key: 'date', direction: 'desc' },
             h2hPage: 1,
 
-            // Last Time When state
-            lastTimeTeam1: '',
-            lastTimeTeam2: '',
-            lastTimeDayOfWeek: '',
-            lastTimeLocation: '',
-            lastTimeStage: '',
-            
             // Team Seasons state
             teamSeasonsSelectedLeague: 'champions-league',
             teamSeasonsSelectedTeam: '',
@@ -1490,7 +1273,7 @@
             // Team Dashboard state (locked team via ?team= URL params, or
             // picked from the in-page search). dashboardLockedTeam is the
             // stable identity - it survives tab switches, unlike
-            // selectedTeam1/teamSeasonsSelectedTeam/lastTimeTeam1/etc, which
+            // selectedTeam1/teamSeasonsSelectedTeam/etc, which
             // each tab resets independently when switching away from it.
             // Unlike Domestic, there's no league to track here - Continental
             // only ever has one selectable competition (Champions League).
@@ -1504,7 +1287,7 @@
             pendingShareableState: null,
 
             // Match Finder state - its own team selection/cache slot, same
-            // reasoning as Last Time When/Team Streaks above.
+            // reasoning as Team Streaks above.
             matchFinderTeam1: '',
             matchFinderTeam2: '',
             matchFinderExtraTeam2s: [],
@@ -2793,20 +2576,6 @@
                 ]);
             }
 
-            if (lastTimeTeam2Combobox) {
-                lastTimeTeam2Combobox.setOptions([
-                    { value: '', text: 'Select Team 2' },
-                    ...leagueTeams.map(team => ({ value: team, text: team })),
-                    ...(state.lastTimeTeam1 ? countryOpts : [])
-                ]);
-            }
-            if (elements.lastTimeTeam2Select) {
-                const currentValue = elements.lastTimeTeam2Select.value;
-                elements.lastTimeTeam2Select.innerHTML = '<option value="">Select Team 2</option>' +
-                    leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('') +
-                    (state.lastTimeTeam1 ? countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('') : '');
-                elements.lastTimeTeam2Select.value = currentValue;
-            }
 
             const streaksTeam1Value = elements.teamStreaksTeam1Select ? elements.teamStreaksTeam1Select.value : '';
             if (teamStreaksTeam2Combobox) {
@@ -2887,13 +2656,7 @@
                 if (state.teamSeasonsSelectedPosition) params.set('pos', state.teamSeasonsSelectedPosition);
                 if (state.teamSeasonsSelectedPosition && state.includeBetterResults) params.set('better', '1');
                 if (state.firstOccurrenceOnly) params.set('first', '1');
-            } else if (view === 'last-time-when') {
-                if (state.lastTimeTeam1) params.set('t1', state.lastTimeTeam1);
-                if (state.lastTimeTeam2) params.set('t2', state.lastTimeTeam2);
-                if (state.lastTimeDayOfWeek) params.set('day', state.lastTimeDayOfWeek);
-                if (state.lastTimeLocation) params.set('loc', state.lastTimeLocation);
-                if (state.lastTimeStage) params.set('stage', state.lastTimeStage);
-            } else if (view === 'team-streaks') {
+            }  else if (view === 'team-streaks') {
                 const t1 = elements.teamStreaksTeam1Select.value;
                 const t2 = elements.teamStreaksTeam2Select.value;
                 if (t1) params.set('t1', t1);
@@ -3082,27 +2845,7 @@
                 // After the position, whose change resets these toggles
                 if (params.get('better') === '1' && !state.includeBetterResults) elements.includeBetterResultsCheckbox.click();
                 if (params.get('first') === '1' && !state.firstOccurrenceOnly) elements.firstOccurrenceOnlyToggle.click();
-            } else if (view === 'last-time-when') {
-                const t1 = params.get('t1');
-                const t2 = params.get('t2');
-                const day = params.get('day');
-                const loc = params.get('loc');
-                const stage = params.get('stage');
-                if (t1) lastTimeTeam1Combobox.selectOption(t1, t1);
-                if (t2) lastTimeTeam2Combobox.selectOption(t2, getOpponentDisplayLabel(t2));
-                if (day) {
-                    elements.lastTimeDayOfWeekSelect.value = day;
-                    elements.lastTimeDayOfWeekSelect.dispatchEvent(new Event('change'));
-                }
-                if (loc) {
-                    elements.lastTimeLocationSelect.value = loc;
-                    elements.lastTimeLocationSelect.dispatchEvent(new Event('change'));
-                }
-                if (stage) {
-                    elements.lastTimeStageSelect.value = stage;
-                    elements.lastTimeStageSelect.dispatchEvent(new Event('change'));
-                }
-            } else if (view === 'team-streaks') {
+            }  else if (view === 'team-streaks') {
                 const t1 = params.get('t1');
                 const t2 = params.get('t2');
                 const status = params.get('status');
@@ -3420,12 +3163,6 @@
             teamSeasonsComboboxContainer: document.getElementById('teamSeasonsComboboxContainer'),
             teamSeasonsComboboxInput: document.getElementById('teamSeasonsComboboxInput'),
             teamSeasonsComboboxDropdown: document.getElementById('teamSeasonsComboboxDropdown'),
-            lastTimeTeam1ComboboxContainer: document.getElementById('lastTimeTeam1ComboboxContainer'),
-            lastTimeTeam1ComboboxInput: document.getElementById('lastTimeTeam1ComboboxInput'),
-            lastTimeTeam1ComboboxDropdown: document.getElementById('lastTimeTeam1ComboboxDropdown'),
-            lastTimeTeam2ComboboxContainer: document.getElementById('lastTimeTeam2ComboboxContainer'),
-            lastTimeTeam2ComboboxInput: document.getElementById('lastTimeTeam2ComboboxInput'),
-            lastTimeTeam2ComboboxDropdown: document.getElementById('lastTimeTeam2ComboboxDropdown'),
             teamStreaksTeam1ComboboxContainer: document.getElementById('teamStreaksTeam1ComboboxContainer'),
             teamStreaksTeam1ComboboxInput: document.getElementById('teamStreaksTeam1ComboboxInput'),
             teamStreaksTeam1ComboboxDropdown: document.getElementById('teamStreaksTeam1ComboboxDropdown'),
@@ -3441,7 +3178,6 @@
             resetBtn: document.getElementById('resetBtn'),
             copyLinkBtnLeagueFilters: document.getElementById('copyLinkBtnLeagueFilters'),
             copyLinkBtnTeamSeasons: document.getElementById('copyLinkBtnTeamSeasons'),
-            copyLinkBtnLastTimeWhen: document.getElementById('copyLinkBtnLastTimeWhen'),
             copyLinkBtnTeamStreaks: document.getElementById('copyLinkBtnTeamStreaks'),
             copyLinkBtnMatchFinder: document.getElementById('copyLinkBtnMatchFinder'),
             retryBtn: document.getElementById('retryBtn'),
@@ -3477,41 +3213,6 @@
             h2hPrevPageBtn: document.getElementById('h2hPrevPageBtn'),
             h2hPageInfo: document.getElementById('h2hPageInfo'),
             h2hNextPageBtn: document.getElementById('h2hNextPageBtn'),
-            lastTimeLeagueButtons: document.getElementById('lastTimeLeagueButtons'),
-            lastTimeDayOfWeekSelect: document.getElementById('lastTimeDayOfWeekSelect'),
-            lastTimeLocationSelect: document.getElementById('lastTimeLocationSelect'),
-            lastTimeStageSelect: document.getElementById('lastTimeStageSelect'),
-            lastTimeTeam1Select: document.getElementById('lastTimeTeam1Select'),
-            lastTimeTeam2Select: document.getElementById('lastTimeTeam2Select'),
-            lastTimeResults: document.getElementById('lastTimeResults'),
-            // Table sections
-            team1HomeWinSection: document.getElementById('team1HomeWinSection'),
-            team1AwayWinSection: document.getElementById('team1AwayWinSection'),
-            team1HomeDrawSection: document.getElementById('team1HomeDrawSection'),
-            team1AwayDrawSection: document.getElementById('team1AwayDrawSection'),
-            team1HomeLossSection: document.getElementById('team1HomeLossSection'),
-            team1AwayLossSection: document.getElementById('team1AwayLossSection'),
-            // Table bodies
-            team1HomeWinBody: document.getElementById('team1HomeWinBody'),
-            team1AwayWinBody: document.getElementById('team1AwayWinBody'),
-            team1HomeDrawBody: document.getElementById('team1HomeDrawBody'),
-            team1AwayDrawBody: document.getElementById('team1AwayDrawBody'),
-            team1HomeLossBody: document.getElementById('team1HomeLossBody'),
-            team1AwayLossBody: document.getElementById('team1AwayLossBody'),
-            // Day counters
-            team1HomeWinDays: document.getElementById('team1HomeWinDays'),
-            team1AwayWinDays: document.getElementById('team1AwayWinDays'),
-            team1HomeDrawDays: document.getElementById('team1HomeDrawDays'),
-            team1AwayDrawDays: document.getElementById('team1AwayDrawDays'),
-            team1HomeLossDays: document.getElementById('team1HomeLossDays'),
-            team1AwayLossDays: document.getElementById('team1AwayLossDays'),
-            // Titles
-            team1HomeWinTitle: document.getElementById('team1HomeWinTitle'),
-            team1AwayWinTitle: document.getElementById('team1AwayWinTitle'),
-            team1HomeDrawTitle: document.getElementById('team1HomeDrawTitle'),
-            team1AwayDrawTitle: document.getElementById('team1AwayDrawTitle'),
-            team1HomeLossTitle: document.getElementById('team1HomeLossTitle'),
-            team1AwayLossTitle: document.getElementById('team1AwayLossTitle'),
             teamHistoryTable: document.getElementById('teamHistoryTable'),
             teamHistoryTitle: document.getElementById('teamHistoryTitle'),
             teamHistoryHeader: document.getElementById('teamHistoryHeader'),
@@ -5049,24 +4750,23 @@
         // Each tab passes what it just worked out, and only the search's
         // own view is answered: from = { table, h2h, matchHistory } from
         // updateTable(), { finder } from Match Finder, { seasons } from
-        // Team Seasons' rows, { lastTime } from Last Time When's results.
+        // Team Seasons' rows, { streaks } from Team Streaks.
         function updateSearchAnswer(from) {
             if (!SEARCH_MODE_VIEW || SEARCH_MODE_VIEW === 'none') return;
-            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'last-time-when': 'lastTime', 'team-streaks': 'streaks' }[SEARCH_MODE_VIEW] || 'table';
+            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'team-streaks': 'streaks' }[SEARCH_MODE_VIEW] || 'table';
             if (!(source in from)) return;
-            const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, lastTime, streaks } = from;
+            const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, streaks } = from;
             const isFinder = SEARCH_MODE_VIEW === 'match-finder';
             const isSeasons = SEARCH_MODE_VIEW === 'team-seasons';
-            const isLastTime = SEARCH_MODE_VIEW === 'last-time-when';
             const isStreaks = SEARCH_MODE_VIEW === 'team-streaks';
             const team1 = isSeasons ? state.teamSeasonsSelectedTeam
-                : (isFinder ? state.matchFinderTeam1 : (isLastTime ? state.lastTimeTeam1
-                    : (isStreaks ? elements.teamStreaksTeam1Select.value : state.selectedTeam1)));
-            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2 : (isLastTime ? state.lastTimeTeam2
-                : (isStreaks ? elements.teamStreaksTeam2Select.value : state.selectedTeam2)));
-            const extraTeam2s = isSeasons || isLastTime || isStreaks ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
+                : (isFinder ? state.matchFinderTeam1
+                    : (isStreaks ? elements.teamStreaksTeam1Select.value : state.selectedTeam1));
+            const team2 = isSeasons ? '' : (isFinder ? state.matchFinderTeam2
+                : (isStreaks ? elements.teamStreaksTeam2Select.value : state.selectedTeam2));
+            const extraTeam2s = isSeasons || isStreaks ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
             const season = isSeasons ? state.teamSeasonsSelectedSeason
-                : (isFinder ? state.matchFinderSeason : (isLastTime || isStreaks ? '' : state.selectedSeason));
+                : (isFinder ? state.matchFinderSeason : (isStreaks ? '' : state.selectedSeason));
             const league = isSeasons ? state.teamSeasonsSelectedLeague : state.selectedLeague;
             // Season standings load as one batch (a flag per cache entry on
             // Continental, one flag on Domestic)
@@ -5079,7 +4779,6 @@
             const grouped = !!(tableResult && tableResult.isGroupedByPhase);
             const ready = {
                 'team-seasons': () => !seasonsLoading && seasonsLoaded,
-                'last-time-when': () => !state.lastTimeApiLoading && (state.lastTimeApiCacheKey || '').includes(`::${team1}`),
                 // The all-teams list only shows once its data is in
                 'team-streaks': () => !team1 || (!state.teamStreaksApiLoading && (state.teamStreaksApiCacheKey || '').includes(`::${team1}`)),
                 'match-finder': () => !state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`),
@@ -5110,7 +4809,6 @@
                     result: state.matchFinderResult || 'any',
                     team1Goals: state.matchFinderRecentTeam1Goals, opponentGoals: state.matchFinderRecentOpponentGoals
                 } : null,
-                lastTime: isLastTime ? lastTime : null,
                 streaks: isStreaks ? streaks : null,
                 // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
                 historicTitles: isSeasons && team1 && typeof historicSeasonsData !== 'undefined'
@@ -5193,7 +4891,6 @@
             `).join('');
             
             elements.leagueButtons.innerHTML = leagueButtonsHTML;
-            elements.lastTimeLeagueButtons.innerHTML = leagueButtonsHTML;
             if (elements.matchFinderLeagueButtons) elements.matchFinderLeagueButtons.innerHTML = leagueButtonsHTML;
         }
 
@@ -6030,7 +5727,6 @@
             'league-filters': 'leagueFiltersTab',
             'match-finder': 'matchFinderTab',
             'team-seasons': 'teamSeasonsTab',
-            'last-time-when': 'lastTimeWhenTab',
             'team-streaks': 'teamStreaksTab'
         };
 
@@ -6072,19 +5768,6 @@
                     elements.firstOccurrenceOnlyContainer.classList.add('hidden');
                 }
 
-                // Reset Last Time When state
-                state.lastTimeTeam1 = '';
-                state.lastTimeTeam2 = '';
-                state.lastTimeDayOfWeek = '';
-                state.lastTimeLocation = '';
-                state.lastTimeStage = '';
-                elements.lastTimeTeam1Select.value = '';
-                elements.lastTimeTeam2Select.value = '';
-                elements.lastTimeDayOfWeekSelect.value = '';
-                elements.lastTimeLocationSelect.value = '';
-                elements.lastTimeStageSelect.value = '';
-                elements.lastTimeResults.classList.add('hidden');
-
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
                 state.matchFinderTeam2 = '';
@@ -6116,19 +5799,11 @@
                 state.selectedSeason = '';
                 state.competitionStage = '';
                 state.selectedDayOfWeek = '';
-                state.lastTimeTeam1 = '';
-                state.lastTimeTeam2 = '';
-                state.lastTimeDayOfWeek = '';
                 elements.team1Select.value = '';
                 elements.team2Select.value = '';
                 elements.seasonSelect.value = '';
                 elements.competitionStageSelect.value = '';
                 elements.dayOfWeekSelect.value = '';
-                elements.lastTimeTeam1Select.value = '';
-                elements.lastTimeTeam2Select.value = '';
-                elements.lastTimeDayOfWeekSelect.value = '';
-                elements.lastTimeLocationSelect.value = '';
-                elements.lastTimeStageSelect.value = '';
 
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
@@ -6145,7 +5820,6 @@
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
-                elements.lastTimeResults.classList.add('hidden');
 
                 // Ensure checkbox is hidden when switching TO Team Seasons tab
                 if (elements.includeBetterResultsContainer) {
@@ -6187,56 +5861,7 @@
                     elements.teamSeasonsSeasonContainer.classList.add('hidden');
                 }
 
-            } else if (tabName === 'last-time-when') {
-                document.getElementById('lastTimeWhenTab').classList.add('active');
-                document.getElementById('lastTimeWhenContent').classList.add('active');
-
-                // Simple approach: just set the league and update
-                state.selectedLeague = preservedLeague;
-
-                // Reset Team Seasons state when switching away
-                state.teamSeasonsSelectedTeam = '';
-                state.teamSeasonsSelectedSeason = '';
-                state.teamSeasonsSelectedPosition = '';
-                state.includeBetterResults = false;
-                state.firstOccurrenceOnly = false;
-                updateFirstOccurrenceOnlyToggleButton();
-                if (elements.firstOccurrenceOnlyContainer) {
-                    elements.firstOccurrenceOnlyContainer.classList.add('hidden');
-                }
-
-                // Reset League Filters state
-                state.selectedTeam1 = '';
-                state.selectedTeam2 = '';
-                state.extraTeam2s = [];
-                state.selectedSeason = '';
-                state.selectedDayOfWeek = '';
-                elements.team1Select.value = '';
-                elements.team2Select.value = '';
-                elements.seasonSelect.value = '';
-                elements.dayOfWeekSelect.value = '';
-
-                // Reset Match Finder state when switching away
-                state.matchFinderTeam1 = '';
-                state.matchFinderTeam2 = '';
-                state.matchFinderExtraTeam2s = [];
-                elements.matchFinderTeam1Select.value = '';
-                elements.matchFinderTeam2Select.value = '';
-                elements.matchFinderResults.classList.add('hidden');
-                elements.matchFinderCategoryContainer.classList.add('hidden');
-
-                // Hide league table and related sections
-                elements.tableContainer.classList.add('hidden');
-                elements.matchHistorySection.classList.add('hidden');
-                elements.h2hSection.classList.add('hidden');
-                elements.h2hMatchesTable.classList.add('hidden');
-                elements.tableInfo.classList.add('hidden');
-
-                // Update league buttons and team selects for Last Time When
-                createLeagueButtons(); // This will update the league buttons with correct selection
-                updateTeamSelects();
-                
-            } else if (tabName === 'team-streaks') {
+            }  else if (tabName === 'team-streaks') {
                 document.getElementById('teamStreaksTab').classList.add('active');
                 document.getElementById('teamStreaksContent').classList.add('active');
 
@@ -6261,19 +5886,11 @@
                 state.selectedSeason = '';
                 state.competitionStage = '';
                 state.selectedDayOfWeek = '';
-                state.lastTimeTeam1 = '';
-                state.lastTimeTeam2 = '';
-                state.lastTimeDayOfWeek = '';
                 elements.team1Select.value = '';
                 elements.team2Select.value = '';
                 elements.seasonSelect.value = '';
                 elements.competitionStageSelect.value = '';
                 elements.dayOfWeekSelect.value = '';
-                elements.lastTimeTeam1Select.value = '';
-                elements.lastTimeTeam2Select.value = '';
-                elements.lastTimeDayOfWeekSelect.value = '';
-                elements.lastTimeLocationSelect.value = '';
-                elements.lastTimeStageSelect.value = '';
 
                 // Reset Match Finder state when switching away
                 state.matchFinderTeam1 = '';
@@ -6290,7 +5907,6 @@
                 elements.h2hSection.classList.add('hidden');
                 elements.h2hMatchesTable.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
-                elements.lastTimeResults.classList.add('hidden');
 
                 // Clear Team Streaks visual elements to match cleared state
                 elements.teamStreaksResults.classList.add('hidden');
@@ -6334,19 +5950,6 @@
                 elements.seasonSelect.value = '';
                 elements.dayOfWeekSelect.value = '';
 
-                // Reset Last Time When state
-                state.lastTimeTeam1 = '';
-                state.lastTimeTeam2 = '';
-                state.lastTimeDayOfWeek = '';
-                state.lastTimeLocation = '';
-                state.lastTimeStage = '';
-                elements.lastTimeTeam1Select.value = '';
-                elements.lastTimeTeam2Select.value = '';
-                elements.lastTimeDayOfWeekSelect.value = '';
-                elements.lastTimeLocationSelect.value = '';
-                elements.lastTimeStageSelect.value = '';
-                elements.lastTimeResults.classList.add('hidden');
-
                 // Reset Team Streaks state
                 state.teamStreaksStage = '';
                 elements.teamStreaksResults.classList.add('hidden');
@@ -6382,7 +5985,6 @@
             document.getElementById('leagueFiltersTab').addEventListener('click', () => switchTab('league-filters'));
             document.getElementById('matchFinderTab').addEventListener('click', () => switchTab('match-finder'));
             document.getElementById('teamSeasonsTab').addEventListener('click', () => switchTab('team-seasons'));
-            document.getElementById('lastTimeWhenTab').addEventListener('click', () => switchTab('last-time-when'));
             document.getElementById('teamStreaksTab').addEventListener('click', () => switchTab('team-streaks'));
 
             // League selection
@@ -6393,14 +5995,6 @@
                 }
             });
             
-            // Last Time When league selection
-            elements.lastTimeLeagueButtons.addEventListener('click', (e) => {
-                const button = e.target.closest('.league-button');
-                if (button) {
-                    handleLeagueChange(button.dataset.league);
-                }
-            });
-
             // Match Finder league selection
             elements.matchFinderLeagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -6510,9 +6104,6 @@
                 if (state.selectedTeam1 || state.selectedTeam2) {
                     updateH2HTable();
                 }
-                if (state.lastTimeTeam1) {
-                    calculateLastTimeWhen();
-                }
                 if (state.teamStreaksTeam1) {
                     calculateActiveStreaks();
                 }
@@ -6532,9 +6123,6 @@
                 if (state.selectedTeam1 || state.selectedTeam2) {
                     updateH2HTable();
                 }
-                if (state.lastTimeTeam1) {
-                    calculateLastTimeWhen();
-                }
                 if (state.teamStreaksTeam1) {
                     calculateActiveStreaks();
                 }
@@ -6549,38 +6137,12 @@
             elements.resetBtn.addEventListener('click', clearFilters);
             elements.copyLinkBtnLeagueFilters.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamSeasons.addEventListener('click', copyShareableLink);
-            elements.copyLinkBtnLastTimeWhen.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamStreaks.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnMatchFinder.addEventListener('click', copyShareableLink);
 
-            // Last Time When controls
-            elements.lastTimeTeam1Select.addEventListener('change', (e) => {
-                state.lastTimeTeam1 = e.target.value;
-                refreshTeam2CountryOptions();
-                calculateLastTimeWhen();
-            });
             
-            elements.lastTimeTeam2Select.addEventListener('change', (e) => {
-                state.lastTimeTeam2 = e.target.value;
-                calculateLastTimeWhen();
-            });
             
-            elements.lastTimeDayOfWeekSelect.addEventListener('change', (e) => {
-                state.lastTimeDayOfWeek = e.target.value;
-                calculateLastTimeWhen();
-            });
             
-            elements.lastTimeLocationSelect.addEventListener('change', (e) => {
-                // Location dropdown changed
-                state.lastTimeLocation = e.target.value;
-                // State updated
-                calculateLastTimeWhen();
-            });
-            
-            elements.lastTimeStageSelect.addEventListener('change', (e) => {
-                state.lastTimeStage = e.target.value;
-                calculateLastTimeWhen();
-            });
             elements.retryBtn.addEventListener('click', () => {
                 state.error = '';
                 updateUI();
@@ -7039,22 +6601,6 @@
             state.selectedTeam2 = '';
             state.extraTeam2s = [];
             state.selectedSeason = '';
-
-            // Reset Last Time When state
-            state.lastTimeTeam1 = '';
-            state.lastTimeTeam2 = '';
-            state.lastTimeDayOfWeek = '';
-            state.lastTimeLocation = '';
-            
-            // Reset Last Time When UI elements
-            if (elements.lastTimeTeam1Select) elements.lastTimeTeam1Select.value = '';
-            if (elements.lastTimeTeam2Select) elements.lastTimeTeam2Select.value = '';
-            if (elements.lastTimeDayOfWeekSelect) elements.lastTimeDayOfWeekSelect.value = '';
-            if (elements.lastTimeLocationSelect) elements.lastTimeLocationSelect.value = '';
-            
-            // Hide Last Time When results
-            if (elements.lastTimeResults) elements.lastTimeResults.classList.add('hidden');
-            hideAllLastTimeSections();
 
             // Reset Match Finder state
             state.matchFinderTeam1 = '';
@@ -7576,7 +7122,7 @@
         let leagueTeam2Picker, matchFinderTeam2Picker;
 
         // Initialize comboboxes
-        let team1Combobox, team2Combobox, teamSeasonsCombobox, lastTimeTeam1Combobox, lastTimeTeam2Combobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox, matchFinderTeam1Combobox, matchFinderTeam2Combobox;
+        let team1Combobox, team2Combobox, teamSeasonsCombobox, teamStreaksTeam1Combobox, teamStreaksTeam2Combobox, matchFinderTeam1Combobox, matchFinderTeam2Combobox;
 
         // Update team selects
         function updateTeamSelects() {
@@ -7645,34 +7191,6 @@
                 );
             }
 
-            // Initialize Last Time When comboboxes
-            if (!lastTimeTeam1Combobox) {
-                lastTimeTeam1Combobox = new Combobox(
-                    'lastTimeTeam1ComboboxContainer',
-                    'lastTimeTeam1ComboboxInput',
-                    'lastTimeTeam1ComboboxDropdown',
-                    'Select Team 1',
-                    (value, text) => {
-                        console.log('Last Time Team 1 selected:', value);
-                        elements.lastTimeTeam1Select.value = value;
-                        elements.lastTimeTeam1Select.dispatchEvent(new Event('change'));
-                    }
-                );
-            }
-
-            if (!lastTimeTeam2Combobox) {
-                lastTimeTeam2Combobox = new Combobox(
-                    'lastTimeTeam2ComboboxContainer',
-                    'lastTimeTeam2ComboboxInput',
-                    'lastTimeTeam2ComboboxDropdown',
-                    'Select Team 2',
-                    (value, text) => {
-                        console.log('Last Time Team 2 selected:', value);
-                        elements.lastTimeTeam2Select.value = value;
-                        elements.lastTimeTeam2Select.dispatchEvent(new Event('change'));
-                    }
-                );
-            }
 
             // Initialize Team Streaks comboboxes
             if (!teamStreaksTeam1Combobox) {
@@ -7763,14 +7281,6 @@
                 { value: '', text: 'Choose a team...' },
                 ...leagueTeams.map(team => ({ value: team, text: team }))
             ];
-            const lastTimeTeam1ComboOptions = [
-                { value: '', text: 'Select Team 1' },
-                ...leagueTeams.map(team => ({ value: team, text: team }))
-            ];
-            const lastTimeTeam2ComboOptions = [
-                { value: '', text: 'Select Team 2' },
-                ...leagueTeams.map(team => ({ value: team, text: team }))
-            ];
             const teamStreaksTeam1ComboOptions = [
                 { value: '', text: 'Select Team 1' },
                 ...leagueTeams.map(team => ({ value: team, text: team }))
@@ -7791,8 +7301,6 @@
             team1Combobox.setOptions(team1ComboOptions);
             team2Combobox.setOptions(team2ComboOptions);
             teamSeasonsCombobox.setOptions(teamComboOptions);
-            lastTimeTeam1Combobox.setOptions(lastTimeTeam1ComboOptions);
-            lastTimeTeam2Combobox.setOptions(lastTimeTeam2ComboOptions);
             teamStreaksTeam1Combobox.setOptions(teamStreaksTeam1ComboOptions);
             teamStreaksTeam2Combobox.setOptions(teamStreaksTeam2ComboOptions);
             matchFinderTeam1Combobox.setOptions(matchFinderTeam1ComboOptions);
@@ -7812,14 +7320,6 @@
                 }
             }
 
-            // Also populate Last Time When team selects (for backward compatibility)
-            const lastTimeTeam1Options = '<option value="">Select Team 1</option>' +
-                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-            const lastTimeTeam2Options = '<option value="">Select Team 2</option>' +
-                leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('');
-
-            elements.lastTimeTeam1Select.innerHTML = lastTimeTeam1Options;
-            elements.lastTimeTeam2Select.innerHTML = lastTimeTeam2Options;
 
             elements.team1Select.value = state.selectedTeam1;
             elements.team2Select.value = state.selectedTeam2;
@@ -7838,9 +7338,7 @@
             const teamSeasonsText = state.teamSeasonsSelectedTeam || 'Choose a team...';
             teamSeasonsCombobox.setValue(state.teamSeasonsSelectedTeam, teamSeasonsText);
 
-            // Set default values for Last Time When and Team Streaks comboboxes
-            lastTimeTeam1Combobox.setValue('', 'Select Team 1');
-            lastTimeTeam2Combobox.setValue('', 'Select Team 2');
+            // Set default values for the Team Streaks comboboxes
             teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
             teamStreaksTeam2Combobox.setValue('', 'Select Team 2');
 
@@ -8045,7 +7543,7 @@
         }
 
         // Match Finder's own team-scoped match cache, same reasoning as
-        // teamHistoryApiCache/lastTimeApiCache/teamStreaksApiCache above -
+        // teamHistoryApiCache/teamStreaksApiCache above -
         // this tab can have a different team selected at the same time as
         // the others, so it needs its own cache slot.
         async function ensureMatchFinderDataLoaded(team1, opponents, div) {
@@ -9037,496 +8535,6 @@
             calculateMatchFinder();
         }
 
-        // Helper function to hide all Last Time sections
-        function hideAllLastTimeSections() {
-            elements.team1HomeWinSection.classList.add('hidden');
-            elements.team1AwayWinSection.classList.add('hidden');
-            elements.team1HomeDrawSection.classList.add('hidden');
-            elements.team1AwayDrawSection.classList.add('hidden');
-            elements.team1HomeLossSection.classList.add('hidden');
-            elements.team1AwayLossSection.classList.add('hidden');
-        }
-
-        // Helper function to create match table row (matching Head-to-Head format)
-        function createMatchTableRow(match) {
-            const homeTeamColor = getTeamColor(match.HomeTeam, state.selectedLeague);
-            const awayTeamColor = getTeamColor(match.AwayTeam, state.selectedLeague);
-            
-            const homeScore = parseInt(match.FTHG) || 0;
-            const awayScore = parseInt(match.FTAG) || 0;
-            
-            // Determine winner and apply highlighting like Head-to-Head tables
-            let homeScoreClass = '';
-            let awayScoreClass = '';
-            let resultStyle = '';
-            let winnerTeam = '';
-            
-            if (homeScore > awayScore) {
-                // Home team wins
-                winnerTeam = match.HomeTeam;
-                homeScoreClass = 'font-bold win-score';
-                awayScoreClass = 'text-red-600 font-bold';
-                resultStyle = homeTeamColor ? 
-                    `color: ${homeTeamColor} !important; font-weight: bold;` : 
-                    'color: #059669 !important; font-weight: bold;';
-            } else if (awayScore > homeScore) {
-                // Away team wins
-                winnerTeam = match.AwayTeam;
-                homeScoreClass = 'text-red-600 font-bold';
-                awayScoreClass = 'font-bold win-score';
-                resultStyle = awayTeamColor ? 
-                    `color: ${awayTeamColor} !important; font-weight: bold;` : 
-                    'color: #059669 !important; font-weight: bold;';
-            } else {
-                // Draw
-                winnerTeam = 'D';
-                homeScoreClass = 'text-gray-400 font-bold draw-score';
-                awayScoreClass = 'text-gray-400 font-bold draw-score';
-                resultStyle = 'color: #9ca3af !important; font-weight: bold;';
-            }
-
-            // Team styling
-            const homeTeamStyle = homeTeamColor ? `color: ${homeTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
-            const awayTeamStyle = awayTeamColor ? `color: ${awayTeamColor} !important; font-weight: bold;` : 'font-weight: bold;';
-
-            // Get team logos
-            const homeLogoUrl = getTeamLogoUrl(match.HomeTeam, state.selectedLeague);
-            const awayLogoUrl = getTeamLogoUrl(match.AwayTeam, state.selectedLeague);
-
-            // Get winner logo for result column (if not a draw)
-            const winnerLogoUrl = winnerTeam !== 'D' ? getTeamLogoUrl(winnerTeam, state.selectedLeague) : null;
-
-            return `
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="text-center text-sm">${match.dateObj.toLocaleDateString()}</td>
-                    <td class="text-center">
-                        <div class="flex items-center justify-center">
-                            ${homeLogoUrl ? `<img src="${homeLogoUrl}" alt="${match.HomeTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span style="${homeTeamStyle}; display: none;">${match.HomeTeam}</span>
-                        </div>
-                    </td>
-                    <td class="text-center text-lg" style="white-space: nowrap;"><span class="${homeScoreClass}">${homeScore}</span>:<span class="${awayScoreClass}">${awayScore}</span></td>
-                    <td class="text-center">
-                        <div class="flex items-center justify-center">
-                            ${awayLogoUrl ? `<img src="${awayLogoUrl}" alt="${match.AwayTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span style="${awayTeamStyle}; display: none;">${match.AwayTeam}</span>
-                        </div>
-                    </td>
-                    <td class="text-center">
-                        <div class="flex items-center justify-center">
-                            ${winnerLogoUrl ? `<img src="${winnerLogoUrl}" alt="${winnerTeam} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
-                            <span style="${resultStyle}${winnerTeam === 'D' ? '' : '; display: none;'}">${winnerTeam}</span>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        }
-
-        // Helper function to populate a result section
-        function populateResultSection(sectionElement, bodyElement, daysElement, titleElement, result, team1Name, team2Name, resultType, isHome) {
-            if (result) {
-                sectionElement.classList.remove('hidden');
-                bodyElement.innerHTML = createMatchTableRow(result);
-                
-                const daysSince = Math.floor((new Date() - result.dateObj) / (1000 * 60 * 60 * 24));
-                daysElement.textContent = `${daysSince} days ago`;
-                
-                const location = isHome ? 'at Home' : 'Away';
-                // .text-gray-400 (not .text-gray-600) to match the same
-                // muted grey used for draw scores/results elsewhere -
-                // .text-gray-600 doubles as a general secondary-text
-                // utility class already mapped to white in dark mode,
-                // which fought this draw-specific meaning.
-                const color = resultType === 'Won' ? 'text-green-700' : resultType === 'Drew' ? 'text-gray-400' : 'text-red-600';
-                titleElement.className = `text-lg font-semibold ${color} mb-3`;
-
-                // Get team colors - this title sits as plain text on the
-                // page's own background (no team1-highlight/team2-highlight
-                // pill involved), so unlike the match-row functions above
-                // it always needs dark-mode lightening, not just
-                // conditionally on a CSS class.
-                const team1Color = pickTeamTextColor(getTeamColor(team1Name, state.selectedLeague), '');
-                const team2Color = team2Name ? pickTeamTextColor(getTeamColor(team2Name, state.selectedLeague), '') : null;
-                
-                // Use different title format for single-team vs two-team mode
-                if (team2Name && team2Name !== team1Name) {
-                    // Two-team mode: Last [Result] [Location] vs [Team2]
-                    const resultWord = resultType === 'Won' ? 'Win' : resultType === 'Drew' ? 'Draw' : 'Loss';
-                    titleElement.innerHTML = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1Name}</span> Last ${resultWord} ${location} vs <span style="color: ${team2Color || '#374151'}; font-weight: bold;">${getOpponentDisplayLabel(team2Name)}</span>`;
-                } else {
-                    // Single-team mode: simple format
-                    const resultWord = resultType === 'Won' ? 'Win' : resultType === 'Drew' ? 'Draw' : 'Loss';
-                    titleElement.innerHTML = `<span style="color: ${team1Color || '#374151'}; font-weight: bold;">${team1Name}</span> Last ${resultWord} ${location}`;
-                }
-            }
-        }
-
-        // Calculate last time when results
-        // Fetches (or reuses a cached) match list for The Last Time
-        // When... - team1 alone (all opponents, via team-history) or
-        // team1 vs a specific opponent/country grouping (via
-        // head-to-head, opponents already resolved to concrete team
-        // names by the caller). Own cache slot, separate from League
-        // Filters' and Team Streaks' - this tab can have a different team
-        // selected at the same time. Same fire-and-forget pattern as
-        // ensureTeamHistoryLoaded()/ensureHeadToHeadLoaded(), except it
-        // re-renders via calculateLastTimeWhen() (which re-reads current
-        // state itself) rather than updateTable().
-        async function ensureLastTimeDataLoaded(team1, opponents, div) {
-            const cacheKey = opponents
-                ? `${div}::${team1}::${[...opponents].sort().join(',')}`
-                : `${div}::${team1}::__all__`;
-            if (state.lastTimeApiCacheKey === cacheKey) return;
-            if (state.lastTimeApiLoading) return;
-
-            state.lastTimeApiLoading = true;
-            try {
-                const url = opponents
-                    ? `${TEAM_HISTORY_API_BASE}/api/head-to-head?div=${encodeURIComponent(div)}&team1=${encodeURIComponent(team1)}&team2=${encodeURIComponent(opponents.join(','))}`
-                    : `${TEAM_HISTORY_API_BASE}/api/team-history?div=${encodeURIComponent(div)}&team=${encodeURIComponent(team1)}`;
-                const res = await fetch(url);
-                if (!res.ok) throw new Error(`Last Time When data request failed: ${res.status}`);
-                const data = await res.json();
-
-                state.lastTimeApiCache = data.matches.map(m => ({
-                    Div: div,
-                    dateObj: isoDateToLocalDateObj(m.date),
-                    HomeTeam: m.homeTeam,
-                    AwayTeam: m.awayTeam,
-                    FTHG: m.homeGoals,
-                    FTAG: m.awayGoals,
-                    CompetitionPhase: m.competitionPhase,
-                    isQualifier: m.isQualifier,
-                    AdditionalInfo: m.additionalInfo
-                }));
-                state.lastTimeApiCacheKey = cacheKey;
-            } catch (err) {
-                console.error('Failed to load Last Time When data from API:', err);
-                state.lastTimeApiCacheKey = cacheKey; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
-            } finally {
-                state.lastTimeApiLoading = false;
-            }
-
-            calculateLastTimeWhen();
-        }
-
-        function calculateLastTimeWhen() {
-            if (!state.lastTimeTeam1) {
-                elements.lastTimeResults.classList.add('hidden');
-                return;
-            }
-
-            // Handle single team scenario (Team 1 only selected)
-            if (!state.lastTimeTeam2) {
-                calculateSingleTeamResults();
-                return;
-            }
-
-            if (state.lastTimeTeam1 === state.lastTimeTeam2) {
-                elements.lastTimeResults.classList.add('hidden');
-                return;
-            }
-
-            // Hide all sections initially
-            hideAllLastTimeSections();
-
-            const leagueMapping = {
-                'champions-league': 'C1',
-                'europa-league': 'E1',
-                'conference-league': 'C2'
-            };
-            const div = leagueMapping[state.selectedLeague];
-
-            const opponents = isCountryOpponentValue(state.lastTimeTeam2)
-                ? getCountryOpponents(countryFromOpponentValue(state.lastTimeTeam2), state.lastTimeTeam1)
-                : [state.lastTimeTeam2];
-
-            if (div && opponents.length > 0) {
-                ensureLastTimeDataLoaded(state.lastTimeTeam1, opponents, div);
-            }
-
-            let matches = [...(state.lastTimeApiCache || [])];
-
-            // Apply qualifier exclusion filter if enabled
-            if (state.excludeQualifiers) {
-                matches = matches.filter(row => !row.isQualifier);
-            }
-            
-            // Apply main stage exclusion filter if enabled
-            if (state.excludeMainStage) {
-                matches = matches.filter(row => row.isQualifier);
-            }
-            
-            // Apply day of week filter if selected
-            if (state.lastTimeDayOfWeek !== '') {
-                matches = matches.filter(row => {
-                    const dayOfWeek = row.dateObj.getDay();
-                    return dayOfWeek.toString() === state.lastTimeDayOfWeek;
-                });
-            }
-            
-            // Apply location filter if selected
-            // Location filter state
-            // Matches before location filter
-            if (state.lastTimeLocation !== '') {
-                matches = matches.filter(row => {
-                    if (state.lastTimeLocation === 'home') {
-                        // Only show matches where Team 1 was playing at home
-                        // Filtering for home matches
-                        return row.HomeTeam === state.lastTimeTeam1;
-                    } else if (state.lastTimeLocation === 'away') {
-                        // Only show matches where Team 1 was playing away
-                        // Filtering for away matches
-                        return row.AwayTeam === state.lastTimeTeam1;
-                    }
-                    // If 'Both Home and Away' or empty, show all matches (no filtering)
-                    return true;
-                });
-                // Matches after location filter
-            }
-            
-            // Apply stage filter if selected
-            if (state.lastTimeStage !== '') {
-                matches = matches.filter(row => {
-                    return matchesStageCategory(row.CompetitionPhase, state.lastTimeStage);
-                });
-            }
-            
-            // Sort matches by date (most recent first)
-            matches.sort((a, b) => b.dateObj - a.dateObj);
-            
-            // Find last occurrence of each result type
-            const results = {
-                team1HomeWin: null,    // Team 1 won at home
-                team1AwayWin: null,    // Team 1 won away
-                team1HomeDraw: null,   // Team 1 drew at home
-                team1AwayDraw: null,   // Team 1 drew away
-                team1HomeLoss: null,   // Team 1 lost at home
-                team1AwayLoss: null    // Team 1 lost away
-            };
-            
-            matches.forEach(match => {
-                const homeScore = parseInt(match.FTHG) || 0;
-                const awayScore = parseInt(match.FTAG) || 0;
-                
-                if (match.HomeTeam === state.lastTimeTeam1) {
-                    // Team 1 is home, opponent is away
-                    if (homeScore > awayScore && !results.team1HomeWin) {
-                        results.team1HomeWin = match;
-                    } else if (homeScore === awayScore && !results.team1HomeDraw) {
-                        results.team1HomeDraw = match;
-                    } else if (homeScore < awayScore && !results.team1HomeLoss) {
-                        results.team1HomeLoss = match;
-                    }
-                } else if (match.AwayTeam === state.lastTimeTeam1) {
-                    // Team 1 is away, opponent is home
-                    if (awayScore > homeScore && !results.team1AwayWin) {
-                        results.team1AwayWin = match;
-                    } else if (homeScore === awayScore && !results.team1AwayDraw) {
-                        results.team1AwayDraw = match;
-                    } else if (homeScore > awayScore && !results.team1AwayLoss) {
-                        results.team1AwayLoss = match;
-                    }
-                }
-            });
-            
-            // Populate the 6 result sections
-            populateResultSection(
-                elements.team1HomeWinSection, elements.team1HomeWinBody, elements.team1HomeWinDays,
-                elements.team1HomeWinTitle, results.team1HomeWin, state.lastTimeTeam1, state.lastTimeTeam2, 'Won', true
-            );
-            
-            populateResultSection(
-                elements.team1AwayWinSection, elements.team1AwayWinBody, elements.team1AwayWinDays,
-                elements.team1AwayWinTitle, results.team1AwayWin, state.lastTimeTeam1, state.lastTimeTeam2, 'Won', false
-            );
-            
-            populateResultSection(
-                elements.team1HomeDrawSection, elements.team1HomeDrawBody, elements.team1HomeDrawDays,
-                elements.team1HomeDrawTitle, results.team1HomeDraw, state.lastTimeTeam1, state.lastTimeTeam2, 'Drew', true
-            );
-            
-            populateResultSection(
-                elements.team1AwayDrawSection, elements.team1AwayDrawBody, elements.team1AwayDrawDays,
-                elements.team1AwayDrawTitle, results.team1AwayDraw, state.lastTimeTeam1, state.lastTimeTeam2, 'Drew', false
-            );
-            
-            populateResultSection(
-                elements.team1HomeLossSection, elements.team1HomeLossBody, elements.team1HomeLossDays,
-                elements.team1HomeLossTitle, results.team1HomeLoss, state.lastTimeTeam1, state.lastTimeTeam2, 'Lost', true
-            );
-            
-            populateResultSection(
-                elements.team1AwayLossSection, elements.team1AwayLossBody, elements.team1AwayLossDays,
-                elements.team1AwayLossTitle, results.team1AwayLoss, state.lastTimeTeam1, state.lastTimeTeam2, 'Lost', false
-            );
-            
-            // Show results
-            elements.lastTimeResults.classList.remove('hidden');
-            updateSearchAnswer({ lastTime: results });
-        }
-
-        // Calculate single team results (Team 1 vs all opponents)
-        function calculateSingleTeamResults() {
-            // Hide all sections initially
-            hideAllLastTimeSections();
-
-            const leagueMapping = {
-                'champions-league': 'C1',
-                'europa-league': 'E1',
-                'conference-league': 'C2'
-            };
-            const div = leagueMapping[state.selectedLeague];
-
-            if (div) {
-                ensureLastTimeDataLoaded(state.lastTimeTeam1, null, div);
-            }
-
-            let matches = [...(state.lastTimeApiCache || [])];
-
-            // Apply qualifier exclusion filter if enabled
-            if (state.excludeQualifiers) {
-                matches = matches.filter(row => !row.isQualifier);
-            }
-            
-            // Apply main stage exclusion filter if enabled
-            if (state.excludeMainStage) {
-                matches = matches.filter(row => row.isQualifier);
-            }
-            
-            // Apply day of week filter if selected
-            if (state.lastTimeDayOfWeek !== '') {
-                matches = matches.filter(row => {
-                    const dayOfWeek = row.dateObj.getDay();
-                    return dayOfWeek.toString() === state.lastTimeDayOfWeek;
-                });
-            }
-            
-            // Apply location filter if selected
-            // Single team - Location filter state
-            // Single team - Matches before location filter
-            if (state.lastTimeLocation !== '') {
-                matches = matches.filter(row => {
-                    if (state.lastTimeLocation === 'home') {
-                        // Only show matches where Team 1 was playing at home
-                        // Single team - Filtering for home matches
-                        return row.HomeTeam === state.lastTimeTeam1;
-                    } else if (state.lastTimeLocation === 'away') {
-                        // Only show matches where Team 1 was playing away
-                        // Single team - Filtering for away matches
-                        return row.AwayTeam === state.lastTimeTeam1;
-                    }
-                    // If 'Both Home and Away' or empty, show all matches (no filtering)
-                    return true;
-                });
-                // Single team - Matches after location filter
-            }
-            
-            // Apply stage filter if selected
-            if (state.lastTimeStage !== '') {
-                matches = matches.filter(row => {
-                    return matchesStageCategory(row.CompetitionPhase, state.lastTimeStage);
-                });
-            }
-            
-            // Sort matches by date (most recent first)
-            matches.sort((a, b) => b.dateObj - a.dateObj);
-            
-            const today = new Date();
-            
-            // Find last occurrence of each result type
-            const results = {
-                team1HomeWin: null,
-                team1HomeDraw: null,
-                team1HomeLoss: null,
-                team1AwayWin: null,
-                team1AwayDraw: null,
-                team1AwayLoss: null
-            };
-            
-            matches.forEach(match => {
-                const homeScore = parseInt(match.FTHG) || 0;
-                const awayScore = parseInt(match.FTAG) || 0;
-                
-                if (match.HomeTeam === state.lastTimeTeam1) {
-                    // Team 1 is home
-                    if (homeScore > awayScore && !results.team1HomeWin) {
-                        results.team1HomeWin = match;
-                    } else if (homeScore === awayScore && !results.team1HomeDraw) {
-                        results.team1HomeDraw = match;
-                    } else if (homeScore < awayScore && !results.team1HomeLoss) {
-                        results.team1HomeLoss = match;
-                    }
-                } else if (match.AwayTeam === state.lastTimeTeam1) {
-                    // Team 1 is away
-                    if (awayScore > homeScore && !results.team1AwayWin) {
-                        results.team1AwayWin = match;
-                    } else if (homeScore === awayScore && !results.team1AwayDraw) {
-                        results.team1AwayDraw = match;
-                    } else if (homeScore > awayScore && !results.team1AwayLoss) {
-                        results.team1AwayLoss = match;
-                    }
-                }
-            });
-            
-            // For single team, we get opponent team names from the matches
-            function getSingleTeamOpponentName(match) {
-                return match.HomeTeam === state.lastTimeTeam1 ? match.AwayTeam : match.HomeTeam;
-            }
-            
-            // Populate the 6 result sections for single team
-            if (results.team1HomeWin) {
-                populateResultSection(
-                    elements.team1HomeWinSection, elements.team1HomeWinBody, elements.team1HomeWinDays,
-                    elements.team1HomeWinTitle, results.team1HomeWin, state.lastTimeTeam1, 
-                    null, 'Won', true
-                );
-            }
-            
-            if (results.team1AwayWin) {
-                populateResultSection(
-                    elements.team1AwayWinSection, elements.team1AwayWinBody, elements.team1AwayWinDays,
-                    elements.team1AwayWinTitle, results.team1AwayWin, state.lastTimeTeam1, 
-                    null, 'Won', false
-                );
-            }
-            
-            if (results.team1HomeDraw) {
-                populateResultSection(
-                    elements.team1HomeDrawSection, elements.team1HomeDrawBody, elements.team1HomeDrawDays,
-                    elements.team1HomeDrawTitle, results.team1HomeDraw, state.lastTimeTeam1, 
-                    null, 'Drew', true
-                );
-            }
-            
-            if (results.team1AwayDraw) {
-                populateResultSection(
-                    elements.team1AwayDrawSection, elements.team1AwayDrawBody, elements.team1AwayDrawDays,
-                    elements.team1AwayDrawTitle, results.team1AwayDraw, state.lastTimeTeam1, 
-                    null, 'Drew', false
-                );
-            }
-            
-            if (results.team1HomeLoss) {
-                populateResultSection(
-                    elements.team1HomeLossSection, elements.team1HomeLossBody, elements.team1HomeLossDays,
-                    elements.team1HomeLossTitle, results.team1HomeLoss, state.lastTimeTeam1, 
-                    null, 'Lost', true
-                );
-            }
-            
-            if (results.team1AwayLoss) {
-                populateResultSection(
-                    elements.team1AwayLossSection, elements.team1AwayLossBody, elements.team1AwayLossDays,
-                    elements.team1AwayLossTitle, results.team1AwayLoss, state.lastTimeTeam1, 
-                    null, 'Lost', false
-                );
-            }
-            
-            // Show results
-            elements.lastTimeResults.classList.remove('hidden');
-            updateSearchAnswer({ lastTime: results });
-        }
 
         // Qualifying rounds are "Qualification ..." in the data, but share
         // round names with the main stage ("Qualification Play-Offs" vs the
@@ -11829,7 +10837,6 @@
             state.dashboardLockedTeam = '';
             unlockComboboxUI('team1ComboboxContainer', 'team1ComboboxInput');
             unlockComboboxUI('teamSeasonsComboboxContainer', 'teamSeasonsComboboxInput');
-            unlockComboboxUI('lastTimeTeam1ComboboxContainer', 'lastTimeTeam1ComboboxInput');
             unlockComboboxUI('teamStreaksTeam1ComboboxContainer', 'teamStreaksTeam1ComboboxInput');
             history.replaceState(null, '', window.location.pathname);
             updateTeamDashboardHeader();
@@ -11837,9 +10844,9 @@
 
         // Re-apply the locked team to whichever tab just became active.
         // Each tab keeps its own "selected team" state (selectedTeam1,
-        // teamSeasonsSelectedTeam, lastTimeTeam1, teamStreaksTeam1) and
+        // teamSeasonsSelectedTeam, teamStreaksTeam1) and
         // switchTab() resets the tabs being left/entered independently of
-        // each other - this keeps all four in sync with the dashboard lock
+        // each other - this keeps them all in sync with the dashboard lock
         // instead of only the tab the lock was originally applied on.
         //
         // Guarded against re-entrancy: showTeamHistory() (triggered by
@@ -11860,10 +10867,7 @@
                 } else if (tabName === 'team-seasons' && teamSeasonsCombobox) {
                     teamSeasonsCombobox.selectOption(team, team);
                     lockComboboxUI('teamSeasonsComboboxContainer', 'teamSeasonsComboboxInput');
-                } else if (tabName === 'last-time-when' && lastTimeTeam1Combobox) {
-                    lastTimeTeam1Combobox.selectOption(team, team);
-                    lockComboboxUI('lastTimeTeam1ComboboxContainer', 'lastTimeTeam1ComboboxInput');
-                } else if (tabName === 'team-streaks' && teamStreaksTeam1Combobox) {
+                }  else if (tabName === 'team-streaks' && teamStreaksTeam1Combobox) {
                     teamStreaksTeam1Combobox.selectOption(team, team);
                     lockComboboxUI('teamStreaksTeam1ComboboxContainer', 'teamStreaksTeam1ComboboxInput');
                 } else if (tabName === 'match-finder' && matchFinderTeam1Combobox) {
@@ -11898,7 +10902,7 @@
             state.teamLocked = true;
             state.dashboardLockedTeam = teamName;
             applyTeamDashboardLockToTab(activeTab);
-            // Team Seasons/Last Time When/Team Streaks selections don't run
+            // Team Seasons/Team Streaks selections don't run
             // through updateTable() (that's League Filters-specific), so the
             // snapshot header needs an explicit refresh here.
             updateTeamDashboardHeader();
@@ -13544,12 +12548,6 @@
                 const teamSeasonsText = savedState.teamSeasonsSelectedTeam || 'Choose a team...';
                 teamSeasonsCombobox.setValue(savedState.teamSeasonsSelectedTeam, teamSeasonsText);
             }
-            if (lastTimeTeam1Combobox) {
-                lastTimeTeam1Combobox.setValue('', 'Select Team 1');
-            }
-            if (lastTimeTeam2Combobox) {
-                lastTimeTeam2Combobox.setValue('', 'Select Team 2');
-            }
             if (teamStreaksTeam1Combobox) {
                 teamStreaksTeam1Combobox.setValue('', 'Select Team 1');
             }
@@ -14740,7 +13738,7 @@
                     elements.h2hSection.classList.add('hidden');
                 }
             } else {
-                // Keep table hidden on Last Time When tab
+                // Keep table hidden on the other tabs
                 elements.tableContainer.classList.add('hidden');
                 elements.h2hSection.classList.add('hidden');
                 elements.tableInfo.classList.add('hidden');
@@ -14869,7 +13867,7 @@
         // handlePositionColors() above, which only resets its own narrower
         // set of League Table/Team History <td> cells). Toggling the theme
         // while looking at an already-rendered Match History/Knockout Match
-        // History/Team Streaks/Last Time When/Match Finder/Team History
+        // History/Team Streaks/Match Finder/Team History
         // table left every team-colored name stuck at whichever color it
         // was computed for, until something else re-rendered that section.
         // Re-running whichever tab's own (side-effect-free) recalculation
@@ -14882,9 +13880,7 @@
                 updateTable();
             } else if (activeTab === 'match-finder') {
                 calculateMatchFinder();
-            } else if (activeTab === 'last-time-when') {
-                calculateLastTimeWhen();
-            } else if (activeTab === 'team-streaks') {
+            }  else if (activeTab === 'team-streaks') {
                 calculateTeamStreaks();
             } else if (activeTab === 'team-seasons' && state.teamSeasonsSelectedTeam) {
                 // Single-team view only - re-showing here can hide the
@@ -14900,7 +13896,7 @@
         
         // Handle table colors by specific column headers
         // Scoped per .league-table (not a page-wide querySelectorAll) -
-        // Match History/H2H/Streaks/Last Time When tables ALSO carry the
+        // Match History/H2H/Streaks tables ALSO carry the
         // .league-table class (just with entirely different columns:
         // Date/Home Team/Home Score/.../Result, none of which appear in
         // columnRules below), and were previously always present in the
