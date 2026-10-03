@@ -65,8 +65,14 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
-- Later: **Upcoming matches dashboard** — noted 2026-09-29. A dashboard of
-  upcoming fixtures, where each match shows the context for that meeting:
+- Later: **Upcoming matches dashboard** — noted 2026-09-29. **Direction
+  changed 2026-10-03:** upcoming matches go on the home page, in the
+  header above the search bar, not on their own page - lower priority as
+  a result. The branch's fixtures table, update script / workflow,
+  planned /api/upcoming and per-match context (below) still apply; the
+  standalone UpcomingMatches page (and its mobile twin) don't. A
+  dashboard of upcoming fixtures, where each match shows the context for
+  that meeting:
   - all-time head-to-head record between the two teams
   - any active streak in that head-to-head (e.g. "unbeaten in 6 vs them")
   - each team's own active streaks regardless of opponent (winning,
@@ -125,9 +131,12 @@ Feature ideas, not yet scheduled.
     (upcoming-fixtures-sample.json): compact two-per-row cards; opened
     card has the season table, H2H and record bars, Premier League era
     switch, streak tables with an Overall / Home / Away switch.
-  - Next: UpcomingMatchesMobile.html + redirect; then /api/upcoming
-    (Worker deploy) and switching the page to live fixtures; then entry
-    points.
+  - Next (after the 2026-10-03 change): /api/upcoming (Worker deploy);
+    a compact upcoming-matches strip on index.html above the search bar
+    (desktop + phone width - index.html has no separate mobile page),
+    opening each match's context; reuse what fits from the branch's
+    desktop page. The UpcomingMatchesMobile.html + redirect step is
+    dropped.
   - **Before continuing on the branch: merge `main` into it.** `main` has
     moved on since the branch was cut (local-format dates on all four
     pages, the Continental Team Seasons qualifier fixes, the Main Stage /
