@@ -52,11 +52,16 @@ Feature ideas, not yet scheduled.
   side); the search then sends these there instead of asking for a team.
 
 - Later: **Comebacks** — noted 2026-10-01 ("Barcelona comebacks" in the
-  search). No concept of a comeback yet. Possible meanings: a match won
-  or drawn from behind (needs half-time / goal-time data - check what the
-  match rows have), or a Continental two-legged tie won after losing the
-  first leg (the 6-1 vs PSG) - doable from the existing tie data. Decide
-  which first, then a Match Finder category and the search words for it.
+  search). Decided 2026-10-03: a comeback is a Continental **two-legged
+  tie won after losing the first leg** (Barcelona's 6-1 vs PSG after
+  losing 4-0) - not a single match won from behind. Doable from the
+  existing tie data (Match Finder's Double-Legged Tie mode already
+  pairs the legs).
+  - A Match Finder tie-mode category, e.g. "Comebacks": Team 1 lost leg 1
+    and went through - on aggregate, away goals, after extra time or on
+    penalties. Biggest first-leg deficit overturned first, then newest.
+  - Search words: "comebacks", "remontada", "overturned", "came back from".
+  - Maybe its mirror too: ties lost after winning the first leg.
 
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
