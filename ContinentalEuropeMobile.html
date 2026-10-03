@@ -6585,6 +6585,9 @@
                 const button = e.target.closest('.league-button');
                 if (button && button.dataset.mode !== state.matchFinderMode) {
                     state.matchFinderMode = button.dataset.mode;
+                    // Comebacks only exist for two-legged ties
+                    const category = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
+                    if (state.matchFinderMode !== 'tie' && category && category.tieOnly) state.matchFinderCategory = 'victories';
                     // Home/Away has no meaning for a two-legged tie (no single home venue);
                     // Away Goals Only is the opposite - it has no meaning for a single match
                     // (only a two-legged tie can be "decided by away goals").
@@ -7399,7 +7402,9 @@
             { key: 'totalGoals', label: 'Most Total Goals' },
             { key: 'leastGoals', label: 'Least Total Goals' },
             { key: 'scoreline', label: 'Specific Scoreline' },
-            { key: 'recent', label: 'Most Recent' }
+            { key: 'recent', label: 'Most Recent' },
+            // Double-Legged Tie mode only: ties won after losing the first leg
+            { key: 'comebacks', label: 'Comebacks', tieOnly: true }
         ];
 
         // Most Recent's Result filter, relative to Team 1
@@ -7418,7 +7423,8 @@
             totalGoals: 'Most Total Aggregate Goals',
             leastGoals: 'Fewest Aggregate Goals',
             scoreline: 'Specific Aggregate Scoreline',
-            recent: 'Most Recent Ties'
+            recent: 'Most Recent Ties',
+            comebacks: 'Comebacks (Lost the First Leg)'
         };
 
         const MATCH_FINDER_MODES = [
@@ -7439,7 +7445,7 @@
 
         function renderMatchFinderCategoryButtons() {
             const isTieMode = state.matchFinderMode === 'tie';
-            elements.matchFinderCategoryButtons.innerHTML = MATCH_FINDER_CATEGORIES.map(cat => `
+            elements.matchFinderCategoryButtons.innerHTML = MATCH_FINDER_CATEGORIES.filter(cat => isTieMode || !cat.tieOnly).map(cat => `
                 <label class="league-button ${state.matchFinderCategory === cat.key ? 'active' : ''}" data-category="${cat.key}">
                     <div class="radio-dot ${state.matchFinderCategory === cat.key ? 'active' : ''}"></div>
                     <span class="text-sm font-medium ${state.matchFinderCategory === cat.key ? 'text-green-700' : 'text-gray-700'}">
@@ -8123,6 +8129,17 @@
                     });
                 }
                 classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
+            } else if (state.matchFinderCategory === 'comebacks') {
+                // Lost the first leg, still went through (on aggregate, away
+                // goals, after extra time or on penalties) - the biggest
+                // first-leg deficit overturned first, then the newest
+                classified = classified.map(t => {
+                    const b = t.breakdown;
+                    const opponent = b.teamA === team1 ? b.teamB : b.teamA;
+                    return { ...t, firstLegTeam1Goals: b.legs[0][team1], firstLegOpponentGoals: b.legs[0][opponent] };
+                }).filter(t => !t.breakdown.isSingleLeg && t.breakdown.winner === team1 && t.firstLegTeam1Goals < t.firstLegOpponentGoals);
+                const deficit = t => t.firstLegOpponentGoals - t.firstLegTeam1Goals;
+                classified.sort((a, b) => deficit(b) - deficit(a) || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'recent') {
                 classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
                 renderMatchFinderLastResults(classified, true);
@@ -8154,8 +8171,9 @@
             elements.matchFinderTieResultsTitle.textContent = matchFinderTieSubtitle(classified.length);
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
+            const isComeback = state.matchFinderCategory === 'comebacks';
             const isRecent = state.matchFinderCategory === 'recent';
-            const valueLabel = isRecent ? 'Result' : (isMarginCategory ? 'Agg. Margin' : 'Agg. Goals');
+            const valueLabel = isComeback ? 'Deficit' : isRecent ? 'Result' : (isMarginCategory ? 'Agg. Margin' : 'Agg. Goals');
             const team1 = state.matchFinderTeam1;
 
             elements.matchFinderTieTableHeader.innerHTML = `
@@ -8173,7 +8191,13 @@
                 const firstLeg = t.legMatches[0];
 
                 let valueClass, valueText, valueSort;
-                if (isRecent) {
+                if (isComeback) {
+                    // How many goals down they were after the first leg (4 for
+                    // 0-4 then 6-1); the aggregate shows underneath
+                    valueClass = 'win-score';
+                    valueSort = t.firstLegOpponentGoals - t.firstLegTeam1Goals;
+                    valueText = `${valueSort}`;
+                } else if (isRecent) {
                     valueClass = t.result === 'win' ? 'win-score' : t.result === 'loss' ? 'text-red-600' : 'text-gray-400';
                     valueText = t.result === 'win' ? 'W' : t.result === 'loss' ? 'L' : 'D';
                     valueSort = t.result === 'win' ? 2 : t.result === 'draw' ? 1 : 0;
