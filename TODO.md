@@ -58,6 +58,24 @@ Feature ideas, not yet scheduled.
   first leg (the 6-1 vs PSG) - doable from the existing tie data. Decide
   which first, then a Match Finder category and the search words for it.
 
+- Later: **Team Streaks: every club vs a Team 2** — noted 2026-10-03.
+  Streaks for any club against a chosen opponent, ranked: "longest
+  historic unbeaten runs (anyone) vs Chelsea", "active winning streaks
+  (anyone) vs the Big 6", and on Continental vs a country's clubs. The
+  flip side of Chelsea's winless runs per opponent - today only one
+  opponent at a time (Team 1 + Team 2), never a ranked list across all.
+  - Cheap: the all-teams lists already hold the division's full history
+    (/api/season-matches, ~70 ms for every club's streaks); filter each
+    club's matches to games against Team 2 before computing.
+  - Team Streaks needs Team 2 usable with no Team 1 (today it's only
+    offered once Team 1 is set).
+  - Big 6 vs Big 6: a Big 6 club's runs count only its games against the
+    other five.
+  - Active: same rule as now - clubs in the latest season only, so a
+    relegated club's frozen run against Chelsea doesn't show as active.
+  - Search: "longest unbeaten run against Chelsea" reads Chelsea as Team
+    1 today - "against X" with no subject should mean every club vs X.
+
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
   one-team-at-a-time view.
