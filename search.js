@@ -1518,7 +1518,9 @@
             return { view: 'match-finder', category: 'recent', result, lastTime: true, location };
         }
         let category = null;
-        if (scoreline) category = 'scoreline';
+        // A two-legged tie won after losing the first leg
+        if (has(/\b(comebacks?|come ?backs?|came back|remontadas?|overturn(ed|s|ing)?|turned around)\b/)) category = 'comebacks';
+        else if (scoreline) category = 'scoreline';
         else if (has(/\b(biggest|heaviest|largest|record|best) (wins?|victory|victories)\b|\bthrashings?\b|\bbiggest margins?\b/)) category = 'victories';
         else if (has(/\b(biggest|heaviest|worst|largest|record) (defeats?|loss|losses|beatings?)\b/)) category = 'defeats';
         else if (has(/\b(highest scoring|biggest) draws?\b|\bscore draws?\b/)) category = 'draws';
@@ -2013,7 +2015,7 @@
         'victories': 'Biggest aggregate wins', 'defeats': 'Biggest aggregate defeats',
         'draws': 'Highest-scoring aggregate draws', 'totalGoals': 'Most aggregate goals',
         'leastGoals': 'Fewest aggregate goals', 'scoreline': 'Aggregate scoreline',
-        'recent': 'Most recent ties'
+        'recent': 'Most recent ties', 'comebacks': 'Comebacks'
     };
 
     // Match Finder (needs Team 1). Single matches, or two-legged ties on
@@ -2021,7 +2023,7 @@
     // scoreline is home-away for single matches, Team 1-opponent for ties.
     function matchFinderResult(comp, t1, opponents, parsed, category, lastTime) {
         const f = parsed.filters;
-        const tie = comp.continental && f.tieMode;
+        const tie = comp.continental && (f.tieMode || category === 'comebacks');
         const params = { t1, t2: opponents };
         // Most Recent's result, relative to Team 1. A match decided on
         // penalties is a draw at full time, so with penalties it's left out.
@@ -2115,6 +2117,8 @@
                 primary.push(streaksResult(comp, t1, opponents[0], { ...intent, location }, parsed));
                 break;
             case 'match-finder':
+                // Comebacks only exist in two-legged ties (the Champions League)
+                if (intent.category === 'comebacks' && !comp.continental) break;
                 // Match Finder needs a team to look from
                 if (t1) primary.push(matchFinderResult(comp, t1, opponents, parsed, intent.category, intent.lastTime ? intent : null));
                 break;
@@ -2250,6 +2254,9 @@
             }
             if (parsed.intent.view === 'match-finder' && parsed.mentions.length === 0) {
                 return { results: [], message: 'Match Finder looks from one team\'s side - add a team, e.g. "Arsenal biggest wins".' };
+            }
+            if (parsed.intent.category === 'comebacks' && !comps.some(comp => comp.continental)) {
+                return { results: [], message: 'Comebacks are two-legged ties won after losing the first leg - pick the Champions League in the dropdown.' };
             }
             if (parsed.opponentGroup === 'BIG_6' && !comps.some(comp => comp.key === 'premier-league')) {
                 return { results: [], message: 'The Big 6 are Premier League clubs - pick the Premier League in the dropdown.' };
@@ -2450,6 +2457,25 @@
             return `${score} ${where} ${b(opponentOf(entry))} ${when}`;
         };
         const nothing = what => ({ crestTeam: ctx.team1, html: `No ${what} found for ${team1}${scope}.` });
+
+        // Comebacks: "FC Barcelona's biggest comeback in the Champions
+        // League was overturning a 0-4 first-leg defeat against PSG ..."
+        if (finder.category === 'comebacks') {
+            if (results.length === 0) {
+                return { crestTeam: ctx.team1, html: `${team1} have never won a two-legged tie after losing the first leg${scope}.` };
+            }
+            const best = results[0];
+            const b2 = best.breakdown;
+            const howThrough = b2.decidedByAwayGoals ? ' on away goals'
+                : (b2.penalties ? ' on penalties' : (b2.hasAet ? ' after extra time' : ''));
+            const level = results.filter(r => (r.firstLegOpponentGoals - r.firstLegTeam1Goals) === (best.firstLegOpponentGoals - best.firstLegTeam1Goals)).length;
+            const others = results.length > 1
+                ? ` - one of ${formatNumber(results.length)} comebacks${level > 1 ? `, ${level} from that far behind` : ''}` : '';
+            return {
+                crestTeam: ctx.team1,
+                html: `${team1s} biggest comeback${scope} was overturning a ${best.firstLegTeam1Goals}-${best.firstLegOpponentGoals} first-leg defeat against ${b(opponentOf(best))} in the ${tieRound(best)}, going through ${best.team1Goals}-${best.opponentGoals} on aggregate${howThrough}${others}.`
+            };
+        }
 
         // Most Recent: "The last time Arsenal FC beat Chelsea FC at home in
         // the Premier League was ..." (Last Time When's answer)
@@ -3063,7 +3089,7 @@
             ['Titles & finishes', ['Real Madrid titles', 'Champions League winners', 'Liverpool lost in the final', 'Ajax European Cup titles']],
             ['Streaks', ['Bayern longest winning streak in the knockouts', 'Longest unbeaten run against English clubs']],
             ['Last time', ['Last time Real Madrid lost to English clubs']],
-            ['Biggest wins & matches', ['Real Madrid biggest aggregate wins']]
+            ['Biggest wins & matches', ['Real Madrid biggest aggregate wins', 'Barcelona comebacks']]
         ]
     };
 

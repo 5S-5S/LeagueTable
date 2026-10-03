@@ -51,18 +51,6 @@ Feature ideas, not yet scheduled.
   all-clubs mode on all four pages (each match listed once, not once per
   side); the search then sends these there instead of asking for a team.
 
-- Later: **Comebacks** — noted 2026-10-01 ("Barcelona comebacks" in the
-  search). Decided 2026-10-03: a comeback is a Continental **two-legged
-  tie won after losing the first leg** (Barcelona's 6-1 vs PSG after
-  losing 4-0) - not a single match won from behind. Doable from the
-  existing tie data (Match Finder's Double-Legged Tie mode already
-  pairs the legs).
-  - A Match Finder tie-mode category, e.g. "Comebacks": Team 1 lost leg 1
-    and went through - on aggregate, away goals, after extra time or on
-    penalties. Biggest first-leg deficit overturned first, then newest.
-  - Search words: "comebacks", "remontada", "overturned", "came back from".
-  - Maybe its mirror too: ties lost after winning the first leg.
-
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
   one-team-at-a-time view.
@@ -166,6 +154,26 @@ Feature ideas, not yet scheduled.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Comebacks~~ — done (2026-10-03), both Continental pages. A comeback
+  is a two-legged tie won after losing the first leg (decided
+  2026-10-03 - not a single match won from behind). Match Finder's
+  Double-Legged Tie mode has a "Comebacks (Lost the First Leg)" category
+  (tie mode only - switching to Single Match falls back to Biggest
+  Victories): Team 1 lost leg 1 and went through on aggregate, away goals,
+  after extra time or on penalties; biggest deficit first, then newest.
+  The last column, "Deficit Overturned" ("Deficit" on mobile), is the
+  goals they were down after leg 1 with the aggregate under it - 4, then
+  6-5, for Barcelona vs PSG (0-4, 6-1). Copy Link: cat=comebacks&mode=tie.
+  - Search: "comebacks", "comeback", "came back", "remontada",
+    "overturned", "turned around" -> Comebacks: "FC Barcelona's biggest
+    comeback ... was overturning a 0-4 first-leg defeat against Paris
+    Saint-Germain in the 2016-17 round of 16, going through 6-5 on
+    aggregate - one of 7 comebacks." Outside the Champions League it says
+    to pick it. "Barcelona comebacks" is in the Champions League examples;
+    the Q&A's two-legged ties answer mentions it.
+  - Not done (maybe later): the mirror - ties lost after winning the
+    first leg.
 
 - ~~Team Streaks: every club vs a Team 2~~ — done (2026-10-03), all four
   pages. With no Team 1, a Team 2 (a club, the Big 6, a country's clubs on
