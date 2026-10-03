@@ -942,7 +942,7 @@
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2 (Optional):</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team 2:</label>
                             <div class="combobox-container" id="teamStreaksTeam2ComboboxContainer">
                                 <input type="text" id="teamStreaksTeam2ComboboxInput" class="combobox-input" placeholder="Select Team 2" autocomplete="off">
                                 <span class="combobox-arrow">▼</span>
@@ -2623,19 +2623,18 @@
             }
 
 
-            const streaksTeam1Value = elements.teamStreaksTeam1Select ? elements.teamStreaksTeam1Select.value : '';
             if (teamStreaksTeam2Combobox) {
                 teamStreaksTeam2Combobox.setOptions([
                     { value: '', text: 'Select Team 2' },
                     ...leagueTeams.map(team => ({ value: team, text: team })),
-                    ...(streaksTeam1Value ? countryOpts : [])
+                    ...countryOpts
                 ]);
             }
             if (elements.teamStreaksTeam2Select) {
                 const currentValue = elements.teamStreaksTeam2Select.value;
-                elements.teamStreaksTeam2Select.innerHTML = '<option value="">Select Team 2 (Optional)</option>' +
+                elements.teamStreaksTeam2Select.innerHTML = '<option value="">Select Team 2</option>' +
                     leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('') +
-                    (streaksTeam1Value ? countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('') : '');
+                    countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('');
                 elements.teamStreaksTeam2Select.value = currentValue;
             }
 
@@ -3474,7 +3473,7 @@
 
             if (!team1) {
                 // No team picked: every team's streaks of this type
-                calculateLeagueStreaks(status, location, streakType);
+                calculateLeagueStreaks(status, location, streakType, team2);
                 return;
             }
             
@@ -3678,8 +3677,10 @@
         // Every team's streaks for one div/status/location/type, longest
         // first (ties: most recent first). Recomputed only when those change,
         // not on every page turn or sort.
-        function computeLeagueStreaks(div, matches, status, location, streakType) {
-            const memoKey = `${div}|${status}|${location}|${streakType}|${leagueStreaksMatchFilterKey()}`;
+        // opponents: only each club's games against these (Team 2 - a club,
+        // the Big 6, a country's clubs), or null for all its games
+        function computeLeagueStreaks(div, matches, status, location, streakType, opponents = null) {
+            const memoKey = `${div}|${status}|${location}|${streakType}|${leagueStreaksMatchFilterKey()}|${opponents ? [...opponents].sort().join(',') : ''}`;
             if (state.leagueStreaksMemo && state.leagueStreaksMemo.key === memoKey) return state.leagueStreaksMemo.streaks;
 
             // Each team's matches, oldest first (the API returns them by date)
@@ -3690,6 +3691,14 @@
                     byTeam.get(team).push(match);
                 });
             });
+            // Against Team 2: each club's games with it. A club that is itself
+            // in the group (Big 6 vs the Big 6) plays only the others.
+            if (opponents) {
+                byTeam.forEach((teamMatches, team) => {
+                    const against = teamMatches.filter(m => opponents.includes(m.HomeTeam === team ? m.AwayTeam : m.HomeTeam));
+                    if (against.length) byTeam.set(team, against); else byTeam.delete(team);
+                });
+            }
             const atLocation = (teamMatches, team) =>
                 location === 'home' ? teamMatches.filter(m => m.HomeTeam === team)
                 : location === 'away' ? teamMatches.filter(m => m.AwayTeam === team)
@@ -3760,7 +3769,19 @@
             return `${state.excludeQualifiers}|${state.excludeMainStage}|${state.teamStreaksStage}`;
         }
 
-        function calculateLeagueStreaks(status, location, streakType) {
+        // Team 2 with no Team 1: the clubs every team's streaks are counted
+        // against, and its name for titles
+        function leagueStreaksOpponents(team2) {
+            if (!team2) return null;
+            if (isCountryOpponentValue(team2)) return getCountryOpponents(countryFromOpponentValue(team2), '');
+            return [team2];
+        }
+
+        function leagueStreaksOpponentLabel(team2) {
+            return getOpponentDisplayLabel(team2);
+        }
+
+        function calculateLeagueStreaks(status, location, streakType, team2 = '') {
             const leagueMapping = {
                 'champions-league': 'C1',
                 'europa-league': 'E1',
@@ -3773,7 +3794,7 @@
             }
 
             // New list: back to page 1, default order, all chevrons closed
-            const currentParams = `league|${div}|${status}|${location}|${streakType}|${leagueStreaksMatchFilterKey()}`;
+            const currentParams = `league|${div}|${status}|${location}|${streakType}|${leagueStreaksMatchFilterKey()}|${team2}`;
             if (state.lastHistoricStreaksParams !== currentParams) {
                 state.historicStreaksSortConfig = { key: null, direction: null };
                 state.lastHistoricStreaksParams = currentParams;
@@ -3794,7 +3815,7 @@
                 return;
             }
 
-            const streaks = [...computeLeagueStreaks(div, matches, status, location, streakType)];
+            const streaks = [...computeLeagueStreaks(div, matches, status, location, streakType, leagueStreaksOpponents(team2))];
             const { key, direction } = state.historicStreaksSortConfig;
             if (key && direction) {
                 streaks.sort((a, b) => {
@@ -3803,7 +3824,7 @@
                     return direction === 'desc' ? -cmp : cmp;
                 });
             }
-            displayLeagueStreaks(streaks, status, streakType, location);
+            displayLeagueStreaks(streaks, status, streakType, location, team2);
         }
 
         // Slices a streak list to the current page (20 per page, as Match
@@ -3831,18 +3852,20 @@
             elements.teamStreaksResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        function displayLeagueStreaks(streaks, status, streakType, location) {
+        function displayLeagueStreaks(streaks, status, streakType, location, team2 = '') {
             updateSearchAnswer({ streaks: { mode: 'league', streaks } });
             const streakName = getStreakDisplayName(streakType);
             const locationText = location === 'both' ? '' : ` (${location.charAt(0).toUpperCase() + location.slice(1)})`;
             const isActive = status === 'active';
+            // "vs Chelsea FC" when the list is every club against Team 2
+            const vsText = team2 ? ` vs ${leagueStreaksOpponentLabel(team2)}` : '';
 
             if (streaks.length === 0) {
                 elements.teamStreaksResults.innerHTML = `
                     <div class="text-center py-8">
                         <p class="text-gray-600">${isActive
-                            ? `No team is currently on ${/^[aeiou]/i.test(streakName) ? 'an' : 'a'} ${streakName.toLowerCase()}${locationText}.`
-                            : `No ${streakName.toLowerCase()}s${locationText} of 3+ games found.`}</p>
+                            ? `No team is currently on ${/^[aeiou]/i.test(streakName) ? 'an' : 'a'} ${streakName.toLowerCase()}${locationText}${vsText}.`
+                            : `No ${streakName.toLowerCase()}s${locationText}${vsText} of 3+ games found.`}</p>
                     </div>
                 `;
                 elements.teamStreaksResults.classList.remove('hidden');
@@ -3852,8 +3875,8 @@
             const { pageStreaks, controls: pagination, range } = paginateStreaks(streaks);
 
             const title = isActive
-                ? `Current ${streakName}s${locationText} - All Teams`
-                : `Longest ${streakName}s${locationText} - All Teams`;
+                ? `Current ${streakName}s${locationText}${vsText} - All Teams`
+                : `Longest ${streakName}s${locationText}${vsText} - All Teams`;
             const subtitle = isActive
                 ? `${streaks.length} team${streaks.length === 1 ? '' : 's'} currently on ${/^[aeiou]/i.test(streakName) ? 'an' : 'a'} ${streakName.toLowerCase()}${range}`
                 : `${streaks.length.toLocaleString()} streaks of 3+ games${range}`;

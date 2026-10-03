@@ -1724,6 +1724,12 @@
             intent.view = 'h2h';
         }
 
+        // A streak with no subject - "longest unbeaten run against Chelsea",
+        // "winning streaks vs the Big 6" - is every club against them
+        const opponentOnly = intent.view === 'team-streaks' && (
+            (mentions.length === 1 && mentions[0].start > 0 && /^(against|vs|versus|v|over)$/.test(words[mentions[0].start - 1])) ||
+            (mentions.length === 0 && !!opponentGroup));
+
         // A season or dates are more specific than an era, and "all-time"
         // asks for every season
         const allTime = /\b(all time|alltime|all seasons|every season)\b/.test(rest);
@@ -1737,6 +1743,7 @@
             leaguesNamed,
             mentions: mentions.slice(0, 6),
             opponentGroup,
+            opponentOnly,
             intent,
             filters,
             isEmpty: words.length === 0 && !season && !scoreline && !dateRange
@@ -1932,7 +1939,8 @@
     function streaksResult(comp, t1, opponent, intent, parsed) {
         const type = intent.streakType || 'winning';
         const typeLabel = STREAK_TYPE_LABELS[type];
-        const who = t1 ? (opponent ? `${t1} vs ${opponentLabel([opponent]).replace(/^the /, '')}` : t1) : 'All teams';
+        const vs = opponent ? ` vs ${opponentLabel([opponent]).replace(/^the /, '')}` : '';
+        const who = `${t1 || 'All teams'}${vs}`;
         const stage = parsed && comp.continental && parsed.filters.stage ? parsed.filters.stage : '';
         return {
             kind: 'team-streaks', icon: '⚡', comp,
@@ -2215,9 +2223,14 @@
 
         const primary = [];
         const related = [];
-        teamCombinations(parsed.mentions, parsed.opponentGroup).forEach(teams => {
+        // No Team 1 when the only club is the opponent ("... against Chelsea")
+        const combinations = parsed.opponentOnly
+            ? (parsed.mentions.length ? parsed.mentions[0].teams.map(team => ['', team]) : [['', parsed.opponentGroup]])
+            : teamCombinations(parsed.mentions, parsed.opponentGroup);
+        combinations.forEach(teams => {
             comps.forEach(comp => {
-                if (!teams.every(team => teamInCompetition(team, comp))) return;
+                // '' = no Team 1 ("... against Chelsea"), which any competition has
+                if (!teams.every(team => team === '' || teamInCompetition(team, comp))) return;
                 const found = competitionResults(comp, teams, parsed);
                 primary.push(...found.primary);
                 related.push(...found.related);
@@ -3000,7 +3013,7 @@
             ['Head to head', ['Barcelona vs Real Madrid at home', 'Arsenal vs Chelsea since 2010']],
             ['Seasons & tables', ['Serie A 2005-06', 'Bundesliga table since 2010']],
             ['Titles & finishes', ['Juventus titles', 'Arsenal top 4', 'First time champions Bundesliga']],
-            ['Streaks', ['Bayern longest unbeaten run']],
+            ['Streaks', ['Bayern longest unbeaten run', 'Longest unbeaten run against Bayern']],
             ['Last time', ['Last time Liverpool beat Manchester United away']],
             ['Biggest wins & matches', ['PSG biggest wins']]
         ],
@@ -3008,7 +3021,7 @@
             ['Head to head', ['Arsenal vs Chelsea', 'Arsenal vs the Big 6 at home']],
             ['Seasons & tables', ['Premier League 2003-04']],
             ['Titles & finishes', ['Manchester United Premier League titles', 'Premier League champions']],
-            ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks']],
+            ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks', 'Longest unbeaten run against Chelsea']],
             ['Last time', ['Last time Liverpool beat Everton away']],
             ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws']]
         ],
@@ -3016,7 +3029,7 @@
             ['Head to head', ['Barcelona vs Real Madrid']],
             ['Seasons & tables', ['La Liga 2010-11', 'La Liga home table 2010-11']],
             ['Titles & finishes', ['Real Madrid titles', 'Sevilla top 4', 'First time champions La Liga', 'Athletic Club seasons']],
-            ['Streaks', ['Barcelona longest unbeaten run']],
+            ['Streaks', ['Barcelona longest unbeaten run', 'Longest unbeaten run against Real Madrid']],
             ['Last time', ['Last time Barcelona beat Real Madrid away']],
             ['Biggest wins & matches', ['Atletico Madrid biggest wins']]
         ],
@@ -3024,7 +3037,7 @@
             ['Head to head', ['Juventus vs Inter', 'Inter vs AC Milan since 2010']],
             ['Seasons & tables', ['Serie A 2005-06']],
             ['Titles & finishes', ['Juventus titles', 'Napoli titles', 'Serie A champions', 'Atalanta top 4']],
-            ['Streaks', ['AC Milan longest unbeaten run']],
+            ['Streaks', ['AC Milan longest unbeaten run', 'Longest unbeaten run against Juventus']],
             ['Last time', ['Last time Roma beat Lazio']],
             ['Biggest wins & matches', ['Juventus biggest wins']]
         ],
@@ -3032,7 +3045,7 @@
             ['Head to head', ['Bayern vs Dortmund']],
             ['Seasons & tables', ['Bundesliga 2023-24', 'Bundesliga table since 2010', 'Bayer Leverkusen 2023-24']],
             ['Titles & finishes', ['Bayern titles', 'Werder Bremen titles', 'First time champions Bundesliga']],
-            ['Streaks', ['Dortmund longest winning streak']],
+            ['Streaks', ['Dortmund longest winning streak', 'Longest winning streak against Dortmund']],
             ['Last time', ['Last time Schalke beat Dortmund']],
             ['Biggest wins & matches', ['Bayern biggest wins']]
         ],
@@ -3040,7 +3053,7 @@
             ['Head to head', ['PSG vs Marseille', 'PSG vs Lyon since 2012']],
             ['Seasons & tables', ['Ligue 1 1992-93', 'Lille 2010-11']],
             ['Titles & finishes', ['Saint-Etienne titles', 'Lyon titles', 'Ligue 1 champions']],
-            ['Streaks', ['PSG longest unbeaten run']],
+            ['Streaks', ['PSG longest unbeaten run', 'Longest unbeaten run against PSG']],
             ['Last time', ['Last time Marseille beat PSG away']],
             ['Biggest wins & matches', ['Monaco biggest wins']]
         ],
@@ -3048,7 +3061,7 @@
             ['Head to head', ['Real Madrid vs Bayern', 'Arsenal vs Spain']],
             ['Seasons & tables', ['Champions League 2004-05']],
             ['Titles & finishes', ['Real Madrid titles', 'Champions League winners', 'Liverpool lost in the final', 'Ajax European Cup titles']],
-            ['Streaks', ['Bayern longest winning streak in the knockouts']],
+            ['Streaks', ['Bayern longest winning streak in the knockouts', 'Longest unbeaten run against English clubs']],
             ['Last time', ['Last time Real Madrid lost to English clubs']],
             ['Biggest wins & matches', ['Real Madrid biggest aggregate wins']]
         ]

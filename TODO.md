@@ -162,6 +162,25 @@ Feature ideas, not yet scheduled.
 
 ## Done
 
+- ~~Team Streaks: every club vs a Team 2~~ — done (2026-10-03), all four
+  pages. With no Team 1, a Team 2 (a club, the Big 6, a country's clubs on
+  Continental) lists every club's streaks against it, ranked: "Longest
+  Unbeaten Streaks vs Chelsea FC - All Teams" (Arsenal, 19 games, 1995-
+  2005). Built on the all-teams lists: each club's matches are filtered
+  to games against Team 2 before its streaks are found (memoised per
+  opponent). A club inside the group plays only the others (Big 6 vs the
+  Big 6, English clubs vs England); Active is still clubs in the latest
+  season. Big 6 / countries are offered with no Team 1; picking Team 1
+  keeps Team 2 (unless they'd be the same club); "Team 2 (Optional)" is
+  now "Team 2". Copy Link carries t2 alone.
+  - Search: "against / vs / versus / v / over" before the only club - or
+    a Big 6 / country with no club - means every club vs it ("longest
+    unbeaten run against Chelsea", "active winning streaks vs the Big 6",
+    "longest unbeaten run against English clubs"); answers name the
+    opponent. "Arsenal unbeaten against Tottenham" is unchanged. Each
+    dropdown's example list has one (77 examples, all answering).
+  - Home / away is from the listed club's side.
+
 - ~~Historic streaks: the match that ended each run~~ — done
   (2026-10-02), all four pages. Expanding a historic streak's match list
   now also shows the match that broke the run, in its own one-row table
