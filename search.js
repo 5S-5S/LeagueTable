@@ -1728,7 +1728,8 @@
 
         // A streak with no subject - "longest unbeaten run against Chelsea",
         // "winning streaks vs the Big 6" - is every club against them
-        const opponentOnly = intent.view === 'team-streaks' && (
+        const opponentOnly = (intent.view === 'team-streaks' ||
+                (intent.view === 'match-finder' && !intent.lastTime && intent.category !== 'comebacks')) && (
             (mentions.length === 1 && mentions[0].start > 0 && /^(against|vs|versus|v|over)$/.test(words[mentions[0].start - 1])) ||
             (mentions.length === 0 && !!opponentGroup));
 
@@ -2022,6 +2023,8 @@
     // aggregate (Champions League, "aggregate" / "two-legged"). A
     // scoreline is home-away for single matches, Team 1-opponent for ties.
     function matchFinderResult(comp, t1, opponents, parsed, category, lastTime) {
+        // No Team 1: biggest defeats are the same list as biggest wins
+        if (!t1 && category === 'defeats') category = 'victories';
         const f = parsed.filters;
         const tie = comp.continental && (f.tieMode || category === 'comebacks');
         const params = { t1, t2: opponents };
@@ -2064,8 +2067,8 @@
         }
         const label = category === 'scoreline' && scoreline
             ? `${scoreline.home}-${scoreline.away} ${tie ? 'on aggregate' : 'matches'}`
-            : (tie ? MATCH_FINDER_TIE_LABELS : MATCH_FINDER_LABELS)[category];
-        const who = opponents.length ? `${t1} vs ${opponentLabel(opponents).replace(/^the /, '')}` : t1;
+            : (!t1 && category === 'victories' ? 'Biggest wins' : (tie ? MATCH_FINDER_TIE_LABELS : MATCH_FINDER_LABELS)[category]);
+        const who = `${t1 || 'All clubs'}${opponents.length ? ` vs ${opponentLabel(opponents).replace(/^the /, '')}` : ''}`;
         const parts = filterDetailParts(parsed, comp, 'match-finder');
         // "Last time Arsenal FC beat Chelsea FC"
         const lastTimeTitle = () => {
@@ -2119,8 +2122,9 @@
             case 'match-finder':
                 // Comebacks only exist in two-legged ties (the Champions League)
                 if (intent.category === 'comebacks' && !comp.continental) break;
-                // Match Finder needs a team to look from
-                if (t1) primary.push(matchFinderResult(comp, t1, opponents, parsed, intent.category, intent.lastTime ? intent : null));
+                // No Team 1: every club's matches - but "last time" and
+                // comebacks are about one club
+                if (t1 || (!intent.lastTime && intent.category !== 'comebacks')) primary.push(matchFinderResult(comp, t1, opponents, parsed, intent.category, intent.lastTime ? intent : null));
                 break;
             case 'team-seasons': {
                 const { rank, stage } = intent.finish;
@@ -2252,8 +2256,8 @@
             if (parsed.intent.view === 'match-finder' && parsed.intent.lastTime && parsed.mentions.length === 0) {
                 return { results: [], message: 'Last time questions look from one team\'s side - add a team, e.g. "last time Arsenal beat Chelsea".' };
             }
-            if (parsed.intent.view === 'match-finder' && parsed.mentions.length === 0) {
-                return { results: [], message: 'Match Finder looks from one team\'s side - add a team, e.g. "Arsenal biggest wins".' };
+            if (parsed.intent.view === 'match-finder' && parsed.intent.category === 'comebacks' && parsed.mentions.length === 0) {
+                return { results: [], message: 'Comebacks look from one team\'s side - add a team, e.g. "Barcelona comebacks".' };
             }
             if (parsed.intent.category === 'comebacks' && !comps.some(comp => comp.continental)) {
                 return { results: [], message: 'Comebacks are two-legged ties won after losing the first leg - pick the Champions League in the dropdown.' };
@@ -2414,7 +2418,7 @@
     // legMatches, lastLegDate).
     function describeMatchFinder(ctx, params, { b, location, span, penalties }) {
         const finder = ctx.finder;
-        if (!ctx.team1 || !finder) return null;
+        if (!finder) return null;
         const tie = finder.mode === 'tie';
         const results = finder.results || [];
         const team1 = b(ctx.team1);
@@ -2457,6 +2461,43 @@
             return `${score} ${where} ${b(opponentOf(entry))} ${when}`;
         };
         const nothing = what => ({ crestTeam: ctx.team1, html: `No ${what} found for ${team1}${scope}.` });
+
+        // No Team 1: every club's matches - "The biggest win in La Liga is
+        // Athletic Club 12-1 FC Barcelona on February 8, 1931"
+        if (!ctx.team1) {
+            if (results.length === 0) return { html: `No matches found${scope}.` };
+            const top = results[0];
+            const m = top.match;
+            const score = `${b(m.HomeTeam)} ${m.FTHG}-${m.FTAG} ${b(m.AwayTeam)} on ${longDate(m.dateObj)}`;
+            const crest = top.winner || m.HomeTeam;
+            const level = test => results.filter(test).length;
+            const oneOf = (k, what) => k > 1 ? ` - one of ${formatNumber(k)} ${what}` : '';
+            switch (finder.category) {
+                case 'victories':
+                case 'defeats': {
+                    const k = level(r => r.margin === top.margin);
+                    return { crestTeam: crest, html: `The biggest win${scope} is ${score}${oneOf(k, `by ${top.margin} goals`)}.` };
+                }
+                case 'draws': {
+                    const k = level(r => r.totalGoals === top.totalGoals);
+                    return { crestTeam: crest, html: `The highest-scoring draw${scope} is ${score}${oneOf(k, 'that high')}.` };
+                }
+                case 'totalGoals': {
+                    const k = level(r => r.totalGoals === top.totalGoals);
+                    return { crestTeam: crest, html: `The highest-scoring game${scope} is ${score}, ${top.totalGoals} goals${oneOf(k, `with ${top.totalGoals}`)}.` };
+                }
+                case 'leastGoals': {
+                    const k = level(r => r.totalGoals === top.totalGoals);
+                    const latest = [...results].filter(r => r.totalGoals === top.totalGoals).sort((x, y) => new Date(y.match.dateObj) - new Date(x.match.dateObj))[0];
+                    const lm = latest.match;
+                    return { crestTeam: latest.winner || lm.HomeTeam, html: `${formatNumber(k)} games${scope} ended ${lm.FTHG}-${lm.FTAG}; the most recent was ${b(lm.HomeTeam)} ${lm.FTHG}-${lm.FTAG} ${b(lm.AwayTeam)} on ${longDate(lm.dateObj)}.` };
+                }
+                case 'scoreline':
+                    return { crestTeam: crest, html: `${formatNumber(results.length)} games${scope} ended ${params.get('hsVal')}-${params.get('asVal')} (home team first); the most recent was ${score}.` };
+                default:
+                    return { crestTeam: crest, html: `The most recent game${scope} was ${score}.` };
+            }
+        }
 
         // Comebacks: "FC Barcelona's biggest comeback in the Champions
         // League was overturning a 0-4 first-leg defeat against PSG ..."
@@ -3041,7 +3082,7 @@
             ['Titles & finishes', ['Juventus titles', 'Arsenal top 4', 'First time champions Bundesliga']],
             ['Streaks', ['Bayern longest unbeaten run', 'Longest unbeaten run against Bayern']],
             ['Last time', ['Last time Liverpool beat Manchester United away']],
-            ['Biggest wins & matches', ['PSG biggest wins']]
+            ['Biggest wins & matches', ['PSG biggest wins', 'Highest scoring game in Bundesliga history']]
         ],
         'premier-league': [
             ['Head to head', ['Arsenal vs Chelsea', 'Arsenal vs the Big 6 at home']],
@@ -3049,7 +3090,7 @@
             ['Titles & finishes', ['Manchester United Premier League titles', 'Premier League champions']],
             ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks', 'Longest unbeaten run against Chelsea']],
             ['Last time', ['Last time Liverpool beat Everton away']],
-            ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws']]
+            ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws', 'Highest scoring game in Premier League history']]
         ],
         'la-liga': [
             ['Head to head', ['Barcelona vs Real Madrid']],
@@ -3057,7 +3098,7 @@
             ['Titles & finishes', ['Real Madrid titles', 'Sevilla top 4', 'First time champions La Liga', 'Athletic Club seasons']],
             ['Streaks', ['Barcelona longest unbeaten run', 'Longest unbeaten run against Real Madrid']],
             ['Last time', ['Last time Barcelona beat Real Madrid away']],
-            ['Biggest wins & matches', ['Atletico Madrid biggest wins']]
+            ['Biggest wins & matches', ['Atletico Madrid biggest wins', 'Biggest win in La Liga history']]
         ],
         'serie-a': [
             ['Head to head', ['Juventus vs Inter', 'Inter vs AC Milan since 2010']],
@@ -3065,7 +3106,7 @@
             ['Titles & finishes', ['Juventus titles', 'Napoli titles', 'Serie A champions', 'Atalanta top 4']],
             ['Streaks', ['AC Milan longest unbeaten run', 'Longest unbeaten run against Juventus']],
             ['Last time', ['Last time Roma beat Lazio']],
-            ['Biggest wins & matches', ['Juventus biggest wins']]
+            ['Biggest wins & matches', ['Juventus biggest wins', 'Highest scoring draws in Serie A']]
         ],
         'bundesliga': [
             ['Head to head', ['Bayern vs Dortmund']],
@@ -3073,7 +3114,7 @@
             ['Titles & finishes', ['Bayern titles', 'Werder Bremen titles', 'First time champions Bundesliga']],
             ['Streaks', ['Dortmund longest winning streak', 'Longest winning streak against Dortmund']],
             ['Last time', ['Last time Schalke beat Dortmund']],
-            ['Biggest wins & matches', ['Bayern biggest wins']]
+            ['Biggest wins & matches', ['Bayern biggest wins', 'Biggest win in Bundesliga history']]
         ],
         'ligue-1': [
             ['Head to head', ['PSG vs Marseille', 'PSG vs Lyon since 2012']],
@@ -3081,7 +3122,7 @@
             ['Titles & finishes', ['Saint-Etienne titles', 'Lyon titles', 'Ligue 1 champions']],
             ['Streaks', ['PSG longest unbeaten run', 'Longest unbeaten run against PSG']],
             ['Last time', ['Last time Marseille beat PSG away']],
-            ['Biggest wins & matches', ['Monaco biggest wins']]
+            ['Biggest wins & matches', ['Monaco biggest wins', 'Biggest win in Ligue 1 history']]
         ],
         'champions-league': [
             ['Head to head', ['Real Madrid vs Bayern', 'Arsenal vs Spain']],
@@ -3089,7 +3130,7 @@
             ['Titles & finishes', ['Real Madrid titles', 'Champions League winners', 'Liverpool lost in the final', 'Ajax European Cup titles']],
             ['Streaks', ['Bayern longest winning streak in the knockouts', 'Longest unbeaten run against English clubs']],
             ['Last time', ['Last time Real Madrid lost to English clubs']],
-            ['Biggest wins & matches', ['Real Madrid biggest aggregate wins', 'Barcelona comebacks']]
+            ['Biggest wins & matches', ['Real Madrid biggest aggregate wins', 'Barcelona comebacks', 'Biggest wins all-time']]
         ]
     };
 

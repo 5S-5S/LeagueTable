@@ -44,12 +44,33 @@ Feature ideas, not yet scheduled.
       .png are no longer used.
     - Related: "Match Finder without a team" and "Comebacks" below.
 
-- Later: **Match Finder without a team** — noted 2026-10-01 while testing
-  the search bar. Match Finder needs at least one team picked, so
-  league-wide questions can't be answered: "biggest win in La Liga
-  history", "highest scoring game ever in the Premier League". Needs an
-  all-clubs mode on all four pages (each match listed once, not once per
-  side); the search then sends these there instead of asking for a team.
+- Partly done: **Match Finder without a team** — noted 2026-10-01 while
+  testing the search bar.
+  - Done (2026-10-03), step 1 - single matches, all four pages: leave
+    Team 1 empty for the whole league's matches, each listed once, from
+    the division's full history (the all-teams streaks' data, only
+    fetched while the Match Finder tab is open). "Biggest Victories" is
+    "Biggest Wins" (the margin, whoever won); Biggest Defeats is hidden
+    (same list); Most Recent's result column is H / D / A. Home/Away,
+    Result, the score boxes and the last win / draw / loss cards are
+    hidden (they're Team 1's side). Team 2 alone (a club, the Big 6, a
+    country - now offered with no Team 1) = every club's matches with it;
+    Biggest Wins = the biggest wins against it. Season, dates, weekday,
+    Continental stage / qualifiers / penalties / extra time apply.
+  - Search: "biggest win in La Liga history" (Athletic Club 12-1
+    Barcelona, 1931), "highest scoring game ever Premier League"
+    (Portsmouth 7-4 Reading), "biggest wins against Chelsea", "Serie A
+    0-0 draws". "Last time ..." and comebacks still need a club. One
+    example per competition list; the Q&A and Match Finder's description
+    mention it.
+  - Fixed on the way: Continental mobile rebuilt Match Finder's Team 2
+    list without countries after adding them (a country-only link was
+    ignored).
+  - Still to do, step 2: Continental Double-Legged Tie mode with no Team 1
+    (every tie on aggregate - biggest aggregate wins, highest-scoring
+    ties, ties on penalties / away goals). Today it says "Two-legged ties
+    need a Team 1". Tie mode is built around Team 1, so this is the
+    bigger piece.
 
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
