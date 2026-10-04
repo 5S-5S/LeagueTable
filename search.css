@@ -217,6 +217,11 @@
     border-top: 1px solid #f3f4f6;
     font-size: 0.8rem;
     color: #6b7280;
+    /* Pinned to the bottom of the dropdown: a long example list (the
+       Champions League's) scrolls above it instead of hiding it */
+    position: sticky;
+    bottom: 0;
+    background: white;
 }
 
 .search-guide-tips-label {
@@ -291,6 +296,7 @@
 
 [data-theme="dark"] .search-guide-tips {
     border-top-color: #444;
+    background: #333333;
 }
 
 [data-theme="dark"] .search-guide-tip {
