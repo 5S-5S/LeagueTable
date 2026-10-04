@@ -2,6 +2,48 @@
 
 Feature ideas, not yet scheduled.
 
+## Priority (ranked 2026-10-03)
+
+Most to least important; details are in each item below.
+
+**Tier 1 - before launch** (keep the site up and know how it's doing)
+1. API caching for traffic - the only item that prevents an outage
+2. Analytics, with failed searches
+3. Automated checks
+4. Error reporting
+5. About / sources page
+6. D1 backups
+
+**Tier 2 - high value, soon after launch**
+7. Link previews when sharing
+8. Season records and title races
+9. "Report a data error" link
+10. The table on any date
+11. League trends over time
+12. Match Finder upgrades (what's left)
+13. Lighter pages
+
+**Tier 3 - worthwhile features**
+14. Typo tolerance in search
+15. Upcoming matches (home page strip)
+16. Penalty shootout records
+17. Recent searches
+18. Pinned / favourite team
+19. Road to the final
+20. Head-to-head by decade
+21. More competitions (depends on the data)
+
+**Tier 4 - nice to have**
+22. "On this day"
+23. Trivia mode
+24. Side-by-side Team Seasons
+25. Team progression chart (after league trends)
+26. "/" to search
+27. Knockout Stage bracket view (on hold)
+28. Country vs Country
+
+## Items
+
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
   needed before it's release-worthy. Adds a List View/Bracket View
@@ -43,6 +85,99 @@ Feature ideas, not yet scheduled.
     - Q&A screenshots for Match Finder; the old QAImages/TheLastTimeWhen1/2
       .png are no longer used.
     - Related: "Match Finder without a team" and "Comebacks" below.
+
+- Later (before launch): **Analytics, with failed searches** — noted
+  2026-10-03. Know what people ask - especially questions that get "No
+  results", the best guide to improving the search. Cloudflare Web
+  Analytics is free and cookie-free; failed searches could be logged by
+  the Worker.
+
+- Later (before launch): **About / sources page** — noted 2026-10-03.
+  Where the data comes from, how often it updates, and that club names
+  and crests belong to their owners. A privacy note too if analytics
+  ever uses cookies.
+
+- Later (before launch): **Automated checks** — noted 2026-10-03. A
+  script (maybe a GitHub Action) that loads all four pages, runs every
+  search example and fails on any script error - instead of checking by
+  hand before each push.
+
+- Later (before launch): **Error reporting** — noted 2026-10-03. A small
+  handler that reports visitors' JavaScript errors (to the Worker or a
+  free service), to hear about breakages only some devices hit (iOS).
+
+- Later (before launch): **D1 backups** — noted 2026-10-03. A periodic
+  export of the database (to the repo or elsewhere) as cheap insurance.
+
+- Later: **API caching for traffic (Cloudflare free plan)** — noted
+  2026-10-03, before publishing. The Worker caches in KV, but KV is itself
+  metered on the free plan (per day: 100k Worker requests, 100k KV reads,
+  1k KV writes, 5M D1 rows read; resets 00:00 UTC). Every API call costs
+  a Worker request + 2 KV reads (cache-version, then the entry) + a KV
+  write on a miss; there's no Cache-Control, so browsers refetch every
+  time. Measured 2-6 API calls per page view, ~10-20 per visit. Estimate:
+  fine under ~1k visits/day; low thousands/day - KV writes (one per new
+  question; the daily version bump empties the cache) run out and
+  misses fall through to D1 (a full-history query reads tens of
+  thousands of rows); ~3-5k visits/day - KV reads run out, env.CACHE.get
+  throws and every API call fails until the reset. The four changes,
+  all on the free plan (one Worker deploy):
+  1. Browser caching: a Cache-Control header on API responses (~10 min
+     when the current season is in the answer, longer for history-only),
+     so repeat calls in a visit never reach the Worker - the only change
+     that saves Worker requests.
+  2. Edge cache (Workers Cache API, caches.default - free, unmetered) in
+     front of KV, so popular answers use no KV reads / writes.
+  3. Keep cache-version in the isolate's memory for ~1 minute instead of
+     a KV read per request - halves KV reads.
+  4. Fail safe: if KV errors (over the limit or otherwise), skip the
+     cache and answer from D1 instead of returning an error.
+  Together: first hard failure moves from a few thousand to ~10k
+  visits/day. Past that, Workers Paid ($5/month): no daily cut-off -
+  10M requests and 10M KV reads a month included (~3x free), 1M KV
+  writes (~33x), 25B D1 rows read (~160x), then small per-use charges
+  (~$2 per extra 100k visits). Check Cloudflare's pricing page - figures
+  as of 2026-10.
+  - Also before traffic: remove PapaParse (loaded from unpkg on every
+    page, unused since the gists went), and consider self-hosting the
+    club crests (hotlinked from s.hs-data.com - their server and images;
+    they could rate-limit or block at volume).
+  - Usage to watch: Cloudflare dashboard -> Workers & Pages ->
+    leaguetable-api -> Metrics; KV / D1 -> Metrics.
+
+- Later: **Season records and title races** — noted 2026-10-03; details
+  to be worked out. Proposed home: Team Seasons (it already has every
+  club-season's P W D L GF GA GD Pts, and every club at a position):
+  - Season records: an "All finishes" choice in Filter by Position -
+    every club-season in the league in the existing sortable table.
+    "Most points in a Bundesliga season" = sorted by Pts, "fewest goals
+    conceded" = by GA, "unbeaten seasons" / "most wins" likewise.
+  - Title races: position 1 (every champion) plus a "Gap to 2nd" column
+    (points, or goal difference when level). "Closest title races" /
+    "biggest winning margins" sort it.
+  - Search answers both, opening the list already sorted. A separate
+    "Records" tab only if the Team Seasons version feels buried.
+
+- Later: **League trends over time** — noted 2026-10-03. Per season:
+  goals per game, home win %, draw rate - a simple chart, and searchable
+  ("highest-scoring Serie A season", "has home advantage shrunk").
+  Built from the season data; pairs with the team progression chart idea.
+
+- Later: **"Report a data error" link** — noted 2026-10-03. A small link
+  on each answer / table that opens the contact page with the question
+  (or page link) pre-filled, so visitors can flag wrong results easily.
+
+- Later: **The table on any date** — noted 2026-10-03. "Premier League
+  table on 25 December 2003", "where was Arsenal after 10 games", "who was
+  top at Christmas". League Tables already filters by date range (from
+  the season start to the date), so this is mostly the search (a single
+  date, "after N games") and a "standings on this date" shortcut.
+
+- Later: **Link previews when sharing** — noted 2026-10-03. Copy Link /
+  search links show a bare URL in WhatsApp, X, Discord etc. Add title /
+  description (Open Graph) tags - for search links, the question and its
+  answer - so they preview properly. Small; helps the site spread after
+  launch.
 
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
@@ -142,6 +277,44 @@ Feature ideas, not yet scheduled.
     branch brings all of it over - nothing needs reapplying by hand.
     (The Worker is already deployed with the stage change; the branch
     doesn't touch backend/worker/src/index.js, so no conflict there.)
+
+- Maybe: **Road to the final (Continental)** — noted 2026-10-03. One
+  club's season as its whole path: group results, then each knockout tie
+  on aggregate ("Liverpool 2018-19 run"). The tie code already pairs
+  legs.
+
+- Maybe: **Recent searches** — noted 2026-10-03. A visitor's last few
+  questions, kept in their browser (localStorage), at the top of the
+  empty search bar's suggestions. Pairs with the pinned-team idea.
+
+- Maybe: **Head-to-head by decade** — noted 2026-10-03. A rivalry's
+  record split by decade ("Arsenal v Spurs: 1990s W12 D6 L2, ...") to
+  show who was on top when; reuses the head-to-head data and the search's
+  decade parsing.
+
+- Maybe: **Trivia mode** — noted 2026-10-03. A final table with the
+  club names hidden - guess the season; or guess the club from its
+  season-by-season finishes. Existing data only; a reason to come back
+  daily (like "On this day").
+
+- Maybe: **Lighter pages** — noted 2026-10-03. The sport pages are
+  620-790 KB of HTML because their code is inline; moving it into
+  separate .js files lets browsers cache it once instead of with every
+  page. Helps phones, and pairs with API caching for traffic.
+
+- Maybe: **Typo tolerance in search** — noted 2026-10-03. "arsnl",
+  "chelsae" find nothing; fuzzy-match club names ("Did you mean
+  Arsenal?").
+
+- Maybe: **"/" to search** — noted 2026-10-03. Focus the search bar from
+  anywhere on a page.
+
+- Maybe: **More competitions** — noted 2026-10-03. Europa League /
+  Conference League (the code already maps E1 / C2), or more leagues
+  (Eredivisie, Primeira Liga, Championship) - depends on the data.
+
+- Maybe: **Penalty shootout records** — noted 2026-10-03. "Most
+  shootouts won", "best shootout record" - mostly sorting existing data.
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
