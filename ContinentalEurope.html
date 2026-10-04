@@ -390,7 +390,7 @@
                     <!-- Description -->
                     <div class="mb-6 p-4 border border-gray-200 rounded-lg collapsible-control flex items-start justify-between gap-4">
                         <p class="text-gray-700 text-sm leading-relaxed">
-                            Select one or two teams and find standout matches that they played in. Biggest wins and defeats, highest-scoring draws, the most or fewest total goals, or just a specific scoreline too. Most Recent shows the last time they won, drew or lost. Switch to Double-Legged Tie to get the same information for knock out matchups.
+                            Select one or two teams and find standout matches that they played in - or no team for the whole league's. Biggest wins and defeats, highest-scoring draws, the most or fewest total goals, or just a specific scoreline too. Most Recent shows the last time they won, drew or lost. Switch to Double-Legged Tie to get the same information for knock out matchups.
                         </p>
                         <button id="copyLinkBtnMatchFinder" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
@@ -2642,14 +2642,14 @@
                 matchFinderTeam2Combobox.setOptions([
                     { value: '', text: 'No Team' },
                     ...leagueTeams.map(team => ({ value: team, text: team })),
-                    ...(state.matchFinderTeam1 ? countryOpts : [])
+                    ...countryOpts
                 ]);
             }
             if (elements.matchFinderTeam2Select) {
                 const currentValue = elements.matchFinderTeam2Select.value;
                 elements.matchFinderTeam2Select.innerHTML = '<option value="">No Team</option>' +
                     leagueTeams.map(team => `<option value="${team}">${team}</option>`).join('') +
-                    (state.matchFinderTeam1 ? countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('') : '');
+                    countryOpts.map(o => `<option value="${o.value}">${o.text}</option>`).join('');
                 elements.matchFinderTeam2Select.value = currentValue;
             }
         }
@@ -3663,7 +3663,8 @@
                     FTHG: m.homeGoals,
                     FTAG: m.awayGoals,
                     CompetitionPhase: m.competitionPhase,
-                    isQualifier: m.isQualifier
+                    isQualifier: m.isQualifier,
+                    AdditionalInfo: m.additionalInfo
                 }));
             } catch (err) {
                 console.error('Failed to load league streaks data from API:', err);
@@ -3672,6 +3673,8 @@
                 state.leagueStreaksLoading[div] = false;
             }
             calculateTeamStreaks();
+            // Match Finder with no Team 1 uses the same matches
+            if (!state.matchFinderTeam1) calculateMatchFinder();
         }
 
         // Every team's streaks for one div/status/location/type, longest
@@ -4889,7 +4892,8 @@
                 'team-seasons': () => !seasonsLoading && seasonsLoaded,
                 // The all-teams list only shows once its data is in
                 'team-streaks': () => !team1 || (!state.teamStreaksApiLoading && (state.teamStreaksApiCacheKey || '').includes(`::${team1}`)),
-                'match-finder': () => !state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`),
+                // No Team 1: the all-clubs list only draws once its data is in
+                'match-finder': () => !team1 || (!state.matchFinderApiLoading && (state.matchFinderApiCacheKey || '').includes(`::${team1}`)),
                 h2h: () => !state.h2hApiLoading && (state.h2hApiCacheKey || '').includes(`::${team1}::`),
                 team: () => !state.teamHistoryApiLoading && (state.teamHistoryApiCacheKey || '').endsWith(`::${team1}`),
                 table: () => grouped
@@ -7491,8 +7495,10 @@
         const MATCH_FINDER_PAGE_SIZE = 20;
 
         const MATCH_FINDER_CATEGORIES = [
-            { key: 'victories', label: 'Biggest Victories' },
-            { key: 'defeats', label: 'Biggest Defeats' },
+            // With no Team 1 every match is listed once: Biggest Victories is
+            // the margin whoever won, and Biggest Defeats is the same list
+            { key: 'victories', label: 'Biggest Victories', allClubsLabel: 'Biggest Wins' },
+            { key: 'defeats', label: 'Biggest Defeats', teamOnly: true },
             { key: 'draws', label: 'Highest-Scoring Draws' },
             { key: 'totalGoals', label: 'Most Total Goals' },
             { key: 'leastGoals', label: 'Least Total Goals' },
@@ -7540,11 +7546,11 @@
 
         function renderMatchFinderCategoryButtons() {
             const isTieMode = state.matchFinderMode === 'tie';
-            elements.matchFinderCategoryButtons.innerHTML = MATCH_FINDER_CATEGORIES.filter(cat => isTieMode || !cat.tieOnly).map(cat => `
+            elements.matchFinderCategoryButtons.innerHTML = MATCH_FINDER_CATEGORIES.filter(cat => (isTieMode || !cat.tieOnly) && (state.matchFinderTeam1 || !cat.teamOnly)).map(cat => `
                 <label class="league-button ${state.matchFinderCategory === cat.key ? 'active' : ''}" data-category="${cat.key}">
                     <div class="radio-dot ${state.matchFinderCategory === cat.key ? 'active' : ''}"></div>
                     <span class="text-sm font-medium ${state.matchFinderCategory === cat.key ? 'text-green-700' : 'text-gray-700'}">
-                        ${isTieMode ? MATCH_FINDER_TIE_CATEGORY_LABELS[cat.key] : cat.label}
+                        ${isTieMode ? MATCH_FINDER_TIE_CATEGORY_LABELS[cat.key] : ((!state.matchFinderTeam1 && cat.allClubsLabel) || cat.label)}
                     </span>
                 </label>
             `).join('');
@@ -7572,7 +7578,7 @@
 
         // Most Recent's Result dropdown - only shown for that category
         function updateMatchFinderResultVisibility() {
-            elements.matchFinderResultContainer.classList.toggle('hidden', state.matchFinderCategory !== 'recent');
+            elements.matchFinderResultContainer.classList.toggle('hidden', state.matchFinderCategory !== 'recent' || !state.matchFinderTeam1);
         }
 
         // Team 1/Opponent labels for the Tie mode scoreline inputs - shows
@@ -7580,6 +7586,12 @@
         // "Opponent", same as the rest of Match Finder already does (e.g.
         // matchFinderSubtitle()).
         function updateMatchFinderScorelineLabels() {
+            // No Team 1: an aggregate scoreline is winner first
+            if (!state.matchFinderTeam1) {
+                elements.matchFinderTeam1ScoreLabel.textContent = 'Winner';
+                elements.matchFinderOpponentScoreLabel.textContent = 'Loser';
+                return;
+            }
             elements.matchFinderTeam1ScoreLabel.textContent = state.matchFinderTeam1 || 'Team 1';
             elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s) : 'Opponent';
         }
@@ -7842,16 +7854,148 @@
             return pageItems;
         }
 
+        // --- Match Finder with no Team 1: every club's matches ---
+        // One row per match, from the division's full history (the same data
+        // as the all-teams streaks, fetched once per division - only while
+        // this tab is open, so nobody downloads it by visiting the page).
+        // Biggest Wins is the margin whoever won; Home/Away, Result and the
+        // Team 1 score are from Team 1's side, so they're hidden. Team 2 on
+        // its own: only its matches (Biggest Wins = biggest wins against it).
+        function matchFinderAllClubsOpponents() {
+            const team2 = state.matchFinderTeam2;
+            if (!team2) return null;
+            if (isCountryOpponentValue(team2)) return getCountryOpponents(countryFromOpponentValue(team2), '');
+            return [team2];
+        }
+
+        // The Match Finder filters only Continental has
+        function filterMatchFinderAllClubsMatches(matches) {
+            let rows = matches;
+            if (state.matchFinderExcludeQualifiers) rows = rows.filter(row => !row.isQualifier);
+            if (state.matchFinderExcludeMainStage) rows = rows.filter(row => row.isQualifier);
+            if (state.matchFinderStage !== '') rows = rows.filter(row => matchesStageCategory(row.CompetitionPhase, state.matchFinderStage));
+            if (state.matchFinderPenaltyOnlyFilter) rows = rows.filter(row => row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('pso'));
+            if (state.matchFinderExtraTimeOnlyFilter) rows = rows.filter(row => row.AdditionalInfo && row.AdditionalInfo.toLowerCase().includes('aet'));
+            return rows;
+        }
+
+        function updateMatchFinderTeamlessControls() {
+            const noTeam = !state.matchFinderTeam1;
+            elements.matchFinderHomeAwayContainer.classList.toggle('hidden', noTeam || state.matchFinderMode === 'tie');
+            updateMatchFinderResultVisibility();
+        }
+
+        function calculateMatchFinderAllClubs() {
+            const showStatus = text => {
+                elements.matchFinderResults.classList.remove('hidden');
+                elements.matchFinderLastResults.classList.add('hidden');
+                if (elements.matchFinderSingleMatchCard) elements.matchFinderSingleMatchCard.classList.remove('hidden');
+                if (elements.matchFinderTieResultsCard) elements.matchFinderTieResultsCard.classList.add('hidden');
+                elements.matchFinderTableCaption.textContent = text;
+                elements.matchFinderTableTitle.textContent = '';
+                elements.matchFinderTableHeader.innerHTML = '';
+                elements.matchFinderTableBody.innerHTML = '';
+                elements.matchFinderResultCount.textContent = '';
+                elements.matchFinderPaginationControls.classList.add('hidden');
+            };
+            // Only while the tab is open (search mode opens it too)
+            const tabOpen = document.getElementById('matchFinderContent').classList.contains('active');
+            if (!tabOpen) return;
+
+            elements.matchFinderCategoryContainer.classList.remove('hidden');
+            const category = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
+            if (!category || category.teamOnly || (category.tieOnly && state.matchFinderMode !== 'tie')) {
+                state.matchFinderCategory = 'victories';
+                updateMatchFinderScorelineVisibility();
+            }
+            renderMatchFinderCategoryButtons();
+
+            const div = { 'champions-league': 'C1', 'europa-league': 'E1', 'conference-league': 'C2' }[state.selectedLeague];
+            const all = div ? state.leagueStreaksApiCache[div] : null;
+            if (!all || all === 'error') {
+                if (div && !all) ensureLeagueStreaksDataLoaded(div);
+                return showStatus(all === 'error' ? 'Couldn\'t load the league\'s matches. Please try again later.' : 'Loading every match in this league\'s history...');
+            }
+
+            // Two-legged ties: the tie code pairs the legs and applies the
+            // stage, date and penalty / extra time / away goals filters to
+            // whole ties itself - only the qualifier switches and Team 2 here
+            if (state.matchFinderMode === 'tie') {
+                let legs = all;
+                if (state.matchFinderExcludeQualifiers) legs = legs.filter(row => !row.isQualifier);
+                if (state.matchFinderExcludeMainStage) legs = legs.filter(row => row.isQualifier);
+                const tieOpponents = matchFinderAllClubsOpponents();
+                if (tieOpponents) legs = legs.filter(m => tieOpponents.includes(m.HomeTeam) || tieOpponents.includes(m.AwayTeam));
+                elements.matchFinderLastResults.classList.add('hidden');
+                updateMatchFinderScorelineLabels();
+                calculateMatchFinderTieMode(legs);
+                return;
+            }
+
+            const opponents = matchFinderAllClubsOpponents();
+            let matches = filterMatchFinderAllClubsMatches(all);
+            if (opponents) matches = matches.filter(m => opponents.includes(m.HomeTeam) || opponents.includes(m.AwayTeam));
+            if (state.matchFinderDayOfWeek !== '') matches = matches.filter(row => row.dateObj.getDay().toString() === state.matchFinderDayOfWeek);
+            if (state.matchFinderDateFrom) {
+                const from = new Date(state.matchFinderDateFrom);
+                matches = matches.filter(row => row.dateObj >= from);
+            }
+            if (state.matchFinderDateTo) {
+                const to = new Date(state.matchFinderDateTo);
+                matches = matches.filter(row => row.dateObj <= to);
+            }
+
+            // Each match from the winner's side (a shootout is a draw, as above)
+            let classified = matches.map(match => {
+                const home = parseInt(match.FTHG) || 0;
+                const away = parseInt(match.FTAG) || 0;
+                const winner = home > away ? match.HomeTeam : (away > home ? match.AwayTeam : '');
+                return {
+                    match, margin: Math.abs(home - away), totalGoals: home + away,
+                    result: winner ? 'win' : 'draw', allClubsResult: winner ? (home > away ? 'H' : 'A') : 'D',
+                    winner, loser: winner ? (winner === match.HomeTeam ? match.AwayTeam : match.HomeTeam) : ''
+                };
+            });
+            const byDate = (a, b) => b.match.dateObj - a.match.dateObj;
+            const cat = state.matchFinderCategory;
+            if (cat === 'victories') {
+                // With Team 2: the biggest wins against it
+                classified = classified.filter(e => e.winner && (!opponents || opponents.includes(e.loser)));
+                classified.sort((a, b) => b.margin - a.margin || byDate(a, b));
+            } else if (cat === 'draws') {
+                classified = classified.filter(e => !e.winner);
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || byDate(a, b));
+            } else if (cat === 'totalGoals') {
+                classified.sort((a, b) => b.totalGoals - a.totalGoals || byDate(a, b));
+            } else if (cat === 'leastGoals') {
+                classified.sort((a, b) => a.totalGoals - b.totalGoals || byDate(a, b));
+            } else if (cat === 'scoreline') {
+                const test = (score, op, val) => op === 'at-least' ? score >= val : (op === 'at-most' ? score <= val : score === val);
+                if (state.matchFinderHomeScoreValue !== '') classified = classified.filter(e => test(parseInt(e.match.FTHG) || 0, state.matchFinderHomeScoreOp, parseInt(state.matchFinderHomeScoreValue)));
+                if (state.matchFinderAwayScoreValue !== '') classified = classified.filter(e => test(parseInt(e.match.FTAG) || 0, state.matchFinderAwayScoreOp, parseInt(state.matchFinderAwayScoreValue)));
+                classified.sort(byDate);
+            } else {
+                // Most Recent: newest first (no last win / draw / loss cards -
+                // those are Team 1's)
+                classified.sort(byDate);
+            }
+            elements.matchFinderLastResults.classList.add('hidden');
+            updateMatchFinderTable(classified);
+        }
+
         function calculateMatchFinder(preservePage) {
             if (!preservePage) state.matchFinderPage = 1;
             if (matchFinderTeam2Picker) matchFinderTeam2Picker.render();
+            updateMatchFinderTeamlessControls();
             if (!state.matchFinderTeam1) {
-                elements.matchFinderResults.classList.add('hidden');
-                elements.matchFinderCategoryContainer.classList.add('hidden');
+                // No Team 1: every club's matches
+                calculateMatchFinderAllClubs();
                 return;
             }
 
             elements.matchFinderCategoryContainer.classList.remove('hidden');
+            // Team 1's categories (Biggest Defeats comes back after none)
+            renderMatchFinderCategoryButtons();
 
             const leagueMapping = {
                 'champions-league': 'C1',
@@ -8026,7 +8170,7 @@
 
         function matchFinderSubtitle(count) {
             const team1 = state.matchFinderTeam1;
-            let text = team1;
+            let text = team1 || 'All clubs';
             if (state.matchFinderTeam2) {
                 text += ` vs ${getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)}`;
             }
@@ -8036,7 +8180,7 @@
 
         function matchFinderTieSubtitle(count) {
             const team1 = state.matchFinderTeam1;
-            let text = team1;
+            let text = team1 || 'All clubs';
             if (state.matchFinderTeam2) {
                 text += ` vs ${getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)}`;
             }
@@ -8145,9 +8289,14 @@
             // teamA/teamB are alphabetical, not team1/opponent, so map
             // them back first.
             const team1 = state.matchFinderTeam1;
+            // No Team 1: each tie from the winner's side (the alphabetically
+            // first club when it's level); Team 2 alone = ties against it
+            const sideOf = t => team1 || (t.breakdown.winner !== 'TIE' ? t.breakdown.winner : t.breakdown.teamA);
+            const allClubsOpponents = team1 ? null : matchFinderAllClubsOpponents();
             let classified = ties.map(t => {
                 const b = t.breakdown;
-                const isTeam1A = b.teamA === team1;
+                const side = sideOf(t);
+                const isTeam1A = b.teamA === side;
                 const team1Goals = isTeam1A ? b.aggregate[b.teamA] : b.aggregate[b.teamB];
                 const opponentGoals = isTeam1A ? b.aggregate[b.teamB] : b.aggregate[b.teamA];
                 const margin = team1Goals - opponentGoals;
@@ -8167,14 +8316,16 @@
                 let result;
                 if (b.winner === 'TIE') result = 'draw';
                 else if (team1Goals === opponentGoals && !b.decidedByAwayGoals) result = 'draw';
-                else if (b.winner === team1) result = 'win';
+                else if (b.winner === side) result = 'win';
                 else result = 'loss';
 
-                return { ...t, team1Goals, opponentGoals, margin, totalGoals, result };
+                const opponent = b.teamA === side ? b.teamB : b.teamA;
+                return { ...t, side, opponent, team1Goals, opponentGoals, margin, totalGoals, result };
             });
 
             if (state.matchFinderCategory === 'victories') {
-                classified = classified.filter(t => t.result === 'win');
+                // No Team 1 with a Team 2: the biggest wins against it
+                classified = classified.filter(t => t.result === 'win' && (!allClubsOpponents || allClubsOpponents.includes(t.opponent)));
                 classified.sort((a, b) => b.margin - a.margin || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'defeats') {
                 classified = classified.filter(t => t.result === 'loss');
@@ -8212,14 +8363,14 @@
                 // first-leg deficit overturned first, then the newest
                 classified = classified.map(t => {
                     const b = t.breakdown;
-                    const opponent = b.teamA === team1 ? b.teamB : b.teamA;
-                    return { ...t, firstLegTeam1Goals: b.legs[0][team1], firstLegOpponentGoals: b.legs[0][opponent] };
-                }).filter(t => !t.breakdown.isSingleLeg && t.breakdown.winner === team1 && t.firstLegTeam1Goals < t.firstLegOpponentGoals);
+                    return { ...t, firstLegTeam1Goals: b.legs[0][t.side], firstLegOpponentGoals: b.legs[0][t.opponent] };
+                }).filter(t => !t.breakdown.isSingleLeg && t.breakdown.winner === t.side && t.firstLegTeam1Goals < t.firstLegOpponentGoals &&
+                    (!allClubsOpponents || allClubsOpponents.includes(t.opponent)));
                 const deficit = t => t.firstLegOpponentGoals - t.firstLegTeam1Goals;
                 classified.sort((a, b) => deficit(b) - deficit(a) || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'recent') {
                 classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
-                renderMatchFinderLastResults(classified, true);
+                if (team1) renderMatchFinderLastResults(classified, true);
                 const wanted = MATCH_FINDER_RESULTS[state.matchFinderResult];
                 if (wanted) classified = classified.filter(t => wanted.includes(t.result));
                 if (state.matchFinderRecentTeam1Goals !== '') classified = classified.filter(t => t.team1Goals === parseInt(state.matchFinderRecentTeam1Goals));
@@ -8301,7 +8452,7 @@
                 // H2H Match History's format exactly), since that's a
                 // direct parallel to a single match's own shootout row.
                 const b = t.breakdown;
-                const isTeam1A = b.teamA === team1;
+                const isTeam1A = b.teamA === (t.side || team1);
                 const team1Agg = isTeam1A ? b.aggregate[b.teamA] : b.aggregate[b.teamB];
                 const oppAgg = isTeam1A ? b.aggregate[b.teamB] : b.aggregate[b.teamA];
                 const team1AggClass = t.result === 'win' ? 'win-score' : t.result === 'loss' ? 'text-red-600' : 'text-gray-400';
@@ -8500,7 +8651,7 @@
             elements.matchFinderTieResultsCard.classList.add('hidden');
 
             const cat = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
-            elements.matchFinderTableCaption.textContent = cat.label;
+            elements.matchFinderTableCaption.textContent = (!state.matchFinderTeam1 && cat.allClubsLabel) || cat.label;
             elements.matchFinderTableTitle.textContent = matchFinderSubtitle(classified.length);
 
             const isMarginCategory = state.matchFinderCategory === 'victories' || state.matchFinderCategory === 'defeats';
@@ -8543,7 +8694,8 @@
                 let valueClass, valueText, valueSort;
                 if (isRecent) {
                     valueClass = entry.result === 'win' ? 'win-score' : entry.result === 'loss' ? 'text-red-600' : 'text-gray-400';
-                    valueText = entry.result === 'win' ? 'W' : entry.result === 'loss' ? 'L' : 'D';
+                    // No Team 1: home win / draw / away win
+                    valueText = entry.allClubsResult || (entry.result === 'win' ? 'W' : entry.result === 'loss' ? 'L' : 'D');
                     valueSort = entry.result === 'win' ? 2 : entry.result === 'draw' ? 1 : 0;
                 } else if (isMarginCategory) {
                     valueClass = entry.margin > 0 ? 'win-score' : entry.margin < 0 ? 'text-red-600' : 'text-gray-400';

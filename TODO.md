@@ -44,13 +44,6 @@ Feature ideas, not yet scheduled.
       .png are no longer used.
     - Related: "Match Finder without a team" and "Comebacks" below.
 
-- Later: **Match Finder without a team** — noted 2026-10-01 while testing
-  the search bar. Match Finder needs at least one team picked, so
-  league-wide questions can't be answered: "biggest win in La Liga
-  history", "highest scoring game ever in the Premier League". Needs an
-  all-clubs mode on all four pages (each match listed once, not once per
-  side); the search then sends these there instead of asking for a team.
-
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
   one-team-at-a-time view.
@@ -65,8 +58,14 @@ Feature ideas, not yet scheduled.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
-- Later: **Upcoming matches dashboard** — noted 2026-09-29. A dashboard of
-  upcoming fixtures, where each match shows the context for that meeting:
+- Later: **Upcoming matches dashboard** — noted 2026-09-29. **Direction
+  changed 2026-10-03:** upcoming matches go on the home page, in the
+  header above the search bar, not on their own page - lower priority as
+  a result. The branch's fixtures table, update script / workflow,
+  planned /api/upcoming and per-match context (below) still apply; the
+  standalone UpcomingMatches page (and its mobile twin) don't. A
+  dashboard of upcoming fixtures, where each match shows the context for
+  that meeting:
   - all-time head-to-head record between the two teams
   - any active streak in that head-to-head (e.g. "unbeaten in 6 vs them")
   - each team's own active streaks regardless of opponent (winning,
@@ -125,9 +124,12 @@ Feature ideas, not yet scheduled.
     (upcoming-fixtures-sample.json): compact two-per-row cards; opened
     card has the season table, H2H and record bars, Premier League era
     switch, streak tables with an Overall / Home / Away switch.
-  - Next: UpcomingMatchesMobile.html + redirect; then /api/upcoming
-    (Worker deploy) and switching the page to live fixtures; then entry
-    points.
+  - Next (after the 2026-10-03 change): /api/upcoming (Worker deploy);
+    a compact upcoming-matches strip on index.html above the search bar
+    (desktop + phone width - index.html has no separate mobile page),
+    opening each match's context; reuse what fits from the branch's
+    desktop page. The UpcomingMatchesMobile.html + redirect step is
+    dropped.
   - **Before continuing on the branch: merge `main` into it.** `main` has
     moved on since the branch was cut (local-format dates on all four
     pages, the Continental Team Seasons qualifier fixes, the Main Stage /
@@ -154,6 +156,43 @@ Feature ideas, not yet scheduled.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Match Finder without a team~~ — done (2026-10-03), both steps; noted
+  2026-10-01 while testing the search bar.
+  - Done (2026-10-03), step 1 - single matches, all four pages: leave
+    Team 1 empty for the whole league's matches, each listed once, from
+    the division's full history (the all-teams streaks' data, only
+    fetched while the Match Finder tab is open). "Biggest Victories" is
+    "Biggest Wins" (the margin, whoever won); Biggest Defeats is hidden
+    (same list); Most Recent's result column is H / D / A. Home/Away,
+    Result, the score boxes and the last win / draw / loss cards are
+    hidden (they're Team 1's side). Team 2 alone (a club, the Big 6, a
+    country - now offered with no Team 1) = every club's matches with it;
+    Biggest Wins = the biggest wins against it. Season, dates, weekday,
+    Continental stage / qualifiers / penalties / extra time apply.
+  - Search: "biggest win in La Liga history" (Athletic Club 12-1
+    Barcelona, 1931), "highest scoring game ever Premier League"
+    (Portsmouth 7-4 Reading), "biggest wins against Chelsea", "Serie A
+    0-0 draws". "Last time ..." and comebacks still need a club. One
+    example per competition list; the Q&A and Match Finder's description
+    mention it.
+  - Fixed on the way: Continental mobile rebuilt Match Finder's Team 2
+    list without countries after adding them (a country-only link was
+    ignored).
+  - Done (2026-10-03), step 2 - Continental Double-Legged Tie mode with
+    no Team 1: every two-legged tie, each from the winner's side (a level
+    tie - settled on penalties - from the alphabetically first club). The
+    tie code already paired legs without Team 1; only its classification
+    and table used Team 1, now a per-tie side. Biggest Aggregate Wins
+    (Benfica 18-0 Stade Dudelange, 1965), level / highest-scoring ties,
+    an aggregate scoreline (winner first - the boxes read Winner / Loser),
+    Most Recent Ties (no last win / draw / loss cards), and every club's
+    Comebacks (Barcelona vs PSG first, of 380). Team 2 alone = ties
+    against it. Search: "biggest comebacks", "biggest aggregate wins
+    against English clubs", "comebacks against Barcelona", "ties decided
+    on away goals" (counted - 175, the latest PSG 3-3 Bayern); a query of
+    only tie / away goals / extra time words is no longer treated as
+    empty. "Biggest comebacks" is in the Champions League examples.
 
 - ~~Comebacks~~ — done (2026-10-03), both Continental pages. A comeback
   is a two-legged tie won after losing the first leg (decided
