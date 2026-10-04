@@ -7,7 +7,8 @@ Feature ideas, not yet scheduled.
 Most to least important; details are in each item below.
 
 **Tier 1 - before launch** (keep the site up and know how it's doing)
-1. API caching for traffic - the only item that prevents an outage
+1. API caching for traffic - the only item that prevents an outage (8 parts; the
+   date-range call (part 6) is a quick win to do first)
 2. Analytics, with failed searches
 3. Automated checks
 4. Error reporting
@@ -131,8 +132,34 @@ Most to least important; details are in each item below.
      a KV read per request - halves KV reads.
   4. Fail safe: if KV errors (over the limit or otherwise), skip the
      cache and answer from D1 instead of returning an error.
-  Together: first hard failure moves from a few thousand to ~10k
-  visits/day. Past that, Workers Paid ($5/month): no daily cut-off -
+  Added 2026-10-04 (same deploy):
+  5. Don't expire answers that can't change. Only answers touching the
+     current season need dropping when new matches arrive; anything
+     ending before it (a past season, "matches on Boxing Day 1963",
+     "table on 1/1/23") can be cached for weeks under a key without the
+     cache version - most questions are about the past.
+  6. Replace the wasteful date-range call: every page load fetches the
+     whole all-time standings (ensureDivDateRangeLoaded -> /api/standings,
+     ~51k rows read uncached for the Premier League) only to get the first
+     and last match dates (Last Data Update banner, default date ranges).
+     A small MIN/MAX date endpoint reads ~2 rows via the (div, date) index.
+     Quick win.
+  7. Weekday index: "on a Sunday" (dayOfWeek) filters with
+     strftime('%w', date), which no index covers - measured 51,381 rows
+     read for 3,950 Wednesday matches. Add an expression index on
+     (div, CAST(strftime('%w', date) AS INTEGER)). Low priority (weekday
+     questions are rare).
+  8. Optional: after each data sync, pre-fill the cache with the
+     most-viewed answers (each league's current table) so the first
+     visitors after an update don't pay.
+  Already fine (checked 2026-10-04): team history / head-to-head and
+  /api/teams use their composite indexes; date ranges use the (div, date)
+  prefix of idx_matches_unique (Boxing Day 1963: 11 rows read for 10;
+  a half season: 167 for 166). Full-history requests read the whole
+  division by necessity - caching is what protects them.
+  Together (1-6): roughly half the API calls per visit, far fewer KV
+  reads / writes, and the database barely touched; first hard failure
+  moves from a few thousand to ~10k+ visits/day. Past that, Workers Paid ($5/month): no daily cut-off -
   10M requests and 10M KV reads a month included (~3x free), 1M KV
   writes (~33x), 25B D1 rows read (~160x), then small per-use charges
   (~$2 per extra 100k visits). Check Cloudflare's pricing page - figures
