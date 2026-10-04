@@ -7113,11 +7113,11 @@
             if (opponents) matches = matches.filter(m => opponents.includes(m.HomeTeam) || opponents.includes(m.AwayTeam));
             if (state.matchFinderDayOfWeek !== '') matches = matches.filter(row => row.dateObj.getDay().toString() === state.matchFinderDayOfWeek);
             if (state.matchFinderDateFrom) {
-                const from = new Date(state.matchFinderDateFrom);
+                const from = isoDateToLocalDateObj(state.matchFinderDateFrom);
                 matches = matches.filter(row => row.dateObj >= from);
             }
             if (state.matchFinderDateTo) {
-                const to = new Date(state.matchFinderDateTo);
+                const to = isoDateToLocalDateObj(state.matchFinderDateTo);
                 matches = matches.filter(row => row.dateObj <= to);
             }
 
@@ -7206,11 +7206,11 @@
                 matches = matches.filter(row => row.dateObj.getDay().toString() === state.matchFinderDayOfWeek);
             }
             if (state.matchFinderDateFrom) {
-                const from = new Date(state.matchFinderDateFrom);
+                const from = isoDateToLocalDateObj(state.matchFinderDateFrom);
                 matches = matches.filter(row => row.dateObj >= from);
             }
             if (state.matchFinderDateTo) {
-                const to = new Date(state.matchFinderDateTo);
+                const to = isoDateToLocalDateObj(state.matchFinderDateTo);
                 matches = matches.filter(row => row.dateObj <= to);
             }
 
@@ -7301,6 +7301,26 @@
             });
             el.innerHTML = cards.join('');
             el.classList.remove('hidden');
+        }
+
+        // Most Recent's Result column, as Match History's: the winner's crest
+        // and name in its colour (Team 1 highlighted), or Draw - on a
+        // phone the crest alone, or D
+        function matchFinderResultCell(row) {
+            const winner = row.homeScore > row.awayScore ? row.homeTeam : (row.awayScore > row.homeScore ? row.awayTeam : '');
+            if (!winner) return `<td class="text-center"><span style="color: #9ca3af !important; font-weight: bold;">D</span></td>`;
+            // As the team columns: Team 1, Team 2, or the transparent pill
+            const highlight = winner === state.matchFinderTeam1 ? 'team1-highlight'
+                : (isMatchFinderTeam2(winner) ? 'team2-highlight' : 'team-transparent-highlight');
+            const color = pickTeamTextColor(getTeamColor(winner, state.selectedLeague), highlight);
+            const logo = getTeamLogoUrl(winner, state.selectedLeague);
+            return `
+                        <td class="text-center">
+                            <div class="flex items-center justify-center">
+                                ${logo ? `<img src="${logo}" alt="${winner} logo" class="w-5 h-5 object-contain" onerror="this.style.display='none'">` : ''}
+                                
+                            </div>
+                        </td>`;
         }
 
         function matchFinderSubtitle(count) {
@@ -7439,7 +7459,7 @@
                                 <span style="${row.awayTeamStyle}; display: none;">${row.awayTeam}</span>
                             </div>
                         </td>
-                        <td class="text-center text-lg font-bold ${row.valueClass}">${row.valueText}</td>
+                        ${isRecent ? matchFinderResultCell(row) : `<td class="text-center text-lg font-bold ${row.valueClass}">${row.valueText}</td>`}
                     </tr>
                 `;
             }).join('');

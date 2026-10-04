@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03)
+## Priority (ranked 2026-10-03, updated 2026-10-04)
 
 Most to least important; details are in each item below.
 
@@ -18,29 +18,28 @@ Most to least important; details are in each item below.
 7. Link previews when sharing
 8. Season records and title races
 9. "Report a data error" link
-10. ~~The table on any date~~ - done 2026-10-04
-11. League trends over time
-12. Match Finder upgrades (what's left)
-13. Lighter pages
+10. League trends over time
+11. Match Finder upgrades (what's left)
+12. Lighter pages
 
 **Tier 3 - worthwhile features**
-14. Typo tolerance in search
-15. Upcoming matches (home page strip)
-16. Penalty shootout records
-17. Recent searches
-18. Pinned / favourite team
-19. Road to the final
-20. Head-to-head by decade
-21. More competitions (depends on the data)
+13. Typo tolerance in search
+14. Upcoming matches (home page strip)
+15. Penalty shootout records
+16. Recent searches
+17. Pinned / favourite team
+18. Road to the final
+19. Head-to-head by decade
+20. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-22. "On this day"
-23. Trivia mode
-24. Side-by-side Team Seasons
-25. Team progression chart (after league trends)
-26. "/" to search
-27. Knockout Stage bracket view (on hold)
-28. Country vs Country
+21. "On this day"
+22. Trivia mode
+23. Side-by-side Team Seasons
+24. Team progression chart (after league trends)
+25. "/" to search
+26. Knockout Stage bracket view (on hold)
+27. Country vs Country
 
 ## Items
 
@@ -323,6 +322,18 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Matches on a date~~ — done (2026-10-04), in the search. A single
+  date, no club named and match words ("matches / games / results /
+  fixtures / scores / played on ...") open Match Finder with no team for
+  that day: "matches on 12/26/1963" -> "10 games were played in the First
+  Division on December 26, 1963, with 66 goals; the biggest win was
+  Fulham FC 10-1 Ipswich Town". Title uses the era's name (First
+  Division / European Cup before 1992-93). With a club ("Arsenal matches
+  on ...") it's still that club's record.
+  - Fixed on the way: Match Finder parsed its date range as UTC midnight,
+    so west of Greenwich the end date's matches were dropped (Arsenal 1-20
+    January 2024 missed the 20th). Now read as local days, all four pages.
 
 - ~~The table on any date~~ — done (2026-10-04), in the search. League
   Tables already takes a date range, so a single date with a table

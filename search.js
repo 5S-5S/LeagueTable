@@ -1775,6 +1775,15 @@
             intent.view = 'table';
         }
 
+        // The matches on a day, no club named: "matches on 12/26/1963",
+        // "results on Boxing Day 1963" - Match Finder's every-club list
+        const matchWords = /\b(matches|match|games|game|results|fixtures|scores|scorelines|played)\b/.test(rest);
+        if (dateRange && filters.dateFrom && filters.dateFrom === filters.dateTo && !filters.asOf &&
+            mentions.length === 0 && !opponentGroup && matchWords) {
+            intent.view = 'match-finder';
+            intent.category = 'recent';
+        }
+
         // A season or dates are more specific than an era, and "all-time"
         // asks for every season
         const allTime = /\b(all time|alltime|all seasons|every season)\b/.test(rest);
@@ -2138,9 +2147,15 @@
             }[lastTime.result || 'any'];
             return `Last time ${t1} ${verb}${scoreline ? ` ${scoreline.home}-${scoreline.away}` : ''}`;
         };
+        // One day's matches: "First Division matches · December 26, 1963"
+        const oneDay = !t1 && category === 'recent' && f.dateFrom && f.dateFrom === f.dateTo;
+        // Its name then: the First Division / European Cup before 1992-93
+        const oneDayName = oneDay && f.dateFrom < '1992-07-01'
+            ? ({ 'premier-league': 'First Division', 'champions-league': 'European Cup' }[comp.key] || comp.name) : comp.name;
         return {
             kind: 'match-finder', icon: lastTime ? '🔍' : '🎯', comp,
-            title: lastTime ? lastTimeTitle() : `${who} · ${label}`,
+            title: lastTime ? lastTimeTitle()
+                : (oneDay ? `${oneDayName} matches · ${longDate(localDay(f.dateFrom))}` : `${who} · ${label}`),
             detail: joinDetail([
                 category === 'scoreline' && !tie ? 'Home score - away score' : (tie ? 'Two-legged ties' : 'Match Finder'),
                 ...parts
@@ -2585,8 +2600,22 @@
                 }
                 case 'scoreline':
                     return { crestTeam: crest, html: `${formatNumber(results.length)} games${scope} ended ${params.get('hsVal')}-${params.get('asVal')} (home team first); the most recent was ${score}.` };
-                default:
+                default: {
+                    // One day's matches: how many, the goals, the biggest win
+                    if (params.get('from') && params.get('from') === params.get('to')) {
+                        const goals = results.reduce((sum, r) => sum + r.totalGoals, 0);
+                        const biggest = [...results].sort((x, y) => y.margin - x.margin || y.totalGoals - x.totalGoals)[0];
+                        const bm = biggest.match;
+                        const highlight = biggest.margin > 0
+                            ? `the biggest win was ${b(bm.HomeTeam)} ${bm.FTHG}-${bm.FTAG} ${b(bm.AwayTeam)}`
+                            : `every game was a draw`;
+                        return {
+                            crestTeam: biggest.winner || bm.HomeTeam,
+                            html: `${formatNumber(results.length)} game${results.length === 1 ? ' was' : 's were'} played${scope}, with ${formatNumber(goals)} goal${goals === 1 ? '' : 's'}; ${results.length === 1 ? `it finished ${b(bm.HomeTeam)} ${bm.FTHG}-${bm.FTAG} ${b(bm.AwayTeam)}` : highlight}.`
+                        };
+                    }
                     return { crestTeam: crest, html: `The most recent game${scope} was ${score}.` };
+                }
             }
         }
 
@@ -3203,7 +3232,7 @@
             ['Titles & finishes', ['Manchester United Premier League titles', 'Premier League champions']],
             ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks', 'Longest unbeaten run against Chelsea']],
             ['Last time', ['Last time Liverpool beat Everton away']],
-            ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws', 'Highest scoring game in Premier League history']]
+            ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws', 'Highest scoring game in Premier League history', 'Matches on Boxing Day 1963']]
         ],
         'la-liga': [
             ['Head to head', ['Barcelona vs Real Madrid']],
