@@ -44,34 +44,6 @@ Feature ideas, not yet scheduled.
       .png are no longer used.
     - Related: "Match Finder without a team" and "Comebacks" below.
 
-- Partly done: **Match Finder without a team** — noted 2026-10-01 while
-  testing the search bar.
-  - Done (2026-10-03), step 1 - single matches, all four pages: leave
-    Team 1 empty for the whole league's matches, each listed once, from
-    the division's full history (the all-teams streaks' data, only
-    fetched while the Match Finder tab is open). "Biggest Victories" is
-    "Biggest Wins" (the margin, whoever won); Biggest Defeats is hidden
-    (same list); Most Recent's result column is H / D / A. Home/Away,
-    Result, the score boxes and the last win / draw / loss cards are
-    hidden (they're Team 1's side). Team 2 alone (a club, the Big 6, a
-    country - now offered with no Team 1) = every club's matches with it;
-    Biggest Wins = the biggest wins against it. Season, dates, weekday,
-    Continental stage / qualifiers / penalties / extra time apply.
-  - Search: "biggest win in La Liga history" (Athletic Club 12-1
-    Barcelona, 1931), "highest scoring game ever Premier League"
-    (Portsmouth 7-4 Reading), "biggest wins against Chelsea", "Serie A
-    0-0 draws". "Last time ..." and comebacks still need a club. One
-    example per competition list; the Q&A and Match Finder's description
-    mention it.
-  - Fixed on the way: Continental mobile rebuilt Match Finder's Team 2
-    list without countries after adding them (a country-only link was
-    ignored).
-  - Still to do, step 2: Continental Double-Legged Tie mode with no Team 1
-    (every tie on aggregate - biggest aggregate wins, highest-scoring
-    ties, ties on penalties / away goals). Today it says "Two-legged ties
-    need a Team 1". Tie mode is built around Team 1, so this is the
-    bigger piece.
-
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current
   one-team-at-a-time view.
@@ -184,6 +156,43 @@ Feature ideas, not yet scheduled.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Match Finder without a team~~ — done (2026-10-03), both steps; noted
+  2026-10-01 while testing the search bar.
+  - Done (2026-10-03), step 1 - single matches, all four pages: leave
+    Team 1 empty for the whole league's matches, each listed once, from
+    the division's full history (the all-teams streaks' data, only
+    fetched while the Match Finder tab is open). "Biggest Victories" is
+    "Biggest Wins" (the margin, whoever won); Biggest Defeats is hidden
+    (same list); Most Recent's result column is H / D / A. Home/Away,
+    Result, the score boxes and the last win / draw / loss cards are
+    hidden (they're Team 1's side). Team 2 alone (a club, the Big 6, a
+    country - now offered with no Team 1) = every club's matches with it;
+    Biggest Wins = the biggest wins against it. Season, dates, weekday,
+    Continental stage / qualifiers / penalties / extra time apply.
+  - Search: "biggest win in La Liga history" (Athletic Club 12-1
+    Barcelona, 1931), "highest scoring game ever Premier League"
+    (Portsmouth 7-4 Reading), "biggest wins against Chelsea", "Serie A
+    0-0 draws". "Last time ..." and comebacks still need a club. One
+    example per competition list; the Q&A and Match Finder's description
+    mention it.
+  - Fixed on the way: Continental mobile rebuilt Match Finder's Team 2
+    list without countries after adding them (a country-only link was
+    ignored).
+  - Done (2026-10-03), step 2 - Continental Double-Legged Tie mode with
+    no Team 1: every two-legged tie, each from the winner's side (a level
+    tie - settled on penalties - from the alphabetically first club). The
+    tie code already paired legs without Team 1; only its classification
+    and table used Team 1, now a per-tie side. Biggest Aggregate Wins
+    (Benfica 18-0 Stade Dudelange, 1965), level / highest-scoring ties,
+    an aggregate scoreline (winner first - the boxes read Winner / Loser),
+    Most Recent Ties (no last win / draw / loss cards), and every club's
+    Comebacks (Barcelona vs PSG first, of 380). Team 2 alone = ties
+    against it. Search: "biggest comebacks", "biggest aggregate wins
+    against English clubs", "comebacks against Barcelona", "ties decided
+    on away goals" (counted - 175, the latest PSG 3-3 Bayern); a query of
+    only tie / away goals / extra time words is no longer treated as
+    empty. "Biggest comebacks" is in the Champions League examples.
 
 - ~~Comebacks~~ — done (2026-10-03), both Continental pages. A comeback
   is a two-legged tie won after losing the first leg (decided

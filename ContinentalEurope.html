@@ -7586,6 +7586,12 @@
         // "Opponent", same as the rest of Match Finder already does (e.g.
         // matchFinderSubtitle()).
         function updateMatchFinderScorelineLabels() {
+            // No Team 1: an aggregate scoreline is winner first
+            if (!state.matchFinderTeam1) {
+                elements.matchFinderTeam1ScoreLabel.textContent = 'Winner';
+                elements.matchFinderOpponentScoreLabel.textContent = 'Loser';
+                return;
+            }
             elements.matchFinderTeam1ScoreLabel.textContent = state.matchFinderTeam1 || 'Team 1';
             elements.matchFinderOpponentScoreLabel.textContent = state.matchFinderTeam2 ? getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s) : 'Opponent';
         }
@@ -7898,19 +7904,32 @@
 
             elements.matchFinderCategoryContainer.classList.remove('hidden');
             const category = MATCH_FINDER_CATEGORIES.find(c => c.key === state.matchFinderCategory);
-            if (!category || category.teamOnly || category.tieOnly) {
+            if (!category || category.teamOnly || (category.tieOnly && state.matchFinderMode !== 'tie')) {
                 state.matchFinderCategory = 'victories';
                 updateMatchFinderScorelineVisibility();
             }
             renderMatchFinderCategoryButtons();
-            // Two-legged ties are worked out around Team 1
-            if (state.matchFinderMode === 'tie') return showStatus('Two-legged ties need a Team 1 - pick one above.');
 
             const div = { 'champions-league': 'C1', 'europa-league': 'E1', 'conference-league': 'C2' }[state.selectedLeague];
             const all = div ? state.leagueStreaksApiCache[div] : null;
             if (!all || all === 'error') {
                 if (div && !all) ensureLeagueStreaksDataLoaded(div);
                 return showStatus(all === 'error' ? 'Couldn\'t load the league\'s matches. Please try again later.' : 'Loading every match in this league\'s history...');
+            }
+
+            // Two-legged ties: the tie code pairs the legs and applies the
+            // stage, date and penalty / extra time / away goals filters to
+            // whole ties itself - only the qualifier switches and Team 2 here
+            if (state.matchFinderMode === 'tie') {
+                let legs = all;
+                if (state.matchFinderExcludeQualifiers) legs = legs.filter(row => !row.isQualifier);
+                if (state.matchFinderExcludeMainStage) legs = legs.filter(row => row.isQualifier);
+                const tieOpponents = matchFinderAllClubsOpponents();
+                if (tieOpponents) legs = legs.filter(m => tieOpponents.includes(m.HomeTeam) || tieOpponents.includes(m.AwayTeam));
+                elements.matchFinderLastResults.classList.add('hidden');
+                updateMatchFinderScorelineLabels();
+                calculateMatchFinderTieMode(legs);
+                return;
             }
 
             const opponents = matchFinderAllClubsOpponents();
@@ -8161,7 +8180,7 @@
 
         function matchFinderTieSubtitle(count) {
             const team1 = state.matchFinderTeam1;
-            let text = team1;
+            let text = team1 || 'All clubs';
             if (state.matchFinderTeam2) {
                 text += ` vs ${getTeam2Label(state.matchFinderTeam1, state.matchFinderTeam2, state.matchFinderExtraTeam2s)}`;
             }
@@ -8270,9 +8289,14 @@
             // teamA/teamB are alphabetical, not team1/opponent, so map
             // them back first.
             const team1 = state.matchFinderTeam1;
+            // No Team 1: each tie from the winner's side (the alphabetically
+            // first club when it's level); Team 2 alone = ties against it
+            const sideOf = t => team1 || (t.breakdown.winner !== 'TIE' ? t.breakdown.winner : t.breakdown.teamA);
+            const allClubsOpponents = team1 ? null : matchFinderAllClubsOpponents();
             let classified = ties.map(t => {
                 const b = t.breakdown;
-                const isTeam1A = b.teamA === team1;
+                const side = sideOf(t);
+                const isTeam1A = b.teamA === side;
                 const team1Goals = isTeam1A ? b.aggregate[b.teamA] : b.aggregate[b.teamB];
                 const opponentGoals = isTeam1A ? b.aggregate[b.teamB] : b.aggregate[b.teamA];
                 const margin = team1Goals - opponentGoals;
@@ -8292,14 +8316,16 @@
                 let result;
                 if (b.winner === 'TIE') result = 'draw';
                 else if (team1Goals === opponentGoals && !b.decidedByAwayGoals) result = 'draw';
-                else if (b.winner === team1) result = 'win';
+                else if (b.winner === side) result = 'win';
                 else result = 'loss';
 
-                return { ...t, team1Goals, opponentGoals, margin, totalGoals, result };
+                const opponent = b.teamA === side ? b.teamB : b.teamA;
+                return { ...t, side, opponent, team1Goals, opponentGoals, margin, totalGoals, result };
             });
 
             if (state.matchFinderCategory === 'victories') {
-                classified = classified.filter(t => t.result === 'win');
+                // No Team 1 with a Team 2: the biggest wins against it
+                classified = classified.filter(t => t.result === 'win' && (!allClubsOpponents || allClubsOpponents.includes(t.opponent)));
                 classified.sort((a, b) => b.margin - a.margin || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'defeats') {
                 classified = classified.filter(t => t.result === 'loss');
@@ -8337,14 +8363,14 @@
                 // first-leg deficit overturned first, then the newest
                 classified = classified.map(t => {
                     const b = t.breakdown;
-                    const opponent = b.teamA === team1 ? b.teamB : b.teamA;
-                    return { ...t, firstLegTeam1Goals: b.legs[0][team1], firstLegOpponentGoals: b.legs[0][opponent] };
-                }).filter(t => !t.breakdown.isSingleLeg && t.breakdown.winner === team1 && t.firstLegTeam1Goals < t.firstLegOpponentGoals);
+                    return { ...t, firstLegTeam1Goals: b.legs[0][t.side], firstLegOpponentGoals: b.legs[0][t.opponent] };
+                }).filter(t => !t.breakdown.isSingleLeg && t.breakdown.winner === t.side && t.firstLegTeam1Goals < t.firstLegOpponentGoals &&
+                    (!allClubsOpponents || allClubsOpponents.includes(t.opponent)));
                 const deficit = t => t.firstLegOpponentGoals - t.firstLegTeam1Goals;
                 classified.sort((a, b) => deficit(b) - deficit(a) || b.lastLegDate - a.lastLegDate);
             } else if (state.matchFinderCategory === 'recent') {
                 classified.sort((a, b) => b.lastLegDate - a.lastLegDate);
-                renderMatchFinderLastResults(classified, true);
+                if (team1) renderMatchFinderLastResults(classified, true);
                 const wanted = MATCH_FINDER_RESULTS[state.matchFinderResult];
                 if (wanted) classified = classified.filter(t => wanted.includes(t.result));
                 if (state.matchFinderRecentTeam1Goals !== '') classified = classified.filter(t => t.team1Goals === parseInt(state.matchFinderRecentTeam1Goals));
@@ -8426,7 +8452,7 @@
                 // H2H Match History's format exactly), since that's a
                 // direct parallel to a single match's own shootout row.
                 const b = t.breakdown;
-                const isTeam1A = b.teamA === team1;
+                const isTeam1A = b.teamA === (t.side || team1);
                 const team1Agg = isTeam1A ? b.aggregate[b.teamA] : b.aggregate[b.teamB];
                 const oppAgg = isTeam1A ? b.aggregate[b.teamB] : b.aggregate[b.teamA];
                 const team1AggClass = t.result === 'win' ? 'win-score' : t.result === 'loss' ? 'text-red-600' : 'text-gray-400';
