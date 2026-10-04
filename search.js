@@ -1373,7 +1373,8 @@
         'group': 'the group stage', 'group-stage': 'the group stage', 'League/Group Stage': 'the group stage',
         'knockout': 'the knockout stage', 'knockout-stage': 'the knockout stage', 'Knock-Out Stage': 'the knockout stage',
         'Final': 'the final', 'Semi-Finals': 'the semi-finals', 'Quarter-Finals': 'the quarter-finals',
-        'Round Of 16': 'the round of 16', 'Play-Offs': 'the play-offs', 'Qualifiers': 'qualifying'
+        'Round Of 16': 'the round of 16', 'Play-Offs': 'the play-offs', 'Qualifiers': 'qualifying',
+        'Main Stage': 'the main stage'
     };
 
     // Champions League opponents by country: "English clubs", "vs Spain"
@@ -1946,7 +1947,9 @@
         const typeLabel = STREAK_TYPE_LABELS[type];
         const vs = opponent ? ` vs ${opponentLabel([opponent]).replace(/^the /, '')}` : '';
         const who = `${t1 || 'All teams'}${vs}`;
-        const stage = parsed && comp.continental && parsed.filters.stage ? parsed.filters.stage : '';
+        // "excluding qualifiers": the dropdown's All Main Stage
+        const stage = parsed && comp.continental
+            ? (parsed.filters.stage || (parsed.filters.excludeQualifiers ? 'Main Stage' : '')) : '';
         return {
             kind: 'team-streaks', icon: '⚡', comp,
             title: `${who} · ${typeLabel} streaks`,

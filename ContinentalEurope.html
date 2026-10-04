@@ -871,6 +871,7 @@
                         <select id="teamStreaksStageSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-green-500 focus:outline-none">
                             <option value="">All</option>
                             <optgroup label="Main Stage">
+                                <option value="Main Stage">All Main Stage</option>
                                 <option value="League/Group Stage">League/Group Stage</option>
                                 <option value="Knock-Out Stage">Knock-Out Stage</option>
                                 <option value="Final">Final</option>
@@ -1022,6 +1023,7 @@
                         <select id="h2hStageSelect" class="px-3 py-1 border border-gray-300 rounded focus:border-green-500 focus:outline-none text-sm">
                             <option value="">All</option>
                             <optgroup label="Main Stage">
+                                <option value="Main Stage">All Main Stage</option>
                                 <option value="League/Group Stage">League/Group Stage</option>
                                 <option value="Knock-Out Stage">Knock-Out Stage</option>
                                 <option value="Final">Final</option>
@@ -1108,6 +1110,7 @@
                             <select id="matchHistoryStageSelect" class="px-3 py-1 border border-gray-300 rounded focus:border-green-500 focus:outline-none text-sm">
                                 <option value="">All</option>
                                 <optgroup label="Main Stage">
+                                    <option value="Main Stage">All Main Stage</option>
                                     <option value="League/Group Stage">League/Group Stage</option>
                                     <option value="Knock-Out Stage">Knock-Out Stage</option>
                                     <option value="Final">Final</option>
@@ -8876,6 +8879,8 @@
 
             const qualifierRound = qualifierRoundLabel(competitionPhase);
             if (stageCategory === 'Qualifiers') return qualifierRound !== null;
+            // Everything but qualifying (League/Group Stage + Knock-Out Stage)
+            if (stageCategory === 'Main Stage') return qualifierRound === null;
             if (stageCategory.endsWith('(Q)')) return qualifierRound === stageCategory;
             if (qualifierRound) return false;
 
