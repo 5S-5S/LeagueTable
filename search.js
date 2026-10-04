@@ -1187,6 +1187,13 @@
         return MONTHS.findIndex(month => month.startsWith(name.slice(0, 3))) + 1;
     }
 
+    // "2023-01-01" as that day in the visitor's time zone (new Date() would
+    // read it as UTC midnight - the evening before, west of Greenwich)
+    function localDay(iso) {
+        const [year, month, day] = iso.split('-').map(Number);
+        return new Date(year, month - 1, day);
+    }
+
     function isoDate(year, month, day) {
         const date = new Date(Date.UTC(year, month - 1, day));
         // Rejects 31/02 and the like (the date rolls over into another month)
@@ -1232,6 +1239,26 @@
             const swap = first > 12 ? false : (second > 12 ? true : !dayFirst());
             const [day, month] = swap ? [second, first] : [first, second];
             const date = isoDate(Number(m[3]), month, day);
+            add(m[0], date, date);
+        });
+        // A two-digit year: "1/1/23" (20xx unless that's in the future)
+        take(/\b(\d{1,2})[\/.](\d{1,2})[\/.](\d{2})\b/g, m => {
+            let [first, second] = [Number(m[1]), Number(m[2])];
+            const swap = first > 12 ? false : (second > 12 ? true : !dayFirst());
+            const [day, month] = swap ? [second, first] : [first, second];
+            const yy = Number(m[3]);
+            const year = 2000 + yy <= new Date().getFullYear() ? 2000 + yy : 1900 + yy;
+            const date = isoDate(year, month, day);
+            add(m[0], date, date);
+        });
+        // Holidays: "Christmas 2003", "Boxing Day", "New Year's Day 2010" -
+        // with no year, the most recent one
+        take(/\b(christmas eve|christmas day|christmas|xmas|boxing day|new year'?s? day|new year'?s?)(?:\s+(?:of\s+)?(1[89]\d{2}|20\d{2}))?\b/g, m => {
+            const name = m[1];
+            const [month, day] = /eve/.test(name) ? [12, 24] : (/boxing/.test(name) ? [12, 26] : (/new year/.test(name) ? [1, 1] : [12, 25]));
+            let year = m[2] ? Number(m[2]) : new Date().getFullYear();
+            if (!m[2] && localDay(isoDate(year, month, day)) > new Date()) year -= 1;
+            const date = isoDate(year, month, day);
             add(m[0], date, date);
         });
         take(new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:of\\s+)?${MONTH_PATTERN}\\.?,?\\s+(1[89]\\d{2}|20\\d{2})\\b`, 'g'), m => {
@@ -1734,6 +1761,20 @@
             (mentions.length === 1 && mentions[0].start > 0 && /^(against|vs|versus|v|over)$/.test(words[mentions[0].start - 1])) ||
             (mentions.length === 0 && !!opponentGroup));
 
+        // The table on a date: "table on 1/1/23", "who was top at Christmas
+        // 2003", "where was Arsenal on 1 January 2023" - from that season's
+        // start (1 July) to the date. ("Arsenal on 10/05/2026" with no
+        // table words is still that day's match.)
+        const standingWords = /\b(top|bottom|leaders?|leading|first place|where (was|were)|positions?|place|standings?|tables?)\b/.test(rest);
+        if (dateRange && filters.dateFrom && filters.dateFrom === filters.dateTo && mentions.length <= 1 &&
+            (intent.view === 'table' || standingWords)) {
+            const day = localDay(filters.dateTo);
+            const start = day.getMonth() >= 6 ? day.getFullYear() : day.getFullYear() - 1;
+            filters.dateFrom = isoDate(start, 7, 1);
+            filters.asOf = filters.dateTo;
+            intent.view = 'table';
+        }
+
         // A season or dates are more specific than an era, and "all-time"
         // asks for every season
         const allTime = /\b(all time|alltime|all seasons|every season)\b/.test(rest);
@@ -1890,8 +1931,19 @@
     }
 
     // Each result: { kind, icon, crestTeam?, title, detail, comp, href }
-    function tableResult(comp, parsed) {
+    function tableResult(comp, parsed, focusTeam = '') {
         const parts = filterDetailParts(parsed, comp, 'table');
+        // The table on a date: from the season's start to it. asof / who are
+        // the search's own parameters (the page ignores them) for the answer.
+        if (parsed.filters.asOf) {
+            const params = { ...leagueFilterParams(comp, parsed, 'table'), asof: '1', who: focusTeam };
+            return {
+                kind: 'table', icon: '📊', comp, crestTeam: focusTeam || undefined,
+                title: `${focusTeam ? `${focusTeam} · ` : ''}${comp.name} table · ${longDate(localDay(parsed.filters.asOf))}`,
+                detail: joinDetail(['League table on the day', ...parts.slice(1)]),
+                href: competitionUrl(comp, 'league-filters', params)
+            };
+        }
         // A plain single season is that season's final standings in Team
         // Seasons (medal colors, each club's matches a click away). League
         // Tables only for what Team Seasons can't do: home / away / weekday
@@ -2157,7 +2209,9 @@
                 break;
             case 'table':
             case 'matches':
-                if (t1) primary.push(teamRecordResult(comp, t1, parsed));
+                // "where was Arsenal on ...": the table, the answer naming Arsenal
+                if (t1 && parsed.filters.asOf) primary.push(tableResult(comp, parsed, t1));
+                else if (t1) primary.push(teamRecordResult(comp, t1, parsed));
                 else primary.push(tableResult(comp, parsed));
                 break;
             default:
@@ -3086,6 +3140,28 @@
             }
             const leader = ctx.table && ctx.table[0];
             if (!leader) return null;
+            // The table on a date: "On January 1, 2023, Arsenal FC were top
+            // of the 2022-23 Premier League with 43 points from 16 games, 5
+            // ahead of Newcastle United" / "... were 4th, 8 behind ..."
+            if (params.get('asof') === '1' && params.get('to')) {
+                const onDate = `On ${longDate(localDay(params.get('to')))}`;
+                const startYear = Number(params.get('from').slice(0, 4));
+                const seasonName = `${seasonKey(startYear)} ${shortCompetition}`;
+                const pts = n => `${formatNumber(n)} point${n === 1 ? '' : 's'}`;
+                const who = params.get('who');
+                const row = who ? ctx.table.find(r => r.team === who) : leader;
+                if (!row) return { crestTeam: who, html: `${onDate}, ${b(who)} hadn't played in the ${seasonName} yet.` };
+                const place = ctx.table.indexOf(row) + 1;
+                const second = ctx.table[1];
+                const gap = place === 1
+                    ? (second ? `, ${row.points - second.points === 0 ? `level with ${b(second.team)}` : `${pts(row.points - second.points)} ahead of ${b(second.team)}`}` : '')
+                    : `, ${pts(leader.points - row.points)} behind ${b(leader.team)}`;
+                const standing = place === 1 ? 'top of' : `${place}${ordinalSuffix(place)} in`;
+                return {
+                    crestTeam: row.team,
+                    html: `${onDate}, ${b(row.team)} were ${standing} the ${seasonName} with ${pts(row.points)} from ${row.played} game${row.played === 1 ? '' : 's'}${gap}.`
+                };
+            }
             // A home / away / one-weekday table
             const kindOfTable = [location, day !== null && day !== '' ? capitalize(WEEKDAYS[Number(day)]) : ''].filter(Boolean).join(' ');
             const points = `${formatNumber(leader.points)} points`;
@@ -3123,7 +3199,7 @@
         ],
         'premier-league': [
             ['Head to head', ['Arsenal vs Chelsea', 'Arsenal vs the Big 6 at home']],
-            ['Seasons & tables', ['Premier League 2003-04']],
+            ['Seasons & tables', ['Premier League 2003-04', 'Who was top at Christmas 2003']],
             ['Titles & finishes', ['Manchester United Premier League titles', 'Premier League champions']],
             ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks', 'Longest unbeaten run against Chelsea']],
             ['Last time', ['Last time Liverpool beat Everton away']],
@@ -3139,7 +3215,7 @@
         ],
         'serie-a': [
             ['Head to head', ['Juventus vs Inter', 'Inter vs AC Milan since 2010']],
-            ['Seasons & tables', ['Serie A 2005-06']],
+            ['Seasons & tables', ['Serie A 2005-06', 'Serie A table on 1 January 2010']],
             ['Titles & finishes', ['Juventus titles', 'Napoli titles', 'Serie A champions', 'Atalanta top 4']],
             ['Streaks', ['AC Milan longest unbeaten run', 'Longest unbeaten run against Juventus']],
             ['Last time', ['Last time Roma beat Lazio']],

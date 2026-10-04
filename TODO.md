@@ -18,7 +18,7 @@ Most to least important; details are in each item below.
 7. Link previews when sharing
 8. Season records and title races
 9. "Report a data error" link
-10. The table on any date
+10. ~~The table on any date~~ - done 2026-10-04
 11. League trends over time
 12. Match Finder upgrades (what's left)
 13. Lighter pages
@@ -166,12 +166,6 @@ Most to least important; details are in each item below.
 - Later: **"Report a data error" link** — noted 2026-10-03. A small link
   on each answer / table that opens the contact page with the question
   (or page link) pre-filled, so visitors can flag wrong results easily.
-
-- Later: **The table on any date** — noted 2026-10-03. "Premier League
-  table on 25 December 2003", "where was Arsenal after 10 games", "who was
-  top at Christmas". League Tables already filters by date range (from
-  the season start to the date), so this is mostly the search (a single
-  date, "after N games") and a "standings on this date" shortcut.
 
 - Later: **Link previews when sharing** — noted 2026-10-03. Copy Link /
   search links show a bare URL in WhatsApp, X, Discord etc. Add title /
@@ -329,6 +323,19 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~The table on any date~~ — done (2026-10-04), in the search. League
+  Tables already takes a date range, so a single date with a table
+  question means that season's start (1 July) to the date: "table on
+  1/1/23", "who was top at Christmas 2003", "Serie A table on 1 January
+  2010", "where was Arsenal on 1/1/2023" (the table, the answer naming
+  that club's place). Answer: "On January 1, 2023, Arsenal FC were top of
+  the 2022-23 Premier League with 43 points from 16 games, 7 points ahead
+  of Manchester City" / "Liverpool FC were 6th ..., 15 points behind".
+  Dates gained two-digit years (1/1/23) and holidays (Christmas, Christmas
+  Eve, Boxing Day, New Year's Day; no year = the most recent). "Arsenal on
+  10/05/2026" with no table words is still that day's match. Not done:
+  "after N games" (League Tables has no matchday filter).
 
 - ~~Match Finder without a team~~ — done (2026-10-03), both steps; noted
   2026-10-01 while testing the search bar.
