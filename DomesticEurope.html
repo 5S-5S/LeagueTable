@@ -11006,6 +11006,8 @@
                     const revoked = { 'premier-league': 'E0', 'la-liga': 'SP1', 'serie-a': 'I1', 'bundesliga': 'D1', 'ligue-1': 'F1' }[leagueToUse] === undefined ? false
                     : strippedChampions.some(([t, d, s, p]) => t === teamName && s === row.season && p === row.position &&
                         d === { 'premier-league': 'E0', 'la-liga': 'SP1', 'serie-a': 'I1', 'bundesliga': 'D1', 'ligue-1': 'F1' }[leagueToUse]);
+                    // A stripped title shows as NR in the Pos column too
+                    row.revoked = revoked;
                     // The current season isn't a finish yet (as the position
                     // filter's own 34-game rule)
                     const now = new Date();
@@ -11110,12 +11112,13 @@
                                 ${season.points}
                             </span>
                         </td>
-                        <td class="px-3 py-4 text-center font-bold" style="${
-                            season.position === 1 ? 'color: #d97706; background-color: #fef3c7;' : 
+                        <td class="px-3 py-4 text-center font-bold" ${season.revoked ? 'title="Title revoked" ' : ''}style="${
+                            season.revoked ? 'color: #6b7280;' :
+                            season.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
                             season.position === 2 ? 'color: #374151; background-color: #e5e7eb;' : 
                             season.position === 3 ? 'color: #b45309; background-color: #fef7ed;' : 
                             'color: #6b7280;'
-                        }">${season.position}</td>
+                        }">${season.revoked ? 'NR' : season.position}</td>
                     </tr>
                     ${renderTeamSeasonMatchesRowIfOpen(seasonRef, leagueToUse, 12)}
                 `;
