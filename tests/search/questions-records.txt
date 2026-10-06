@@ -1,0 +1,61 @@
+# Season-record questions (Team Records / League History), each run in the
+# Domestic, Premier League and Champions League dropdowns.
+most points in a season
+most points in a Premier League season
+fewest points in a season
+most goals in a season
+fewest goals conceded in a season
+best defence ever
+most points by a champion
+fewest points by title winners
+most points by a team finishing 4th
+most points for a runner up
+Arsenal most points in a season
+most goals in a season by Bayern
+most points per game in a season
+most points in a season with 3 points for a win
+highest scoring team in a season
+most wins in a season
+most draws in a season
+fewest defeats in a season
+best goal difference in a season
+worst goal difference
+unbeaten season
+invincibles
+Arsenal best season
+Arsenal worst season
+highest scoring seasons
+highest scoring club seasons
+highest scoring Serie A season
+lowest scoring premier league seasons
+highest scoring Aston Villa seasons
+lowest scoring Arsenal seasons
+season with the most draws
+season with the most goals
+season with the fewest home wins
+season with most clubs
+closest title race
+closest title races
+biggest title winning margin
+biggest points gap
+best title race by points
+title race with most points
+home advantage
+has home advantage shrunk
+lowest home win percentage
+draw rate
+league history
+how has the premier league changed
+goals per game by season
+Arsenal goals per game by season
+most goals in a champions league campaign
+most goals in a campaign
+most goals by a beaten finalist
+most goals by a semi finalist
+most goals in a campaign including qualifiers
+home advantage including qualifiers
+most goals in a game
+highest scoring game
+most wins in a row
+Arsenal most wins against Chelsea
+most goals in 2003-04

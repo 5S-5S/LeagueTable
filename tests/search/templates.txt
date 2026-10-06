@@ -1,0 +1,89 @@
+# One question per line. T = Team 1, U = an opponent, L = the dropdown's league
+# (filled per dropdown by compare-routing.js).
+T
+T vs U
+T v U at home
+T against U since 2010
+T titles
+T top 4
+T 2nd place
+T finishes
+T seasons
+T relegated
+T longest unbeaten run
+T longest winning streak
+T current streak
+last time T beat U
+last time T lost
+when did T last win the league
+T biggest wins
+T biggest defeats
+T highest scoring games
+T most goals
+T record
+T home record
+T away record
+T last 10 games
+T on a Sunday
+T 2003-04
+L 2003-04
+L table
+L table since 2010
+L champions
+first time champions L
+who was top at christmas 2003
+table on 1/1/2010
+matches on boxing day 1963
+highest scoring game
+biggest win
+most goals in a game
+most goals
+fewest goals
+goalless draws
+highest scoring draws
+T 5-0 wins
+T 3-3 draws
+T penalty shootouts
+T vs U penalties
+T comebacks
+T semi finals
+T knocked out in the quarter finals
+T champions league titles
+T european cup
+T at home
+T away
+T in the 90s
+T between 1990 and 2000
+T with 2 points for a win
+T without deductions
+T most points
+T best season
+T worst season
+T most wins
+most wins
+most points
+most draws
+most losses
+fewest points
+biggest margin
+title race
+T record against U
+T unbeaten at home
+T best defence
+T vs U last 5 meetings
+T vs the big 6
+T vs english clubs
+T highest scoring draw
+T longest winless run
+L winners
+T record wins
+T worst defeats
+T season by season
+T history
+T best record
+T goals
+L top scorers
+T record in finals
+T most goals in a match
+T fewest goals conceded
+T biggest home win

@@ -116,6 +116,13 @@ Most to least important; details are in each item below.
      script error, no empty answer and no hang.
   When an answer changes on purpose (rewording), its expected text is
   updated in the same commit, so the change shows in the diff.
+  Started 2026-10-06: tests/search/compare-routing.js runs 1,511
+  questions (each dropdown's examples, templates.txt per dropdown,
+  questions-from-history.txt, questions-records.txt) through search.js
+  as it is now and as it is in a git ref, listing every question whose
+  results differ - routing only, no page. The suite's question set
+  starts from these; it adds the expected answer lines (pages in
+  headless Chrome) on top.
 
 - Later (before launch): **Error reporting** — noted 2026-10-03. A small
   handler that reports visitors' JavaScript errors (to the Worker or a

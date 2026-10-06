@@ -1,0 +1,102 @@
+a unbeaten streak
+Add to any question
+aggregate
+All English Seasons
+All Main Stage
+All Teams
+all-time
+an away run
+Arsenal penalty shootouts
+arsenal seasons
+attempted
+Away goals
+biggest wins
+Champions League
+champions-league
+cheap, single-team
+days ago
+Days Since Last Match Results
+decided by away goals
+didn't lose
+drew on a Wednesday
+European Cup
+everyone who finished 2nd
+exactly the semi finals
+Filter by Progression
+finalists
+finals
+First Division
+First Occurrence Only
+first time finalists
+Group Stage
+has this season started
+hide not-yet-started seasons
+highest scoring game ever Premier League
+home - away
+how far
+in the 90s
+including historic
+January 2010
+knocked out in ...
+last 5
+Last 5
+last 5 meetings
+Last Data Update
+last time ...
+last time arsenal won away
+league::teamName
+level with Manchester United
+load league data
+loose index scan
+lost 5-0
+lost in the final
+maiden
+main stage only
+Match Finder
+Most recent N
+Next steps
+No seasons found
+No Team
+not yet merged to main
+once, in 2015-16
+Opponent
+Premier League
+premier league champions
+quarter final defeats
+reached the final
+Reload Data
+results on Boxing Day 1963
+runners up
+Schalke Bundesliga titles
+Schalke titles
+Scoreline:
+Scoreline: Home Score: [op] [val] Away Score: [op] [val]
+search every league for champions-league
+Select Streak
+semi final exits
+semi finals
+set default date range for this competition
+since 01/01/1991
+since the last sync
+Start -> End
+table on 1/1/23
+Team 2
+the English top flight
+the European Cup and Champions League
+The Last Time When...
+third qualifying round
+TIE def. X & Y
+Title revoked
+titles
+to filter with
+too many SQL variables
+victories by away goals
+Viking FC
+Viking FK
+were beaten by
+when did arsenal last win the league
+where was Arsenal on 1/1/2023
+which teams finished Nth
+won a final
+X at Y
+X def. Y

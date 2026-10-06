@@ -2553,6 +2553,9 @@
             if (parsed.intent.view === 'match-finder' && parsed.intent.lastTime && parsed.mentions.length === 0) {
                 return { results: [], message: 'Last time questions look from one team\'s side - add a team, e.g. "last time Arsenal beat Chelsea".' };
             }
+            if (parsed.intent.view === 'team-records' && parsed.intent.finish && parsed.intent.finish.stage && !parsed.intent.finish.rank && !comps.some(comp => comp.continental)) {
+                return { results: [], message: 'Knockout stages (semi finals, finals...) are the Champions League\'s - pick it in the dropdown.' };
+            }
             if (parsed.intent.view === 'league-history' && ['gap', 'topTwo'].includes(parsed.intent.rank) && comps.every(comp => comp.continental)) {
                 return { results: [], message: 'Title races are a league\'s - the Champions League is decided by knockouts. Pick a league in the dropdown.' };
             }
