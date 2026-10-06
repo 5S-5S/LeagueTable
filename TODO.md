@@ -147,18 +147,47 @@ Most to least important; details are in each item below.
   2026-10. Usage to watch: Cloudflare dashboard -> Workers & Pages ->
   leaguetable-api -> Metrics; KV / D1 -> Metrics.
 
-- Later: **Season records and title races** — noted 2026-10-03; details
-  to be worked out. Proposed home: Team Seasons (it already has every
-  club-season's P W D L GF GA GD Pts, and every club at a position):
-  - Season records: an "All finishes" choice in Filter by Position -
-    every club-season in the league in the existing sortable table.
-    "Most points in a Bundesliga season" = sorted by Pts, "fewest goals
-    conceded" = by GA, "unbeaten seasons" / "most wins" likewise.
-  - Title races: position 1 (every champion) plus a "Gap to 2nd" column
-    (points, or goal difference when level). "Closest title races" /
-    "biggest winning margins" sort it.
-  - Search answers both, opening the list already sorted. A separate
-    "Records" tab only if the Team Seasons version feels buried.
+- Later: **Season records and title races** — noted 2026-10-03, shaped
+  2026-10-06. Needs care - many kinds of question; design before building.
+  - Home: two sub-tabs inside Team Seasons, not a new top-level tab.
+    **History** (working name) = everything Team Seasons does today (one
+    club's seasons, every club at a position); **Records** = the new part.
+  - Every record is a list of rows ranked by one number, with filters.
+    Two kinds of row:
+    1. Team seasons - one row per club per season (P W D L GF GA GD Pts,
+       final position). Every club in every season by default, whatever
+       they finished - position is a column and an optional filter, so a
+       runner-up or 4th-placed side ranks wherever its numbers put it.
+       Most / fewest Pts, W, D, L, GF, GA, GD across all clubs;
+       filtered by position (fewest points by a champion, most by a
+       relegated side, most by a team finishing 4th); grouped to the best
+       row per position (most points for each finishing position, 1st to
+       20th) or per club (each club's best season).
+    2. League seasons - one row per league per season: champion,
+       runner-up, gap between them (points, or GD when level), top two's
+       average points, total goals, goals per game. Closest title races,
+       best title races (highest top-two average), biggest winning
+       margins, highest-scoring seasons. Same rows League trends needs.
+    (Single matches stay in Match Finder.)
+  - Controls: Rows (team seasons / league seasons), Stat, Most / Fewest,
+    Totals / Per game, filters (league, era, position) and grouping.
+  - Totals / Per game for every stat - Pts or PPG, W or win %, GF or
+    goals per game - since seasons ran 34-42 games. The table shows both,
+    the toggle picks which one ranks.
+  - Search maps a question onto those controls: "most points by a team
+    finishing 4th in the Premier League" = team seasons, Pts, most,
+    position 4; "highest-scoring team" vs "highest-scoring season" picks
+    the row kind.
+  - Care points: the points system (points awarded, or every season at
+    3 for a win - the existing toggle); final positions must reuse Team
+    Seasons' logic (deductions, stripped titles, ranking overrides); the
+    unfinished current season left out or flagged; joint records shown
+    as joint; Domestic first (Champions League has no positions or title
+    races - team-season stats there could come later).
+  - Build order: 1. team-season records (sub-tabs, controls, search);
+    2. grouping and per-game; 3. league-season records (title races,
+    highest-scoring seasons); 4. League trends as a chart from the same
+    rows.
 
 - Later: **League trends over time** — noted 2026-10-03. Per season:
   goals per game, home win %, draw rate - a simple chart, and searchable
