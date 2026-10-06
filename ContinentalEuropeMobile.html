@@ -8438,8 +8438,7 @@
                 // for a single shootout-decided match - find whichever leg
                 // actually went to penalties (only one leg of a tie ever
                 // can) and parse it exactly like updateMatchFinderTable()'s
-                // single-match penaltyInfo does, including the home-away
-                // (not winner-loser) score order that format uses.
+                // single-match penaltyInfo does, winner's score first.
                 let penaltyInfo = '';
                 if (t.breakdown.penalties) {
                     const psoLeg = t.legMatches.find(leg => leg.AdditionalInfo && leg.AdditionalInfo.toLowerCase().includes('pso'));
@@ -8450,7 +8449,7 @@
                             const awayPenalties = psoMatch[2];
                             const psoWinner = parseInt(homePenalties) > parseInt(awayPenalties) ? psoLeg.HomeTeam : psoLeg.AwayTeam;
                             const psoLoser = psoWinner === psoLeg.HomeTeam ? psoLeg.AwayTeam : psoLeg.HomeTeam;
-                            penaltyInfo = `${psoWinner} def. ${psoLoser} (Penalty Shootout ${homePenalties}-${awayPenalties})`;
+                            penaltyInfo = `${psoWinner} def. ${psoLoser} (Penalty Shootout ${Math.max(homePenalties, awayPenalties)}-${Math.min(homePenalties, awayPenalties)})`;
                         }
                     }
                 }
@@ -8663,7 +8662,7 @@
                         const awayPenalties = psoMatch[2];
                         const psoWinner = parseInt(homePenalties) > parseInt(awayPenalties) ? match.HomeTeam : match.AwayTeam;
                         const psoLoser = psoWinner === match.HomeTeam ? match.AwayTeam : match.HomeTeam;
-                        penaltyInfo = `${psoWinner} def. ${psoLoser} (Penalty Shootout ${homePenalties}-${awayPenalties})`;
+                        penaltyInfo = `${psoWinner} def. ${psoLoser} (Penalty Shootout ${Math.max(homePenalties, awayPenalties)}-${Math.min(homePenalties, awayPenalties)})`;
                     }
                 }
 
@@ -10806,7 +10805,7 @@
                     const penaltyWinner = parseInt(penaltyHomeScore) > parseInt(penaltyAwayScore) ? match.HomeTeam : match.AwayTeam;
                     const penaltyLoser = penaltyWinner === match.HomeTeam ? match.AwayTeam : match.HomeTeam;
                     
-                    penaltyInfo = `${penaltyWinner} def. ${penaltyLoser} (Penalty Shootout ${penaltyHomeScore}-${penaltyAwayScore})`;
+                    penaltyInfo = `${penaltyWinner} def. ${penaltyLoser} (Penalty Shootout ${Math.max(penaltyHomeScore, penaltyAwayScore)}-${Math.min(penaltyHomeScore, penaltyAwayScore)})`;
                 }
             }
             
@@ -11920,7 +11919,7 @@
                     loser = match.HomeTeam;
                 }
 
-                finalScore = `${homeScore}-${awayScore}${hasAet ? ' aet' : ''}, (Penalty Shootout ${homePenalties}-${awayPenalties})`;
+                finalScore = `${homeScore}-${awayScore}${hasAet ? ' aet' : ''}, (Penalty Shootout ${Math.max(homePenalties, awayPenalties)}-${Math.min(homePenalties, awayPenalties)})`;
             } else {
                 // Won outright in extra time (no shootout needed)
                 if (homeScore > awayScore) {
@@ -12457,7 +12456,7 @@
                         const penaltyWinner = parseInt(penaltyHomeScore) > parseInt(penaltyAwayScore) ? match.HomeTeam : match.AwayTeam;
                         const penaltyLoser = penaltyWinner === match.HomeTeam ? match.AwayTeam : match.HomeTeam;
 
-                        penaltyInfo = `${penaltyWinner} def. ${penaltyLoser} (Penalty Shootout ${penaltyHomeScore}-${penaltyAwayScore})`;
+                        penaltyInfo = `${penaltyWinner} def. ${penaltyLoser} (Penalty Shootout ${Math.max(penaltyHomeScore, penaltyAwayScore)}-${Math.min(penaltyHomeScore, penaltyAwayScore)})`;
                     }
                 }
 
