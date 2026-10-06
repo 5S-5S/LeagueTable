@@ -1822,6 +1822,14 @@
             else if (/\b(draws?|drew|level)\b/.test(rest)) intent.category = 'draws';
             else intent.category = 'victories';
         }
+        // A club named in a scoring-seasons question ("highest scoring
+        // Aston Villa seasons") means that club's seasons by goals scored,
+        // not the league's
+        if (intent.view === 'league-history' && intent.rank === 'goals' && mentions.length >= 1) {
+            Object.assign(intent, { view: 'team-records', stat: 'goalsFor', finish: detectFinish(rest) });
+            delete intent.rank;
+        }
+
         // A named opponent makes it a head to head, whatever else the
         // words suggest (a stage, "matches", "table")
         if ((mentions.length >= 2 || opponentGroup) && ['team-seasons', 'team-records', 'table', 'matches', null].includes(intent.view)) {

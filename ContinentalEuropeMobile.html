@@ -13793,9 +13793,13 @@
             const key = state.leagueHistoryRank;
             const ranked = key !== 'season';
             const label = LEAGUE_HISTORY_RANKS[key];
-            const titleParts = [ranked
-                ? `${state.leagueHistoryOrder === 'fewest' ? 'Lowest' : 'Highest'} ${label.toLowerCase()}${state.leagueHistoryPerGame && ['goals', 'championPoints', 'gap', 'topTwo'].includes(key) ? ' per game' : ''}`
-                : `Every season, ${state.leagueHistoryOrder === 'fewest' ? 'oldest' : 'newest'} first`];
+            const low = state.leagueHistoryOrder === 'fewest';
+            const perGameWords = state.leagueHistoryPerGame && ['goals', 'championPoints', 'gap', 'topTwo'].includes(key) ? ' per game' : '';
+            const titleParts = [!ranked
+                ? `Every season, ${low ? 'oldest' : 'newest'} first`
+                : key === 'goals' ? `${low ? 'Lowest' : 'Highest'}-scoring seasons${state.leagueHistoryPerGame ? ' (goals per game)' : ''}`
+                    : key === 'gap' ? `${low ? 'Closest title races' : 'Biggest title-winning margins'}${perGameWords}`
+                        : `${low ? 'Lowest' : 'Highest'} ${label.toLowerCase()}${perGameWords}`];
             const eraLabel = recordsEraOptions(league).find(([k]) => k === state.leagueHistoryEra);
             if (eraLabel) titleParts.push(eraLabel[1]);
             if (state.leagueHistoryMatches === 'all') titleParts.push('including qualifiers');
