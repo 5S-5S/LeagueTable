@@ -3698,6 +3698,29 @@ html:not(.search-mode) .header-actions {
     display: none !important;
 }
 
+/* The three sub-tab buttons share one row - smaller, and a label may
+   take two lines, so they fit a phone */
+.league-buttons.seasons-sub-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+.seasons-sub-tabs .league-button {
+    padding: 0.5rem;
+    justify-content: center;
+    text-align: center;
+}
+
+/* the green border marks the active one; the radio dot's room goes to the label */
+.seasons-sub-tabs .radio-dot {
+    display: none;
+}
+
+.seasons-sub-tabs .league-button span {
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
 /* League History: the season still being played, and a revoked title */
 .league-history-in-progress td {
     opacity: 0.75;

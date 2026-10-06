@@ -2075,6 +2075,11 @@ html.search-mode body[data-theme="dark"] .search-mode-switch {
     display: none !important;
 }
 
+/* The three sub-tab buttons share one row */
+.league-buttons.seasons-sub-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 /* League History: the season still being played, and a revoked title */
 .league-history-in-progress td {
     opacity: 0.75;
