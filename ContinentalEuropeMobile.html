@@ -169,7 +169,7 @@
                 <div class="tab-container">
                     <button class="tab-button active" id="leagueFiltersTab" data-mobile-text="Tables & H2H">League Tables & Head to Head Stats</button>
                     <button class="tab-button" id="matchFinderTab" data-mobile-text="Match Finder">Match Finder</button>
-                    <button class="tab-button" id="teamSeasonsTab" data-mobile-text="Team Seasons">Team Seasons</button>
+                    <button class="tab-button" id="teamSeasonsTab" data-mobile-text="Seasons">Seasons</button>
                     <button class="tab-button" id="teamStreaksTab" data-mobile-text="Streaks">Team Streaks</button>
                 </div>
 
@@ -693,9 +693,25 @@
                 </div>
 
                 <!-- Team Seasons Tab Content -->
-                <div id="teamSeasonsContent" class="tab-content">
+                <div id="teamSeasonsContent" class="tab-content" data-sub="history">
+                    <!-- Sub-tabs: Team History (a club's seasons, every club at a
+                         position) and Team Records (every club-season ranked by a
+                         stat). data-sub on the tab shows one sub-tab's parts
+                         (.seasons-history-only / .seasons-records-only) -->
+                    <div class="mb-6 collapsible-control">
+                        <div class="league-buttons seasons-sub-tabs" id="seasonsSubTabButtons">
+                            <!-- Sub-tab buttons populated here -->
+                        </div>
+                    </div>
+
                     <!-- Description -->
-                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3">
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3 seasons-records-only">
+                        <p class="text-gray-700 text-sm leading-relaxed w-full">
+                            Every club's campaign in the competition, ranked by the stat you pick - most goals, fewest conceded and so on, however far they got. Narrow it to a stage reached, an era or one team, and choose whether qualifiers count. Click on the button on the left side of a row to get a list of matches played.
+                        </p>
+                        <button id="copyLinkBtnTeamRecords" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                    </div>
+                    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3 seasons-history-only">
                         <p class="text-gray-700 text-sm leading-relaxed w-full">
                             Select a competition, then pick a Season to see how every team did that season. Use Progression to only get teams which reached a particular stage. Select Team to get a list of performances from a team. Click on the button on the left side of a row to get a list of matches played.
                         </p>
@@ -711,7 +727,7 @@
                     </div>
 
                     <!-- Team Selection -->
-                    <div class="mb-8 collapsible-control">
+                    <div class="mb-8 collapsible-control seasons-history-only">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Select Team:</label>
                         <div class="combobox-container" id="teamSeasonsComboboxContainer">
                             <input type="text" id="teamSeasonsComboboxInput" class="combobox-input" placeholder="Choose a team..." autocomplete="off">
@@ -724,7 +740,7 @@
                     </div>
 
                     <!-- Season Selection (eras for the Champions League, plus every individual season) -->
-                    <div id="teamSeasonsSeasonContainer" class="mb-8 hidden collapsible-control">
+                    <div id="teamSeasonsSeasonContainer" class="mb-8 hidden collapsible-control seasons-history-only">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             <span class="icon-search mr-2"></span>Season
                         </label>
@@ -734,7 +750,7 @@
                     </div>
 
                     <!-- Progression Filter -->
-                    <div id="teamSeasonsPositionContainer" class="mb-8 collapsible-control">
+                    <div id="teamSeasonsPositionContainer" class="mb-8 collapsible-control seasons-history-only">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Filter by Progression:</label>
                         <select id="teamSeasonsPositionSelect" class="form-input w-full">
                             <option value="">All Progressions</option>
@@ -780,7 +796,7 @@
                     </div>
 
                     <!-- Team History Table -->
-                    <div id="teamHistoryTable" class="mt-8 hidden">
+                    <div id="teamHistoryTable" class="mt-8 hidden seasons-history-only">
                         <div class="league-table">
                             <div class="text-center py-4 bg-blue-50 border-b relative">
                                 <!-- Back Arrow for Team History -->
@@ -805,6 +821,101 @@
                                     <!-- Team history rows will be populated -->
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Team Records controls -->
+                    <div class="mb-8 collapsible-control seasons-records-only">
+                        <div class="records-controls">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsStatSelect">Stat:</label>
+                                <select id="recordsStatSelect" class="form-input w-full">
+                                    <option value="points">Points</option>
+                                    <option value="won">Wins</option>
+                                    <option value="drawn">Draws</option>
+                                    <option value="lost">Losses</option>
+                                    <option value="goalsFor">Goals Scored</option>
+                                    <option value="goalsAgainst">Goals Conceded</option>
+                                    <option value="goalDifference">Goal Difference</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsOrderSelect">Order:</label>
+                                <select id="recordsOrderSelect" class="form-input w-full">
+                                    <option value="most">Most</option>
+                                    <option value="fewest">Fewest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsPositionSelect">Stage Reached:</label>
+                                <select id="recordsPositionSelect" class="form-input w-full">
+                                    <option value="">Any stage</option>
+                                    <optgroup label="Main Stage">
+                                        <option value="Champions">Champions</option>
+                                        <option value="Final">Final</option>
+                                        <option value="Semi-Finals">Semi-Finals</option>
+                                        <option value="Quarter-Finals">Quarter-Finals</option>
+                                        <option value="Round Of 16">Round Of 16</option>
+                                        <option value="Play-Offs">Play-Offs</option>
+                                        <option value="Group Stage">Group Stage</option>
+                                        <option value="2. Round">2. Round</option>
+                                        <option value="1. Round">1. Round</option>
+                                    </optgroup>
+                                    <optgroup label="Qualifiers">
+                                        <option value="Play-Offs (Q)">Play-Offs (Q)</option>
+                                        <option value="3. Round (Q)">3. Round (Q)</option>
+                                        <option value="2. Round (Q)">2. Round (Q)</option>
+                                        <option value="1. Round (Q)">1. Round (Q)</option>
+                                        <option value="Preliminary Round (Q)">Preliminary Round (Q)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsEraSelect">Seasons:</label>
+                                <select id="recordsEraSelect" class="form-input w-full">
+                                    <option value="">All seasons</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="records-controls mt-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsMatchesSelect">Matches:</label>
+                                <select id="recordsMatchesSelect" class="form-input w-full">
+                                    <option value="main">Main stage only</option>
+                                    <option value="all">Including qualifiers</option>
+                                    <option value="qualifiers">Qualifiers only</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Team (optional):</label>
+                            <div class="combobox-container" id="recordsTeamComboboxContainer">
+                                <input type="text" id="recordsTeamComboboxInput" class="combobox-input" placeholder="All teams" autocomplete="off">
+                                <span class="combobox-arrow">▼</span>
+                                <div class="combobox-dropdown" id="recordsTeamComboboxDropdown"></div>
+                            </div>
+                        </div>
+                        <div id="recordsInfo" class="mt-3 text-sm text-gray-600"></div>
+                    </div>
+
+                    <!-- Team Records table -->
+                    <div id="teamRecordsTable" class="mt-8 seasons-records-only" style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <div class="league-table" data-own-colors>
+                            <div class="text-center py-4 bg-blue-50 border-b">
+                                <h2 class="text-xl font-semibold text-blue-800 mb-1">📈 Team Records</h2>
+                                <p class="text-sm text-blue-600 font-medium" id="teamRecordsTitle"></p>
+                            </div>
+                            <table>
+                                <thead>
+                                    <tr id="teamRecordsHeader"></tr>
+                                </thead>
+                                <tbody id="teamRecordsBody"></tbody>
+                            </table>
+                        </div>
+                        <div id="recordsPaginationControls" class="flex items-center justify-center gap-4 mt-4 mb-4 hidden">
+                            <button id="recordsPrevPageBtn" class="btn btn-secondary">Previous</button>
+                            <span id="recordsPageInfo" class="text-sm text-gray-600">Page 1 of 1</span>
+                            <button id="recordsNextPageBtn" class="btn btn-secondary">Next</button>
                         </div>
                     </div>
                 </div>
@@ -1259,6 +1370,17 @@
             // H2H sort config
             h2hSortConfig: { key: 'date', direction: 'desc' },
             h2hPage: 1,
+
+            // Seasons tab: which sub-tab shows ('history' = Team History,
+            // 'records' = Team Records), and Team Records' controls
+            seasonsSubTab: 'history',
+            recordsStat: 'points',
+            recordsOrder: 'most',
+            recordsPosition: '', // a stage reached (Continental)
+            recordsMatches: 'main', // 'main' | 'all' (with qualifiers) | 'qualifiers'
+            recordsEra: '',
+            recordsTeam: '',
+            recordsPage: 1,
 
             // Team Seasons state
             teamSeasonsSelectedLeague: 'champions-league',
@@ -2661,6 +2783,17 @@
                 if (state.h2hPenaltyFilter) params.set('h2hPso', '1');
                 if (state.matchHistoryStage) params.set('mhStage', state.matchHistoryStage);
                 if (state.matchHistoryPenaltyFilter) params.set('mhPso', '1');
+            } else if (view === 'team-seasons' && state.seasonsSubTab === 'records') {
+                // Team Records: sub=records, the stat and order always, the
+                // rest only when narrowed
+                params.set('sub', 'records');
+                if (state.teamSeasonsSelectedLeague) params.set('league', state.teamSeasonsSelectedLeague);
+                params.set('stat', state.recordsStat);
+                params.set('order', state.recordsOrder);
+                if (state.recordsPosition) params.set('pos', state.recordsPosition);
+                if (state.recordsEra) params.set('season', state.recordsEra);
+                if (state.recordsTeam) params.set('t1', state.recordsTeam);
+                if (state.recordsMatches !== 'main') params.set('matches', state.recordsMatches);
             } else if (view === 'team-seasons') {
                 if (state.teamSeasonsSelectedLeague) params.set('league', state.teamSeasonsSelectedLeague);
                 if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
@@ -2837,6 +2970,19 @@
                     elements.matchHistoryStageSelect.dispatchEvent(new Event('change'));
                 }
                 if (params.get('mhPso') === '1' && !state.matchHistoryPenaltyFilter) elements.matchHistoryPenaltyCheckbox.click();
+            } else if (view === 'team-seasons' && params.get('sub') === 'records') {
+                const recordsLeague = params.get('league');
+                if (recordsLeague && recordsLeague !== state.teamSeasonsSelectedLeague) {
+                    await handleTeamSeasonsLeagueChange(recordsLeague);
+                }
+                if (RECORDS_STATS[params.get('stat')]) state.recordsStat = params.get('stat');
+                state.recordsOrder = params.get('order') === 'fewest' ? 'fewest' : 'most';
+                state.recordsPosition = params.get('pos') || '';
+                state.recordsEra = params.get('season') || '';
+                state.recordsTeam = params.get('t1') || '';
+                state.recordsMatches = ['all', 'qualifiers'].includes(params.get('matches')) ? params.get('matches') : 'main';
+                state.recordsPage = 1;
+                setSeasonsSubTab('records');
             } else if (view === 'team-seasons') {
                 const league = params.get('league');
                 if (league && league !== state.teamSeasonsSelectedLeague) {
@@ -3190,6 +3336,22 @@
             resetBtn: document.getElementById('resetBtn'),
             copyLinkBtnLeagueFilters: document.getElementById('copyLinkBtnLeagueFilters'),
             copyLinkBtnTeamSeasons: document.getElementById('copyLinkBtnTeamSeasons'),
+            copyLinkBtnTeamRecords: document.getElementById('copyLinkBtnTeamRecords'),
+            teamSeasonsContent: document.getElementById('teamSeasonsContent'),
+            seasonsSubTabButtons: document.getElementById('seasonsSubTabButtons'),
+            recordsStatSelect: document.getElementById('recordsStatSelect'),
+            recordsOrderSelect: document.getElementById('recordsOrderSelect'),
+            recordsPositionSelect: document.getElementById('recordsPositionSelect'),
+            recordsEraSelect: document.getElementById('recordsEraSelect'),
+            recordsInfo: document.getElementById('recordsInfo'),
+            teamRecordsTitle: document.getElementById('teamRecordsTitle'),
+            teamRecordsHeader: document.getElementById('teamRecordsHeader'),
+            teamRecordsBody: document.getElementById('teamRecordsBody'),
+            recordsPaginationControls: document.getElementById('recordsPaginationControls'),
+            recordsPrevPageBtn: document.getElementById('recordsPrevPageBtn'),
+            recordsPageInfo: document.getElementById('recordsPageInfo'),
+            recordsNextPageBtn: document.getElementById('recordsNextPageBtn'),
+            recordsMatchesSelect: document.getElementById('recordsMatchesSelect'),
             copyLinkBtnTeamStreaks: document.getElementById('copyLinkBtnTeamStreaks'),
             copyLinkBtnMatchFinder: document.getElementById('copyLinkBtnMatchFinder'),
             retryBtn: document.getElementById('retryBtn'),
@@ -5080,6 +5242,14 @@
             
             // Hide team history table until team is selected
             elements.teamHistoryTable.classList.add('hidden');
+
+            // Team Records follows the league (its filters for the old
+            // league - an era, a team - are dropped if they don't apply)
+            state.recordsPage = 1;
+            if (state.seasonsSubTab === 'records') {
+                updateTeamRecordsControls();
+                renderTeamRecords();
+            }
         }
 
         // Toggle controls collapse
@@ -5904,6 +6074,10 @@
                     elements.teamSeasonsSeasonContainer.classList.add('hidden');
                 }
 
+                // The sub-tab last shown. Not redrawing Team History here:
+                // showTeamHistory() calls switchTab() itself.
+                setSeasonsSubTab(state.seasonsSubTab, { redrawHistory: false });
+
             }  else if (tabName === 'team-streaks') {
                 document.getElementById('teamStreaksTab').classList.add('active');
                 document.getElementById('teamStreaksContent').classList.add('active');
@@ -6180,6 +6354,7 @@
             elements.resetBtn.addEventListener('click', clearFilters);
             elements.copyLinkBtnLeagueFilters.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamSeasons.addEventListener('click', copyShareableLink);
+            elements.copyLinkBtnTeamRecords.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamStreaks.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnMatchFinder.addEventListener('click', copyShareableLink);
 
@@ -6362,6 +6537,29 @@
                 updateTable();
             });
             
+            // Seasons sub-tabs and Team Records controls
+            elements.seasonsSubTabButtons.addEventListener('click', (e) => {
+                const button = e.target.closest('.league-button');
+                if (button) setSeasonsSubTab(button.dataset.sub);
+            });
+            [['recordsStatSelect', 'recordsStat'], ['recordsOrderSelect', 'recordsOrder'],
+                ['recordsPositionSelect', 'recordsPosition'], ['recordsEraSelect', 'recordsEra'],
+                ['recordsMatchesSelect', 'recordsMatches']].forEach(([el, key]) => {
+                elements[el].addEventListener('change', (e) => {
+                    state[key] = e.target.value;
+                    state.recordsPage = 1;
+                    renderTeamRecords();
+                });
+            });
+            elements.recordsPrevPageBtn.addEventListener('click', () => {
+                state.recordsPage -= 1;
+                renderTeamRecords();
+            });
+            elements.recordsNextPageBtn.addEventListener('click', () => {
+                state.recordsPage += 1;
+                renderTeamRecords();
+            });
+
             // Team Seasons controls
             elements.teamSeasonsLeagueButtons.addEventListener('click', (e) => {
                 const button = e.target.closest('.league-button');
@@ -9352,6 +9550,16 @@
                 state.seasonStandingsApiLoading[cacheKey] = false;
             }
 
+            if (state.seasonsSubTab === 'records') {
+                renderTeamRecords();
+            } else {
+                refreshTeamHistoryView();
+            }
+        }
+
+        // Redraw whichever Team History view the controls describe - a
+        // team's seasons, every club that reached a stage, or one season
+        function refreshTeamHistoryView() {
             if (state.teamSeasonsSelectedTeam) {
                 showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
             } else if (state.teamSeasonsSelectedPosition) {
@@ -12808,6 +13016,10 @@
 
         // Show team history across seasons
         function showTeamHistory(teamName, sourceLeague = null) {
+            // A team's seasons are Team History's view (switchTab() below
+            // shows the sub-tab)
+            state.seasonsSubTab = 'history';
+
             // Determine which league to use based on source
             let leagueToUse;
             if (sourceLeague) {
@@ -13180,13 +13392,13 @@
             const isExpanded = expandedTeamSeasons.has(`${row.team}|${row.season}`);
             return `<button type="button" class="season-expand-btn${isExpanded ? ' expanded' : ''}" aria-expanded="${isExpanded}"
                 data-team="${row.team}" data-season="${row.season}" data-start="${row.seasonStart}" data-end="${row.seasonEnd}" data-league="${league}"
-                ${row.includeAllStages ? 'data-all-stages="1"' : ''} ${row.mainStageOnly ? 'data-main-stage-only="1"' : ''} title="Show ${row.team} ${row.season} matches">▸</button>`;
+                ${row.includeAllStages ? 'data-all-stages="1"' : ''} ${row.mainStageOnly ? 'data-main-stage-only="1"' : ''} ${row.qualifiersOnly ? 'data-qualifiers-only="1"' : ''} title="Show ${row.team} ${row.season} matches">▸</button>`;
         }
 
         // The expanded row after `row`, if it's open (for full re-renders)
         function renderTeamSeasonMatchesRowIfOpen(row, league, colspan) {
             if (!row.seasonStart || !expandedTeamSeasons.has(`${row.team}|${row.season}`)) return '';
-            return renderTeamSeasonMatchesRow({ team: row.team, season: row.season, start: row.seasonStart, end: row.seasonEnd, league, allStages: row.includeAllStages ? '1' : '' }, colspan);
+            return renderTeamSeasonMatchesRow({ team: row.team, season: row.season, start: row.seasonStart, end: row.seasonEnd, league, allStages: row.includeAllStages ? '1' : '', mainStageOnly: row.mainStageOnly ? '1' : '', qualifiersOnly: row.qualifiersOnly ? '1' : '' }, colspan);
         }
 
         function renderTeamSeasonMatchesContent(ref) {
@@ -13207,6 +13419,7 @@
                     // Progression rows count every stage, whatever the filters say
                     // Season standings rows count the competition proper only
                     if (ref.mainStageOnly && match.isQualifier) return false;
+                    if (ref.qualifiersOnly && !match.isQualifier) return false;
                     if (!ref.allStages && state.excludeQualifiers && match.isQualifier) return false;
                     if (!ref.allStages && state.excludeMainStage && !match.isQualifier) return false;
                     return true;
@@ -13242,7 +13455,7 @@
         function renderTeamSeasonMatchesRow(ref, colspan) {
             ensureTeamSeasonMatchesLoaded(ref.team, ref.league);
             return `
-                <tr class="season-matches-row" data-team="${ref.team}" data-season="${ref.season}" data-start="${ref.start}" data-end="${ref.end}" data-league="${ref.league}" data-all-stages="${ref.allStages || ''}" data-main-stage-only="${ref.mainStageOnly || ''}">
+                <tr class="season-matches-row" data-team="${ref.team}" data-season="${ref.season}" data-start="${ref.start}" data-end="${ref.end}" data-league="${ref.league}" data-all-stages="${ref.allStages || ''}" data-main-stage-only="${ref.mainStageOnly || ''}" data-qualifiers-only="${ref.qualifiersOnly || ''}">
                     <td colspan="${colspan}">${renderTeamSeasonMatchesContent(ref)}</td>
                 </tr>
             `;
@@ -13250,7 +13463,7 @@
 
         // Re-fill any open rows once their team's matches arrive
         function refreshExpandedTeamSeasonRows() {
-            elements.teamHistoryBody.querySelectorAll('tr.season-matches-row').forEach(row => {
+            document.querySelectorAll('#teamHistoryBody tr.season-matches-row, #teamRecordsBody tr.season-matches-row').forEach(row => {
                 row.firstElementChild.innerHTML = renderTeamSeasonMatchesContent({ ...row.dataset });
             });
         }
@@ -13273,6 +13486,316 @@
             const isExpanded = expandedTeamSeasons.has(key);
             button.classList.toggle('expanded', isExpanded);
             button.setAttribute('aria-expanded', String(isExpanded));
+        }
+
+        // --- Seasons sub-tabs and Team Records ---
+        // Team History is what Team Seasons always did; Team Records ranks
+        // every club's campaign in the competition by one stat, however far
+        // they got. Both use the tab's Select League, the season-standings
+        // data and calculateTournamentProgression(), so a stage reached
+        // means the same in both.
+
+        const SEASONS_SUB_TABS = [
+            { id: 'history', name: '🏆 Team History' },
+            { id: 'records', name: '📈 Team Records' }
+        ];
+
+        const RECORDS_STATS = {
+            points: { label: 'Points', short: 'Pts' },
+            won: { label: 'Wins', short: 'W' },
+            drawn: { label: 'Draws', short: 'D' },
+            lost: { label: 'Losses', short: 'L' },
+            goalsFor: { label: 'Goals Scored', short: 'GF' },
+            goalsAgainst: { label: 'Goals Conceded', short: 'GA' },
+            goalDifference: { label: 'Goal Difference', short: 'GD' }
+        };
+
+        const RECORDS_PAGE_SIZE = 50;
+        let recordsTeamCombobox = null;
+
+        function renderSeasonsSubTabButtons() {
+            elements.seasonsSubTabButtons.innerHTML = SEASONS_SUB_TABS.map(sub => {
+                const active = state.seasonsSubTab === sub.id;
+                return `
+                    <label class="league-button ${active ? 'active' : ''}" data-sub="${sub.id}">
+                        <div class="radio-dot ${active ? 'active' : ''}"></div>
+                        <span class="text-sm font-medium ${active ? 'text-green-700' : 'text-gray-700'}">${sub.name}</span>
+                    </label>`;
+            }).join('');
+        }
+
+        // Show one sub-tab. History's own controls and table keep their
+        // state underneath, so switching back finds them as they were.
+        function setSeasonsSubTab(sub, { redrawHistory = true } = {}) {
+            state.seasonsSubTab = sub === 'records' ? 'records' : 'history';
+            elements.teamSeasonsContent.dataset.sub = state.seasonsSubTab;
+            renderSeasonsSubTabButtons();
+            if (state.seasonsSubTab === 'records') {
+                updateTeamRecordsControls();
+                renderTeamRecords();
+            } else if (redrawHistory) {
+                // Data that arrived while Records showed hasn't been drawn here yet
+                refreshTeamHistoryView();
+            }
+        }
+
+        // Runs fn with state.selectedLeague set to `league` -
+        // getSeasonDateRange() reads the season tables from it
+        function withSelectedLeague(league, fn) {
+            const original = state.selectedLeague;
+            state.selectedLeague = league;
+            try {
+                return fn();
+            } finally {
+                state.selectedLeague = original;
+            }
+        }
+
+        // The eras offered in Seasons (the same ones Team History offers)
+        function recordsEraOptions(league) {
+            if (league === 'champions-league') {
+                const endYear = getSeasonEraEndYear('C1', 2026);
+                return [
+                    ['champions-league-era-1992-2026', `Champions League Era (1992-${endYear})`],
+                    ['european-cup-era-1955-1992', 'European Cup Era (1955-1992)']
+                ];
+            }
+            return [];
+        }
+
+        // The Matches filter's season-standings request flags
+        function recordsMatchesFlags() {
+            return {
+                main: { excludeQualifiers: true, excludeMainStage: false },
+                all: { excludeQualifiers: false, excludeMainStage: false },
+                qualifiers: { excludeQualifiers: false, excludeMainStage: true }
+            }[state.recordsMatches] || { excludeQualifiers: true, excludeMainStage: false };
+        }
+
+        function recordsStandingsCacheKey(divCode) {
+            const { excludeQualifiers, excludeMainStage } = recordsMatchesFlags();
+            return `${divCode}::${excludeQualifiers}::${excludeMainStage}`;
+        }
+
+        // Fill the league-dependent controls: eras and teams (the stage
+        // options are fixed)
+        function updateTeamRecordsControls() {
+            const league = state.teamSeasonsSelectedLeague;
+            const eras = recordsEraOptions(league);
+            if (!eras.some(([key]) => key === state.recordsEra)) state.recordsEra = '';
+            elements.recordsEraSelect.innerHTML = '<option value="">All seasons</option>' +
+                eras.map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
+            elements.recordsEraSelect.value = state.recordsEra;
+
+            if (![...elements.recordsPositionSelect.options].some(o => o.value === state.recordsPosition)) state.recordsPosition = '';
+            elements.recordsPositionSelect.value = state.recordsPosition;
+            elements.recordsStatSelect.value = state.recordsStat;
+            elements.recordsOrderSelect.value = state.recordsOrder;
+            elements.recordsMatchesSelect.value = state.recordsMatches;
+
+            const teams = getLeagueTeams(league);
+            if (state.recordsTeam && !teams.includes(state.recordsTeam)) state.recordsTeam = '';
+            if (!recordsTeamCombobox) {
+                recordsTeamCombobox = new Combobox(
+                    'recordsTeamComboboxContainer',
+                    'recordsTeamComboboxInput',
+                    'recordsTeamComboboxDropdown',
+                    'All teams',
+                    (value) => {
+                        state.recordsTeam = value;
+                        state.recordsPage = 1;
+                        renderTeamRecords();
+                    }
+                );
+            }
+            recordsTeamCombobox.setOptions([{ value: '', text: 'All teams' }, ...teams.map(team => ({ value: team, text: team }))]);
+            recordsTeamCombobox.setValue(state.recordsTeam, state.recordsTeam || 'All teams');
+        }
+
+        function getLeagueDivCode(league) {
+            return { 'champions-league': 'C1', 'europa-league': 'E1', 'conference-league': 'C2' }[league];
+        }
+
+        // Every finished club campaign in the competition (filtered), ranked
+        // by the chosen stat. Joint values share a rank; within a rank the
+        // earlier season comes first. Points as awarded (2 for a win until
+        // 1994-95) less any deduction; the stage reached from each club's
+        // last match in these matches, as Team History works it out. The
+        // season still being played is left out - its numbers aren't final.
+        function buildTeamRecordsRows() {
+            const league = state.teamSeasonsSelectedLeague;
+            const divCode = getLeagueDivCode(league);
+            const bySeason = state.seasonStandingsApiCache[recordsStandingsCacheKey(divCode)] || {};
+            const today = localDateKey(new Date());
+            const era = state.recordsEra ? withSelectedLeague(league, () => getSeasonDateRange(state.recordsEra)) : null;
+            const { excludeQualifiers, excludeMainStage } = recordsMatchesFlags();
+
+            const rows = [];
+            getAvailableSeasons(league).filter(season => !isEraSeasonKey(season)).forEach(season => {
+                const seasonStandings = bySeason[season];
+                const seasonDates = withSelectedLeague(league, () => getSeasonDateRange(season));
+                if (!seasonStandings || !seasonDates || seasonDates.end > today) return;
+                if (era && (seasonDates.start < era.start || seasonDates.end > era.end)) return;
+                const seasonStart = new Date(seasonDates.start);
+                const seasonEnd = new Date(seasonDates.end);
+                seasonStandings.standings.filter(stats => stats.team && stats.team.length > 1).forEach(stats => {
+                    if (state.recordsTeam && stats.team !== state.recordsTeam) return;
+                    const lastMatch = stats.lastMatch ? [{
+                        dateObj: isoDateToLocalDateObj(stats.lastMatch.date),
+                        HomeTeam: stats.lastMatch.homeTeam,
+                        AwayTeam: stats.lastMatch.awayTeam,
+                        FTHG: stats.lastMatch.homeGoals,
+                        FTAG: stats.lastMatch.awayGoals,
+                        CompetitionPhase: stats.lastMatch.competitionPhase,
+                        AdditionalInfo: stats.lastMatch.additionalInfo,
+                    }] : [];
+                    const progression = calculateTournamentProgression(stats.team, lastMatch);
+                    if (state.recordsPosition && progression !== state.recordsPosition) return;
+                    let points = stats.points;
+                    pointDeductions.forEach(deduction => {
+                        if (deduction.team === stats.team && deduction.league === divCode &&
+                            seasonStart <= new Date(deduction.endDate) && seasonEnd >= new Date(deduction.startDate)) {
+                            points -= deduction.points;
+                        }
+                    });
+                    rows.push({
+                        team: stats.team,
+                        played: stats.played,
+                        won: stats.won,
+                        drawn: stats.drawn,
+                        lost: stats.lost,
+                        goalsFor: stats.goalsFor,
+                        goalsAgainst: stats.goalsAgainst,
+                        goalDifference: stats.goalsFor - stats.goalsAgainst,
+                        points,
+                        tournamentProgression: progression,
+                        season,
+                        seasonStart: seasonDates.start, // for the expandable match lists
+                        seasonEnd: seasonDates.end,
+                        // the match list shows the same matches the totals count
+                        includeAllStages: !excludeQualifiers && !excludeMainStage,
+                        mainStageOnly: excludeQualifiers,
+                        qualifiersOnly: excludeMainStage
+                    });
+                });
+            });
+
+            const stat = state.recordsStat;
+            const sign = state.recordsOrder === 'fewest' ? 1 : -1;
+            rows.sort((a, b) => sign * (a[stat] - b[stat]) ||
+                a.seasonStart.localeCompare(b.seasonStart) || a.team.localeCompare(b.team));
+            rows.forEach((row, index) => {
+                row.rank = index > 0 && row[stat] === rows[index - 1][stat] ? rows[index - 1].rank : index + 1;
+            });
+            return rows;
+        }
+
+        function renderTeamRecords() {
+            if (state.seasonsSubTab !== 'records') return;
+            const league = state.teamSeasonsSelectedLeague;
+            const divCode = getLeagueDivCode(league);
+            if (!divCode) return;
+
+            // Re-invokes this once loaded (see ensureSeasonStandingsLoaded)
+            const { excludeQualifiers, excludeMainStage } = recordsMatchesFlags();
+            ensureSeasonStandingsLoaded(divCode, league, excludeQualifiers, excludeMainStage);
+            const loaded = !!state.seasonStandingsApiCache[recordsStandingsCacheKey(divCode)];
+
+            const stat = state.recordsStat;
+            const statInfo = RECORDS_STATS[stat];
+            const parts = [`${state.recordsOrder === 'fewest' ? 'Fewest' : 'Most'} ${statInfo.label.toLowerCase()} in a campaign`];
+            if (state.recordsPosition) parts.push(`reached: ${state.recordsPosition}`);
+            if (state.recordsMatches === 'all') parts.push('including qualifiers');
+            if (state.recordsMatches === 'qualifiers') parts.push('qualifiers only');
+            if (state.recordsTeam) parts.push(state.recordsTeam);
+            const eraLabel = recordsEraOptions(league).find(([key]) => key === state.recordsEra);
+            if (eraLabel) parts.push(eraLabel[1]);
+            elements.teamRecordsTitle.textContent = parts.join(' · ');
+
+            // Phone layout: the season and games played sit under the team
+            // name, W-D-L and GF:GA share a column (as in Team History), and
+            // the ranked stat is bold in its column. Tapping a stat ranks by it.
+            const statSpan = key => `<span data-stat="${key}" class="${key === stat ? 'records-stat-text' : ''}" style="cursor:pointer;" title="Rank by ${RECORDS_STATS[key].label.toLowerCase()}">${RECORDS_STATS[key].short}</span>`;
+            const headerCols = [
+                ['#', ''], ['Team', ''], ['Prog.', ''],
+                [`${statSpan('won')}-${statSpan('drawn')}-${statSpan('lost')}`, ['won', 'drawn', 'lost'].includes(stat)],
+                [`${statSpan('goalsFor')}:${statSpan('goalsAgainst')}`, ['goalsFor', 'goalsAgainst'].includes(stat)],
+                [statSpan('goalDifference'), stat === 'goalDifference'],
+                [statSpan('points'), stat === 'points']
+            ];
+            const headers = headerCols;
+            elements.teamRecordsHeader.innerHTML = headerCols.map(([label, ranked], i) => `
+                <th class="px-2 py-4 font-bold text-sm ${ranked ? 'records-stat-header' : ''}"
+                    style="text-align: ${i === 1 ? 'left' : 'center'}; white-space: nowrap;">${label}</th>
+            `).join('');
+            elements.teamRecordsHeader.onclick = (e) => {
+                const span = e.target.closest('[data-stat]');
+                if (!span || span.dataset.stat === state.recordsStat) return;
+                state.recordsStat = span.dataset.stat;
+                state.recordsPage = 1;
+                elements.recordsStatSelect.value = state.recordsStat;
+                renderTeamRecords();
+            };
+
+            if (!loaded) {
+                elements.recordsInfo.textContent = '';
+                elements.recordsPaginationControls.classList.add('hidden');
+                elements.teamRecordsBody.innerHTML = `<tr><td colspan="${headers.length}" class="px-3 py-6 text-center text-gray-600">Loading seasons...</td></tr>`;
+                return;
+            }
+            updateTeamRecordsControls();
+
+            const rows = buildTeamRecordsRows();
+            const totalPages = Math.max(1, Math.ceil(rows.length / RECORDS_PAGE_SIZE));
+            state.recordsPage = Math.min(Math.max(1, state.recordsPage), totalPages);
+            const pageRows = rows.slice((state.recordsPage - 1) * RECORDS_PAGE_SIZE, state.recordsPage * RECORDS_PAGE_SIZE);
+
+            const seasonsCovered = new Set(rows.map(row => row.season));
+            elements.recordsInfo.textContent = rows.length
+                ? `${rows.length.toLocaleString('en-US')} club campaign${rows.length === 1 ? '' : 's'} from ${seasonsCovered.size} season${seasonsCovered.size === 1 ? '' : 's'} (finished seasons only)`
+                : 'No club campaigns match these filters.';
+            elements.recordsPaginationControls.classList.toggle('hidden', totalPages <= 1);
+            elements.recordsPageInfo.textContent = `Page ${state.recordsPage} of ${totalPages}`;
+            elements.recordsPrevPageBtn.disabled = state.recordsPage <= 1;
+            elements.recordsNextPageBtn.disabled = state.recordsPage >= totalPages;
+
+            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsEra}::${state.recordsTeam}::${state.recordsMatches}::${state.recordsPage}`;
+            resetExpandedTeamSeasonsFor(viewKey);
+            elements.teamRecordsBody.onclick = handleTeamSeasonExpandClick;
+            const strong = (key, value) => key === stat ? `<span class="records-stat-text">${value}</span>` : value;
+            const col = (ranked, content) => `<td class="px-2 py-4 text-center ${ranked ? 'records-stat-col' : ''}" style="white-space: nowrap;">${content}</td>`;
+            elements.teamRecordsBody.innerHTML = pageRows.map((row, index) => {
+                const logoUrl = getTeamLogoUrl(row.team, league);
+                const gd = `<span class="font-bold ${row.goalDifference > 0 ? 'text-green-700' : row.goalDifference < 0 ? 'text-red-600' : 'text-black'}">${row.goalDifference > 0 ? '+' : ''}${row.goalDifference}</span>`;
+                return `
+                    <tr class="border-b hover:bg-gray-50 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}">
+                        <td class="px-2 py-4 text-center font-bold text-gray-700">${row.rank}</td>
+                        <td class="px-2 py-4 font-semibold text-gray-900">
+                            <div class="flex items-center">
+                                ${renderTeamSeasonExpandButton(row, league)}
+                                ${logoUrl ? `<img src="${logoUrl}" alt="${row.team} logo" class="w-5 h-5 mr-2 object-contain" onerror="this.style.display='none'">` : ''}
+                                <div>
+                                    <span class="team-name-text">${row.team}</span>
+                                    <div class="records-row-season">${row.season} · ${row.played} games</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-2 py-4 text-center font-bold" style="${
+                            row.tournamentProgression === 'Champions' ? 'color: #d97706; background-color: #fef3c7;' :
+                            row.tournamentProgression === 'Final' ? 'color: #374151; background-color: #e5e7eb;' :
+                            row.tournamentProgression === 'Semi-Finals' ? 'color: #b45309; background-color: #fef7ed;' :
+                            row.tournamentProgression === 'Quarter-Finals' ? 'color: #059669; background-color: #d1fae5;' :
+                            row.tournamentProgression === 'Round Of 16' ? 'color: #2563eb; background-color: #dbeafe;' :
+                            'color: #6b7280; background-color: #f9fafb;'
+                        }">${abbreviateProgression(row.tournamentProgression)}</td>
+                        ${col(['won', 'drawn', 'lost'].includes(stat), `${strong('won', row.won)}-${strong('drawn', row.drawn)}-${strong('lost', row.lost)}`)}
+                        ${col(['goalsFor', 'goalsAgainst'].includes(stat), `${strong('goalsFor', row.goalsFor)}:${strong('goalsAgainst', row.goalsAgainst)}`)}
+                        ${col(stat === 'goalDifference', gd)}
+                        ${col(stat === 'points', `<span class="points-badge">${row.points}</span>`)}
+                    </tr>
+                    ${renderTeamSeasonMatchesRowIfOpen(row, league, headers.length)}
+                `;
+            }).join('');
         }
 
         // Team Seasons with just one season picked (no team or progression):
@@ -14147,6 +14670,8 @@
             const isDark = document.body.getAttribute('data-theme') === 'dark';
 
             document.querySelectorAll('.league-table').forEach(table => {
+                // Tables that set their own cell colors (Team Records)
+                if (table.hasAttribute('data-own-colors')) return;
                 if (!isDark) {
                     // Undo only the white text dark mode set (marked below) -
                     // a table's own colors, like the gold 1st place in Team

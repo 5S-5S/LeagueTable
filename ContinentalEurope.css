@@ -2065,3 +2065,38 @@ html.search-mode body[data-theme="dark"] .search-mode-switch {
     gap: 1rem;
     align-items: end;
 }
+
+/* Seasons tab: Team History and Team Records sub-tabs. data-sub on the tab
+   shows one sub-tab's parts; each part's own .hidden logic still applies
+   inside its sub-tab. */
+#teamSeasonsContent[data-sub="history"] .seasons-records-only,
+#teamSeasonsContent[data-sub="records"] .seasons-history-only {
+    display: none !important;
+}
+
+/* Team Records: Stat / Order / Position / Seasons in a row */
+.records-controls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .records-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* The stat the list is ranked by */
+.league-table td.records-stat-col {
+    font-weight: 700;
+    background-color: rgba(5, 150, 105, 0.08);
+}
+
+.league-table th.records-stat-header {
+    background: #047857;
+}
+
+[data-theme="dark"] .league-table td.records-stat-col {
+    background-color: rgba(52, 211, 153, 0.12);
+}
