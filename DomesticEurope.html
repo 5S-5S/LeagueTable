@@ -591,7 +591,7 @@
                     </div>
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex items-start justify-between gap-4 seasons-league-only">
                         <p class="text-gray-700 text-sm leading-relaxed">
-                            Every season of the league, all clubs added up - matches, goals, how often the home side won - with the champion, the runner-up and the gap between them. Newest first, to see how the league has changed; rank by any column for record seasons and the closest title races.
+                            Every season of the league, all clubs added up - matches, goals, how often the home side won - and the title race: the points gap between 1st and 2nd, and their average points. Newest first, to see how the league has changed; rank by any column for record seasons and the closest title races. Open a season with the button on the left of its row for its final table.
                         </p>
                         <button id="copyLinkBtnLeagueHistory" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
@@ -788,8 +788,7 @@
                                     <option value="homePct">Home win %</option>
                                     <option value="drawPct">Draw %</option>
                                     <option value="awayPct">Away win %</option>
-                                    <option value="championPoints">Champion's points</option>
-                                    <option value="gap">Title race gap (1st to 2nd)</option>
+                                    <option value="gap">Points gap (1st to 2nd)</option>
                                     <option value="topTwo">Top two average points</option>
                                 </select>
                             </div>
@@ -11085,8 +11084,7 @@
             homePct: 'Home win %',
             drawPct: 'Draw %',
             awayPct: 'Away win %',
-            championPoints: "Champion's points",
-            gap: 'Title race gap (1st to 2nd)',
+            gap: 'Points gap (1st to 2nd)',
             topTwo: 'Top two average points'
         };
 
@@ -11156,15 +11154,18 @@
                         team === champion.team && div === divCode && s === season && pos === 1),
                     championPoints: champion ? perGame(points(champion), champion.played) : null,
                     runnerUp: runnerUp ? runnerUp.team : '',
-                    gapPoints: gapPoints === null ? null : perGame(gapPoints, champion.played),
-                    gapGoalDifference: champion && runnerUp ? champion.goalDifference - runnerUp.goalDifference : null,
-                    gapGoalsFor: champion && runnerUp ? champion.goalsFor - runnerUp.goalsFor : null,
-                    // level on points, goal difference then goals scored
-                    // decide - they rank just above / below the points
-                    gap: gapPoints === null ? null : perGame(gapPoints, champion.played) +
-                        (champion.goalDifference - runnerUp.goalDifference) * 1e-6 +
-                        (champion.goalsFor - runnerUp.goalsFor) * 1e-9,
-                    topTwo: champion && runnerUp ? perGame((points(champion) + points(runnerUp)) / 2, champion.played) : null
+                    // points between 1st and 2nd - 0 when a tie-break
+                    // (goal difference, goals scored...) decided it
+                    gap: gapPoints === null ? null : perGame(gapPoints, champion.played),
+                    topTwo: champion && runnerUp ? perGame((points(champion) + points(runnerUp)) / 2, champion.played) : null,
+                    // the season's final table for the chevron, its points
+                    // as the 3 Points for all Wins toggle says
+                    table: table.map(row => ({
+                        ...row,
+                        points: points(row),
+                        revoked: strippedChampions.some(([team, div, s, pos]) =>
+                            team === row.team && div === divCode && s === season && pos === row.position)
+                    }))
                 });
             });
 
@@ -11193,19 +11194,8 @@
                 if (state.leagueHistoryPerGame) return value.toFixed(2);
                 return Number.isInteger(value) ? value.toLocaleString('en-US') : value.toFixed(1);
             }
-            if (key === 'gap') {
-                // points ahead, or the goal difference when level on points
-                if (!same0(row.gapPoints)) return state.leagueHistoryPerGame ? row.gapPoints.toFixed(2) : `${row.gapPoints}`;
-                if (row.gapGoalDifference) return `GD ${row.gapGoalDifference > 0 ? '+' : ''}${row.gapGoalDifference}`;
-                // level on goal difference too: goals scored (an older rule,
-                // like goal average, can leave even that behind)
-                return row.gapGoalsFor > 0 ? `GF +${row.gapGoalsFor}` : 'Level';
-            }
+            if (key === 'gap') return state.leagueHistoryPerGame ? value.toFixed(2) : `${value}`;
             return `${value}`;
-        }
-
-        function same0(value) {
-            return Math.abs(value) < 1e-9;
         }
 
         function renderLeagueHistory() {
@@ -11261,8 +11251,20 @@
                 <tr class="border-b hover:bg-gray-50 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}${row.inProgress ? ' league-history-in-progress' : ''}">
                     ${ranked ? `<td class="px-2 py-3 text-center font-bold text-gray-700">${row.rank}</td>` : ''}
                     ${columns.map(col => `<td class="px-2 py-3 ${col.left ? 'text-left' : 'text-center'} ${col.rank && col.rank === key ? 'records-stat-col' : ''}" style="white-space: ${col.wrap ? 'normal' : 'nowrap'};">${col.cell(row)}</td>`).join('')}
-                </tr>`).join('');
+                </tr>
+                ${leagueHistoryOpen.has(`${league}::${row.season}`) ? `<tr class="season-matches-row"><td colspan="${colspan}">${leagueHistorySeasonTable(row, league)}</td></tr>` : ''}`).join('');
+            elements.leagueHistoryBody.onclick = (e) => {
+                const button = e.target.closest('.league-history-expand');
+                if (!button) return;
+                const openKey = `${league}::${button.dataset.season}`;
+                if (leagueHistoryOpen.has(openKey)) leagueHistoryOpen.delete(openKey);
+                else leagueHistoryOpen.add(openKey);
+                renderLeagueHistory();
+            };
         }
+
+        // Seasons whose table is open, as `${league}::${season}`
+        const leagueHistoryOpen = new Set();
 
         // A club with its crest; a revoked title says so
         function leagueHistoryClub(name, league, revoked = false) {
@@ -11274,14 +11276,20 @@
             </div>`;
         }
 
+        // The season, with the chevron that opens its table
+        function leagueHistoryExpandButton(row) {
+            const open = leagueHistoryOpen.has(`${state.teamSeasonsSelectedLeague}::${row.season}`);
+            return `<button type="button" class="season-expand-btn league-history-expand${open ? ' expanded' : ''}" aria-expanded="${open}"
+                data-season="${row.season}" title="Show the ${row.season} table">▸</button>`;
+        }
+
         function leagueHistorySeasonCell(row) {
-            return `<span class="font-semibold">${row.season}</span>${row.inProgress ? ' <span class="league-history-badge">in progress</span>' : ''}`;
+            return `${leagueHistoryExpandButton(row)}<span class="font-semibold">${row.season}</span>${row.inProgress ? ' <span class="league-history-badge">in progress</span>' : ''}`;
         }
 
         // League History's columns: label, the ranking each header sets,
         // and the cell
         function LEAGUE_HISTORY_COLUMNS() {
-            const league = state.teamSeasonsSelectedLeague;
             const fmt = key => row => formatLeagueHistoryValue(row, key);
             return [
                 { label: 'Season', rank: 'season', left: true, cell: leagueHistorySeasonCell },
@@ -11290,12 +11298,41 @@
                 { label: 'Home', rank: 'homePct', cell: fmt('homePct') },
                 { label: 'Draw', rank: 'drawPct', cell: fmt('drawPct') },
                 { label: 'Away', rank: 'awayPct', cell: fmt('awayPct') },
-                { label: 'Champion', left: true, wrap: true, cell: row => leagueHistoryClub(row.champion, league, row.championRevoked) },
-                { label: state.leagueHistoryPerGame ? 'PPG' : 'Pts', rank: 'championPoints', cell: row => `<span class="points-badge">${formatLeagueHistoryValue(row, 'championPoints')}</span>` },
-                { label: 'Runner-up', left: true, wrap: true, cell: row => leagueHistoryClub(row.runnerUp, league) },
-                { label: 'Gap', rank: 'gap', cell: fmt('gap') },
+                { label: 'Points Gap', rank: 'gap', cell: fmt('gap') },
                 { label: 'Top 2', rank: 'topTwo', cell: fmt('topTwo') }
             ];
+        }
+
+        // An open season's table: every club's season, ranked as the
+        // season's final standings
+        function leagueHistorySeasonTable(row, league) {
+            if (!row.table || !row.table.length) return '<p class="season-matches-status">No table for this season.</p>';
+            return `
+                <div class="league-table season-matches" data-own-colors>
+                    <table>
+                        <thead><tr><th class="text-center">Pos</th><th class="text-center">Team</th><th class="text-center">P</th><th class="text-center">W</th><th class="text-center">D</th><th class="text-center">L</th><th class="text-center">GF</th><th class="text-center">GA</th><th class="text-center">GD</th><th class="text-center">Pts</th></tr></thead>
+                        <tbody>
+                            ${row.table.map(row => `<tr>
+                            <td class="text-center font-bold" style="${
+                                row.revoked ? 'color: #6b7280;' :
+                                row.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
+                                row.position === 2 ? 'color: #374151; background-color: #e5e7eb;' :
+                                row.position === 3 ? 'color: #b45309; background-color: #fef7ed;' :
+                                'color: #6b7280;'
+                            }">${row.revoked ? 'NR' : row.position}</td>
+                            <td class="text-left">${leagueHistoryClub(row.team, league)}</td>
+                            <td class="text-center">${row.played}</td>
+                            <td class="text-center">${row.won}</td>
+                            <td class="text-center">${row.drawn}</td>
+                            <td class="text-center">${row.lost}</td>
+                            <td class="text-center">${row.goalsFor}</td>
+                            <td class="text-center">${row.goalsAgainst}</td>
+                            <td class="text-center"><span class="font-bold ${row.goalDifference > 0 ? 'text-green-700' : row.goalDifference < 0 ? 'text-red-600' : 'text-black'}">${row.goalDifference > 0 ? '+' : ''}${row.goalDifference}</span></td>
+                            <td class="text-center"><span class="points-badge">${row.points}</span></td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
         }
 
         // --- Seasons sub-tabs and Team Records ---

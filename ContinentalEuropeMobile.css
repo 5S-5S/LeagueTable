@@ -3871,6 +3871,12 @@ html:not(.search-mode) .header-actions {
     white-space: nowrap;
 }
 
+/* phone tables use tiny text - the tag follows it */
+.records-row-season .league-history-badge {
+    font-size: 1em;
+    padding: 0 0.3rem;
+}
+
 .league-history-revoked {
     color: #6b7280;
     text-decoration: line-through;

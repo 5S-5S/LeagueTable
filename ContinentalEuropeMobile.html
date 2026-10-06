@@ -713,7 +713,7 @@
                     </div>
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3 seasons-league-only">
                         <p class="text-gray-700 text-sm leading-relaxed w-full">
-                            Every season of the competition, all clubs added up - matches, goals and how often the home side won - with each season's winner and runner-up. Newest first, to see how it has changed; rank by any column to find the record seasons.
+                            Every season of the competition, all clubs added up - matches, goals and how often the home side won. Newest first, to see how it has changed; rank by any column to find the record seasons. Open a season with the button on the left of its row for every club's campaign.
                         </p>
                         <button id="copyLinkBtnLeagueHistory" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
                     </div>
@@ -13720,11 +13720,23 @@
                 const clubs = seasonStandings.standings.filter(stats => stats.team && stats.team.length > 1);
                 const champion = clubs.find(stats => progressionOf(stats) === 'Champions');
                 const runnerUp = clubs.find(stats => progressionOf(stats) === 'Final');
+                // The season's table for the chevron: how far each club got,
+                // then points, goal difference and goals scored
+                const table = clubs.map(stats => ({
+                    team: stats.team, played: stats.played, won: stats.won, drawn: stats.drawn, lost: stats.lost,
+                    goalsFor: stats.goalsFor, goalsAgainst: stats.goalsAgainst,
+                    goalDifference: stats.goalsFor - stats.goalsAgainst, points: stats.points,
+                    tournamentProgression: progressionOf(stats)
+                })).sort((a, b) =>
+                    getProgressionRank(a.tournamentProgression) - getProgressionRank(b.tournamentProgression) ||
+                    b.points - a.points || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor
+                ).map((row, index) => ({ ...row, position: index + 1 }));
                 rows.push({
                     ...base,
                     teams: clubs.length,
                     champion: champion ? champion.team : '',
-                    runnerUp: runnerUp ? runnerUp.team : ''
+                    runnerUp: runnerUp ? runnerUp.team : '',
+                    table
                 });
             });
 
@@ -13753,19 +13765,7 @@
                 if (state.leagueHistoryPerGame) return value.toFixed(2);
                 return Number.isInteger(value) ? value.toLocaleString('en-US') : value.toFixed(1);
             }
-            if (key === 'gap') {
-                // points ahead, or the goal difference when level on points
-                if (!same0(row.gapPoints)) return state.leagueHistoryPerGame ? row.gapPoints.toFixed(2) : `${row.gapPoints}`;
-                if (row.gapGoalDifference) return `GD ${row.gapGoalDifference > 0 ? '+' : ''}${row.gapGoalDifference}`;
-                // level on goal difference too: goals scored (an older rule,
-                // like goal average, can leave even that behind)
-                return row.gapGoalsFor > 0 ? `GF +${row.gapGoalsFor}` : 'Level';
-            }
             return `${value}`;
-        }
-
-        function same0(value) {
-            return Math.abs(value) < 1e-9;
         }
 
         function renderLeagueHistory() {
@@ -13822,8 +13822,20 @@
                 <tr class="border-b hover:bg-gray-50 ${index % 2 === 1 ? 'bg-gray-50' : 'bg-white'}${row.inProgress ? ' league-history-in-progress' : ''}">
                     ${ranked ? `<td class="px-2 py-3 text-center font-bold text-gray-700">${row.rank}</td>` : ''}
                     ${columns.map(col => `<td class="px-2 py-3 ${col.left ? 'text-left' : 'text-center'} ${col.rank && col.rank === key ? 'records-stat-col' : ''}" style="white-space: ${col.wrap ? 'normal' : 'nowrap'};">${col.cell(row)}</td>`).join('')}
-                </tr>`).join('');
+                </tr>
+                ${leagueHistoryOpen.has(`${league}::${row.season}`) ? `<tr class="season-matches-row"><td colspan="${colspan}">${leagueHistorySeasonTable(row, league)}</td></tr>` : ''}`).join('');
+            elements.leagueHistoryBody.onclick = (e) => {
+                const button = e.target.closest('.league-history-expand');
+                if (!button) return;
+                const openKey = `${league}::${button.dataset.season}`;
+                if (leagueHistoryOpen.has(openKey)) leagueHistoryOpen.delete(openKey);
+                else leagueHistoryOpen.add(openKey);
+                renderLeagueHistory();
+            };
         }
+
+        // Seasons whose table is open, as `${league}::${season}`
+        const leagueHistoryOpen = new Set();
 
         // A club with its crest; a revoked title says so
         function leagueHistoryClub(name, league, revoked = false) {
@@ -13835,26 +13847,62 @@
             </div>`;
         }
 
-        function leagueHistorySeasonCell(row) {
-            return `<span class="font-semibold">${row.season}</span>${row.inProgress ? ' <span class="league-history-badge">in progress</span>' : ''}`;
+        // The season, with the chevron that opens its table
+        function leagueHistoryExpandButton(row) {
+            const open = leagueHistoryOpen.has(`${state.teamSeasonsSelectedLeague}::${row.season}`);
+            return `<button type="button" class="season-expand-btn league-history-expand${open ? ' expanded' : ''}" aria-expanded="${open}"
+                data-season="${row.season}" title="Show the ${row.season} table">▸</button>`;
         }
 
-        // League History's columns on phones: Season (games under it),
-        // goals, home / draw / away % in one column, and the winner with
-        // the runner-up on a second line
+        function leagueHistorySeasonCell(row) {
+            return `${leagueHistoryExpandButton(row)}<span class="font-semibold">${row.season}</span>${row.inProgress ? ' <span class="league-history-badge">in progress</span>' : ''}`;
+        }
+
+        // League History's columns on phones: Season (matches under it),
+        // clubs, goals and home / draw / away % in one column
         function LEAGUE_HISTORY_COLUMNS() {
-            const league = state.teamSeasonsSelectedLeague;
             const key = state.leagueHistoryRank;
             const share = (row, k) => {
                 const text = `${Math.round(row[k] * 100)}`;
                 return k === key ? `<span class="records-stat-text">${text}</span>` : text;
             };
             return [
-                { label: 'Season', rank: 'season', left: true, wrap: true, cell: row => `<span class="font-semibold">${row.season}</span><div class="records-row-season">${row.inProgress ? '<span class="league-history-badge">in progress</span> ' : ''}${row.games} ${row.games === 1 ? 'game' : 'games'}</div>` },
+                { label: 'Season', rank: 'season', left: true, wrap: true, cell: row => `<span class="font-semibold">${leagueHistoryExpandButton(row)}${row.season}</span><div class="records-row-season">${row.inProgress ? '<span class="league-history-badge">in progress</span> ' : ''}${row.games} ${row.games === 1 ? 'match' : 'matches'}</div>` },
+                { label: 'Clubs', rank: 'teams', cell: row => row.teams },
                 { label: state.leagueHistoryPerGame ? 'G/G' : 'Goals', rank: 'goals', cell: row => formatLeagueHistoryValue(row, 'goals') },
-                { label: 'H-D-A %', rank: ['homePct', 'drawPct', 'awayPct'].includes(key) ? key : 'homePct', cell: row => `${share(row, 'homePct')}-${share(row, 'drawPct')}-${share(row, 'awayPct')}` },
-                { label: 'Winner', rank: null, left: true, wrap: true, cell: row => `${leagueHistoryClub(row.champion, league, row.championRevoked)}<div class="records-row-season">${row.runnerUp ? `beat ${row.runnerUp}` : ''}</div>` }
+                { label: 'H-D-A %', rank: ['homePct', 'drawPct', 'awayPct'].includes(key) ? key : 'homePct', cell: row => `${share(row, 'homePct')}-${share(row, 'drawPct')}-${share(row, 'awayPct')}` }
             ];
+        }
+
+        // An open season's table: every club's season, ranked as the
+        // season's final standings (how far each club got first)
+        function leagueHistorySeasonTable(row, league) {
+            if (!row.table || !row.table.length) return '<p class="season-matches-status">No table for this season.</p>';
+            return `
+                <div class="league-table season-matches" data-own-colors>
+                    <table>
+                        <thead><tr><th class="text-center">Pos</th><th class="text-center">Team</th><th class="text-center">P</th><th class="text-center">W-D-L</th><th class="text-center">GF:GA</th><th class="text-center">GD</th><th class="text-center">Pts</th><th class="text-center">Prog.</th></tr></thead>
+                        <tbody>
+                            ${row.table.map(row => `<tr>
+                            <td class="text-center font-bold" style="color: #6b7280;">${row.revoked ? 'NR' : row.position}</td>
+                            <td class="text-left">${leagueHistoryClub(row.team, league)}</td>
+                            <td class="text-center">${row.played}</td>
+                            <td class="text-center" style="white-space: nowrap;">${row.won}-${row.drawn}-${row.lost}</td>
+                            <td class="text-center" style="white-space: nowrap;">${row.goalsFor}:${row.goalsAgainst}</td>
+                            <td class="text-center"><span class="font-bold ${row.goalDifference > 0 ? 'text-green-700' : row.goalDifference < 0 ? 'text-red-600' : 'text-black'}">${row.goalDifference > 0 ? '+' : ''}${row.goalDifference}</span></td>
+                            <td class="text-center"><span class="points-badge">${row.points}</span></td>
+                            <td class="text-center font-bold" style="${
+                                row.tournamentProgression === 'Champions' ? 'color: #d97706; background-color: #fef3c7;' :
+                                row.tournamentProgression === 'Final' ? 'color: #374151; background-color: #e5e7eb;' :
+                                row.tournamentProgression === 'Semi-Finals' ? 'color: #b45309; background-color: #fef7ed;' :
+                                row.tournamentProgression === 'Quarter-Finals' ? 'color: #059669; background-color: #d1fae5;' :
+                                row.tournamentProgression === 'Round Of 16' ? 'color: #2563eb; background-color: #dbeafe;' :
+                                'color: #6b7280; background-color: #f9fafb;'
+                            }">${abbreviateProgression(row.tournamentProgression)}</td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
         }
 
         // --- Seasons sub-tabs and Team Records ---
