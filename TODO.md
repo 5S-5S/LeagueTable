@@ -154,7 +154,8 @@ Most to least important; details are in each item below.
     Team History / Team Records sub-tabs on all four pages, Team Records
     with stat, most / fewest, position (Domestic) or stage reached and
     matches (Continental), era, team, Per game and 3 Points for all
-    Wins. Not built yet: League History, search. Dropped 2026-10-06:
+    Wins; League History (step 3: every season added up, rankable).
+    Not built yet: League History's chart, search. Dropped 2026-10-06:
     grouping to the best row per position or per club - the Position
     filter and Team History already answer those.
   - Home: the Team Seasons tab renamed **Seasons** (everything in it is
@@ -204,7 +205,7 @@ Most to least important; details are in each item below.
     stats there could come later).
   - Build order: 1. the Seasons tab and its sub-tabs, with Team Records
     (done); 2. per game and 3 points for a win (done); 3. League
-    History's table (evolution order, ranked records, title races);
+    History's table (evolution order, ranked records, title races - done);
     4. its chart; 5. search for Team Records and League History.
 
 - Later: **Bug: Continental League Tables, one season with Exclude Main

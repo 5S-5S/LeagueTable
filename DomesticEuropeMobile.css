@@ -3692,9 +3692,30 @@ html:not(.search-mode) .header-actions {
 /* Seasons tab: Team History and Team Records sub-tabs. data-sub on the tab
    shows one sub-tab's parts; each part's own .hidden logic still applies
    inside its sub-tab. */
-#teamSeasonsContent[data-sub="history"] .seasons-records-only,
-#teamSeasonsContent[data-sub="records"] .seasons-history-only {
+#teamSeasonsContent:not([data-sub="history"]) .seasons-history-only,
+#teamSeasonsContent:not([data-sub="records"]) .seasons-records-only,
+#teamSeasonsContent:not([data-sub="league"]) .seasons-league-only {
     display: none !important;
+}
+
+/* League History: the season still being played, and a revoked title */
+.league-history-in-progress td {
+    opacity: 0.75;
+}
+
+.league-history-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+    background-color: #fef3c7;
+    color: #92400e;
+    white-space: nowrap;
+}
+
+.league-history-revoked {
+    color: #6b7280;
+    text-decoration: line-through;
 }
 
 /* Team Records: Stat / Order / Position / Seasons, two to a row */
@@ -3724,6 +3745,12 @@ html:not(.search-mode) .header-actions {
     font-weight: 800;
     text-decoration: underline;
     text-underline-offset: 3px;
+}
+
+/* League History's season and club cells may wrap (the phone tables'
+   nowrap rule would otherwise widen the table past the screen) */
+#leagueHistoryBody td[style*="white-space: normal"] {
+    white-space: normal !important;
 }
 
 /* A long club name wraps rather than widening the table */

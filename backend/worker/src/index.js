@@ -49,7 +49,7 @@
 //   small (one season's matches, not the full division history).
 //
 // POST /api/season-standings  body: { div, seasons: [{season, start, end, qualifiersStart?, qualifiersEnd?}, ...], excludeQualifiers?, excludeMainStage? }
-//   -> { div, seasons: [{ season, matchCount, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points, lastMatch }, ...] }, ...] }
+//   -> { div, seasons: [{ season, matchCount, goals, homeWins, draws, awayWins, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points, lastMatch }, ...] }, ...] }
 //   Batch version of /api/standings for Team Seasons: buckets one
 //   division's entire match history into the given season date ranges in
 //   a single query/pass, returning each season's full (all-teams,
@@ -700,7 +700,9 @@ async function handleSeasonStandings(request, env) {
     // they get their own entries (a page from before those dates existed
     // can't fill the cache for the current pages, or the other way round)
     const qualifierDates = seasons.some(s => s.qualifiersStart || s.qualifiersEnd) ? 'qdates' : 'plain';
-    const responseBody = await withCache(env, ['season-standings', div, !!excludeQualifiers, !!excludeMainStage, qualifierDates], async () => {
+    // 'totals': entries from before each season carried its league-wide
+    // totals (goals, home wins, draws, away wins) aren't reused
+    const responseBody = await withCache(env, ['season-standings', div, !!excludeQualifiers, !!excludeMainStage, qualifierDates, 'totals'], async () => {
         const { results } = await env.DB.prepare(
             `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
              FROM matches WHERE div = ?1 ORDER BY date ASC`
@@ -747,7 +749,16 @@ async function handleSeasonStandings(request, env) {
                     } : null,
                 };
             });
-            return { season, matchCount: seasonMatches.length, standings: standingsWithLastMatch };
+            // League-wide totals for League History: goals, and how many
+            // matches ended in a home win, a draw or an away win
+            let goals = 0, homeWins = 0, draws = 0, awayWins = 0;
+            for (const m of seasonMatches) {
+                goals += m.homeGoals + m.awayGoals;
+                if (m.homeGoals > m.awayGoals) homeWins++;
+                else if (m.homeGoals < m.awayGoals) awayWins++;
+                else draws++;
+            }
+            return { season, matchCount: seasonMatches.length, goals, homeWins, draws, awayWins, standings: standingsWithLastMatch };
         });
 
         return { div, seasons: seasonResults };
