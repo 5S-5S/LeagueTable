@@ -4925,6 +4925,9 @@
                 opponents: [team2, ...activeExtraTeam2s(team1, team2, extraTeam2s)].filter(Boolean),
                 record: stats ? { w: stats.team1Wins, d: stats.draws, l: stats.team2Wins, total: stats.total } : null,
                 matches: matchHistoryResult ? matchHistoryResult.matches : null,
+                // The head-to-head matches after every filter, for a
+                // shootout answer (who won each shootout, not the match)
+                h2hMatches: h2hResult ? h2hResult.matches : null,
                 table: tableResult && !grouped ? tableResult.tableData : null,
                 seasonMatches: grouped ? state.seasonMatchesApiCache : null,
                 finder: isFinder ? {

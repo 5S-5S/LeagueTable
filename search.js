@@ -3044,6 +3044,50 @@
     }
 
     // { html, crestTeam } for the answer, or null when there's nothing to say
+    // Penalty shootouts (Champions League): AdditionalInfo holds the
+    // shootout score home side first ("pso 4:2"). A shootout match is often
+    // a draw, or even a defeat in the second leg of a tie the team went
+    // through, so a shootout answer counts who won the shootout instead of
+    // the match result.
+    function shootoutScore(m) {
+        const pso = (m.AdditionalInfo || '').match(/pso\s*(\d+):(\d+)/i);
+        return pso ? { home: Number(pso[1]), away: Number(pso[2]) } : null;
+    }
+
+    // "W2 L1 penalty shootout record ..., most recently losing 4-3 to Paris
+    // Saint-Germain in the final on May 30, 2026". matches: newest first.
+    // opponent: the one club already named (head to head), left out of the
+    // latest shootout's wording. lastN: "in their last 3 penalty shootouts".
+    function describeShootouts(b, team, matches, { verb, at, against, span, past, opponent: named = '', lastN = 0, competition = '' }) {
+        const shootouts = matches.map(m => ({ m, pso: shootoutScore(m) })).filter(s => s.pso);
+        if (shootouts.length === 0) {
+            return { crestTeam: team, html: `${b(team)} ${past ? 'had' : 'have had'} no penalty shootouts${at}${against} ${span}.` };
+        }
+        let won = 0;
+        shootouts.forEach(({ m, pso }) => {
+            const home = m.HomeTeam === team;
+            if ((home ? pso.home : pso.away) > (home ? pso.away : pso.home)) won++;
+        });
+        const lost = shootouts.length - won;
+        const { m, pso } = shootouts[0];
+        const home = m.HomeTeam === team;
+        const mine = home ? pso.home : pso.away, theirs = home ? pso.away : pso.home;
+        const opponent = home ? m.AwayTeam : m.HomeTeam;
+        const phase = phaseWords(m.CompetitionPhase);
+        const result = opponent === named
+            ? (mine > theirs ? `winning ${mine}-${theirs}` : `losing ${theirs}-${mine}`)
+            : (mine > theirs ? `beating ${b(opponent)} ${mine}-${theirs}` : `losing ${theirs}-${mine} to ${b(opponent)}`);
+        const latest = `${result}${phase ? ` in the ${escapeSearchHtml(phase)}` : ''} on ${longDate(m.dateObj)}`;
+        const record = `<span class="search-answer-record">W${won} L${lost}</span>`;
+        const what = lastN
+            ? `record in their last ${shootouts.length} ${competition} penalty shootouts${at}${against}`
+            : `penalty shootout record${at}${against} ${span}`;
+        return {
+            crestTeam: team,
+            html: `${b(team)} ${verb} a ${record} ${what}, ${shootouts.length === 1 ? '' : 'most recently '}${latest}.`
+        };
+    }
+
     function describeAnswer(ctx, params) {
         // Bold names are teams: in the team's colour
         const b = text => {
@@ -3084,6 +3128,12 @@
             const singleTeam = ctx.opponents.length === 1 && ctx.opponents[0] !== 'BIG_6' && !ctx.opponents[0].startsWith('COUNTRY:');
             const against = singleTeam ? b(ctx.opponents[0]) : escapeSearchHtml(opponentLabel(ctx.opponents));
             const at = location === 'home' ? 'at home ' : (location === 'away' ? 'away ' : '');
+            if (penalties && ctx.h2hMatches) {
+                return describeShootouts(b, ctx.team1, ctx.h2hMatches, {
+                    verb: 'have', at: at ? ` ${at.trim()}` : '', against: ` against ${against}`, span, past: false,
+                    opponent: singleTeam ? ctx.opponents[0] : '', lastN, competition: shortCompetition
+                });
+            }
             if (total === 0) {
                 return {
                     crestTeam: ctx.team1,
@@ -3155,10 +3205,15 @@
                 if (gf > ga) w++; else if (gf < ga) l++; else d++;
             });
             const at = location === 'home' ? ' at home' : (location === 'away' ? ' away' : '');
-            if (matches.length === 0) {
-                return { crestTeam: ctx.team1, html: `No matches found for ${b(ctx.team1)}${at} ${span}${penalties ? ' decided on penalties' : ''}.` };
-            }
             const past = ctx.season && ctx.season !== seasonKey(currentSeasonStart());
+            if (penalties) {
+                return describeShootouts(b, ctx.team1, matches, {
+                    verb: past ? 'had' : 'have', at, against: '', span, past, lastN, competition: shortCompetition
+                });
+            }
+            if (matches.length === 0) {
+                return { crestTeam: ctx.team1, html: `No matches found for ${b(ctx.team1)}${at} ${span}.` };
+            }
             const games = lastN
                 ? `in their last ${matches.length} ${shortCompetition} games${[when, dayText].filter(Boolean).map(t => ` ${t}`).join('')}`
                 : span;

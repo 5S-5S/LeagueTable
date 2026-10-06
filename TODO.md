@@ -23,7 +23,7 @@ Most to least important; details are in each item below.
 **Tier 3 - worthwhile features**
 11. Typo tolerance in search
 12. Upcoming matches (home page strip)
-13. Penalty shootout records
+13. Penalty shootout leaderboard (team and head-to-head answers done)
 14. Recent searches
 15. Pinned / favourite team
 16. Road to the final
@@ -298,8 +298,12 @@ Most to least important; details are in each item below.
   Conference League (the code already maps E1 / C2), or more leagues
   (Eredivisie, Primeira Liga, Championship) - depends on the data.
 
-- Maybe: **Penalty shootout records** — noted 2026-10-03. "Most
-  shootouts won", "best shootout record" - mostly sorting existing data.
+- Partly done: **Penalty shootout records** — noted 2026-10-03. Done
+  2026-10-06: the search answers a team's or a head-to-head's shootouts
+  from the shootout scores ("Arsenal penalty shootouts" -> W2 L1, most
+  recently losing 4-3 to PSG in the final), not the match results. Still
+  to do: a leaderboard with no team - "most shootouts won", "best
+  shootout record" - which needs a new all-clubs list.
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
