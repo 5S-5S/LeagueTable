@@ -13,31 +13,30 @@ Most to least important; details are in each item below.
 4. About / sources page
 
 **Tier 2 - high value, soon after launch**
-5. Season records and title races
+5. Season records, title races and league trends
 6. "Report a data error" link
-7. League trends over time
-8. Match Finder upgrades (what's left)
-9. API caching (what's left - the outage-preventing parts are done)
+7. Match Finder upgrades (what's left)
+8. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-10. Typo tolerance in search
-11. Upcoming matches (home page strip)
-12. Recent searches
-13. Pinned / favourite team
-14. Road to the final
-15. Head-to-head by decade
-16. More competitions (depends on the data)
+9. Typo tolerance in search
+10. Upcoming matches (home page strip)
+11. Recent searches
+12. Pinned / favourite team
+13. Road to the final
+14. Head-to-head by decade
+15. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-17. "On this day"
-18. Trivia mode
-19. Side-by-side Team Seasons
-20. Team progression chart (after league trends)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. Lighter pages (small gain - see the item)
-24. Knockout Stage bracket view (on hold)
-25. Country vs Country
+16. "On this day"
+17. Trivia mode
+18. Side-by-side Team Seasons
+19. Team progression chart (after the League sub-tab)
+20. "/" to search
+21. Penalty shootout leaderboard (team and head-to-head answers done)
+22. Lighter pages (small gain - see the item)
+23. Knockout Stage bracket view (on hold)
+24. Country vs Country
 
 ## Items
 
@@ -147,52 +146,54 @@ Most to least important; details are in each item below.
   2026-10. Usage to watch: Cloudflare dashboard -> Workers & Pages ->
   leaguetable-api -> Metrics; KV / D1 -> Metrics.
 
-- Later: **Season records and title races** — noted 2026-10-03, shaped
-  2026-10-06. Needs care - many kinds of question; design before building.
-  - Home: two sub-tabs inside Team Seasons, not a new top-level tab.
-    **History** (working name) = everything Team Seasons does today (one
-    club's seasons, every club at a position); **Records** = the new part.
-  - Every record is a list of rows ranked by one number, with filters.
-    Two kinds of row:
-    1. Team seasons - one row per club per season (P W D L GF GA GD Pts,
-       final position). Every club in every season by default, whatever
-       they finished - position is a column and an optional filter, so a
-       runner-up or 4th-placed side ranks wherever its numbers put it.
-       Most / fewest Pts, W, D, L, GF, GA, GD across all clubs;
-       filtered by position (fewest points by a champion, most by a
-       relegated side, most by a team finishing 4th); grouped to the best
-       row per position (most points for each finishing position, 1st to
-       20th) or per club (each club's best season).
-    2. League seasons - one row per league per season: champion,
-       runner-up, gap between them (points, or GD when level), top two's
-       average points, total goals, goals per game. Closest title races,
-       best title races (highest top-two average), biggest winning
-       margins, highest-scoring seasons. Same rows League trends needs.
-    (Single matches stay in Match Finder.)
-  - Controls: Rows (team seasons / league seasons), Stat, Most / Fewest,
-    Totals / Per game, filters (league, era, position) and grouping.
+- Later: **Season records, title races and league trends** — noted
+  2026-10-03, shaped 2026-10-06 (League trends merged in). Needs care -
+  many kinds of question; design before building.
+  - Home: sub-tabs inside Team Seasons, not a new top-level tab - maybe
+    renaming the tab **Seasons**, since League isn't about one team.
+    Working names:
+    - **History** = everything Team Seasons does today (one club's
+      seasons, every club at a position).
+    - **Records** = team-season rows ranked by a stat.
+    - **League** = league-season rows: in season order by default (how
+      the league has changed, with a chart), any column click ranks them.
+    Three rather than two so no view needs a switch that changes its
+    columns, filters and order underneath; each has one kind of row.
+  - Records (team seasons): one row per club per season - P W D L GF GA
+    GD Pts and final position. Every club in every season by default,
+    whatever they finished - position is a column and an optional
+    filter, so a runner-up or 4th-placed side ranks wherever its numbers
+    put it. Most / fewest Pts, W, D, L, GF, GA, GD; filtered by position
+    (fewest points by a champion, most by a relegated side, most by a
+    team finishing 4th); grouped to the best row per position (most
+    points for each finishing position, 1st to 20th) or per club (each
+    club's best season).
+  - League (league seasons): one row per league per season, every club
+    added up - games, goals (2025-26: 1,045), goals per game (2.75), home
+    win / draw / away win %, champion and runner-up, the gap between them
+    (points, or GD when level), the top two's average points, champion's
+    points. In season order it shows evolution ("has home advantage
+    shrunk"); ranked, it gives highest-scoring seasons, closest title
+    races, best title races (highest top-two average), biggest winning
+    margins. A chart draws any one column over time.
   - Totals / Per game for every stat - Pts or PPG, W or win %, GF or
-    goals per game - since seasons ran 34-42 games. The table shows both,
-    the toggle picks which one ranks.
-  - Search maps a question onto those controls: "most points by a team
-    finishing 4th in the Premier League" = team seasons, Pts, most,
-    position 4; "highest-scoring team" vs "highest-scoring season" picks
-    the row kind.
+    goals per game - since seasons ran 34-42 games and leagues changed
+    size (22 clubs / 462 games, then 20 / 380). Tables show both; the
+    toggle picks which one ranks or charts.
+  - Search maps a question onto the controls: "most points by a team
+    finishing 4th in the Premier League" = Records, Pts, most, position
+    4; "highest-scoring team" opens Records, "highest-scoring season" or
+    "has home advantage shrunk" opens League.
   - Care points: the points system (points awarded, or every season at
     3 for a win - the existing toggle); final positions must reuse Team
     Seasons' logic (deductions, stripped titles, ranking overrides); the
-    unfinished current season left out or flagged; joint records shown
-    as joint; Domestic first (Champions League has no positions or title
-    races - team-season stats there could come later).
-  - Build order: 1. team-season records (sub-tabs, controls, search);
-    2. grouping and per-game; 3. league-season records (title races,
-    highest-scoring seasons); 4. League trends as a chart from the same
-    rows.
-
-- Later: **League trends over time** — noted 2026-10-03. Per season:
-  goals per game, home win %, draw rate - a simple chart, and searchable
-  ("highest-scoring Serie A season", "has home advantage shrunk").
-  Built from the season data; pairs with the team progression chart idea.
+    unfinished current season left out of records and shown as in
+    progress in League; joint records shown as joint; Domestic first
+    (Champions League has no positions or title races - team-season
+    stats there could come later).
+  - Build order: 1. Records sub-tab (team-season records, search);
+    2. grouping and per game; 3. League sub-tab table (evolution order,
+    ranked records, title races); 4. its chart.
 
 - Later: **"Report a data error" link** — noted 2026-10-03. A small link
   on each answer / table that opens the contact page with the question
