@@ -2632,6 +2632,52 @@
         themeWatcher.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
+    // "Did you mean": the other readings of an ambiguous question, as
+    // links under the answer - "highest scoring seasons" can be the
+    // league's or a club's, "unbeaten season" a season or a run of games.
+    // Each is a real search in the same dropdown, so it lands on its own
+    // view with its own answer; one that would land back here is skipped.
+    function didYouMean(ctx, params) {
+        const team = params.get('t1') || '';
+        const most = params.get('order') !== 'fewest';
+        const sub = params.get('sub');
+        const alts = [];
+        if (ctx.view === 'league-history') {
+            const rank = params.get('rank');
+            if (rank === 'goals') alts.push([`the ${most ? 'highest' : 'lowest'}-scoring club seasons`, `${most ? 'highest' : 'lowest'} scoring club seasons`]);
+            if (rank === 'drawPct') alts.push(['the club with the most draws in a season', 'most draws in a season']);
+            if (rank === 'gap' && !most) alts.push(['the biggest title-winning margins', 'biggest title winning margin'], ['the best title races by points', 'best title race by points']);
+            if (rank === 'gap' && most) alts.push(['the closest title races', 'closest title race'], ['the best title races by points', 'best title race by points']);
+            if (rank === 'topTwo') alts.push(['the closest title races', 'closest title race']);
+        } else if (ctx.view === 'team-records' || (ctx.view === 'team-seasons' && sub === 'records')) {
+            const stat = params.get('stat');
+            if (stat === 'goalsFor' && !team) alts.push([`the ${most ? 'highest' : 'lowest'}-scoring league seasons (every club's goals added up)`, `${most ? 'highest' : 'lowest'} scoring seasons`]);
+            if (stat === 'drawn' && !team && most) alts.push(['the season with the most drawn matches', 'season with the most draws']);
+            if (stat === 'lost' && !most) alts.push([`${team ? `${team}'s` : 'the'} longest unbeaten runs (games in a row)`, `${team} longest unbeaten run`.trim()]);
+            if (stat === 'points' && team && !params.get('pos')) alts.push([`every ${team} season`, `${team} season by season`]);
+        } else if (ctx.view === 'match-finder' && params.get('cat') === 'totalGoals' && !team && !params.get('t2') && params.get('mode') !== 'tie') {
+            alts.push(['the highest-scoring club seasons', 'highest scoring club seasons'], ['the highest-scoring league seasons', 'highest scoring seasons']);
+        } else if (ctx.view === 'team-streaks' && params.get('type') === 'unbeaten' && params.get('status') === 'historic' && !params.get('t2')) {
+            alts.push([`${team ? `${team}'s` : 'the'} unbeaten seasons`, `${team} unbeaten season`.trim()]);
+        }
+
+        const scope = params.get('scope') || '';
+        const here = window.location.pathname.split('/').pop() + window.location.search;
+        const links = alts.map(([label, query]) => {
+            const result = (searchFor(query, scope).results || [])[0];
+            if (!result) return '';
+            const href = resultHref(result, query, scope);
+            // the same view (by its own parameters) isn't another reading
+            const target = new URLSearchParams(href.split('?')[1] || '');
+            const sameView = ['view', 'sub', 'stat', 'rank', 'order', 'cat', 'type', 't1'].every(key => (target.get(key) || '') === (params.get(key) || ''));
+            if (sameView || href === here) return '';
+            return `<a href="${escapeSearchHtml(href)}">${escapeSearchHtml(label)}</a>`;
+        }).filter(Boolean);
+        if (!links.length) return '';
+        const listed = links.length === 1 ? links[0] : `${links.slice(0, -1).join(', ')} or ${links[links.length - 1]}`;
+        return `Did you mean ${listed}?`;
+    }
+
     function renderAnswer(el, ctx) {
         if (!el) return;
         lastAnswer = { el, ctx };
@@ -2640,11 +2686,14 @@
             el.innerHTML = '<p class="search-answer-loading">Working out the answer...</p>';
             return;
         }
-        const answer = describeAnswer(ctx, new URLSearchParams(window.location.search));
+        const params = new URLSearchParams(window.location.search);
+        const answer = describeAnswer(ctx, params);
         if (!answer) {
             el.innerHTML = '';
             return;
         }
+        const alternative = didYouMean(ctx, params);
+        if (alternative) answer.note = answer.note ? `${answer.note} ${alternative}` : alternative;
         const logo = answer.crestTeam && ctx.logo ? ctx.logo(answer.crestTeam) : '';
         el.innerHTML = `
             ${logo ? `<img src="${logo}" class="search-answer-crest" alt="">` : ''}
