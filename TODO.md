@@ -33,12 +33,13 @@ Most to least important; details are in each item below.
 18. Trivia mode
 19. Side-by-side Team Seasons
 20. League History chart
-21. Team progression chart (after League History)
-22. "/" to search
-23. Penalty shootout leaderboard (team and head-to-head answers done)
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
+21. A club's title races
+22. Team progression chart (after League History)
+23. "/" to search
+24. Penalty shootout leaderboard (team and head-to-head answers done)
+25. Lighter pages (small gain - see the item)
+26. Knockout Stage bracket view (on hold)
+27. Country vs Country
 
 ## Items
 
@@ -378,6 +379,13 @@ Most to least important; details are in each item below.
 - Maybe: **Pinned/favorite team** — remember a user's team via
   `localStorage` so the landing-page search can offer a one-click shortcut
   back to their dashboard instead of retyping every visit.
+
+- Maybe: **A club's title races** — noted 2026-10-06. "Arsenal closest
+  title races" answers for the whole league - League History has no club
+  filter, so the club is dropped. Could list the seasons the club
+  finished 1st or 2nd, ranked by the points gap (closest / biggest), as
+  League History or Team Records. Same for other League History
+  questions naming a club (e.g. "Juventus biggest title winning margin").
 
 - Maybe: **League History chart** — noted 2026-10-06, split from Season
   records and title races. A line chart on League History of whichever
