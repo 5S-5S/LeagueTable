@@ -31,7 +31,7 @@ Most to least important; details are in each item below.
 16. "On this day"
 17. Trivia mode
 18. Side-by-side Team Seasons
-19. Team progression chart (after the League sub-tab)
+19. Team progression chart (after League History)
 20. "/" to search
 21. Penalty shootout leaderboard (team and head-to-head answers done)
 22. Lighter pages (small gain - see the item)
@@ -149,17 +149,22 @@ Most to least important; details are in each item below.
 - Later: **Season records, title races and league trends** — noted
   2026-10-03, shaped 2026-10-06 (League trends merged in). Needs care -
   many kinds of question; design before building.
-  - Home: sub-tabs inside Team Seasons, not a new top-level tab - maybe
-    renaming the tab **Seasons**, since League isn't about one team.
-    Working names:
-    - **History** = everything Team Seasons does today (one club's
+  - Home: the Team Seasons tab renamed **Seasons** (everything in it is
+    per season, and one sub-tab is about the whole league), with three
+    sub-tabs - names agreed 2026-10-06:
+    - **Team History** = everything Team Seasons does today (one club's
       seasons, every club at a position).
-    - **Records** = team-season rows ranked by a stat.
-    - **League** = league-season rows: in season order by default (how
-      the league has changed, with a chart), any column click ranks them.
+    - **Team Records** = team-season rows ranked by a stat.
+    - **League History** = league-season rows: in season order by
+      default (how the league has changed, with a chart), any column
+      click ranks them.
+    Team History / League History mirror each other (a club across the
+    seasons, the league across the seasons), with Team Records between.
     Three rather than two so no view needs a switch that changes its
     columns, filters and order underneath; each has one kind of row.
-  - Records (team seasons): one row per club per season - P W D L GF GA
+    Phones: three 12-14 character labels are tight at 390px - two-line
+    labels or a compact segmented control.
+  - Team Records: one row per club per season - P W D L GF GA
     GD Pts and final position. Every club in every season by default,
     whatever they finished - position is a column and an optional
     filter, so a runner-up or 4th-placed side ranks wherever its numbers
@@ -168,7 +173,7 @@ Most to least important; details are in each item below.
     team finishing 4th); grouped to the best row per position (most
     points for each finishing position, 1st to 20th) or per club (each
     club's best season).
-  - League (league seasons): one row per league per season, every club
+  - League History: one row per league per season, every club
     added up - games, goals (2025-26: 1,045), goals per game (2.75), home
     win / draw / away win %, champion and runner-up, the gap between them
     (points, or GD when level), the top two's average points, champion's
@@ -181,19 +186,20 @@ Most to least important; details are in each item below.
     size (22 clubs / 462 games, then 20 / 380). Tables show both; the
     toggle picks which one ranks or charts.
   - Search maps a question onto the controls: "most points by a team
-    finishing 4th in the Premier League" = Records, Pts, most, position
-    4; "highest-scoring team" opens Records, "highest-scoring season" or
-    "has home advantage shrunk" opens League.
+    finishing 4th in the Premier League" = Team Records, Pts, most, position
+    4; "highest-scoring team" opens Team Records, "highest-scoring
+    season" or "has home advantage shrunk" opens League History.
   - Care points: the points system (points awarded, or every season at
     3 for a win - the existing toggle); final positions must reuse Team
     Seasons' logic (deductions, stripped titles, ranking overrides); the
     unfinished current season left out of records and shown as in
-    progress in League; joint records shown as joint; Domestic first
+    progress in League History; joint records shown as joint; Domestic first
     (Champions League has no positions or title races - team-season
     stats there could come later).
-  - Build order: 1. Records sub-tab (team-season records, search);
-    2. grouping and per game; 3. League sub-tab table (evolution order,
-    ranked records, title races); 4. its chart.
+  - Build order: 1. the Seasons tab and its sub-tabs, with Team Records
+    (team-season records, search); 2. grouping and per game; 3. League
+    History's table (evolution order, ranked records, title races);
+    4. its chart.
 
 - Later: **"Report a data error" link** — noted 2026-10-03. A small link
   on each answer / table that opens the contact page with the question
