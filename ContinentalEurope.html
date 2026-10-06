@@ -941,6 +941,10 @@
                             </div>
                         </div>
                         <div class="records-toggles mt-4">
+                            <label id="recordsBetterLabel" class="flex items-center cursor-pointer hidden">
+                                <div id="recordsBetterCheckbox" class="checkbox"></div>
+                                <span class="text-sm font-medium">Include further stages</span>
+                            </label>
                             <label class="flex items-center cursor-pointer">
                                 <div id="recordsPerGameCheckbox" class="checkbox"></div>
                                 <span class="text-sm font-medium">Per game</span>
@@ -1499,6 +1503,7 @@
             recordsTeam: '',
             recordsPage: 1,
             recordsPerGame: false, // every column per game (W / D / L as a percentage)
+            recordsBetter: false, // the position or better / the stage or further
             // League History
             leagueHistoryRank: 'season',
             leagueHistoryOrder: 'most', // 'most' = newest first / highest
@@ -2934,6 +2939,7 @@
                 if (state.recordsPerGame) params.set('pg', '1');
                 if (state.recordsThreePoints) params.set('p3', '1');
                 if (state.recordsPosition) params.set('pos', state.recordsPosition);
+                if (state.recordsPosition && state.recordsBetter) params.set('better', '1');
                 if (state.recordsEra) params.set('season', state.recordsEra);
                 if (state.recordsTeam) params.set('t1', state.recordsTeam);
                 if (state.recordsMatches !== 'main') params.set('matches', state.recordsMatches);
@@ -3134,6 +3140,7 @@
                 state.recordsPerGame = params.get('pg') === '1';
                 state.recordsThreePoints = params.get('p3') === '1';
                 state.recordsPosition = params.get('pos') || '';
+                state.recordsBetter = params.get('better') === '1';
                 state.recordsEra = params.get('season') || '';
                 state.recordsTeam = params.get('t1') || '';
                 state.recordsMatches = ['all', 'qualifiers'].includes(params.get('matches')) ? params.get('matches') : 'main';
@@ -3516,6 +3523,8 @@
             recordsPageInfo: document.getElementById('recordsPageInfo'),
             recordsNextPageBtn: document.getElementById('recordsNextPageBtn'),
             recordsPerGameCheckbox: document.getElementById('recordsPerGameCheckbox'),
+            recordsBetterCheckbox: document.getElementById('recordsBetterCheckbox'),
+            recordsBetterLabel: document.getElementById('recordsBetterLabel'),
             recordsThreePointsCheckbox: document.getElementById('recordsThreePointsCheckbox'),
             copyLinkBtnLeagueHistory: document.getElementById('copyLinkBtnLeagueHistory'),
             leagueHistoryRankSelect: document.getElementById('leagueHistoryRankSelect'),
@@ -5229,7 +5238,7 @@
                 records: isRecords ? {
                     rows: from.records, stat: state.recordsStat, order: state.recordsOrder,
                     perGame: state.recordsPerGame, threePoints: state.recordsThreePoints,
-                    position: state.recordsPosition, team: state.recordsTeam, continental: true
+                    position: state.recordsPosition, better: state.recordsBetter, team: state.recordsTeam, continental: true
                 } : null,
                 // League History's ranked rows (season order has no answer)
                 leagueHistory: isLeagueHistory ? {
@@ -6973,7 +6982,7 @@
                     renderLeagueHistory();
                 });
             });
-            [['recordsPerGameCheckbox', 'recordsPerGame'], ['recordsThreePointsCheckbox', 'recordsThreePoints']].forEach(([el, key]) => {
+            [['recordsPerGameCheckbox', 'recordsPerGame'], ['recordsThreePointsCheckbox', 'recordsThreePoints'], ['recordsBetterCheckbox', 'recordsBetter']].forEach(([el, key]) => {
                 elements[el].addEventListener('click', () => {
                     state[key] = !state[key];
                     state.recordsPage = 1;
@@ -14222,6 +14231,9 @@
             elements.recordsStatSelect.value = state.recordsStat;
             elements.recordsOrderSelect.value = state.recordsOrder;
             elements.recordsPerGameCheckbox.className = `checkbox ${state.recordsPerGame ? 'checked' : ''}`;
+            elements.recordsBetterCheckbox.className = `checkbox ${state.recordsBetter ? 'checked' : ''}`;
+            // only with a position / stage picked (the top one has nothing better)
+            elements.recordsBetterLabel.classList.toggle('hidden', !state.recordsPosition || ['1', 'Champions'].includes(state.recordsPosition));
             elements.recordsThreePointsCheckbox.className = `checkbox ${state.recordsThreePoints ? 'checked' : ''}`;
             elements.recordsMatchesSelect.value = state.recordsMatches;
 
@@ -14282,7 +14294,9 @@
                         AdditionalInfo: stats.lastMatch.additionalInfo,
                     }] : [];
                     const progression = calculateTournamentProgression(stats.team, lastMatch);
-                    if (state.recordsPosition && progression !== state.recordsPosition) return;
+                    if (state.recordsPosition && (state.recordsBetter && state.recordsPosition !== 'Champions'
+                        ? !isProgressionEqualOrBetter(progression, state.recordsPosition)
+                        : progression !== state.recordsPosition)) return;
                     let points = stats.points;
                     pointDeductions.forEach(deduction => {
                         if (deduction.team === stats.team && deduction.league === divCode &&
@@ -14345,7 +14359,7 @@
             const statInfo = RECORDS_STATS[stat];
             const parts = [`${state.recordsOrder === 'fewest' ? 'Fewest' : 'Most'} ${statInfo.label.toLowerCase()}${state.recordsPerGame ? ' per game' : ''} in a campaign`];
             if (state.recordsThreePoints && stat === 'points') parts.push('3 points for a win');
-            if (state.recordsPosition) parts.push(`reached: ${state.recordsPosition}`);
+            if (state.recordsPosition) parts.push(`reached: ${state.recordsPosition}${state.recordsBetter && state.recordsPosition !== 'Champions' ? ' or further' : ''}`);
             if (state.recordsMatches === 'all') parts.push('including qualifiers');
             if (state.recordsMatches === 'qualifiers') parts.push('qualifiers only');
             if (state.recordsTeam) parts.push(state.recordsTeam);
@@ -14400,7 +14414,7 @@
             elements.recordsPrevPageBtn.disabled = state.recordsPage <= 1;
             elements.recordsNextPageBtn.disabled = state.recordsPage >= totalPages;
 
-            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsEra}::${state.recordsTeam}::${state.recordsMatches}::${state.recordsPage}`;
+            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsBetter}::${state.recordsEra}::${state.recordsTeam}::${state.recordsMatches}::${state.recordsPage}`;
             resetExpandedTeamSeasonsFor(viewKey);
             elements.teamRecordsBody.onclick = handleTeamSeasonExpandClick;
             const cell = (key, content) => `<td class="px-3 py-4 text-center ${key === stat ? 'records-stat-col' : ''}">${content}</td>`;

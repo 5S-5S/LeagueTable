@@ -59,3 +59,10 @@ highest scoring game
 most wins in a row
 Arsenal most wins against Chelsea
 most goals in 2003-04
+most goals in a campaign reached final
+most goals by a team that lost the final
+most goals by a club knocked out in the semi finals
+most goals in a campaign reaching the semi finals
+most points by a top 4 team
+most points finishing 4th or better
+fewest points in the top 4

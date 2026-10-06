@@ -1580,14 +1580,18 @@
         // ("biggest wins", "highest scoring draws") stay its own.
         if (!has(RECORD_SUPERLATIVES)) return null;
         if (has(/\b(biggest|heaviest|largest|record|best|worst) (wins?|victory|victories|defeats?|loss|losses|beatings?)\b|\b(scoring|score|biggest) draws?\b|\bthrashings?\b|\bcomebacks?\b/)) return null;
+        // How a club went out describes the finish, not the stat: "lost the
+        // final" isn't losses
+        const statText = text.replace(/\b(lost|lose|losing|beaten|knocked out|went out|out) (in |at )?(the )?(·|final|semi ?finals?|quarter ?finals?|round of 16|last 16|knockouts?|group stages?)\b/g, ' ');
+        const hasStat = pattern => pattern.test(statText);
         let stat = null;
-        if (has(/\bgoal difference\b|\bgd\b/)) stat = 'goalDifference';
-        else if (has(/\b(conceded|conceding|goals against|let in|defen[cs]e|defensive)\b/)) stat = 'goalsAgainst';
-        else if (has(/\b(points?|pts|ppg)\b/)) stat = 'points';
-        else if (has(/\b(wins|won|victories)\b/)) stat = 'won';
-        else if (has(/\b(draws|drawn|drew)\b/)) stat = 'drawn';
-        else if (has(/\b(losses|defeats|lost)\b/)) stat = 'lost';
-        else if (has(/\b(goals|scored|scoring|attack)\b/)) stat = 'goalsFor';
+        if (hasStat(/\bgoal difference\b|\bgd\b/)) stat = 'goalDifference';
+        else if (hasStat(/\b(conceded|conceding|goals against|let in|defen[cs]e|defensive)\b/)) stat = 'goalsAgainst';
+        else if (hasStat(/\b(points?|pts|ppg)\b/)) stat = 'points';
+        else if (hasStat(/\b(wins|won|victories)\b/)) stat = 'won';
+        else if (hasStat(/\b(draws|drawn|drew)\b/)) stat = 'drawn';
+        else if (hasStat(/\b(losses|defeats|lost)\b/)) stat = 'lost';
+        else if (hasStat(/\b(goals|scored|scoring|attack)\b/)) stat = 'goalsFor';
         // "best season" / "worst season": by points
         const bestSeason = !stat && has(/\b(best|worst|greatest) (· )*(seasons?|campaigns?)\b/);
         if (bestSeason) stat = 'points';
@@ -1596,7 +1600,8 @@
         // word season, or "by" a finish ("by a semi finalist"); points,
         // wins, draws, losses and goal difference are only ever a season's,
         // unless it says game or match ("per game" is a season's rate)
-        const finishWord = has(/\bby (a |the )?(beaten |losing )?(champions?|winners?|runners? up|finalists?|semi ?finalists?|quarter ?finalists?|(\d{1,2})(st|nd|rd|th))\b/);
+        const finishWord = has(/\b(knocked out|went out|out|lost|lose|losing|beaten) (in |at )?(the )?(final|semi|quarter|round|last 16|group)|\b(reached|reaching|reach) (the )?(final|semi|quarter|round|last 16|knockout)/) ||
+            has(/\bby (a |the )?(beaten |losing )?(champions?|winners?|runners? up|finalists?|semi ?finalists?|quarter ?finalists?|(\d{1,2})(st|nd|rd|th))\b/);
         const matchWord = has(/\bin (a|the|one) (game|match)\b|(?<!\bper |\ba )\b(games?|matches|match)\b|\bdraws? in\b|\bwin in\b/);
         if (!seasonWord && ((stat === 'goalsFor' && !finishWord) || matchWord)) return null;
         // "worst defence" = most conceded, "best defence" = fewest
@@ -2215,14 +2220,17 @@
     // Team Records, through its Copy Link parameters (sub=records)
     function teamRecordsResult(comp, team, parsed, intent) {
         const { finish } = intent;
-        // A league position (exactly - "top 4" is more than one) or a stage reached
-        const pos = comp.continental ? finish.stage : (finish.better ? '' : finish.rank);
+        // A league position or a stage reached - and "or better" ("top 4",
+        // "reached the final") unless it's exactly that finish
+        const pos = comp.continental ? finish.stage : finish.rank;
+        const better = !!pos && finish.better && !['1', 'Champions'].includes(pos);
         const params = {
             league: comp.continental ? comp.key : '',
             sub: 'records',
             stat: intent.stat,
             order: intent.order,
             pos,
+            better: better ? '1' : '',
             season: parsed.eras[comp.key] || '',
             t1: team,
             pg: intent.perGame ? '1' : '',
@@ -2238,7 +2246,7 @@
             detail: joinDetail([
                 'Team Records',
                 eraDetail(parsed, comp),
-                pos ? (comp.continental ? `Reached: ${pos}` : `Finished ${pos}${ordinalSuffix(Number(pos))}`) : '',
+                pos ? (comp.continental ? `Reached: ${pos}${better ? ' or further' : ''}` : `Finished ${pos}${ordinalSuffix(Number(pos))}${better ? ' or better' : ''}`) : '',
                 params.p3 ? '3 points for a win' : ''
             ]),
             href: competitionUrl(comp, 'team-seasons', params)
@@ -2654,7 +2662,7 @@
             if (rank === 'topTwo') alts.push(['the closest title races', 'closest title race']);
         } else if (ctx.view === 'team-records' || (ctx.view === 'team-seasons' && sub === 'records')) {
             const stat = params.get('stat');
-            if (stat === 'goalsFor' && !team) alts.push([`the ${most ? 'highest' : 'lowest'}-scoring league seasons (every club's goals added up)`, `${most ? 'highest' : 'lowest'} scoring seasons`]);
+            if (stat === 'goalsFor' && !team && !params.get('pos')) alts.push([`the ${most ? 'highest' : 'lowest'}-scoring league seasons (every club's goals added up)`, `${most ? 'highest' : 'lowest'} scoring seasons`]);
             if (stat === 'drawn' && !team && most) alts.push(['the season with the most drawn matches', 'season with the most draws']);
             if (stat === 'lost' && !most) alts.push([`${team ? `${team}'s` : 'the'} longest unbeaten runs (games in a row)`, `${team} longest unbeaten run`.trim()]);
             if (stat === 'points' && team && !params.get('pos')) alts.push([`every ${team} season`, `${team} season by season`]);
@@ -2666,6 +2674,22 @@
 
         const scope = params.get('scope') || '';
         const here = window.location.pathname.split('/').pop() + window.location.search;
+
+        // A finish filter, the other way: exactly that finish, or it and better
+        const pos = params.get('pos');
+        let flip = '';
+        if (ctx.view === 'team-records' && pos && !['1', 'Champions'].includes(pos)) {
+            const continental = !!(ctx.records && ctx.records.continental);
+            const better = params.get('better') === '1';
+            const flipped = new URLSearchParams(params);
+            if (better) flipped.delete('better'); else flipped.set('better', '1');
+            const label = continental
+                ? (better
+                    ? (pos === 'Final' ? 'only beaten finalists' : `only clubs knocked out in the ${phaseWords(pos)}`)
+                    : (pos === 'Final' ? 'finalists and winners' : `clubs that reached the ${phaseWords(pos)} or further`))
+                : (better ? `only teams finishing exactly ${pos}${ordinalSuffix(Number(pos))}` : `any team in the top ${pos}`);
+            flip = `<a href="${escapeSearchHtml(`${window.location.pathname.split('/').pop()}?${flipped.toString()}`)}">${escapeSearchHtml(label)}</a>`;
+        }
         const links = alts.map(([label, query]) => {
             const result = (searchFor(query, scope).results || [])[0];
             if (!result) return '';
@@ -2676,6 +2700,7 @@
             if (sameView || href === here) return '';
             return `<a href="${escapeSearchHtml(href)}">${escapeSearchHtml(label)}</a>`;
         }).filter(Boolean);
+        if (flip) links.unshift(flip);
         if (!links.length) return '';
         const listed = links.length === 1 ? links[0] : `${links.slice(0, -1).join(', ')} or ${links[links.length - 1]}`;
         return `Did you mean ${listed}?`;
@@ -3395,7 +3420,11 @@
                 ? `the ${most ? 'best' : 'worst'} goal difference${r.perGame ? ' per game' : ''}`
                 : `the ${most ? 'most' : 'fewest'} ${{ points: 'points', won: 'wins', drawn: 'draws', lost: 'losses', goalsFor: 'goals', goalsAgainst: 'goals conceded' }[r.stat]}${r.perGame ? ' per game' : ''}`;
         let by = '';
-        if (r.position) {
+        if (r.position && r.better && !['1', 'Champions'].includes(r.position)) {
+            by = r.continental
+                ? ` by a club that reached the ${phaseWords(r.position)}${r.position === 'Final' ? '' : ' or further'}`
+                : ` by a team finishing in the top ${r.position}`;
+        } else if (r.position) {
             if (r.continental) {
                 by = r.position === 'Champions' ? ' by the winners'
                     : r.position === 'Final' ? ' by a beaten finalist'
