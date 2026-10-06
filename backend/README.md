@@ -102,6 +102,17 @@ visitors are now served by the API, not the gists.
       team-history 0.62s→0.12s, head-to-head 0.71s→0.08s, season-matches
       0.47s→0.07s - byte-identical responses, and confirmed present via
       `wrangler kv key list`.
+- [x] Caching for traffic on the free plan (2026-10-06): a
+      `Cache-Control` header on every successful GET (10 minutes, or a day
+      for past-only answers), `cache-version` / `history-version` read
+      from KV at most once a minute per isolate, and any KV failure
+      answering from D1 instead of an error. `/api/standings` and
+      `/api/season-matches` answers whose `dateTo` ends before the current
+      season (1 July) and at least two weeks ago are cached for 30 days
+      under `history-version`, which the daily sync never bumps. **After
+      correcting old matches by hand, bump it** so those answers are
+      recomputed (browsers may keep their copy up to a day longer):
+      `npx wrangler kv key put history-version "$(date -u +%FT%TZ)" --namespace-id=b2fa8b93e59540749923768aaf1fc08d --remote`
 - [x] `getLeagueTeams()` (team-name dropdown population) cut over to the
       hardcoded color/logo table on the two Domestic pages
       (`DomesticEurope.html`, `DomesticEuropeMobile.html`) — verified each

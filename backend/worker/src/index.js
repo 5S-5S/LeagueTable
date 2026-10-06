@@ -36,7 +36,7 @@
 //   matchDateRange, which read the whole division (~51k rows for E0) on
 //   every page load; this reads 2 rows via idx_matches_unique's (div, date)
 //   prefix, so it's left out of the KV cache - a D1 read this small costs
-//   less than the 2 KV reads a cache lookup would.
+//   less than the KV reads a cache lookup would.
 //
 // GET /api/season-matches?div=C1&dateFrom=&dateTo=
 //   -> { div, matches: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase, isQualifier, additionalInfo }, ...] }
@@ -64,7 +64,7 @@
 //   (e.g. did the team win the Final) without a second per-team request.
 //
 // Caching: every endpoint above is cached in KV (see
-// withCache()/getCacheVersion() below) rather than re-reading D1 on every
+// withCache()/getKvSetting() below) rather than re-reading D1 on every
 // request - /api/standings and /api/season-standings because they each
 // scan an entire division, /api/team-history and /api/head-to-head
 // because even a "cheap, single-team" read adds up once traffic (or
@@ -77,6 +77,15 @@
 // step, once its D1 writes for the day commit, so cached results are
 // never more stale than "since the last sync" (the same lag that
 // already exists in the data itself).
+//
+// Answers that end before the current season (endsBeforeCurrentSeason())
+// can't change when the sync adds matches, so they're kept for weeks
+// under the separate 'history-version' key instead, which only a manual
+// correction to old data needs to bump. Successful GETs also carry a
+// Cache-Control header, so a browser repeating a question within a visit
+// never reaches the Worker at all. If KV fails (e.g. the free plan's
+// daily read limit), the answer comes straight from D1 instead of an
+// error.
 
 const CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -84,20 +93,29 @@ const CORS_HEADERS = {
     'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-function jsonResponse(body, status = 200) {
+// Browser cache lifetimes. Kept short for anything touching the current
+// season (after a sync, a visitor sees new matches within 10 minutes);
+// a day for past-only answers, since a browser copy can't be cleared by a
+// history-version bump the way KV entries can.
+const BROWSER_MAX_AGE_SECONDS = 10 * 60;
+const BROWSER_MAX_AGE_FIXED_SECONDS = 24 * 60 * 60;
+
+function jsonResponse(body, status = 200, { fixed = false } = {}) {
+    const maxAge = fixed ? BROWSER_MAX_AGE_FIXED_SECONDS : BROWSER_MAX_AGE_SECONDS;
     return new Response(JSON.stringify(body), {
         status,
-        headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+        headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': status === 200 ? `public, max-age=${maxAge}` : 'no-store',
+            ...CORS_HEADERS,
+        },
     });
 }
 
-// Response cache for the two full-division-scan endpoints (/api/standings
-// and /api/season-standings) - both read the entire division from D1 on
-// every call today, which is fine for one request but doesn't scale with
-// traffic (every visitor viewing League Table's default view or Team
-// Seasons pays the full read again). Match data only changes once a day
-// (the sync workflow), so there's nothing to gain from re-reading D1 more
-// often than that.
+// Response cache for every endpoint - see "Caching" in the header comment
+// for why each one is here. Match data only changes once a day (the sync
+// workflow), so there's nothing to gain from re-reading D1 more often
+// than that.
 //
 // Invalidation is version-based rather than a blind TTL: sync.mjs bumps
 // the 'cache-version' key in KV as its last step, after its D1 writes
@@ -105,11 +123,40 @@ function jsonResponse(body, status = 200) {
 // from before today's sync become unreachable immediately rather than
 // serving stale data until an arbitrary timer expires. CACHE_TTL_SECONDS
 // below is just a backstop so orphaned old-version entries eventually get
-// garbage collected even if nothing ever re-reads them.
+// garbage collected even if nothing ever re-reads them. Fixed (past-only)
+// answers fold in 'history-version' instead and live FIXED_CACHE_TTL_SECONDS.
 const CACHE_TTL_SECONDS = 60 * 60 * 48;
+const FIXED_CACHE_TTL_SECONDS = 60 * 60 * 24 * 30;
 
-async function getCacheVersion(env) {
-    return (await env.CACHE.get('cache-version')) || '0';
+// 'cache-version' / 'history-version' are read from KV at most once a
+// minute per isolate instead of on every request - half the KV reads. A
+// sync's bump can therefore take up to a minute to reach every isolate,
+// well inside the browser cache's own 10 minutes.
+const KV_SETTING_MEMO_MS = 60 * 1000;
+const kvSettingMemo = new Map();
+
+async function getKvSetting(env, name) {
+    const memo = kvSettingMemo.get(name);
+    if (memo && Date.now() - memo.readAt < KV_SETTING_MEMO_MS) return memo.value;
+    const value = (await env.CACHE.get(name)) || '0';
+    kvSettingMemo.set(name, { value, readAt: Date.now() });
+    return value;
+}
+
+// True when an answer bounded by dateTo can no longer change: it ends
+// before the current season (which starts 1 July - Continental's first
+// qualifiers; Domestic seasons start 1 August) and at least two weeks ago.
+// sync.mjs only inserts matches on/after each division's latest date, so
+// nothing new lands there; the two weeks cover a sync that's been failing
+// for a while around the 1 July boundary.
+const FIXED_MIN_AGE_DAYS = 14;
+
+function endsBeforeCurrentSeason(dateTo) {
+    if (!dateTo || !/^\d{4}-\d{2}-\d{2}$/.test(dateTo)) return false;
+    const now = new Date();
+    const seasonStartYear = now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+    const minAgeCutoff = new Date(now.getTime() - FIXED_MIN_AGE_DAYS * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    return dateTo < `${seasonStartYear}-07-01` && dateTo <= minAgeCutoff;
 }
 
 // KV keys are capped at 512 bytes; a long team list (head-to-head against
@@ -129,23 +176,38 @@ async function kvSafeKey(key) {
 // name plus caller-supplied key parts (which must include every request
 // parameter that affects the result - the classic caching bug is a
 // parameter that's missing from the key, causing one query's response to
-// be silently served for a different one). A cache write failure doesn't
-// fail the request - caching is an optimization, not a correctness
-// requirement, so the response is still returned either way.
-async function withCache(env, keyParts, compute) {
-    const version = await getCacheVersion(env);
-    const key = await kvSafeKey(`v${version}:${keyParts.join(':')}`);
+// be silently served for a different one). fixed: the answer ends before
+// the current season (endsBeforeCurrentSeason()), so it's keyed by
+// history-version and kept for weeks. Any KV failure - reading the
+// version, reading the entry or writing it - falls through to compute()
+// rather than failing the request: caching is an optimization, not a
+// correctness requirement.
+async function withCache(env, keyParts, compute, { fixed = false } = {}) {
+    let key = null;
+    try {
+        const version = fixed
+            ? `h${await getKvSetting(env, 'history-version')}`
+            : `v${await getKvSetting(env, 'cache-version')}`;
+        key = await kvSafeKey(`${version}:${keyParts.join(':')}`);
 
-    const cached = await env.CACHE.get(key);
-    if (cached !== null) {
-        return JSON.parse(cached);
+        const cached = await env.CACHE.get(key);
+        if (cached !== null) {
+            return JSON.parse(cached);
+        }
+    } catch (err) {
+        // Also skips the write below: an entry KV can't read back is
+        // wasted, and writes have the smallest daily limit (1,000).
+        console.error('Cache read failed - answering from D1:', err);
+        key = null;
     }
 
     const result = await compute();
-    try {
-        await env.CACHE.put(key, JSON.stringify(result), { expirationTtl: CACHE_TTL_SECONDS });
-    } catch (err) {
-        console.error('Failed to write cache entry:', err);
+    if (key) {
+        try {
+            await env.CACHE.put(key, JSON.stringify(result), { expirationTtl: fixed ? FIXED_CACHE_TTL_SECONDS : CACHE_TTL_SECONDS });
+        } catch (err) {
+            console.error('Failed to write cache entry:', err);
+        }
     }
     return result;
 }
@@ -478,6 +540,7 @@ async function handleStandings(url, env) {
     const excludeMainStage = parseBoolParam(url, 'excludeMainStage', false);
     const competitionStage = url.searchParams.get('competitionStage') || '';
 
+    const fixed = endsBeforeCurrentSeason(dateTo);
     const body = await withCache(env, ['standings', canonicalQueryKey(url)], async () => {
         let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier FROM matches WHERE div = ?1`;
         const params = [div];
@@ -500,9 +563,9 @@ async function handleStandings(url, env) {
         const { matchDateRange, standings } = aggregateStandings(matches, { threePointSystem, homeFilter, awayFilter });
 
         return { div, matchCount: matches.length, matchDateRange, standings };
-    });
+    }, { fixed });
 
-    return jsonResponse(body);
+    return jsonResponse(body, 200, { fixed });
 }
 
 async function handleDateRange(url, env) {
@@ -529,9 +592,11 @@ async function handleSeasonMatches(url, env) {
         return jsonResponse({ error: 'div query param is required' }, 400);
     }
 
+    const dateFrom = url.searchParams.get('dateFrom');
+    const dateTo = url.searchParams.get('dateTo');
+    const fixed = endsBeforeCurrentSeason(dateTo);
+
     const body = await withCache(env, ['season-matches', canonicalQueryKey(url)], async () => {
-        const dateFrom = url.searchParams.get('dateFrom');
-        const dateTo = url.searchParams.get('dateTo');
 
         let sql = `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info FROM matches WHERE div = ?1`;
         const params = [div];
@@ -553,9 +618,9 @@ async function handleSeasonMatches(url, env) {
         }));
 
         return { div, matches };
-    });
+    }, { fixed });
 
-    return jsonResponse(body);
+    return jsonResponse(body, 200, { fixed });
 }
 
 // Buckets a sorted match list into sorted, possibly slightly-overlapping

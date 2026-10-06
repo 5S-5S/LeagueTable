@@ -7,21 +7,20 @@ Feature ideas, not yet scheduled.
 Most to least important; details are in each item below.
 
 **Tier 1 - before launch** (keep the site up and know how it's doing)
-1. API caching for traffic - the only item that prevents an outage (7 parts;
-   1-5 go out together in one Worker deploy)
-2. Analytics, with failed searches
-3. Automated checks
-4. Error reporting
-5. About / sources page
-6. D1 backups
+1. Analytics, with failed searches
+2. Automated checks
+3. Error reporting
+4. About / sources page
+5. D1 backups
 
 **Tier 2 - high value, soon after launch**
-7. Link previews when sharing
-8. Season records and title races
-9. "Report a data error" link
-10. League trends over time
-11. Match Finder upgrades (what's left)
-12. Lighter pages
+6. Link previews when sharing
+7. Season records and title races
+8. "Report a data error" link
+9. League trends over time
+10. Match Finder upgrades (what's left)
+11. Lighter pages
+12. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
 13. Typo tolerance in search
@@ -109,61 +108,34 @@ Most to least important; details are in each item below.
 - Later (before launch): **D1 backups** — noted 2026-10-03. A periodic
   export of the database (to the repo or elsewhere) as cheap insurance.
 
-- Later: **API caching for traffic (Cloudflare free plan)** — noted
-  2026-10-03, before publishing. The Worker caches in KV, but KV is itself
-  metered on the free plan (per day: 100k Worker requests, 100k KV reads,
-  1k KV writes, 5M D1 rows read; resets 00:00 UTC). Every API call costs
-  a Worker request + 2 KV reads (cache-version, then the entry) + a KV
-  write on a miss; there's no Cache-Control, so browsers refetch every
-  time. Measured 2-6 API calls per page view, ~10-20 per visit. Estimate:
-  fine under ~1k visits/day; low thousands/day - KV writes (one per new
-  question; the daily version bump empties the cache) run out and
-  misses fall through to D1 (a full-history query reads tens of
-  thousands of rows); ~3-5k visits/day - KV reads run out, env.CACHE.get
-  throws and every API call fails until the reset. The four changes,
-  all on the free plan (one Worker deploy):
-  1. Browser caching: a Cache-Control header on API responses (~10 min
-     when the current season is in the answer, longer for history-only),
-     so repeat calls in a visit never reach the Worker - the only change
-     that saves Worker requests.
-  2. Edge cache (Workers Cache API, caches.default - free, unmetered) in
-     front of KV, so popular answers use no KV reads / writes.
-  3. Keep cache-version in the isolate's memory for ~1 minute instead of
-     a KV read per request - halves KV reads.
-  4. Fail safe: if KV errors (over the limit or otherwise), skip the
-     cache and answer from D1 instead of returning an error.
-  Added 2026-10-04 (same deploy):
-  5. Don't expire answers that can't change. Only answers touching the
-     current season need dropping when new matches arrive; anything
-     ending before it (a past season, "matches on Boxing Day 1963",
-     "table on 1/1/23") can be cached for weeks under a key without the
-     cache version - most questions are about the past.
-  6. Weekday index: "on a Sunday" (dayOfWeek) filters with
+- Partly done: **API caching for traffic (Cloudflare free plan)** —
+  noted 2026-10-03. Free-plan limits per day: 100k Worker requests, 100k
+  KV reads, 1k KV writes, 5M D1 rows read (reset 00:00 UTC). Done
+  2026-10-06: browser caching, the cache version kept in memory, falling
+  back to D1 when KV fails, past-only answers kept for weeks, and the
+  date-range call - estimated to move the first hard failure from a few
+  thousand to ~10k+ visits/day. Still to do:
+  1. Edge cache (Workers Cache API, caches.default - free, unmetered) in
+     front of KV, so popular answers use no KV reads / writes. Needs a
+     custom domain on Cloudflare: the Cache API does nothing on
+     workers.dev. Worth it only with a domain bought for the site anyway.
+  2. Weekday index: "on a Sunday" (dayOfWeek) filters with
      strftime('%w', date), which no index covers - measured 51,381 rows
      read for 3,950 Wednesday matches. Add an expression index on
      (div, CAST(strftime('%w', date) AS INTEGER)). Low priority (weekday
      questions are rare).
-  7. Optional: after each data sync, pre-fill the cache with the
+  3. Optional: after each data sync, pre-fill the cache with the
      most-viewed answers (each league's current table) so the first
      visitors after an update don't pay.
-  Already fine (checked 2026-10-04): team history / head-to-head and
-  /api/teams use their composite indexes; date ranges use the (div, date)
-  prefix of idx_matches_unique (Boxing Day 1963: 11 rows read for 10;
-  a half season: 167 for 166). Full-history requests read the whole
-  division by necessity - caching is what protects them.
-  Together (1-5): roughly half the API calls per visit, far fewer KV
-  reads / writes, and the database barely touched; first hard failure
-  moves from a few thousand to ~10k+ visits/day. Past that, Workers Paid ($5/month): no daily cut-off -
-  10M requests and 10M KV reads a month included (~3x free), 1M KV
-  writes (~33x), 25B D1 rows read (~160x), then small per-use charges
-  (~$2 per extra 100k visits). Check Cloudflare's pricing page - figures
-  as of 2026-10.
-  - Also before traffic: remove PapaParse (loaded from unpkg on every
-    page, unused since the gists went), and consider self-hosting the
-    club crests (hotlinked from s.hs-data.com - their server and images;
-    they could rate-limit or block at volume).
-  - Usage to watch: Cloudflare dashboard -> Workers & Pages ->
-    leaguetable-api -> Metrics; KV / D1 -> Metrics.
+  4. Consider self-hosting the club crests (hotlinked from s.hs-data.com
+     - their server and images; they could rate-limit or block at
+     volume).
+  Past ~10k visits/day, Workers Paid ($5/month): no daily cut-off - 10M
+  requests and 10M KV reads a month included (~3x free), 1M KV writes
+  (~33x), 25B D1 rows read (~160x), then small per-use charges (~$2 per
+  extra 100k visits). Check Cloudflare's pricing page - figures as of
+  2026-10. Usage to watch: Cloudflare dashboard -> Workers & Pages ->
+  leaguetable-api -> Metrics; KV / D1 -> Metrics.
 
 - Later: **Season records and title races** — noted 2026-10-03; details
   to be worked out. Proposed home: Team Seasons (it already has every
