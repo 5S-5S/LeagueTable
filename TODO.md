@@ -95,10 +95,25 @@ Most to least important; details are in each item below.
   and crests belong to their owners. A privacy note too if analytics
   ever uses cookies.
 
-- Later (before launch): **Automated checks** — noted 2026-10-03. A
-  script (maybe a GitHub Action) that loads all four pages, runs every
-  search example and fails on any script error - instead of checking by
-  hand before each push.
+- Later (before launch): **Automated checks** — noted 2026-10-03,
+  planned 2026-10-06. A test suite run before each push, instead of
+  checking by hand. One command, headless Chrome on the Mac (the answers
+  come from each page's own JavaScript), all four pages, desktop and
+  mobile. Three levels:
+  1. Expected answers: ~50-100 questions whose answers can't change
+     (past-only - "Liverpool 2019-20", "Real Madrid vs Atletico Madrid
+     penalties", "Who was top at Christmas 2003") with the exact answer
+     line each should give. Covers every kind: tables, head-to-heads,
+     Match Finder, Team Seasons, streaks, shootouts, both scopes. Catches
+     wrong values (e.g. the shootout answers counting match results).
+  2. Shape checks for questions touching the current season, whose
+     numbers change after each sync ("Arsenal vs Chelsea since 2010"):
+     an answer appears and reads right ("... have a W_ D_ L_ record
+     against Chelsea FC ...").
+  3. Smoke checks: every search example opens on each page with no
+     script error, no empty answer and no hang.
+  When an answer changes on purpose (rewording), its expected text is
+  updated in the same commit, so the change shows in the diff.
 
 - Later (before launch): **Error reporting** — noted 2026-10-03. A small
   handler that reports visitors' JavaScript errors (to the Worker or a
