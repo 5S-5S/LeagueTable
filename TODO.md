@@ -154,8 +154,9 @@ Most to least important; details are in each item below.
     Team History / Team Records sub-tabs on all four pages, Team Records
     with stat, most / fewest, position (Domestic) or stage reached and
     matches (Continental), era, team, Per game and 3 Points for all
-    Wins. Not built yet: grouping (best per position / per club - may
-    not be needed), League History, search.
+    Wins. Not built yet: League History, search. Dropped 2026-10-06:
+    grouping to the best row per position or per club - the Position
+    filter and Team History already answer those.
   - Home: the Team Seasons tab renamed **Seasons** (everything in it is
     per season, and one sub-tab is about the whole league), with three
     sub-tabs - names agreed 2026-10-06:
@@ -177,9 +178,7 @@ Most to least important; details are in each item below.
     filter, so a runner-up or 4th-placed side ranks wherever its numbers
     put it. Most / fewest Pts, W, D, L, GF, GA, GD; filtered by position
     (fewest points by a champion, most by a relegated side, most by a
-    team finishing 4th); grouped to the best row per position (most
-    points for each finishing position, 1st to 20th) or per club (each
-    club's best season).
+    team finishing 4th).
   - League History: one row per league per season, every club
     added up - games, goals (2025-26: 1,045), goals per game (2.75), home
     win / draw / away win %, champion and runner-up, the gap between them
@@ -204,9 +203,9 @@ Most to least important; details are in each item below.
     (Champions League has no positions or title races - team-season
     stats there could come later).
   - Build order: 1. the Seasons tab and its sub-tabs, with Team Records
-    (team-season records, search); 2. grouping and per game; 3. League
+    (done); 2. per game and 3 points for a win (done); 3. League
     History's table (evolution order, ranked records, title races);
-    4. its chart.
+    4. its chart; 5. search for Team Records and League History.
 
 - Later: **Bug: Continental League Tables, one season with Exclude Main
   Stage shows nothing** — noted 2026-10-06. e.g. 2016-17 with Exclude
