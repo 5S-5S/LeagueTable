@@ -28,6 +28,16 @@
 //   raw/undeducted - point deductions stay a client-side correction (the
 //   table is hardcoded in the frontend, not duplicated here).
 //
+// GET /api/date-range?div=E0
+//   -> { div, matchDateRange: {start, end} | null }
+//   A division's first and last match dates - all the frontend's
+//   ensureDivDateRangeLoaded() needs (Last Data Update banner, era-season
+//   labels, default date ranges). Used to come from /api/standings'
+//   matchDateRange, which read the whole division (~51k rows for E0) on
+//   every page load; this reads 2 rows via idx_matches_unique's (div, date)
+//   prefix, so it's left out of the KV cache - a D1 read this small costs
+//   less than the 2 KV reads a cache lookup would.
+//
 // GET /api/season-matches?div=C1&dateFrom=&dateTo=
 //   -> { div, matches: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase, isQualifier, additionalInfo }, ...] }
 //   Raw match rows (same shape as team-history/head-to-head) for one
@@ -495,6 +505,24 @@ async function handleStandings(url, env) {
     return jsonResponse(body);
 }
 
+async function handleDateRange(url, env) {
+    const div = url.searchParams.get('div');
+    if (!div) {
+        return jsonResponse({ error: 'div query param is required' }, 400);
+    }
+
+    // Two subqueries, not one SELECT MIN(date), MAX(date): SQLite's min/max
+    // optimization only applies to a lone min() or max(), so the combined
+    // form scans the whole division (51,381 rows for E0) while this reads 2.
+    const row = await env.DB.prepare(
+        `SELECT (SELECT MIN(date) FROM matches WHERE div = ?1) AS start,
+                (SELECT MAX(date) FROM matches WHERE div = ?1) AS end`
+    ).bind(div).first();
+
+    const matchDateRange = row && row.start ? { start: row.start, end: row.end } : null;
+    return jsonResponse({ div, matchDateRange });
+}
+
 async function handleSeasonMatches(url, env) {
     const div = url.searchParams.get('div');
     if (!div) {
@@ -667,6 +695,10 @@ export default {
 
             if (url.pathname === '/api/standings') {
                 return await handleStandings(url, env);
+            }
+
+            if (url.pathname === '/api/date-range') {
+                return await handleDateRange(url, env);
             }
 
             if (url.pathname === '/api/season-matches') {

@@ -7,8 +7,8 @@ Feature ideas, not yet scheduled.
 Most to least important; details are in each item below.
 
 **Tier 1 - before launch** (keep the site up and know how it's doing)
-1. API caching for traffic - the only item that prevents an outage (8 parts; the
-   date-range call (part 6) is a quick win to do first)
+1. API caching for traffic - the only item that prevents an outage (8 parts;
+   part 6, the date-range call, done 2026-10-06)
 2. Analytics, with failed searches
 3. Automated checks
 4. Error reporting
@@ -138,12 +138,13 @@ Most to least important; details are in each item below.
      ending before it (a past season, "matches on Boxing Day 1963",
      "table on 1/1/23") can be cached for weeks under a key without the
      cache version - most questions are about the past.
-  6. Replace the wasteful date-range call: every page load fetches the
+  6. Done 2026-10-06: the date-range call. Every page load fetched the
      whole all-time standings (ensureDivDateRangeLoaded -> /api/standings,
      ~51k rows read uncached for the Premier League) only to get the first
-     and last match dates (Last Data Update banner, default date ranges).
-     A small MIN/MAX date endpoint reads ~2 rows via the (div, date) index.
-     Quick win.
+     and last match dates. Now /api/date-range reads 2 rows via the
+     (div, date) index - two MIN/MAX subqueries, since a combined
+     SELECT MIN(date), MAX(date) still scans all 51,381. Not KV-cached (2
+     rows cost less than 2 KV reads).
   7. Weekday index: "on a Sunday" (dayOfWeek) filters with
      strftime('%w', date), which no index covers - measured 51,381 rows
      read for 3,950 Wednesday matches. Add an expression index on

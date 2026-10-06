@@ -7824,24 +7824,20 @@
         }
 
         // Fetches (or reuses a cached) earliest/latest match date for one
-        // division - a byproduct of the standings API's matchDateRange
-        // field, requested with the same default (no filters) params the
-        // flat League Table view uses, so it shares that KV-cached
-        // response server-side even though it's tracked in its own small
-        // client-side cache here to avoid thrashing League Table's own
-        // live filter state. Reused by several small utilities
-        // (era-season dropdown labels, the "Last Data Update" banner,
-        // Clear Filters' date-range reset, the per-league default date
-        // range on a league switch) that each just need a min/max date.
+        // division from /api/date-range (2 rows read - the full standings
+        // call this used to piggyback on read the whole division). Reused
+        // by several small utilities (era-season dropdown labels, the
+        // "Last Data Update" banner, Clear Filters' date-range reset, the
+        // per-league default date range on a league switch) that each just
+        // need a min/max date.
         async function ensureDivDateRangeLoaded(div) {
             if (state.divDateRangeApiCache[div]) return;
             if (state.divDateRangeApiLoading[div]) return;
 
             state.divDateRangeApiLoading[div] = true;
             try {
-                const qs = new URLSearchParams({ div, threePointSystem: 'true', homeFilter: 'true', awayFilter: 'true' });
-                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/standings?${qs.toString()}`);
-                if (!res.ok) throw new Error(`Standings request failed: ${res.status}`);
+                const res = await fetch(`${TEAM_HISTORY_API_BASE}/api/date-range?div=${encodeURIComponent(div)}`);
+                if (!res.ok) throw new Error(`Date range request failed: ${res.status}`);
                 const data = await res.json();
                 state.divDateRangeApiCache[div] = data.matchDateRange || { start: null, end: null };
             } catch (err) {
