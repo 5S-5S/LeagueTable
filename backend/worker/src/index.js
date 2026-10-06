@@ -48,7 +48,7 @@
 //   Always called with a single season's date range, so the result stays
 //   small (one season's matches, not the full division history).
 //
-// POST /api/season-standings  body: { div, seasons: [{season, start, end}, ...], excludeQualifiers?, excludeMainStage? }
+// POST /api/season-standings  body: { div, seasons: [{season, start, end, qualifiersStart?, qualifiersEnd?}, ...], excludeQualifiers?, excludeMainStage? }
 //   -> { div, seasons: [{ season, matchCount, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points, lastMatch }, ...] }, ...] }
 //   Batch version of /api/standings for Team Seasons: buckets one
 //   division's entire match history into the given season date ranges in
@@ -630,7 +630,18 @@ async function handleSeasonMatches(url, env) {
 // pointer keeps this O(matches + seasons): for each match we advance past
 // any seasons fully behind it, then test membership in the season the
 // pointer landed on plus its immediate neighbors (overlaps never reach
-// beyond one season away).
+// beyond one season away). A season may also give its qualifiers their own
+// window (qualifiersStart / qualifiersEnd) - the Champions League's run 1
+// June to 31 May: a season's first qualifying rounds are often played in
+// late June, before its 1 July start, and 2020-21's ran in August-September
+// 2020 while 2019-20's delayed knockouts were still going. By the season's
+// dates alone they'd land in the wrong season, or none.
+function isMatchInSeason(m, s) {
+    const start = m.isQualifier && s.qualifiersStart ? s.qualifiersStart : s.start;
+    const end = m.isQualifier && s.qualifiersEnd ? s.qualifiersEnd : s.end;
+    return m.date >= start && m.date <= end;
+}
+
 function bucketMatchesBySeason(matches, seasons) {
     const sorted = [...seasons].sort((a, b) => a.start < b.start ? -1 : a.start > b.start ? 1 : 0);
     const buckets = sorted.map(() => []);
@@ -642,7 +653,7 @@ function bucketMatchesBySeason(matches, seasons) {
         }
         for (const j of [i - 1, i, i + 1]) {
             if (j < 0 || j >= sorted.length) continue;
-            if (m.date >= sorted[j].start && m.date <= sorted[j].end) {
+            if (isMatchInSeason(m, sorted[j])) {
                 buckets[j].push(m);
             }
         }
@@ -670,6 +681,10 @@ async function handleSeasonStandings(request, env) {
         if (!s || typeof s.season !== 'string' || typeof s.start !== 'string' || typeof s.end !== 'string') {
             return jsonResponse({ error: 'each season entry needs season, start, and end strings' }, 400);
         }
+        if ((s.qualifiersStart !== undefined && typeof s.qualifiersStart !== 'string') ||
+            (s.qualifiersEnd !== undefined && typeof s.qualifiersEnd !== 'string')) {
+            return jsonResponse({ error: 'qualifiersStart / qualifiersEnd must be date strings' }, 400);
+        }
     }
 
     // Cached by div + exclude flags only, not the season list itself - the
@@ -681,7 +696,11 @@ async function handleSeasonStandings(request, env) {
     // cached full-season response instead of its own narrower one - fine
     // for this endpoint's only consumer, but worth knowing if it's ever
     // reused elsewhere.
-    const responseBody = await withCache(env, ['season-standings', div, !!excludeQualifiers, !!excludeMainStage], async () => {
+    // Requests with season-specific qualifying dates bucket differently, so
+    // they get their own entries (a page from before those dates existed
+    // can't fill the cache for the current pages, or the other way round)
+    const qualifierDates = seasons.some(s => s.qualifiersStart || s.qualifiersEnd) ? 'qdates' : 'plain';
+    const responseBody = await withCache(env, ['season-standings', div, !!excludeQualifiers, !!excludeMainStage, qualifierDates], async () => {
         const { results } = await env.DB.prepare(
             `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
              FROM matches WHERE div = ?1 ORDER BY date ASC`

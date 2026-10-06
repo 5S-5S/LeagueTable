@@ -2087,6 +2087,13 @@ html.search-mode body[data-theme="dark"] .search-mode-switch {
     }
 }
 
+/* Per game / 3 Points for all Wins */
+.records-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+}
+
 /* The stat the list is ranked by */
 .league-table td.records-stat-col {
     font-weight: 700;

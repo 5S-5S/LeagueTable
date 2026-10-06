@@ -15,28 +15,29 @@ Most to least important; details are in each item below.
 **Tier 2 - high value, soon after launch**
 5. Season records, title races and league trends
 6. "Report a data error" link
-7. Match Finder upgrades (what's left)
-8. API caching (what's left - the outage-preventing parts are done)
+7. Bug: Continental one-season qualifiers view is empty
+8. Match Finder upgrades (what's left)
+9. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-9. Typo tolerance in search
-10. Upcoming matches (home page strip)
-11. Recent searches
-12. Pinned / favourite team
-13. Road to the final
-14. Head-to-head by decade
-15. More competitions (depends on the data)
+10. Typo tolerance in search
+11. Upcoming matches (home page strip)
+12. Recent searches
+13. Pinned / favourite team
+14. Road to the final
+15. Head-to-head by decade
+16. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-16. "On this day"
-17. Trivia mode
-18. Side-by-side Team Seasons
-19. Team progression chart (after League History)
-20. "/" to search
-21. Penalty shootout leaderboard (team and head-to-head answers done)
-22. Lighter pages (small gain - see the item)
-23. Knockout Stage bracket view (on hold)
-24. Country vs Country
+17. "On this day"
+18. Trivia mode
+19. Side-by-side Team Seasons
+20. Team progression chart (after League History)
+21. "/" to search
+22. Penalty shootout leaderboard (team and head-to-head answers done)
+23. Lighter pages (small gain - see the item)
+24. Knockout Stage bracket view (on hold)
+25. Country vs Country
 
 ## Items
 
@@ -146,9 +147,15 @@ Most to least important; details are in each item below.
   2026-10. Usage to watch: Cloudflare dashboard -> Workers & Pages ->
   leaguetable-api -> Metrics; KV / D1 -> Metrics.
 
-- Later: **Season records, title races and league trends** — noted
+- Partly done: **Season records, title races and league trends** — noted
   2026-10-03, shaped 2026-10-06 (League trends merged in). Needs care -
   many kinds of question; design before building.
+  - Progress (branch `seasons-records`, 2026-10-06): the Seasons tab with
+    Team History / Team Records sub-tabs on all four pages, Team Records
+    with stat, most / fewest, position (Domestic) or stage reached and
+    matches (Continental), era, team, Per game and 3 Points for all
+    Wins. Not built yet: grouping (best per position / per club - may
+    not be needed), League History, search.
   - Home: the Team Seasons tab renamed **Seasons** (everything in it is
     per season, and one sub-tab is about the whole league), with three
     sub-tabs - names agreed 2026-10-06:
@@ -200,6 +207,12 @@ Most to least important; details are in each item below.
     (team-season records, search); 2. grouping and per game; 3. League
     History's table (evolution order, ranked records, title races);
     4. its chart.
+
+- Later: **Bug: Continental League Tables, one season with Exclude Main
+  Stage shows nothing** — noted 2026-10-06. e.g. 2016-17 with Exclude
+  Main Stage: "0 total matches, 0 competition phases", though the
+  season's qualifiers load (92 matches). On the live site too, so not
+  from the Seasons work.
 
 - Later: **"Report a data error" link** — noted 2026-10-03. A small link
   on each answer / table that opens the contact page with the question

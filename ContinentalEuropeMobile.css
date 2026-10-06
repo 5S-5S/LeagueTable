@@ -3839,6 +3839,13 @@ html:not(.search-mode) .header-actions {
     gap: 0.75rem;
 }
 
+/* Per game / 3 Points for all Wins */
+.records-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+}
+
 /* The stat the list is ranked by: its column tinted, the number bold */
 .league-table td.records-stat-col {
     background-color: rgba(5, 150, 105, 0.08);
@@ -3852,6 +3859,11 @@ html:not(.search-mode) .header-actions {
     font-weight: 800;
     text-decoration: underline;
     text-underline-offset: 3px;
+}
+
+/* A long club name wraps rather than widening the table */
+#teamRecordsBody .team-name-text {
+    white-space: normal;
 }
 
 /* Season and games played under the team name */
