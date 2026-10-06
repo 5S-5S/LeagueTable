@@ -33,13 +33,14 @@ Most to least important; details are in each item below.
 18. Trivia mode
 19. Side-by-side Team Seasons
 20. League History chart
-21. A club's title races
-22. Team progression chart (after League History)
-23. "/" to search
-24. Penalty shootout leaderboard (team and head-to-head answers done)
-25. Lighter pages (small gain - see the item)
-26. Knockout Stage bracket view (on hold)
-27. Country vs Country
+21. Team Records: date ranges, bottom / relegated, home / away
+22. A club's title races
+23. Team progression chart (after League History)
+24. "/" to search
+25. Penalty shootout leaderboard (team and head-to-head answers done)
+26. Lighter pages (small gain - see the item)
+27. Knockout Stage bracket view (on hold)
+28. Country vs Country
 
 ## Items
 
@@ -379,6 +380,17 @@ Most to least important; details are in each item below.
 - Maybe: **Pinned/favorite team** — remember a user's team via
   `localStorage` so the landing-page search can offer a one-click shortcut
   back to their dashboard instead of retyping every visit.
+
+- Maybe: **Team Records: more filters search can't reach yet** — noted
+  2026-10-06 in the search audit. Questions that parse, but whose filter
+  Team Records doesn't have, so it's dropped silently:
+  - Date ranges: "most points since 2000", "most goals in the 90s" -
+    Records has eras only (Premier League / First Division...).
+  - Bottom / relegated: "most points by a relegated team", "fewest points
+    by a bottom team" - Position is one exact place; "bottom" varies by
+    season (could be a "Last" option), relegation needs data we lack.
+  - Home / away: "most home wins in a season" - season standings are
+    totals; needs home/away splits per club from the Worker.
 
 - Maybe: **A club's title races** — noted 2026-10-06. "Arsenal closest
   title races" answers for the whole league - League History has no club

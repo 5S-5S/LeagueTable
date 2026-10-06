@@ -1523,11 +1523,36 @@
     function detectRecordIntent(text) {
         const has = pattern => pattern.test(text);
         const low = has(RECORD_LOW_WORDS);
-        const perGame = has(/\b(per (game|match)|ppg|a game|a match|average)\b/);
+        // "per game", "goals a game" - not "in a game", which is a match
+        const perGame = has(/\bper (game|match)\b|\bppg\b|(?<!\bin )\ba (game|match)\b|\baverage\b/);
         const seasonWord = has(/\b(seasons?|campaigns?)\b/);
         const clubWord = has(/\b(team|teams|club|clubs|side|sides|by)\b/);
+        const clubNoun = has(/\b(team|teams|club|clubs|side|sides)\b/);
 
         // League History - the season itself
+        // "best title race by points": the top two's average points
+        if (has(/\btitle (races?|fights?|battles?)\b/) && !has(/\b(closest|tightest|narrowest|biggest|widest|one sided)\b/) &&
+                has(/\b(points|quality|strongest|highest|best|greatest)\b/)) {
+            return { view: 'league-history', rank: 'topTwo', order: has(/\b(lowest|weakest|worst|fewest)\b/) ? 'fewest' : 'most', perGame };
+        }
+        // "season with the most draws": the season is the subject, so it's
+        // the league's rate, not one club's total
+        const seasonSubject = text.match(/\bseasons? with (the )?(most|fewest|least|highest|lowest)\b(.*)$/);
+        if (seasonSubject && (!clubWord || /\b(clubs|teams)\b/.test(seasonSubject[3]))) {
+            const what = seasonSubject[3];
+            const order = /fewest|least|lowest/.test(seasonSubject[2]) ? 'fewest' : 'most';
+            if (/\b(draws?|drawn)\b/.test(what)) return { view: 'league-history', rank: 'drawPct', order, perGame };
+            if (/\bhome wins?\b/.test(what)) return { view: 'league-history', rank: 'homePct', order, perGame };
+            if (/\baway wins?\b/.test(what)) return { view: 'league-history', rank: 'awayPct', order, perGame };
+            if (/\b(clubs|teams)\b/.test(what)) return { view: 'league-history', rank: 'teams', order, perGame };
+            if (/\b(matches|games)\b/.test(what)) return { view: 'league-history', rank: 'games', order, perGame };
+            if (/\bgoals?\b/.test(what)) return { view: 'league-history', rank: 'goals', order, perGame };
+        }
+        // How the league has changed: every season, in order
+        if (has(/\bhow (has|have|did) (· )*(the )?(· )*(league )?(changed|evolved)\b|\b(by|each|every|per) season\b|\bover the (years|decades)\b/) &&
+                !clubNoun && !has(/\b(table|standings|titles?|finish)\b/)) {
+            return { view: 'league-history', rank: 'season', order: 'most', perGame: perGame || has(/\bgoals per game\b/) };
+        }
         if (has(/\btitle (races?|fights?|battles?)\b/)) {
             const order = has(/\b(biggest|widest|one sided|least competitive|least close)\b/) ? 'most' : 'fewest';
             return { view: 'league-history', rank: 'gap', order, perGame };
@@ -1563,11 +1588,17 @@
         else if (has(/\b(draws|drawn|drew)\b/)) stat = 'drawn';
         else if (has(/\b(losses|defeats|lost)\b/)) stat = 'lost';
         else if (has(/\b(goals|scored|scoring|attack)\b/)) stat = 'goalsFor';
+        // "best season" / "worst season": by points
+        const bestSeason = !stat && has(/\b(best|worst|greatest) (· )*(seasons?|campaigns?)\b/);
+        if (bestSeason) stat = 'points';
         if (!stat) return null;
         // Goals can be a match's ("highest scoring game") - they need the
-        // word season; points, wins, draws, losses and goal difference are
-        // only ever a season's, unless it says game or match
-        if (!seasonWord && (stat === 'goalsFor' || has(/\b(games?|matches|match|draws? in|win in)\b/))) return null;
+        // word season, or "by" a finish ("by a semi finalist"); points,
+        // wins, draws, losses and goal difference are only ever a season's,
+        // unless it says game or match ("per game" is a season's rate)
+        const finishWord = has(/\bby (a |the )?(beaten |losing )?(champions?|winners?|runners? up|finalists?|semi ?finalists?|quarter ?finalists?|(\d{1,2})(st|nd|rd|th))\b/);
+        const matchWord = has(/\bin (a|the|one) (game|match)\b|(?<!\bper |\ba )\b(games?|matches|match)\b|\bdraws? in\b|\bwin in\b/);
+        if (!seasonWord && ((stat === 'goalsFor' && !finishWord) || matchWord)) return null;
         // "worst defence" = most conceded, "best defence" = fewest
         const badIsMore = stat === 'goalsAgainst' || stat === 'lost';
         let order = low ? 'fewest' : 'most';
@@ -1579,12 +1610,17 @@
             finish.rank = '1';
             finish.stage = 'Champions';
         }
-        return { view: 'team-records', stat, order, perGame, finish };
+        return { view: 'team-records', stat, order, perGame, finish, bestSeason };
     }
 
     function detectIntent(text, scoreline) {
         const has = pattern => pattern.test(text);
         const location = has(/\bhome\b/) ? 'home' : (has(/\b(away|road)\b/) ? 'away' : '');
+
+        // An unbeaten season is a season record (fewest losses), not a run
+        if (has(/\b(unbeaten|undefeated) (· )*(seasons?|campaigns?)\b|\binvincibles?\b/)) {
+            return { view: 'team-records', stat: 'lost', order: 'fewest', perGame: false, finish: detectFinish(text), location };
+        }
 
         if (has(/\b(streaks?|runs?|in a row|consecutive|unbeaten|undefeated|winless|(games?|matches) without( a)? (win|winning|defeat|losing|loss|scoring|conceding))\b/)) {
             return {
@@ -1822,6 +1858,17 @@
             else if (/\b(draws?|drew|level)\b/.test(rest)) intent.category = 'draws';
             else intent.category = 'victories';
         }
+        // Season records counting qualifiers too ("including qualifiers")
+        if (intent.view === 'team-records' || intent.view === 'league-history') {
+            intent.withQualifiers = /\b(including|incl|with|plus) (the )?qualif/.test(rest);
+        }
+
+        // A club's season-by-season is Team History ("Arsenal goals per
+        // game by season")
+        if (intent.view === 'league-history' && intent.rank === 'season' && mentions.length >= 1) {
+            Object.assign(intent, { view: 'team-seasons', finish: detectFinish(rest) });
+        }
+
         // A club named in a scoring-seasons question ("highest scoring
         // Aston Villa seasons") means that club's seasons by goals scored,
         // not the league's
@@ -2180,9 +2227,11 @@
             t1: team,
             pg: intent.perGame ? '1' : '',
             p3: parsed.filters.points === '1' ? '1' : '',
-            matches: comp.continental && parsed.filters.excludeMainStage ? 'qualifiers' : ''
+            matches: !comp.continental ? '' : (parsed.filters.excludeMainStage ? 'qualifiers' : (intent.withQualifiers ? 'all' : ''))
         };
-        const what = `${intent.order === 'fewest' ? 'Fewest' : 'Most'} ${RECORD_STAT_NAMES[intent.stat]}${intent.perGame ? ' per game' : ''}`;
+        const what = intent.stat === 'goalDifference'
+            ? `${intent.order === 'fewest' ? 'Worst' : 'Best'} goal difference${intent.perGame ? ' per game' : ''}`
+            : `${intent.order === 'fewest' ? 'Fewest' : 'Most'} ${RECORD_STAT_NAMES[intent.stat]}${intent.perGame ? ' per game' : ''}`;
         return {
             kind: 'team-records', icon: '📈', comp, crestTeam: team || undefined,
             title: `${team || 'All clubs'} · ${what} in a ${comp.continental ? 'campaign' : 'season'}`,
@@ -2206,7 +2255,7 @@
             season: parsed.eras[comp.key] || '',
             pg: intent.perGame ? '1' : '',
             p3: !comp.continental && parsed.filters.points === '1' ? '1' : '',
-            matches: comp.continental && parsed.filters.excludeMainStage ? 'qualifiers' : ''
+            matches: !comp.continental ? '' : (parsed.filters.excludeMainStage ? 'qualifiers' : (intent.withQualifiers ? 'all' : ''))
         };
         const low = intent.order === 'fewest';
         const what = {
@@ -2370,6 +2419,11 @@
                 // One season's numbers are that season's table
                 if (season !== null) {
                     primary.push(tableResult(comp, parsed, t1));
+                    break;
+                }
+                // A club's best Champions League season is how far it got
+                if (comp.continental && intent.bestSeason) {
+                    primary.push(seasonsResult(comp, t1, parsed, { rank: '', stage: '', better: false }));
                     break;
                 }
                 // A position means nothing in the Champions League, a stage
@@ -3383,9 +3437,9 @@
                     html: `The ${short} title race with the ${most ? 'most' : 'fewest'} points was ${latest.season}: ${b(latest.champion)} and ${b(latest.runnerUp)} averaged ${points(latest.topTwo)}${three}${many ? ` (${top.length} seasons share it)` : ''}.`
                 };
             case 'teams':
-                return { html: `The ${seasons} ${short} had the ${most ? 'most' : 'fewest'} clubs: ${latest.teams}.` };
+                return { html: `The ${most ? 'most' : 'fewest'} clubs in a ${short} season: ${latest.teams}, in ${seasons}.` };
             case 'games':
-                return { html: `The ${seasons} ${short} had the ${most ? 'most' : 'fewest'} matches: ${formatNumber(latest.games)}.` };
+                return { html: `The ${most ? 'most' : 'fewest'} matches in a ${short} season: ${formatNumber(latest.games)}, in ${seasons}.` };
             default:
                 return null;
         }
