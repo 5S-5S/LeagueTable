@@ -1,0 +1,108 @@
+name: Back up D1 database
+
+on:
+  schedule:
+    # Sundays 03:00 UTC - well clear of the 06:00-06:30 UTC score updates
+    # and sync, so no rows land between the export and its row-count check.
+    - cron: "0 3 * * 0"
+  workflow_dispatch:
+
+# Weekly full export of D1 (wrangler d1 export: schema, indexes and every
+# row as SQL), gzipped onto the "d1-backups" GitHub release - release files
+# stay out of git history, so the repo doesn't grow. Keeps the newest 12
+# (about three months); D1's own Time Travel covers the last 7 days on the
+# free plan. Restoring: backend/README.md's "Backups" section.
+jobs:
+  backup-d1:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # the backups release
+      issues: write
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: d1-backups
+      KEEP: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install wrangler
+        working-directory: backend/worker
+        run: npm ci
+
+      - name: Export D1
+        working-directory: backend/worker
+        run: |
+          FILE="leaguetable-$(date -u +%F).sql"
+          npx wrangler d1 export leaguetable --remote --output "$RUNNER_TEMP/$FILE"
+          echo "FILE=$FILE" >> "$GITHUB_ENV"
+
+      # A backup that doesn't restore is no backup: load it into a fresh
+      # SQLite database and check it has every row live D1 has.
+      - name: Check the backup restores
+        working-directory: backend/worker
+        run: |
+          command -v sqlite3 >/dev/null || { sudo apt-get update && sudo apt-get install -y sqlite3; }
+          sqlite3 "$RUNNER_TEMP/restore.db" < "$RUNNER_TEMP/$FILE"
+          restored=$(sqlite3 "$RUNNER_TEMP/restore.db" "SELECT COUNT(*) FROM matches")
+          live=$(npx wrangler d1 execute leaguetable --remote --json --command "SELECT COUNT(*) AS n FROM matches" | jq '.[0].results[0].n')
+          echo "Rows restored: $restored, rows in D1: $live"
+          [ "$restored" -gt 0 ] && [ "$restored" = "$live" ]
+
+      - name: Upload to the d1-backups release
+        run: |
+          gzip -9 "$RUNNER_TEMP/$FILE"
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || gh release create "$RELEASE_TAG" \
+            --title "D1 backups" --latest=false \
+            --notes "Weekly exports of the leaguetable D1 database (backup-d1 workflow). Restoring: backend/README.md, \"Backups\"."
+          gh release upload "$RELEASE_TAG" "$RUNNER_TEMP/$FILE.gz" --clobber
+          # Keep the newest $KEEP (file names sort by date)
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[].name' \
+            | grep -E '^leaguetable-[0-9-]+\.sql\.gz$' | sort -r | tail -n +$((KEEP + 1)) \
+            | while read -r name; do gh release delete-asset "$RELEASE_TAG" "$name" --yes; done
+
+      # Same one-issue-per-outage approach as sync-d1.yml: a silently
+      # failing backup is only discovered when it's needed.
+      - name: File or update a GitHub issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- backup-d1-failure-tracker -->';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
+
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'backup-failure',
+            });
+            const existing = issues.find(i => i.body && i.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Failed again on ${today}: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'backup-d1 workflow failed - no new D1 backup this week',
+                labels: ['backup-failure'],
+                body: `${marker}\nThe weekly D1 backup failed on ${today}: ${runUrl}\n\n` +
+                  `The site is unaffected - this only means the newest backup on the d1-backups ` +
+                  `release is older than a week. Check the run log: the export, the restore check ` +
+                  `(rows restored vs rows in D1) or the upload.\n\n` +
+                  `This issue stays open and collects a comment per failed week until someone ` +
+                  `closes it.`,
+              });
+            }

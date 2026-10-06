@@ -11,34 +11,33 @@ Most to least important; details are in each item below.
 2. Automated checks
 3. Error reporting
 4. About / sources page
-5. D1 backups
 
 **Tier 2 - high value, soon after launch**
-6. Season records and title races
-7. "Report a data error" link
-8. League trends over time
-9. Match Finder upgrades (what's left)
-10. API caching (what's left - the outage-preventing parts are done)
+5. Season records and title races
+6. "Report a data error" link
+7. League trends over time
+8. Match Finder upgrades (what's left)
+9. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-11. Typo tolerance in search
-12. Upcoming matches (home page strip)
-13. Recent searches
-14. Pinned / favourite team
-15. Road to the final
-16. Head-to-head by decade
-17. More competitions (depends on the data)
+10. Typo tolerance in search
+11. Upcoming matches (home page strip)
+12. Recent searches
+13. Pinned / favourite team
+14. Road to the final
+15. Head-to-head by decade
+16. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-18. "On this day"
-19. Trivia mode
-20. Side-by-side Team Seasons
-21. Team progression chart (after league trends)
-22. "/" to search
-23. Penalty shootout leaderboard (team and head-to-head answers done)
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
+17. "On this day"
+18. Trivia mode
+19. Side-by-side Team Seasons
+20. Team progression chart (after league trends)
+21. "/" to search
+22. Penalty shootout leaderboard (team and head-to-head answers done)
+23. Lighter pages (small gain - see the item)
+24. Knockout Stage bracket view (on hold)
+25. Country vs Country
 
 ## Items
 
@@ -118,9 +117,6 @@ Most to least important; details are in each item below.
 - Later (before launch): **Error reporting** — noted 2026-10-03. A small
   handler that reports visitors' JavaScript errors (to the Worker or a
   free service), to hear about breakages only some devices hit (iOS).
-
-- Later (before launch): **D1 backups** — noted 2026-10-03. A periodic
-  export of the database (to the repo or elsewhere) as cheap insurance.
 
 - Partly done: **API caching for traffic (Cloudflare free plan)** —
   noted 2026-10-03. Free-plan limits per day: 100k Worker requests, 100k

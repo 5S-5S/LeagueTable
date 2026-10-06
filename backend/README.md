@@ -232,6 +232,50 @@ existing `FOOTBALL_DATA_API_KEY`/`GIST_PAT` secrets live:
 Once those are added, either wait for the 06:30 UTC schedule or trigger
 it manually from the Actions tab ("Run workflow").
 
+## Backups
+
+`.github/workflows/backup-d1.yml` exports the whole database every
+Sunday at 03:00 UTC (`wrangler d1 export`: schema, indexes and every
+row as SQL, ~38 MB, ~1.7 MB gzipped), checks the file restores - loaded
+into a fresh SQLite database, it must have exactly as many rows as live
+D1 - and uploads it to the **`d1-backups` release**, keeping the newest
+12 (about three months). A failed run files a `backup-failure` issue,
+like the sync. It reuses the sync's `CLOUDFLARE_API_TOKEN` (`D1: Edit`
+covers export). Run it any time from the Actions tab ("Run workflow").
+The repo is public, so the backups are too - fine, as it's the same
+match data the site shows.
+
+The gists are still the original source, so D1 could also be rebuilt
+from them (see "Regenerating the seed data" below); a backup is the
+faster path, and keeps anything only D1 has.
+
+**Restoring**, by what went wrong:
+
+- **A bad change in the last 7 days** (a wrong UPDATE, a bad sync): D1's
+  Time Travel restores the database in place to any minute in the last
+  7 days on the free plan (30 on Workers Paid), no backup needed:
+  `npx wrangler d1 time-travel info leaguetable --timestamp=<time>` to
+  check the point, then
+  `npx wrangler d1 time-travel restore leaguetable --timestamp=<unix time>`.
+  This overwrites the live database, so export it first
+  (`npx wrangler d1 export leaguetable --remote --output now.sql`).
+- **Anything older, or the database itself gone**: restore a backup into
+  a new database and point everything at it.
+  1. `gh release download d1-backups -p 'leaguetable-YYYY-MM-DD.sql.gz'`
+     then `gunzip` it.
+  2. `npx wrangler d1 create leaguetable-restored`, then
+     `npx wrangler d1 execute leaguetable-restored --remote --file=leaguetable-YYYY-MM-DD.sql`.
+     **Write limit:** every row also writes once per index (7), so ~167k
+     rows is over a million rows written - the free plan allows 100,000 a
+     day. Switch to Workers Paid ($5, includes 50M writes) for the month
+     of the restore.
+  3. Put the new database's id in `backend/worker/wrangler.toml` and the
+     `CLOUDFLARE_DATABASE_ID` repo secret, `npx wrangler deploy`, and
+     bump `cache-version` and `history-version` in KV (see `src/index.js`).
+  4. Run the sync workflow once to add any matches since the backup.
+- **Just looking at old data**: `gunzip -c leaguetable-YYYY-MM-DD.sql.gz |
+  sqlite3 old.db` gives a local copy to query, nothing touched on D1.
+
 ## Layout
 
 ```
