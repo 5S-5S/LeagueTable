@@ -32,12 +32,13 @@ Most to least important; details are in each item below.
 17. "On this day"
 18. Trivia mode
 19. Side-by-side Team Seasons
-20. Team progression chart (after League History)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. Lighter pages (small gain - see the item)
-24. Knockout Stage bracket view (on hold)
-25. Country vs Country
+20. League History chart
+21. Team progression chart (after League History)
+22. "/" to search
+23. Penalty shootout leaderboard (team and head-to-head answers done)
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
 
 ## Items
 
@@ -155,7 +156,8 @@ Most to least important; details are in each item below.
     with stat, most / fewest, position (Domestic) or stage reached and
     matches (Continental), era, team, Per game and 3 Points for all
     Wins; League History (step 3: every season added up, rankable).
-    Not built yet: League History's chart, search. Dropped 2026-10-06:
+    Not built yet: search (next, after a manual check). The chart is
+    its own lower-priority item now. Dropped 2026-10-06:
     grouping to the best row per position or per club - the Position
     filter and Team History already answer those.
   - Home: the Team Seasons tab renamed **Seasons** (everything in it is
@@ -206,7 +208,8 @@ Most to least important; details are in each item below.
   - Build order: 1. the Seasons tab and its sub-tabs, with Team Records
     (done); 2. per game and 3 points for a win (done); 3. League
     History's table (evolution order, ranked records, title races - done);
-    4. its chart; 5. search for Team Records and League History.
+    4. search for Team Records and League History. (League History's
+    chart moved to Tier 4.)
 
 - Later: **Bug: Continental League Tables, one season with Exclude Main
   Stage shows nothing** — noted 2026-10-06. e.g. 2016-17 with Exclude
@@ -373,6 +376,12 @@ Most to least important; details are in each item below.
 - Maybe: **Pinned/favorite team** — remember a user's team via
   `localStorage` so the landing-page search can offer a one-click shortcut
   back to their dashboard instead of retyping every visit.
+
+- Maybe: **League History chart** — noted 2026-10-06, split from Season
+  records and title races. A line chart on League History of whichever
+  column it's ranked by, across the seasons (goals per game, home win %,
+  the title-race gap...) - the same rows, drawn. Per game matters here:
+  leagues changed size.
 
 - Maybe: **Team progression chart** — a line chart (points or league
   position per season) on the Team Dashboard for Domestic and Continental,
