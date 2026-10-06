@@ -14,32 +14,31 @@ Most to least important; details are in each item below.
 5. D1 backups
 
 **Tier 2 - high value, soon after launch**
-6. Link previews when sharing
-7. Season records and title races
-8. "Report a data error" link
-9. League trends over time
-10. Match Finder upgrades (what's left)
-11. API caching (what's left - the outage-preventing parts are done)
+6. Season records and title races
+7. "Report a data error" link
+8. League trends over time
+9. Match Finder upgrades (what's left)
+10. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-12. Typo tolerance in search
-13. Upcoming matches (home page strip)
-14. Penalty shootout records
-15. Recent searches
-16. Pinned / favourite team
-17. Road to the final
-18. Head-to-head by decade
-19. More competitions (depends on the data)
+11. Typo tolerance in search
+12. Upcoming matches (home page strip)
+13. Penalty shootout records
+14. Recent searches
+15. Pinned / favourite team
+16. Road to the final
+17. Head-to-head by decade
+18. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-20. "On this day"
-21. Trivia mode
-22. Side-by-side Team Seasons
-23. Team progression chart (after league trends)
-24. "/" to search
-25. Lighter pages (small gain - see the item)
-26. Knockout Stage bracket view (on hold)
-27. Country vs Country
+19. "On this day"
+20. Trivia mode
+21. Side-by-side Team Seasons
+22. Team progression chart (after league trends)
+23. "/" to search
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
 
 ## Items
 
@@ -158,12 +157,6 @@ Most to least important; details are in each item below.
 - Later: **"Report a data error" link** — noted 2026-10-03. A small link
   on each answer / table that opens the contact page with the question
   (or page link) pre-filled, so visitors can flag wrong results easily.
-
-- Later: **Link previews when sharing** — noted 2026-10-03. Copy Link /
-  search links show a bare URL in WhatsApp, X, Discord etc. Add title /
-  description (Open Graph) tags - for search links, the question and its
-  answer - so they preview properly. Small; helps the site spread after
-  launch.
 
 - Later: **Side-by-side Team Seasons** — a split view comparing two teams'
   season-by-season history in one page, rather than the current

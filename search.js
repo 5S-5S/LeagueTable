@@ -2425,7 +2425,26 @@
             <div class="search-answer-body">
                 <p class="search-answer-text">${answer.html}</p>
                 ${answer.note ? `<p class="search-answer-note">${answer.note}</p>` : ''}
-            </div>`;
+            </div>
+            <button type="button" class="btn btn-secondary copy-link-trigger copy-link-inline search-answer-share">🔗 Copy Link</button>`;
+        el.querySelector('.search-answer-share').addEventListener('click', copySearchLink);
+    }
+
+    // The tabs' Copy Link, for an answer: in search mode the address is
+    // the question (the page keeps it), so the link is just the address.
+    async function copySearchLink(event) {
+        const btn = event.currentTarget;
+        let copied = true;
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+        } catch (err) {
+            copied = false;
+        }
+        btn.textContent = copied ? '✓ Copied!' : 'Copy failed';
+        clearTimeout(btn._resetTimer);
+        btn._resetTimer = setTimeout(() => {
+            btn.textContent = '🔗 Copy Link';
+        }, 1500);
     }
 
     function recordHtml(w, d, l) {
