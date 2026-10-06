@@ -19,25 +19,25 @@ Most to least important; details are in each item below.
 8. "Report a data error" link
 9. League trends over time
 10. Match Finder upgrades (what's left)
-11. Lighter pages
-12. API caching (what's left - the outage-preventing parts are done)
+11. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-13. Typo tolerance in search
-14. Upcoming matches (home page strip)
-15. Penalty shootout records
-16. Recent searches
-17. Pinned / favourite team
-18. Road to the final
-19. Head-to-head by decade
-20. More competitions (depends on the data)
+12. Typo tolerance in search
+13. Upcoming matches (home page strip)
+14. Penalty shootout records
+15. Recent searches
+16. Pinned / favourite team
+17. Road to the final
+18. Head-to-head by decade
+19. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-21. "On this day"
-22. Trivia mode
-23. Side-by-side Team Seasons
-24. Team progression chart (after league trends)
-25. "/" to search
+20. "On this day"
+21. Trivia mode
+22. Side-by-side Team Seasons
+23. Team progression chart (after league trends)
+24. "/" to search
+25. Lighter pages (small gain - see the item)
 26. Knockout Stage bracket view (on hold)
 27. Country vs Country
 
@@ -284,9 +284,15 @@ Most to least important; details are in each item below.
   daily (like "On this day").
 
 - Maybe: **Lighter pages** — noted 2026-10-03. The sport pages are
-  620-790 KB of HTML because their code is inline; moving it into
-  separate .js files lets browsers cache it once instead of with every
-  page. Helps phones, and pairs with API caching for traffic.
+  620-790 KB of HTML (116-146 KB compressed) because their code is
+  inline; moving it into separate .js files lets browsers cache it
+  apart from the page. Moved to Tier 4 on 2026-10-06: GitHub Pages
+  already lets browsers keep every file 10 minutes and then revalidate
+  (a tiny "unchanged" reply), so returning visitors mostly don't
+  re-download pages today. Splitting only helps when a push changes a
+  page's HTML but not its code, or a visitor opens both Domestic and
+  Continental (shared code like search downloaded once) - small gain
+  for a big refactor of four large pages.
 
 - Maybe: **Typo tolerance in search** — noted 2026-10-03. "arsnl",
   "chelsae" find nothing; fuzzy-match club names ("Did you mean
