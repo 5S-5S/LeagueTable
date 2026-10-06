@@ -23,19 +23,19 @@ Most to least important; details are in each item below.
 **Tier 3 - worthwhile features**
 11. Typo tolerance in search
 12. Upcoming matches (home page strip)
-13. Penalty shootout leaderboard (team and head-to-head answers done)
-14. Recent searches
-15. Pinned / favourite team
-16. Road to the final
-17. Head-to-head by decade
-18. More competitions (depends on the data)
+13. Recent searches
+14. Pinned / favourite team
+15. Road to the final
+16. Head-to-head by decade
+17. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-19. "On this day"
-20. Trivia mode
-21. Side-by-side Team Seasons
-22. Team progression chart (after league trends)
-23. "/" to search
+18. "On this day"
+19. Trivia mode
+20. Side-by-side Team Seasons
+21. Team progression chart (after league trends)
+22. "/" to search
+23. Penalty shootout leaderboard (team and head-to-head answers done)
 24. Lighter pages (small gain - see the item)
 25. Knockout Stage bracket view (on hold)
 26. Country vs Country
@@ -303,7 +303,8 @@ Most to least important; details are in each item below.
   from the shootout scores ("Arsenal penalty shootouts" -> W2 L1, most
   recently losing 4-3 to PSG in the final), not the match results. Still
   to do: a leaderboard with no team - "most shootouts won", "best
-  shootout record" - which needs a new all-clubs list.
+  shootout record" - which needs a new all-clubs list. Moved to Tier 4
+  on 2026-10-06 (low priority).
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
