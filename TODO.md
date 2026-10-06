@@ -156,8 +156,10 @@ Most to least important; details are in each item below.
     with stat, most / fewest, position (Domestic) or stage reached and
     matches (Continental), era, team, Per game and 3 Points for all
     Wins; League History (step 3: every season added up, rankable).
-    Not built yet: search (next, after a manual check). The chart is
-    its own lower-priority item now. Dropped 2026-10-06:
+    Search (2026-10-06): record questions ("most points in a season",
+    "fewest goals conceded by a champion", "closest title race", "has
+    home advantage shrunk") open Team Records / League History with a
+    one-line answer. The chart is its own lower-priority item. Dropped 2026-10-06:
     grouping to the best row per position or per club - the Position
     filter and Team History already answer those.
   - Home: the Team Seasons tab renamed **Seasons** (everything in it is
@@ -208,8 +210,8 @@ Most to least important; details are in each item below.
   - Build order: 1. the Seasons tab and its sub-tabs, with Team Records
     (done); 2. per game and 3 points for a win (done); 3. League
     History's table (evolution order, ranked records, title races - done);
-    4. search for Team Records and League History. (League History's
-    chart moved to Tier 4.)
+    4. search for Team Records and League History (done). (League
+    History's chart moved to Tier 4.)
 
 - Later: **Bug: Continental League Tables, one season with Exclude Main
   Stage shows nothing** — noted 2026-10-06. e.g. 2016-17 with Exclude

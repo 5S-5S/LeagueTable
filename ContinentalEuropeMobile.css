@@ -3556,6 +3556,8 @@ html.search-mode[data-search-view="table"] #matchHistorySection {
    area, so show that area with only the results box (no tab buttons,
    description or filters), and none of the League Tables boxes below */
 html.search-mode[data-search-view="match-finder"] #controlsSection,
+html.search-mode[data-search-view="team-records"] #controlsSection,
+html.search-mode[data-search-view="league-history"] #controlsSection,
 html.search-mode[data-search-view="team-seasons"] #controlsSection,
 html.search-mode[data-search-view="team-streaks"] #controlsSection {
     display: block !important;
@@ -3565,6 +3567,14 @@ html.search-mode[data-search-view="match-finder"] #controlsSection .tab-containe
 html.search-mode[data-search-view="match-finder"] #controlsSection .tab-content:not(#matchFinderContent),
 html.search-mode[data-search-view="match-finder"] #matchFinderContent > :not(#matchFinderResults),
 html.search-mode[data-search-view="match-finder"] .table-section,
+html.search-mode[data-search-view="team-records"] #controlsSection .tab-container,
+html.search-mode[data-search-view="team-records"] #controlsSection .tab-content:not(#teamSeasonsContent),
+html.search-mode[data-search-view="team-records"] #teamSeasonsContent > :not(#teamRecordsTable),
+html.search-mode[data-search-view="team-records"] .table-section,
+html.search-mode[data-search-view="league-history"] #controlsSection .tab-container,
+html.search-mode[data-search-view="league-history"] #controlsSection .tab-content:not(#teamSeasonsContent),
+html.search-mode[data-search-view="league-history"] #teamSeasonsContent > :not(#leagueHistoryTable),
+html.search-mode[data-search-view="league-history"] .table-section,
 html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-container,
 html.search-mode[data-search-view="team-seasons"] #controlsSection .tab-content:not(#teamSeasonsContent),
 html.search-mode[data-search-view="team-seasons"] #teamSeasonsContent > :not(#teamHistoryTable),

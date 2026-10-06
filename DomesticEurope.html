@@ -4391,7 +4391,7 @@
         // Team Seasons' rows, { streaks } from Team Streaks.
         function updateSearchAnswer(from) {
             if (!SEARCH_MODE_VIEW || SEARCH_MODE_VIEW === 'none') return;
-            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'team-streaks': 'streaks' }[SEARCH_MODE_VIEW] || 'table';
+            const source = { 'match-finder': 'finder', 'team-seasons': 'seasons', 'team-streaks': 'streaks', 'team-records': 'records', 'league-history': 'league' }[SEARCH_MODE_VIEW] || 'table';
             if (!(source in from)) return;
             const { table: tableResult, h2h: h2hResult, matchHistory: matchHistoryResult, finder: finderResults, seasons: seasonsRows, streaks } = from;
             const isFinder = SEARCH_MODE_VIEW === 'match-finder';
@@ -4405,7 +4405,10 @@
             const extraTeam2s = isSeasons || isStreaks ? [] : (isFinder ? state.matchFinderExtraTeam2s : state.extraTeam2s);
             const season = isSeasons ? state.teamSeasonsSelectedSeason
                 : (isFinder ? state.matchFinderSeason : (isStreaks ? '' : state.selectedSeason));
-            const league = isSeasons ? state.teamSeasonsSelectedLeague : state.selectedLeague;
+            // The Seasons tab's sub-tabs share its league
+            const isRecords = SEARCH_MODE_VIEW === 'team-records';
+            const isLeagueHistory = SEARCH_MODE_VIEW === 'league-history';
+            const league = isSeasons || isRecords || isLeagueHistory ? state.teamSeasonsSelectedLeague : state.selectedLeague;
             // Season standings load as one batch (a flag per cache entry on
             // Continental, one flag on Domestic)
             const seasonsLoading = typeof state.seasonStandingsApiLoading === 'object' && state.seasonStandingsApiLoading
@@ -4449,6 +4452,17 @@
                     team1Goals: state.matchFinderRecentTeam1Goals, opponentGoals: state.matchFinderRecentOpponentGoals
                 } : null,
                 streaks: isStreaks ? streaks : null,
+                // Team Records' ranked rows and what they're ranked by
+                records: isRecords ? {
+                    rows: from.records, stat: state.recordsStat, order: state.recordsOrder,
+                    perGame: state.recordsPerGame, threePoints: state.recordsThreePoints,
+                    position: state.recordsPosition, team: state.recordsTeam, continental: false
+                } : null,
+                // League History's ranked rows (season order has no answer)
+                leagueHistory: isLeagueHistory ? {
+                    rows: from.league, rank: state.leagueHistoryRank, order: state.leagueHistoryOrder,
+                    perGame: state.leagueHistoryPerGame, threePoints: !!state.leagueHistoryThreePoints
+                } : null,
                 // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
                 historicTitles: isSeasons && team1 && typeof historicSeasonsData !== 'undefined'
                     ? historicSeasonsData.filter(([s, div, pos, team]) => team === team1 && pos === 1 &&
@@ -11244,6 +11258,7 @@
             }
 
             const rows = buildLeagueHistoryRows(bySeason);
+            updateSearchAnswer({ league: rows });
             elements.leagueHistoryInfo.textContent = rows.length
                 ? `${rows.length} season${rows.length === 1 ? '' : 's'}${ranked ? ' (finished seasons only)' : ''}`
                 : 'No seasons match these filters.';
@@ -11578,6 +11593,7 @@
             updateTeamRecordsControls();
 
             const rows = buildTeamRecordsRows();
+            updateSearchAnswer({ records: rows });
             const totalPages = Math.max(1, Math.ceil(rows.length / RECORDS_PAGE_SIZE));
             state.recordsPage = Math.min(Math.max(1, state.recordsPage), totalPages);
             const pageRows = rows.slice((state.recordsPage - 1) * RECORDS_PAGE_SIZE, state.recordsPage * RECORDS_PAGE_SIZE);

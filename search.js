@@ -1511,6 +1511,77 @@
 
     // What the visitor is after, from the words left once teams,
     // competitions and the season are taken out
+    // Season records (Seasons tab): "most points in a season", "fewest
+    // goals conceded by a champion", "closest title race", "highest
+    // scoring season". Team Records ranks club-seasons, League History the
+    // seasons themselves. A record needs the word season (or campaign) -
+    // "most goals" on its own is Match Finder's matches - except a title
+    // race, home advantage or a draw rate, which are only ever seasons.
+    const RECORD_SUPERLATIVES = /\b(most|highest|best|record|biggest|largest|greatest|fewest|least|lowest|worst|smallest)\b/;
+    const RECORD_LOW_WORDS = /\b(fewest|least|lowest|smallest|narrowest|closest|tightest|shrunk|weakest)\b/;
+
+    function detectRecordIntent(text) {
+        const has = pattern => pattern.test(text);
+        const low = has(RECORD_LOW_WORDS);
+        const perGame = has(/\b(per (game|match)|ppg|a game|a match|average)\b/);
+        const seasonWord = has(/\b(seasons?|campaigns?)\b/);
+        const clubWord = has(/\b(team|teams|club|clubs|side|sides|by)\b/);
+
+        // League History - the season itself
+        if (has(/\btitle (races?|fights?|battles?)\b/)) {
+            const order = has(/\b(biggest|widest|one sided|least competitive|least close)\b/) ? 'most' : 'fewest';
+            return { view: 'league-history', rank: 'gap', order, perGame };
+        }
+        if (has(/\b(winning|title) margins?\b|\bpoints? gaps?\b|\b(won|win|wins) (the )?(league|title|·) by\b/)) {
+            return { view: 'league-history', rank: 'gap', order: low ? 'fewest' : 'most', perGame };
+        }
+        if (has(/\bhome (advantage|win (rate|percentage|%)|wins? percentage)\b/)) {
+            return { view: 'league-history', rank: 'homePct', order: low ? 'fewest' : 'most', perGame };
+        }
+        if (has(/\baway (win|wins) (rate|percentage|%)\b/)) {
+            return { view: 'league-history', rank: 'awayPct', order: low ? 'fewest' : 'most', perGame };
+        }
+        if (has(/\bdraws? (rate|percentage|%)\b/)) {
+            return { view: 'league-history', rank: 'drawPct', order: low ? 'fewest' : 'most', perGame };
+        }
+        // (· = a competition's name taken out: "highest scoring Serie A season")
+        if (!clubWord && (has(/\b(highest|lowest|most|least|fewest) scoring (· )*seasons?\b/) ||
+                has(/\bseasons? with the (most|fewest|least) goals\b/) || has(/\bleague history\b/))) {
+            if (has(/\bleague history\b/) && !has(RECORD_SUPERLATIVES)) return { view: 'league-history', rank: 'season', order: 'most', perGame };
+            return { view: 'league-history', rank: 'goals', order: low ? 'fewest' : 'most', perGame };
+        }
+
+        // Team Records - a club's season. Match Finder's own phrasings
+        // ("biggest wins", "highest scoring draws") stay its own.
+        if (!has(RECORD_SUPERLATIVES)) return null;
+        if (has(/\b(biggest|heaviest|largest|record|best|worst) (wins?|victory|victories|defeats?|loss|losses|beatings?)\b|\b(scoring|score|biggest) draws?\b|\bthrashings?\b|\bcomebacks?\b/)) return null;
+        let stat = null;
+        if (has(/\bgoal difference\b|\bgd\b/)) stat = 'goalDifference';
+        else if (has(/\b(conceded|conceding|goals against|let in|defen[cs]e|defensive)\b/)) stat = 'goalsAgainst';
+        else if (has(/\b(points?|pts|ppg)\b/)) stat = 'points';
+        else if (has(/\b(wins|won|victories)\b/)) stat = 'won';
+        else if (has(/\b(draws|drawn|drew)\b/)) stat = 'drawn';
+        else if (has(/\b(losses|defeats|lost)\b/)) stat = 'lost';
+        else if (has(/\b(goals|scored|scoring|attack)\b/)) stat = 'goalsFor';
+        if (!stat) return null;
+        // Goals can be a match's ("highest scoring game") - they need the
+        // word season; points, wins, draws, losses and goal difference are
+        // only ever a season's, unless it says game or match
+        if (!seasonWord && (stat === 'goalsFor' || has(/\b(games?|matches|match|draws? in|win in)\b/))) return null;
+        // "worst defence" = most conceded, "best defence" = fewest
+        const badIsMore = stat === 'goalsAgainst' || stat === 'lost';
+        let order = low ? 'fewest' : 'most';
+        if (has(/\bworst\b/)) order = badIsMore ? 'most' : 'fewest';
+        if (has(/\bbest\b/) && badIsMore) order = 'fewest';
+        const finish = detectFinish(text);
+        // "by a champion", "title winners" - one season's winner
+        if (!finish.rank && !finish.stage && has(/\b(champion|title winners?|won (the )?(league|title|·))\b/)) {
+            finish.rank = '1';
+            finish.stage = 'Champions';
+        }
+        return { view: 'team-records', stat, order, perGame, finish };
+    }
+
     function detectIntent(text, scoreline) {
         const has = pattern => pattern.test(text);
         const location = has(/\bhome\b/) ? 'home' : (has(/\b(away|road)\b/) ? 'away' : '');
@@ -1545,6 +1616,9 @@
             else if (/\b(beat|beaten|won|wins?|winning|victory|defeated|thrashed)\b/.test(text)) result = 'win';
             return { view: 'match-finder', category: 'recent', result, lastTime: true, location };
         }
+        const record = detectRecordIntent(text);
+        if (record) return { ...record, location };
+
         let category = null;
         // A two-legged tie won after losing the first leg
         if (has(/\b(comebacks?|come ?backs?|came back|remontadas?|overturn(ed|s|ing)?|turned around)\b/)) category = 'comebacks';
@@ -1750,7 +1824,7 @@
         }
         // A named opponent makes it a head to head, whatever else the
         // words suggest (a stage, "matches", "table")
-        if ((mentions.length >= 2 || opponentGroup) && ['team-seasons', 'table', 'matches', null].includes(intent.view)) {
+        if ((mentions.length >= 2 || opponentGroup) && ['team-seasons', 'team-records', 'table', 'matches', null].includes(intent.view)) {
             intent.view = 'h2h';
         }
 
@@ -2072,6 +2146,77 @@
         };
     }
 
+    const RECORD_STAT_NAMES = {
+        points: 'points', won: 'wins', drawn: 'draws', lost: 'losses',
+        goalsFor: 'goals scored', goalsAgainst: 'goals conceded', goalDifference: 'goal difference'
+    };
+    const LEAGUE_HISTORY_NAMES = { homePct: 'home win %', drawPct: 'draw %', awayPct: 'away win %' };
+
+    function eraDetail(parsed, comp) {
+        const era = parsed.eras[comp.key];
+        return era ? `${capitalize(ERA_NAMES[era].replace(/^the /, ''))} era` : 'All seasons';
+    }
+
+    // Team Records, through its Copy Link parameters (sub=records)
+    function teamRecordsResult(comp, team, parsed, intent) {
+        const { finish } = intent;
+        // A league position (exactly - "top 4" is more than one) or a stage reached
+        const pos = comp.continental ? finish.stage : (finish.better ? '' : finish.rank);
+        const params = {
+            league: comp.continental ? comp.key : '',
+            sub: 'records',
+            stat: intent.stat,
+            order: intent.order,
+            pos,
+            season: parsed.eras[comp.key] || '',
+            t1: team,
+            pg: intent.perGame ? '1' : '',
+            p3: parsed.filters.points === '1' ? '1' : '',
+            matches: comp.continental && parsed.filters.excludeMainStage ? 'qualifiers' : ''
+        };
+        const what = `${intent.order === 'fewest' ? 'Fewest' : 'Most'} ${RECORD_STAT_NAMES[intent.stat]}${intent.perGame ? ' per game' : ''}`;
+        return {
+            kind: 'team-records', icon: '📈', comp, crestTeam: team || undefined,
+            title: `${team || 'All clubs'} · ${what} in a ${comp.continental ? 'campaign' : 'season'}`,
+            detail: joinDetail([
+                'Team Records',
+                eraDetail(parsed, comp),
+                pos ? (comp.continental ? `Reached: ${pos}` : `Finished ${pos}${ordinalSuffix(Number(pos))}`) : '',
+                params.p3 ? '3 points for a win' : ''
+            ]),
+            href: competitionUrl(comp, 'team-seasons', params)
+        };
+    }
+
+    // League History, through its Copy Link parameters (sub=league)
+    function leagueHistoryResult(comp, parsed, intent) {
+        const params = {
+            league: comp.continental ? comp.key : '',
+            sub: 'league',
+            rank: intent.rank,
+            order: intent.order,
+            season: parsed.eras[comp.key] || '',
+            pg: intent.perGame ? '1' : '',
+            p3: !comp.continental && parsed.filters.points === '1' ? '1' : '',
+            matches: comp.continental && parsed.filters.excludeMainStage ? 'qualifiers' : ''
+        };
+        const low = intent.order === 'fewest';
+        const what = {
+            season: 'Every season',
+            goals: low ? 'Lowest-scoring seasons' : 'Highest-scoring seasons',
+            gap: low ? 'Closest title races' : 'Biggest title-winning margins',
+            topTwo: low ? "Lowest top two's points" : 'Best title races by points',
+            teams: low ? 'Fewest clubs' : 'Most clubs',
+            games: low ? 'Fewest matches' : 'Most matches'
+        }[intent.rank] || `${low ? 'Lowest' : 'Highest'} ${LEAGUE_HISTORY_NAMES[intent.rank]}`;
+        return {
+            kind: 'league-history', icon: '📊', comp,
+            title: `${comp.name} · ${what}${intent.perGame && intent.rank === 'goals' ? ' per game' : ''}`,
+            detail: joinDetail(['League History', eraDetail(parsed, comp)]),
+            href: competitionUrl(comp, 'team-seasons', params)
+        };
+    }
+
     function ordinalSuffix(n) {
         const num = Number(n);
         if (num % 100 >= 11 && num % 100 <= 13) return 'th';
@@ -2213,6 +2358,22 @@
                 primary.push(seasonsResult(comp, t1, parsed, intent.finish));
                 break;
             }
+            case 'team-records':
+                // One season's numbers are that season's table
+                if (season !== null) {
+                    primary.push(tableResult(comp, parsed, t1));
+                    break;
+                }
+                // A position means nothing in the Champions League, a stage
+                // nothing in a league
+                if (comp.continental ? (intent.finish.rank && !intent.finish.stage) : (intent.finish.stage && !intent.finish.rank)) break;
+                primary.push(teamRecordsResult(comp, t1, parsed, intent));
+                break;
+            case 'league-history':
+                // Title races are a league's - the Champions League has none
+                if (comp.continental && ['gap', 'topTwo'].includes(intent.rank)) break;
+                primary.push(leagueHistoryResult(comp, parsed, intent));
+                break;
             case 'h2h':
                 if (opponents.length > 0) {
                     primary.push(headToHeadResult(comp, t1, opponents, parsed));
@@ -2329,6 +2490,9 @@
         if (results.length === 0) {
             if (parsed.intent.view === 'match-finder' && parsed.intent.lastTime && parsed.mentions.length === 0) {
                 return { results: [], message: 'Last time questions look from one team\'s side - add a team, e.g. "last time Arsenal beat Chelsea".' };
+            }
+            if (parsed.intent.view === 'league-history' && ['gap', 'topTwo'].includes(parsed.intent.rank) && comps.every(comp => comp.continental)) {
+                return { results: [], message: 'Title races are a league\'s - the Champions League is decided by knockouts. Pick a league in the dropdown.' };
             }
             if (parsed.intent.category === 'comebacks' && !comps.some(comp => comp.continental)) {
                 return { results: [], message: 'Comebacks are two-legged ties won after losing the first leg - pick the Champions League in the dropdown.' };
@@ -3088,6 +3252,137 @@
         };
     }
 
+    // --- Season records (Seasons tab) ---
+
+    // "a Premier League season", "an English top flight season", "a
+    // European Cup or Champions League campaign"
+    function recordScope(competition, continental) {
+        const name = competition.replace(/^the /, '').replace(' and ', ' or ');
+        // "an English", but "a European" (a "you" sound)
+        return `${/^[aeiou]/i.test(name) && !/^(eu|uni|one)/i.test(name) ? 'an' : 'a'} ${name} ${continental ? 'campaign' : 'season'}`;
+    }
+
+    function joinNames(items) {
+        return items.length <= 1 ? (items[0] || '') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`;
+    }
+
+    // Team Records: who holds the record (every rank-1 club-season).
+    // ctx.records: { rows (ranked), stat, order, perGame, threePoints,
+    // position, team, continental }
+    function describeTeamRecords(ctx, params, { b, competition }) {
+        const r = ctx.records;
+        if (!r || !r.rows) return null;
+        const most = r.order !== 'fewest';
+        const scope = recordScope(competition, r.continental) + (r.threePoints && r.stat === 'points' ? ' (3 points for a win)' : '');
+        const rate = ['won', 'drawn', 'lost'].includes(r.stat) && r.perGame;
+        const statPhrase = rate
+            ? `the ${most ? 'highest' : 'lowest'} ${{ won: 'win', drawn: 'draw', lost: 'loss' }[r.stat]} rate`
+            : r.stat === 'goalDifference'
+                ? `the ${most ? 'best' : 'worst'} goal difference${r.perGame ? ' per game' : ''}`
+                : `the ${most ? 'most' : 'fewest'} ${{ points: 'points', won: 'wins', drawn: 'draws', lost: 'losses', goalsFor: 'goals', goalsAgainst: 'goals conceded' }[r.stat]}${r.perGame ? ' per game' : ''}`;
+        let by = '';
+        if (r.position) {
+            if (r.continental) {
+                by = r.position === 'Champions' ? ' by the winners'
+                    : r.position === 'Final' ? ' by a beaten finalist'
+                        : ` by a club knocked out in the ${phaseWords(r.position)}`;
+            } else {
+                const pos = Number(r.position);
+                by = pos === 1 ? ' by a champion' : pos === 2 ? ' by a runner-up' : ` by a team finishing ${pos}${ordinalSuffix(pos)}`;
+            }
+        }
+        if (!r.rows.length) return { html: `No ${r.continental ? 'campaigns' : 'seasons'} match ${r.team ? `for ${b(r.team)} ` : ''}these filters.` };
+
+        const top = r.rows.filter(row => row.rank === 1);
+        const first = top[0];
+        const value = row => {
+            const v = row[r.stat];
+            if (r.perGame) {
+                const perGame = v / row.played;
+                if (rate) return `${Math.round(perGame * 100)}% (${v} of ${row.played} games)`;
+                const text = perGame.toFixed(2);
+                if (r.stat === 'goalDifference') return `${perGame > 0 ? '+' : ''}${text} a game`;
+                return `${text} ${{ points: 'points', goalsFor: 'goals', goalsAgainst: 'conceded' }[r.stat]} per game`;
+            }
+            if (r.stat === 'goalDifference') return `${v > 0 ? '+' : ''}${v}`;
+            return `${formatNumber(v)} ${{ points: 'points', won: 'wins', drawn: 'draws', lost: 'losses', goalsFor: 'goals', goalsAgainst: 'goals' }[r.stat]}`;
+        };
+        if (r.team) {
+            const seasons = joinNames(top.map(row => row.season));
+            return { crestTeam: r.team, html: `${b(r.team)}${/s$/i.test(r.team) ? "'" : "'s"} ${statPhrase.replace(/^the /, '')} in ${scope}${by}: ${value(first)}, in ${seasons}.` };
+        }
+        if (top.length === 1) {
+            return { crestTeam: first.team, html: `${b(first.team)} hold the record for ${statPhrase} in ${scope}${by}: ${value(first)} in ${first.season}.` };
+        }
+        if (top.length <= 3) {
+            return {
+                crestTeam: first.team,
+                html: `${joinNames(top.map(row => `${b(row.team)} (${row.season})`))} share the record for ${statPhrase} in ${scope}${by}: ${value(first)}.`
+            };
+        }
+        const latest = [...top].sort((x, y) => y.season.localeCompare(x.season))[0];
+        return {
+            crestTeam: latest.team,
+            html: `${top.length} ${r.continental ? 'campaigns' : 'club-seasons'} share the record for ${statPhrase} in ${scope}${by} (${value(first)}), most recently ${b(latest.team)} in ${latest.season}.`
+        };
+    }
+
+    // League History: the record season (every rank-1 season).
+    // ctx.leagueHistory: { rows (ranked), rank, order, perGame, threePoints }
+    function describeLeagueHistory(ctx, params, { b, competition }) {
+        const h = ctx.leagueHistory;
+        if (!h || !h.rows || h.rank === 'season') return null;
+        // "European Cup or Champions League"
+        const short = competition.replace(/^the /, '').replace(' and ', ' or ');
+        if (!h.rows.length) return { html: `No ${short} seasons match these filters.` };
+        const most = h.order !== 'fewest';
+        const top = h.rows.filter(row => row.rank === 1);
+        const latest = [...top].sort((x, y) => y.season.localeCompare(x.season))[0];
+        const seasons = joinNames(top.map(row => row.season));
+        const many = top.length > 1;
+        const pct = row => `${(row[h.rank] * 100).toFixed(1)}%`;
+        const points = v => h.perGame ? `${v.toFixed(2)} points per game` : `${formatNumber(v)} point${v === 1 ? '' : 's'}`;
+        const three = h.threePoints ? ' (3 points for a win)' : '';
+        switch (h.rank) {
+            case 'goals': {
+                const v = latest.goals;
+                const goals = h.perGame ? `${v.toFixed(2)} goals per game` : `${formatNumber(v)} goals`;
+                return { html: `The ${most ? 'highest' : 'lowest'}-scoring ${short} season${many ? 's were' : ' was'} ${seasons}, with ${goals}.` };
+            }
+            case 'homePct':
+                return { html: `Home sides won ${most ? 'most' : 'least'} often in ${seasons}: ${pct(latest)} of ${short} matches.` };
+            case 'awayPct':
+                return { html: `Away sides won ${most ? 'most' : 'least'} often in ${seasons}: ${pct(latest)} of ${short} matches.` };
+            case 'drawPct':
+                return { html: `${short} matches were drawn ${most ? 'most' : 'least'} often in ${seasons}: ${pct(latest)}.` };
+            case 'gap': {
+                if (!most && latest.gap === 0) {
+                    return {
+                        crestTeam: latest.champion,
+                        html: many
+                            ? `${top.length} ${short} title races ended level on points, decided by a tie-break - most recently ${latest.season}, ${b(latest.champion)} ahead of ${b(latest.runnerUp)}${three}.`
+                            : `The ${latest.season} ${short} title race ended level on points: ${b(latest.champion)} won it on a tie-break ahead of ${b(latest.runnerUp)}${three}.`
+                    };
+                }
+                return {
+                    crestTeam: latest.champion,
+                    html: `The ${most ? 'biggest' : 'smallest'} ${short} title-winning margin is ${points(latest.gap)}${three}: ${b(latest.champion)} over ${b(latest.runnerUp)} in ${latest.season}${many ? ` (${top.length} seasons share it)` : ''}.`
+                };
+            }
+            case 'topTwo':
+                return {
+                    crestTeam: latest.champion,
+                    html: `The ${short} title race with the ${most ? 'most' : 'fewest'} points was ${latest.season}: ${b(latest.champion)} and ${b(latest.runnerUp)} averaged ${points(latest.topTwo)}${three}${many ? ` (${top.length} seasons share it)` : ''}.`
+                };
+            case 'teams':
+                return { html: `The ${seasons} ${short} had the ${most ? 'most' : 'fewest'} clubs: ${latest.teams}.` };
+            case 'games':
+                return { html: `The ${seasons} ${short} had the ${most ? 'most' : 'fewest'} matches: ${formatNumber(latest.games)}.` };
+            default:
+                return null;
+        }
+    }
+
     function describeAnswer(ctx, params) {
         // Bold names are teams: in the team's colour
         const b = text => {
@@ -3148,6 +3443,8 @@
 
         if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
         if (ctx.view === 'team-streaks') return describeStreaks(ctx, params, { b, competition });
+        if (ctx.view === 'team-records') return describeTeamRecords(ctx, params, { b, competition });
+        if (ctx.view === 'league-history') return describeLeagueHistory(ctx, params, { b, competition });
         if (ctx.view === 'team-seasons') {
             // With the pre-Bundesliga / pre-Serie A champions it's the
             // national championship, not the league
@@ -3296,6 +3593,7 @@
             ['Head to head', ['Barcelona vs Real Madrid at home', 'Arsenal vs Chelsea since 2010']],
             ['Seasons & tables', ['Serie A 2005-06', 'Bundesliga table since 2010']],
             ['Titles & finishes', ['Juventus titles', 'Arsenal top 4', 'First time champions Bundesliga']],
+            ['Season records', ['Most points in a season', 'Closest title races']],
             ['Streaks', ['Bayern longest unbeaten run', 'Longest unbeaten run against Bayern']],
             ['Last time', ['Last time Liverpool beat Manchester United away']],
             ['Biggest wins & matches', ['PSG biggest wins', 'Highest scoring game in Bundesliga history']]
@@ -3304,6 +3602,7 @@
             ['Head to head', ['Arsenal vs Chelsea', 'Arsenal vs the Big 6 at home']],
             ['Seasons & tables', ['Premier League 2003-04', 'Who was top at Christmas 2003']],
             ['Titles & finishes', ['Manchester United Premier League titles', 'Premier League champions']],
+            ['Season records', ['Most points in a Premier League season', 'Biggest title winning margin', 'Highest scoring season']],
             ['Streaks', ['Arsenal longest unbeaten run', 'Longest winning streaks', 'Longest unbeaten run against Chelsea']],
             ['Last time', ['Last time Liverpool beat Everton away']],
             ['Biggest wins & matches', ['Tottenham biggest defeats', 'Newcastle highest scoring draws', 'Highest scoring game in Premier League history', 'Matches on Boxing Day 1963']]
@@ -3312,6 +3611,7 @@
             ['Head to head', ['Barcelona vs Real Madrid']],
             ['Seasons & tables', ['La Liga 2010-11', 'La Liga home table 2010-11']],
             ['Titles & finishes', ['Real Madrid titles', 'Sevilla top 4', 'First time champions La Liga', 'Athletic Club seasons']],
+            ['Season records', ['Most goals in a season', 'Closest title race']],
             ['Streaks', ['Barcelona longest unbeaten run', 'Longest unbeaten run against Real Madrid']],
             ['Last time', ['Last time Barcelona beat Real Madrid away']],
             ['Biggest wins & matches', ['Atletico Madrid biggest wins', 'Biggest win in La Liga history']]
@@ -3320,6 +3620,7 @@
             ['Head to head', ['Juventus vs Inter', 'Inter vs AC Milan since 2010']],
             ['Seasons & tables', ['Serie A 2005-06', 'Serie A table on 1 January 2010']],
             ['Titles & finishes', ['Juventus titles', 'Napoli titles', 'Serie A champions', 'Atalanta top 4']],
+            ['Season records', ['Fewest goals conceded in a season', 'Highest scoring season']],
             ['Streaks', ['AC Milan longest unbeaten run', 'Longest unbeaten run against Juventus']],
             ['Last time', ['Last time Roma beat Lazio']],
             ['Biggest wins & matches', ['Juventus biggest wins', 'Highest scoring draws in Serie A']]
@@ -3328,6 +3629,7 @@
             ['Head to head', ['Bayern vs Dortmund']],
             ['Seasons & tables', ['Bundesliga 2023-24', 'Bundesliga table since 2010', 'Bayer Leverkusen 2023-24']],
             ['Titles & finishes', ['Bayern titles', 'Werder Bremen titles', 'First time champions Bundesliga']],
+            ['Season records', ['Most points by a champion', 'Biggest title winning margin']],
             ['Streaks', ['Dortmund longest winning streak', 'Longest winning streak against Dortmund']],
             ['Last time', ['Last time Schalke beat Dortmund']],
             ['Biggest wins & matches', ['Bayern biggest wins', 'Biggest win in Bundesliga history']]
@@ -3336,6 +3638,7 @@
             ['Head to head', ['PSG vs Marseille', 'PSG vs Lyon since 2012']],
             ['Seasons & tables', ['Ligue 1 1992-93', 'Lille 2010-11']],
             ['Titles & finishes', ['Saint-Etienne titles', 'Lyon titles', 'Ligue 1 champions']],
+            ['Season records', ['Most wins in a season', 'Closest title race']],
             ['Streaks', ['PSG longest unbeaten run', 'Longest unbeaten run against PSG']],
             ['Last time', ['Last time Marseille beat PSG away']],
             ['Biggest wins & matches', ['Monaco biggest wins', 'Biggest win in Ligue 1 history']]
@@ -3344,6 +3647,7 @@
             ['Head to head', ['Real Madrid vs Bayern', 'Arsenal vs Spain']],
             ['Seasons & tables', ['Champions League 2004-05']],
             ['Titles & finishes', ['Real Madrid titles', 'Champions League winners', 'Liverpool lost in the final', 'Ajax European Cup titles']],
+            ['Season records', ['Most goals in a campaign', 'Highest scoring season']],
             ['Streaks', ['Bayern longest winning streak in the knockouts', 'Longest unbeaten run against English clubs']],
             ['Last time', ['Last time Real Madrid lost to English clubs']],
             ['Biggest wins & matches', ['Real Madrid biggest aggregate wins', 'Barcelona comebacks', 'Biggest comebacks', 'Biggest wins all-time']]
@@ -3367,7 +3671,7 @@
 
     const GUIDE_ICONS = {
         'Head to head': '⚔️', 'Seasons & tables': '📊', 'Titles & finishes': '🏆',
-        'Streaks': '⚡', 'Last time': '🔍', 'Biggest wins & matches': '🎯'
+        'Streaks': '⚡', 'Last time': '🔍', 'Biggest wins & matches': '🎯', 'Season records': '📈'
     };
 
     // The example questions for a dropdown choice, as one list
@@ -3380,7 +3684,7 @@
     // Result kinds whose page has a search mode: the page opens with its
     // controls hidden and just the answer showing (?search=<kind>). The
     // rest still open the full page.
-    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons', 'team-streaks'];
+    const SEARCH_MODE_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons', 'team-streaks', 'team-records', 'league-history'];
 
     function resultHref(result, query, scope) {
         if (!SEARCH_MODE_KINDS.includes(result.kind)) return result.href;
