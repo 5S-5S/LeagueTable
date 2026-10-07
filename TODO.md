@@ -18,26 +18,27 @@ Most to least important; details are in each item below.
 
 **Tier 3 - worthwhile features**
 7. Typo tolerance in search
-8. Upcoming matches (home page strip)
-9. Recent searches
-10. Pinned / favourite team
-11. Road to the final
-12. More competitions (depends on the data)
+8. "City" / "United" alone in search
+9. Upcoming matches (home page strip)
+10. Recent searches
+11. Pinned / favourite team
+12. Road to the final
+13. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-13. Head-to-head by decade
-14. "On this day"
-15. Trivia mode
-16. Side-by-side Team Seasons
-17. League History chart
-18. Team Records: date ranges, bottom / relegated, home / away
-19. A club's title races
-20. Team progression chart (after League History)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. Lighter pages (small gain - see the item)
-24. Knockout Stage bracket view (on hold)
-25. Country vs Country
+14. Head-to-head by decade
+15. "On this day"
+16. Trivia mode
+17. Side-by-side Team Seasons
+18. League History chart
+19. Team Records: date ranges, bottom / relegated, home / away
+20. A club's title races
+21. Team progression chart (after League History)
+22. "/" to search
+23. Penalty shootout leaderboard (team and head-to-head answers done)
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
 
 ## Items
 
@@ -77,8 +78,7 @@ Most to least important; details are in each item below.
       gives the last game decided on penalties.
     - A country's clubs as the subject ("last time an English club won
       the UCL") - Team 1 is always one club.
-    - "City" / "United" alone as the opponent ("when did Man Utd last lose
-      to City" reads City as Hull City).
+    - ("City" / "United" alone: split into its own Tier 3 item.)
 
 - Later (before launch): **Self-host the club crests** — noted 2026-10-07,
   after the Q&A audit. The crests are hotlinked from s.hs-data.com, which
@@ -284,6 +284,13 @@ Most to least important; details are in each item below.
   page's HTML but not its code, or a visitor opens both Domestic and
   Continental (shared code like search downloaded once) - small gain
   for a big refactor of four large pages.
+
+- Maybe: **"City" / "United" alone in search** — split from Match Finder
+  upgrades 2026-10-07. "When did Man Utd last lose to City" reads City as
+  Hull City. A bare "City" or "United" should mean the club's local rival
+  (Manchester City for Manchester United and vice versa), or else the most
+  prominent club of that name. Search-only; the routing check shows which
+  questions change.
 
 - Maybe: **Typo tolerance in search** — noted 2026-10-03. "arsnl",
   "chelsae" find nothing; fuzzy-match club names ("Did you mean
