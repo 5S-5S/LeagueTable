@@ -347,6 +347,17 @@ body.um-viewing .search-card {
     margin: 1rem 0 0;
 }
 
+/* The view's switches (table, era, overall / home-away): a little roomier
+   than the strip's chips, with space before the table they control */
+.um-view .um-chip {
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+}
+
+.um-view .um-filters {
+    margin-bottom: 0.6rem;
+}
+
 .um-era + h3 {
     margin-top: 0.75rem;
 }
