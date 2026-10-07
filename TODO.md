@@ -9,8 +9,8 @@ Most to least important; details are in each item below.
 **Tier 1 - before launch** (keep the site up and know how it's doing)
 1. Analytics, with failed searches
 2. Error reporting
-3. About / sources page
-4. Self-host the club crests (then retake the Q&A screenshots automatically)
+3. About / sources page (closer to publication, with the crests)
+4. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch**
 5. Match Finder upgrades (what's left)
@@ -86,10 +86,19 @@ Most to least important; details are in each item below.
   still get them) - so the Q&A screenshots had to be taken by hand, and
   the host could limit or block real visitors at volume too. Download
   every crest once into the repo and serve it with the site (all four
-  pages and search.js), then let tests/qa-screenshots.js retake the shots.
-  Also: search.js shows a broken image when a crest fails (the pages'
-  tables hide it) - make it hide the image too. Replaces part 4 of API
-  caching.
+  pages and search.js). A few hundred files at ~4 KB, so ~1-2 MB. Also:
+  search.js shows a broken image when a crest fails (the pages' tables
+  hide it) - make it hide the image too; and a check that every club has
+  a crest file. Replaces part 4 of API caching.
+  - Do it closer to publication (decided 2026-10-07). The risk is to real
+    visitors losing crests if the host starts limiting browsers; it hasn't
+    yet. The 30 Q&A screenshots are current (taken by hand, kept by
+    tests/qa-screenshots.js) - no retake needed now; self-hosting only
+    lets future retakes after a layout change be automatic.
+  - Legal (general picture, not legal advice): self-hosting and
+    hotlinking are the same use of the clubs' trademarks; hotlinking also
+    uses s.hs-data.com's bandwidth without permission. Pair with the
+    About page's disclaimer (see About / sources page).
 
 - Later (before launch): **Analytics, with failed searches** — noted
   2026-10-03. Know what people ask - especially questions that get "No
@@ -100,7 +109,19 @@ Most to least important; details are in each item below.
 - Later (before launch): **About / sources page** — noted 2026-10-03.
   Where the data comes from, how often it updates, and that club names
   and crests belong to their owners. A privacy note too if analytics
-  ever uses cookies.
+  ever uses cookies. Do it closer to publication, with the crests.
+  - Crests, as discussed 2026-10-07 (general picture, not legal advice):
+    a disclaimer helps but doesn't grant the right to use them - crests
+    are trademarks, often copyrighted artwork. It shows the site isn't
+    official or endorsed, one of the main trademark concerns. What keeps
+    the risk low: crests only identify the club (a small icon by its
+    name - never as the site's own branding or implying a partnership),
+    the site isn't commercial, and removal requests are acted on fast.
+    The realistic worst case is a takedown request, not a lawsuit.
+  - So: the disclaimer in the footer (every page) and on the About page,
+    with a line inviting rights holders to ask for removal via the
+    contact page. If the site ever makes money (ads, paid features), get
+    proper legal advice first.
 
 - Later (before launch): **Error reporting** — noted 2026-10-03. A small
   handler that reports visitors' JavaScript errors (to the Worker or a
