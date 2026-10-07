@@ -794,7 +794,6 @@
             return Array.isArray(history) ? inEra(fixture, history) : history;
         };
         const era = eraOf(fixture);
-        const link = params => `${comp.page}?${new URLSearchParams({ lg: comp.slug, ...params })}`;
         const kickoff = new Date(fixture.utcDate);
         const round = roundText(fixture);
         return `
@@ -841,8 +840,6 @@
 
             <div class="um-links">
                 <a href="${escapeHtml(headToHeadHref(fixture))}">Full head-to-head →</a>
-                <a href="${escapeHtml(link({ view: 'team-streaks', t1: fixture.homeTeam }))}">${escapeHtml(fixture.homeTeam)} streaks →</a>
-                <a href="${escapeHtml(link({ view: 'team-streaks', t1: fixture.awayTeam }))}">${escapeHtml(fixture.awayTeam)} streaks →</a>
             </div>`;
     }
 
