@@ -754,6 +754,21 @@
         return `<span class="um-updated">Fixture updated ${escapeHtml(updated)}</span>`;
     }
 
+    // "Full head-to-head" opens the head-to-head as a search answer - the
+    // question a visitor would type ("Arsenal FC vs Leeds United"), in this
+    // competition's dropdown - rather than the bare League Tables tab. A
+    // Premier League match asks for the era the view is showing. Falls back
+    // to the tab if the search finds nothing.
+    function headToHeadHref(fixture) {
+        const comp = COMPETITIONS[fixture.div];
+        const tab = `${comp.page}?${new URLSearchParams({ lg: comp.slug, view: 'league-filters', t1: fixture.homeTeam, t2: fixture.awayTeam })}`;
+        if (!window.LeagueSearch) return tab;
+        const question = `${fixture.homeTeam} vs ${fixture.awayTeam}${eraOf(fixture) === 'pl' ? ' Premier League' : ''}`;
+        const result = (LeagueSearch.searchFor(question, comp.slug).results || [])[0];
+        if (!result || result.kind !== 'h2h') return tab;
+        return `${result.href}&${new URLSearchParams({ search: result.kind, q: question, scope: comp.slug })}`;
+    }
+
     function viewTeamBlock(fixture, team) {
         const url = getTeamLogoUrl(team, slugOf(fixture.div));
         return `
@@ -825,7 +840,7 @@
             ${streakTable(fixture, 'away', teamStreaksFor(fixture, fixture.awayTeam))}
 
             <div class="um-links">
-                <a href="${escapeHtml(link({ view: 'league-filters', t1: fixture.homeTeam, t2: fixture.awayTeam }))}">Full head-to-head →</a>
+                <a href="${escapeHtml(headToHeadHref(fixture))}">Full head-to-head →</a>
                 <a href="${escapeHtml(link({ view: 'team-streaks', t1: fixture.homeTeam }))}">${escapeHtml(fixture.homeTeam)} streaks →</a>
                 <a href="${escapeHtml(link({ view: 'team-streaks', t1: fixture.awayTeam }))}">${escapeHtml(fixture.awayTeam)} streaks →</a>
             </div>`;
