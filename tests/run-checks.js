@@ -159,6 +159,21 @@ async function checkPages(browser, base) {
         }
     }
     console.log(`Pages: ${states.length} League Tables states`);
+
+    // "Something wrong?": a tab's link opens the contact form with Data
+    // Issue picked and the tab's current address in the message
+    {
+        const { page, errors } = await openPage(browser, `${base}/DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points`, false);
+        await wait(1500);
+        await Promise.all([page.waitForNavigation({ waitUntil: 'networkidle2' }), page.click('.seasons-records-only .report-link')]);
+        const form = await page.evaluate(() => ({ subject: document.getElementById('subject').value, message: document.getElementById('message').value }));
+        if (form.subject !== 'data' || !/Page: .*DomesticEurope\.html\?view=team-seasons&lg=serie-a&sub=records.*stat=points/.test(form.message)) {
+            fail('pages', `report link: contact form "${form.subject}" / "${form.message.slice(0, 120)}"`);
+        }
+        errors.forEach(e => fail('pages', `report link: ${e}`));
+        await page.close();
+        console.log('Pages: report link');
+    }
 }
 
 // A question's search-mode page and its answer line ({ answer, note,

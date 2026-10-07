@@ -227,7 +227,10 @@
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Filter and analyze league tables from the major 5 European leagues. Select prior seasons, custom date ranges, and specific teams to find and filter league standings and head-to-head records. Pick one Team 2 for a head-to-head, or several (or Big 6) to see each opponent's record against Team 1 in its own row.
                         </p>
-                        <button id="copyLinkBtnLeagueFilters" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                        <div class="copy-link-stack">
+                            <button id="copyLinkBtnLeagueFilters" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                            <a class="report-link" data-tab-report href="contact.html?subject=data">Something wrong?</a>
+                        </div>
                     </div>
 
                     <!-- League Selection -->
@@ -358,7 +361,10 @@
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Select one or two teams and find standout matches that they played in - or no team for the whole league's. Biggest wins and defeats, highest-scoring draws, the most or fewest total goals, or just a specific scoreline too. Most Recent shows the last time they won, drew or lost.
                         </p>
-                        <button id="copyLinkBtnMatchFinder" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                        <div class="copy-link-stack">
+                            <button id="copyLinkBtnMatchFinder" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                            <a class="report-link" data-tab-report href="contact.html?subject=data">Something wrong?</a>
+                        </div>
                     </div>
 
                     <!-- League Selection -->
@@ -587,19 +593,28 @@
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Every club's season in the league, ranked by the stat you pick - most points, fewest goals conceded and so on, whatever position they finished. Narrow it to a finishing position, an era or one team. Click on the button on the left side of a row to get a list of matches played.
                         </p>
-                        <button id="copyLinkBtnTeamRecords" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                        <div class="copy-link-stack">
+                            <button id="copyLinkBtnTeamRecords" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                            <a class="report-link" data-tab-report href="contact.html?subject=data">Something wrong?</a>
+                        </div>
                     </div>
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex items-start justify-between gap-4 seasons-league-only">
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Every season of the league, all clubs added up - matches, goals, how often the home side won - and the title race: the points gap between 1st and 2nd, and their average points. Newest first, to see how the league has changed; rank by any column for record seasons and the closest title races. Open a season with the button on the left of its row for its final table.
                         </p>
-                        <button id="copyLinkBtnLeagueHistory" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                        <div class="copy-link-stack">
+                            <button id="copyLinkBtnLeagueHistory" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                            <a class="report-link" data-tab-report href="contact.html?subject=data">Something wrong?</a>
+                        </div>
                     </div>
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex items-start justify-between gap-4 seasons-history-only">
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Select a league, then pick a Season to see that season's final standings. Use Position to only get teams which finished at a particular place on the table. Select Team to get a list of performances from a team. Click on the button on the left side of a row to get a list of matches played. 
                         </p>
-                        <button id="copyLinkBtnTeamSeasons" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                        <div class="copy-link-stack">
+                            <button id="copyLinkBtnTeamSeasons" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                            <a class="report-link" data-tab-report href="contact.html?subject=data">Something wrong?</a>
+                        </div>
                     </div>
 
                     <!-- League Selection for Team Seasons -->
@@ -848,7 +863,10 @@
                         <p class="text-gray-700 text-sm leading-relaxed">
                             Discover active and historic streaks between clubs. Track current and historic performance through Winning, Unbeaten, Draw, Winless, Losing Streaks. Or analyze scoring and defending patterns with Clean Sheet, Goals Conceded, Scoring, and Failed to Score Streaks.
                         </p>
-                        <button id="copyLinkBtnTeamStreaks" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                        <div class="copy-link-stack">
+                            <button id="copyLinkBtnTeamStreaks" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
+                            <a class="report-link" data-tab-report href="contact.html?subject=data">Something wrong?</a>
+                        </div>
                     </div>
 
                     <!-- League Selection -->
@@ -6031,6 +6049,7 @@
             // Buttons
             elements.resetBtn.addEventListener('click', clearFilters);
             elements.copyLinkBtnLeagueFilters.addEventListener('click', copyShareableLink);
+            if (window.LeagueSearch) window.LeagueSearch.bindReportLinks(buildShareableFilterUrl);
             elements.copyLinkBtnTeamSeasons.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnTeamRecords.addEventListener('click', copyShareableLink);
             elements.copyLinkBtnLeagueHistory.addEventListener('click', copyShareableLink);

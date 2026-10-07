@@ -93,7 +93,7 @@
                 <div class="header-content">
                     <div>
                         <h1 class="text-4xl font-black mb-2">Contact & Support</h1>
-                        <p class="text-xl opacity-90">Get in touch with us to suggest new features or report bugs and erors</p>
+                        <p class="text-xl opacity-90">Get in touch with us to suggest new features or report bugs and errors</p>
                     </div>
                     <div class="dark-mode-toggle">
                         <input type="checkbox" id="darkModeToggle" class="toggle-checkbox">
@@ -278,11 +278,38 @@
             });
         }
 
+        // "Something wrong?" links (contact.html?subject=data&page=&q=&scope=&a=):
+        // pick the topic and start the message with what the visitor was
+        // looking at, so the report can be checked by opening that page.
+        // Only a link back to this site is quoted as the page.
+        function prefillFromLink() {
+            const params = new URLSearchParams(window.location.search);
+            const subject = document.getElementById('subject');
+            const message = document.getElementById('message');
+            if (params.get('subject') && subject.querySelector(`option[value="${CSS.escape(params.get('subject'))}"]`)) {
+                subject.value = params.get('subject');
+            }
+            let page = params.get('page') || '';
+            try {
+                const url = new URL(page);
+                if (url.origin !== window.location.origin) page = '';
+            } catch (err) {
+                page = '';
+            }
+            const lines = [];
+            if (params.get('q')) lines.push(`About: ${params.get('q')}${params.get('scope') ? ` (${params.get('scope')})` : ''}`);
+            if (params.get('a')) lines.push(`Answer: ${params.get('a')}`);
+            if (page) lines.push(`Page: ${page}`);
+            if (!lines.length || message.value) return;
+            message.value = `${lines.join('\n')}\n\nWhat looks wrong: `;
+        }
+
         // Initialize everything
         document.addEventListener('DOMContentLoaded', () => {
             initHamburgerMenu();
             initContactForm();
             initDarkMode();
+            prefillFromLink();
         });
     </script>
 </body>

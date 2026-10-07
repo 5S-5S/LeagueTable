@@ -314,3 +314,32 @@
 [data-theme="dark"] .search-answer-note a {
     color: #10b981;
 }
+
+/* Copy Link with "Something wrong?" under it - on each tab and on a
+   search answer; the link opens the contact page with the view filled in */
+.copy-link-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.report-link {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
+.report-link:hover {
+    color: #047857;
+}
+
+[data-theme="dark"] .report-link {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .report-link:hover {
+    color: #10b981;
+}

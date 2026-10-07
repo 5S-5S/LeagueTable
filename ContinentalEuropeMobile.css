@@ -3644,7 +3644,7 @@ html.search-mode .search-answer-body {
     flex-basis: calc(100% - 3.5rem);
 }
 
-html.search-mode .search-answer-share {
+html.search-mode .search-answer-actions {
     margin-left: auto;
 }
 

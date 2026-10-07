@@ -4,7 +4,9 @@
 // what the visitor is after, and links each result to the sport page's view
 // through that page's own Copy Link parameters (?view=&lg=&t1=...).
 // Exposes window.LeagueSearch = { mount(container, options), searchFor,
-// renderAnswer(el, ctx) } - renderAnswer words the search-mode answer line.
+// renderAnswer(el, ctx), examples, reportHref, bindReportLinks(pageUrl) } -
+// renderAnswer words the search-mode answer line; the last two make the
+// "Something wrong?" links to the contact page.
 (function () {
     'use strict';
 
@@ -2819,8 +2821,42 @@
                 <p class="search-answer-text">${answer.html}</p>
                 ${answer.note ? `<p class="search-answer-note">${answer.note}</p>` : ''}
             </div>
-            <button type="button" class="btn btn-secondary copy-link-trigger copy-link-inline search-answer-share">🔗 Copy Link</button>`;
+            <div class="copy-link-stack search-answer-actions">
+                <button type="button" class="btn btn-secondary copy-link-trigger copy-link-inline search-answer-share">🔗 Copy Link</button>
+                <a class="report-link" href="contact.html?subject=data">Something wrong?</a>
+            </div>`;
         el.querySelector('.search-answer-share').addEventListener('click', copySearchLink);
+        // the answer as plain text (no links or record badges' markup)
+        const answerText = el.querySelector('.search-answer-text').textContent.replace(/\s+/g, ' ').trim();
+        el.querySelector('.report-link').href = reportHref({
+            page: window.location.href, question: params.get('q') || '', scope: params.get('scope') || '', answer: answerText
+        });
+    }
+
+    // "Something wrong?": the contact page with Data Issue picked and the
+    // message started - the question, the answer and the page with every
+    // filter (as Copy Link would give it), so a report can be checked by
+    // opening the same view
+    function reportHref({ page, question = '', scope = '', answer = '' }) {
+        const qs = new URLSearchParams({ subject: 'data', page });
+        if (question) {
+            const comp = SEARCH_COMPETITIONS.find(c => c.key === scope);
+            qs.set('q', question);
+            qs.set('scope', scope === 'domestic' ? 'Top 5 Leagues' : (comp ? comp.name : ''));
+        }
+        if (answer) qs.set('a', answer.slice(0, 400));
+        return `contact.html?${qs.toString()}`;
+    }
+
+    // The tabs' "Something wrong?" links: the address is filled in as the
+    // link is used, from the page's own Copy Link (pageUrl() - the current
+    // tab and filters), so it is never stale
+    function bindReportLinks(pageUrl) {
+        const fill = event => {
+            const link = event.target.closest && event.target.closest('a.report-link[data-tab-report]');
+            if (link) link.href = reportHref({ page: pageUrl() });
+        };
+        ['pointerdown', 'focusin', 'click', 'auxclick', 'contextmenu'].forEach(type => document.addEventListener(type, fill, true));
     }
 
     // The tabs' Copy Link, for an answer: in search mode the address is
@@ -4104,5 +4140,5 @@
         };
     }
 
-    window.LeagueSearch = { mount, searchFor, renderAnswer, examples };
+    window.LeagueSearch = { mount, searchFor, renderAnswer, examples, reportHref, bindReportLinks };
 })();
