@@ -277,6 +277,11 @@ Most to least important; details are in each item below.
 - Maybe: **More competitions** — noted 2026-10-03. Europa League /
   Conference League (the code already maps E1 / C2), or more leagues
   (Eredivisie, Primeira Liga, Championship) - depends on the data.
+  When the Europa League is added: it was the UEFA Cup until 2008-09, so
+  give it the same era treatment as the Champions League / European Cup -
+  ALIAS_ERAS, ERA_NAMES, ERA_TITLE_NOTES, LEAGUE_ERAS and ERA_SWITCHES in
+  search.js ("Did you mean the Europa League only?" / "the UEFA Cup and
+  Europa League together?"), plus the page's era seasons.
 
 - Partly done: **Penalty shootout records** — noted 2026-10-03. Done
   2026-10-06: the search answers a team's or a head-to-head's shootouts
@@ -323,6 +328,15 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Era "Did you mean" (Premier League, Champions League)~~ — done
+  (2026-10-07). An answer over every season offers "the Premier League /
+  Champions League only"; one for an era offers "the First Division and
+  Premier League together" / "the European Cup and Champions League
+  together". Each link is the question searched again, shown only when it
+  lands on the same view with the season switched. Not for one season,
+  dates, last-N or one-era titles (they have their own note). Europa
+  League / UEFA Cup to follow - see More competitions.
 
 - ~~Automated checks~~ — done (2026-10-06). `cd tests && npm run check`
   before each push (~3 minutes; `check:quick` ~2): search routing for
