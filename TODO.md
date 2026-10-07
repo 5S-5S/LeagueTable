@@ -10,34 +10,35 @@ Most to least important; details are in each item below.
 1. Analytics, with failed searches
 2. Error reporting
 3. About / sources page
+4. Q&A audit (with Match Finder screenshots)
 
 **Tier 2 - high value, soon after launch**
-4. "Report a data error" link
-5. Match Finder upgrades (what's left)
-6. API caching (what's left - the outage-preventing parts are done)
+5. "Report a data error" link
+6. Match Finder upgrades (what's left)
+7. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-7. Typo tolerance in search
-8. Upcoming matches (home page strip)
-9. Recent searches
-10. Pinned / favourite team
-11. Road to the final
-12. More competitions (depends on the data)
+8. Typo tolerance in search
+9. Upcoming matches (home page strip)
+10. Recent searches
+11. Pinned / favourite team
+12. Road to the final
+13. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-13. Head-to-head by decade
-14. "On this day"
-15. Trivia mode
-16. Side-by-side Team Seasons
-17. League History chart
-18. Team Records: date ranges, bottom / relegated, home / away
-19. A club's title races
-20. Team progression chart (after League History)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. Lighter pages (small gain - see the item)
-24. Knockout Stage bracket view (on hold)
-25. Country vs Country
+14. Head-to-head by decade
+15. "On this day"
+16. Trivia mode
+17. Side-by-side Team Seasons
+18. League History chart
+19. Team Records: date ranges, bottom / relegated, home / away
+20. A club's title races
+21. Team progression chart (after League History)
+22. "/" to search
+23. Penalty shootout leaderboard (team and head-to-head answers done)
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
 
 ## Items
 
@@ -79,9 +80,23 @@ Most to least important; details are in each item below.
       the UCL") - Team 1 is always one club.
     - "City" / "United" alone as the opponent ("when did Man Utd last lose
       to City" reads City as Hull City).
-    - Q&A screenshots for Match Finder; the old QAImages/TheLastTimeWhen1/2
-      .png are no longer used.
-    - Related: "Match Finder without a team" and "Comebacks" below.
+    - (Q&A screenshots for Match Finder: part of the Q&A audit.)
+
+- Later (before launch): **Q&A audit** — noted 2026-10-07. Much has
+  changed since qa.html was written; go through every section against
+  the pages as they are now:
+  - Sections today: General, League Tables, Team Seasons, Match Finder,
+    Team Streaks. Team Seasons is now the Seasons tab, with Team History,
+    Team Records and League History sub-tabs (Per game, 3 Points for all
+    Wins, "or better" finishes) - none of that is described yet.
+  - The search: what it can answer, the dropdown, search mode (answer
+    line, notes, "Did you mean" links, Copy Link) - barely mentioned.
+  - Match Finder: Most Recent (Last Time When merged in), Comebacks,
+    Double-Legged Ties, no-team lists - and its screenshots (none yet).
+  - Screenshots: retake any showing old layouts (QAImages/); delete the
+    unused ones (TheLastTimeWhen1/2.png, TheLeagueTable11.png).
+  - Wording, links and the mobile layout of the page; anything that no
+    longer exists (Last Time When tab, Team Seasons name).
 
 - Later (before launch): **Analytics, with failed searches** — noted
   2026-10-03. Know what people ask - especially questions that get "No
