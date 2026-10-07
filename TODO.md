@@ -10,7 +10,7 @@ Most to least important; details are in each item below.
 1. Analytics, with failed searches
 2. Error reporting
 3. About / sources page
-4. Q&A audit (with Match Finder screenshots)
+4. Self-host the club crests (then retake the Q&A screenshots automatically)
 
 **Tier 2 - high value, soon after launch**
 5. Match Finder upgrades (what's left)
@@ -79,23 +79,17 @@ Most to least important; details are in each item below.
       the UCL") - Team 1 is always one club.
     - "City" / "United" alone as the opponent ("when did Man Utd last lose
       to City" reads City as Hull City).
-    - (Q&A screenshots for Match Finder: part of the Q&A audit.)
 
-- Later (before launch): **Q&A audit** — noted 2026-10-07. Much has
-  changed since qa.html was written; go through every section against
-  the pages as they are now:
-  - Sections today: General, League Tables, Team Seasons, Match Finder,
-    Team Streaks. Team Seasons is now the Seasons tab, with Team History,
-    Team Records and League History sub-tabs (Per game, 3 Points for all
-    Wins, "or better" finishes) - none of that is described yet.
-  - The search: what it can answer, the dropdown, search mode (answer
-    line, notes, "Did you mean" links, Copy Link) - barely mentioned.
-  - Match Finder: Most Recent (Last Time When merged in), Comebacks,
-    Double-Legged Ties, no-team lists - and its screenshots (none yet).
-  - Screenshots: retake any showing old layouts (QAImages/); delete the
-    unused ones (TheLastTimeWhen1/2.png, TheLeagueTable11.png).
-  - Wording, links and the mobile layout of the page; anything that no
-    longer exists (Last Time When tab, Team Seasons name).
+- Later (before launch): **Self-host the club crests** — noted 2026-10-07,
+  after the Q&A audit. The crests are hotlinked from s.hs-data.com, which
+  now answers headless Chrome with 429 Too Many Requests (normal browsers
+  still get them) - so the Q&A screenshots had to be taken by hand, and
+  the host could limit or block real visitors at volume too. Download
+  every crest once into the repo and serve it with the site (all four
+  pages and search.js), then let tests/qa-screenshots.js retake the shots.
+  Also: search.js shows a broken image when a crest fails (the pages'
+  tables hide it) - make it hide the image too. Replaces part 4 of API
+  caching.
 
 - Later (before launch): **Analytics, with failed searches** — noted
   2026-10-03. Know what people ask - especially questions that get "No
@@ -331,6 +325,23 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Q&A audit~~ — done (2026-10-07). qa.html checked against every page:
+  - Text: outdated answers fixed (daily updates, the Seasons tab, nine
+    streak types, typos); new Search and Champions League categories;
+    Seasons sub-tabs, Per game / 3 Points for all Wins, the team
+    dashboard, Copy Link, "Something wrong?", several opponents, and the
+    three General answers reworded (reliability, other competitions,
+    historic champions).
+  - 30 new screenshots (QAImages/<section>-<nn>-<what>.png), a varied
+    set of clubs across all six competitions, incl. 8 for search; the 18
+    old ones deleted. Taken by hand, as the crest host blocks headless
+    Chrome - tests/qa-screenshots.js holds each shot's page and crop, to
+    retake them automatically once the crests are self-hosted. Images
+    load only when their answer is opened (loading="lazy").
+  - Noticed on the way, not fixed: in search mode a three-line answer
+    sits right against the table's info bar; the search dropdown cuts
+    "Champions League" to "Champions Leagu".
 
 - ~~"Report a data error" link~~ — done (2026-10-07). A small "Something
   wrong?" link under every Copy Link (each tab, and each search answer)

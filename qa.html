@@ -109,10 +109,12 @@
                 <div class="qa-filter-buttons mb-8">
                     <div class="filter-buttons-grid">
                         <button class="filter-btn active" data-category="general">General</button>
+                        <button class="filter-btn" data-category="search">Search</button>
                         <button class="filter-btn" data-category="league-tables">League Tables</button>
-                        <button class="filter-btn" data-category="team-seasons">Team Seasons</button>
+                        <button class="filter-btn" data-category="team-seasons">Seasons</button>
                         <button class="filter-btn" data-category="match-finder">Match Finder</button>
                         <button class="filter-btn" data-category="team-streaks">Team Streaks</button>
+                        <button class="filter-btn" data-category="champions-league">Champions League</button>
                     </div>
                 </div>
 
@@ -125,18 +127,18 @@
                         </div>
                         <div class="qa-answer">
                             <p>In short, it's a collection of different team statistics all compiled in one place.</p>
-                            <p>It's a way to find niche and mainstream team information all on one easy to use website.</p>
+                            <p>It's a way to find niche and mainstream team information all on one easy to use website - either by asking the search bar a question in plain English, or by digging into the tabs and filters yourself.</p>
                         </div>
                     </div>
-                    
+
                     <div class="qa-item" data-category="general">
                         <div class="qa-question">
                             <h3><span class="icon-question mr-2"></span>How reliable is this data?</h3>
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>All data has been verified by multiple sources to ensure its accuracy.</p>
-                            <p>Of course, with such a large data set spanning across so many years, it's hard to double check every single statistic. So if you discover something you believe to be wrong, contact us through the Contact & Support tab. We'll investigate your claim as quick as we can.</p>
+                            <p>The data is checked against multiple sources, but with over a century of results, some mistakes may slip through.</p>
+                            <p>Of course, with such a large data set spanning across so many years, it's hard to double check every single statistic. So if you discover something you believe to be wrong, click "Something wrong?" under the Copy Link button - on any tab, or under a search answer. It opens the contact form with the page you were looking at already filled in. We'll investigate your claim as quick as we can.</p>
                         </div>
                     </div>
 
@@ -156,17 +158,17 @@
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>We currently cover the top 5 European leagues: the English Premier Liga, Spanish La Liga, German Bundesliga, Italian Serie A, and the French Ligue 1. Additionaly, we cover the UEFA Champions League. All statistics on this website are only from these 6 competitions, in this point of time.</p>
+                            <p>We currently cover the top 5 European leagues: the English Premier League, Spanish La Liga, German Bundesliga, Italian Serie A, and the French Ligue 1. Additionally, we cover the UEFA Champions League. All statistics on this website are only from these 6 competitions, at this point in time.</p>
                         </div>
                     </div>
 
                     <div class="qa-item" data-category="general">
                         <div class="qa-question">
-                            <h3><span class="icon-stats mr-2"></span>Are there plans to add other European leagues and domestic competitons?</h3>
+                            <h3><span class="icon-stats mr-2"></span>Are there plans to add other European leagues and domestic competitions?</h3>
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>Not at this time. The current focus is on continental and international competitions, and then other sports.</p>
+                            <p>Possibly. The Europa League is the most likely next addition, with other sports following suit.</p>
                         </div>
                     </div>
 
@@ -176,7 +178,7 @@
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>Currently every Thursday. In the near future, it will be done more often.</p>
+                            <p>Every day. New results are added each morning (UK time), and the date of the latest update is shown at the top of each page.</p>
                         </div>
                     </div>
 
@@ -186,11 +188,101 @@
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>Every single professional season from the major five domesticleagues and the UEFA Champions League in their current setup, with their current name and format has been included. Examples of exclusions include Oberliga seasons in Germany, Divisione Nazionale seasons in Italy, and Amateur Football Champions in France.</p>
+                            <p>Every single professional season from the major five domestic leagues and the UEFA Champions League in their current setup, with their current name and format has been included. Examples of exclusions include Oberliga seasons in Germany, Divisione Nazionale seasons in Italy, and Amateur Football Champions in France. Those earlier champions can still be included in Team History with "Include Historic Seasons", which counts their titles but has no match data.</p>
                         </div>
                     </div>
 
-                    <!-- Features Questions -->
+                    <div class="qa-item" data-category="general">
+                        <div class="qa-question">
+                            <h3><span class="icon-team mr-2"></span>What is a team's dashboard?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Type a club into "Search for a team to view its dashboard" at the top of the Domestic or Champions League page. That team is then picked as Team 1 on every tab, and a snapshot of its current season sits at the top: its position, games played, W-D-L, points and the last 5 results. Click "Change Team" to pick another club.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="general">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>Can I share what I'm looking at?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Yes. Every tab, and every search answer, has a Copy Link button. The link keeps every filter you've picked - the league, season, teams, home or away and so on - so whoever opens it sees exactly the same view.</p>
+                        </div>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="qa-item" data-category="search">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>How does the search work?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Type a question in plain English into the search bar on the home page, or open it with the Search button on any page. For example:</p>
+                            <ul>
+                                <li><strong>Arsenal vs Chelsea</strong> - a head-to-head record.</li>
+                                <li><strong>Premier League 2003-04</strong> - a final table.</li>
+                                <li><strong>Liverpool titles</strong> or <strong>Juventus top 4 finishes</strong> - a club's seasons.</li>
+                                <li><strong>Bayern biggest wins</strong> or <strong>last time Liverpool beat Everton away</strong> - single matches.</li>
+                                <li><strong>Bayern longest unbeaten run</strong> - streaks.</li>
+                                <li><strong>most points in a season</strong> or <strong>closest title races</strong> - season records.</li>
+                            </ul>
+                            <p>The dropdown next to the search bar picks where to look: the Top 5 Leagues, one league, or the Champions League. Pick a result and you land on that view with the answer written out at the top.</p>
+                            <img src="QAImages/search-01-results.png" alt="Search results for Paris Saint-Germain in Ligue 1" class="qa-screenshot" loading="lazy">
+                            <p>Seasons ("2010-11"), dates ("since 2015", "between 1990 and 2010", "on Boxing Day"), home or away, a day of the week and "last 10 games" can all be added to most questions.</p>
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="search">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>What do the notes under an answer mean?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Some answers have a short note underneath:</p>
+                            <ul>
+                                <li><strong>Did you mean...?</strong> - when a question can be read more than one way, the other readings are links. "Highest scoring seasons" could mean a club's best season or the league's, and "Premier League only" or "the First Division and Premier League together" switches between one era and every season.</li>
+                                <li><strong>Points as awarded</strong> - older seasons gave 2 points for a win. The note says so, and has a link to count every win as 3 points instead.</li>
+                            </ul>
+                            <p>Next to the answer, Copy Link shares it, and "Something wrong?" reports a mistake.</p>
+                            <img src="QAImages/search-02-answer.png" alt="The answer to "Most goals in a La Liga season", with a "Did you mean" link" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="search">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>Premier League or English top flight - what's the difference?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>The Premier League began in 1992-93; before that, England's top division was the First Division. In the same way, the European Cup became the Champions League in 1992-93.</p>
+                            <p>A question that doesn't name the competition covers every season ("Arsenal vs Chelsea" is their whole top-flight record). Naming it narrows it to that era: "Arsenal vs Chelsea Premier League" counts from 1992 only, and "First Division" before then. The answer always says which it used, with a link to the other.</p>
+                            <img src="QAImages/search-03-era.png" alt="The answer to &quot;Arsenal vs Chelsea&quot; in the Premier League dropdown, with &quot;Did you mean the Premier League only?&quot;" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="search">
+                        <div class="qa-question">
+                            <h3><span class="icon-question mr-2"></span>Search examples</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>A few questions and what they give back. Each one opens the view behind the answer, so you can keep exploring from there.</p>
+                            <p><strong>Serie A 2005-06</strong> - a past season's final table.</p>
+                            <img src="QAImages/search-04-final-table.png" alt="The answer to &quot;Serie A 2005-06&quot;: Inter won with 76 points, 7 ahead of AS Roma" class="qa-screenshot" loading="lazy">
+                            <p><strong>Last time Olympique Marseille beat Paris Saint-Germain</strong> - the last win, draw or loss between two clubs, and how long ago it was.</p>
+                            <img src="QAImages/search-05-last-time.png" alt="The answer to &quot;Last time Olympique Marseille beat Paris Saint-Germain&quot;, with Marseille's wins over PSG" class="qa-screenshot" loading="lazy">
+                            <p><strong>Bayer Leverkusen longest unbeaten run</strong> - a club's longest streaks.</p>
+                            <img src="QAImages/search-06-streak.png" alt="The answer to &quot;Bayer Leverkusen longest unbeaten run&quot;: 35 games from 2023 to 2024" class="qa-screenshot" loading="lazy">
+                            <p><strong>Premier League table on Christmas Day 2003</strong> - the table as it stood on any date.</p>
+                            <img src="QAImages/search-07-date.png" alt="The Premier League table on December 25, 2003, with Manchester United top" class="qa-screenshot" loading="lazy">
+                            <p><strong>Liverpool penalty shootouts</strong> - in the Champions League dropdown, a club's shootout record and every shootout.</p>
+                            <img src="QAImages/search-08-champions-league.png" alt="The answer to &quot;Liverpool penalty shootouts&quot;: W3 L1, with all four shootouts" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- League Tables -->
                     <div class="qa-item" data-category="league-tables">
                         <div class="qa-question">
                             <h3><span class="icon-table mr-2"></span>How does the League Tables tab work?</h3>
@@ -199,10 +291,11 @@
                         <div class="qa-answer">
                             <p>The League Tables tab allows you to grab historic league and competition finishes or access head-to-head data with various filters:</p>
                             <ul>
-                                <li><strong>Date Range</strong> - Filter matches by specific date ranges, or look at past league tables.</li>
+                                <li><strong>Season or Date Range</strong> - Look at a past league table, a whole era, or any range of dates.</li>
                                 <li><strong>Day of Week</strong> - See performance on specific days (e.g., weekend vs weekday games).</li>
                                 <li><strong>Home/Away</strong> - Toggle between home and away performance.</li>
                                 <li><strong>Point Deductions</strong> - Include or exclude point penalties.</li>
+                                <li><strong>3 Points for all Wins</strong> - Count every win as 3 points, even in seasons that gave 2.</li>
                                 <li><strong>Team Record Stats</strong> - Get accurate team record against all opposition with various filtering options.</li>
                                 <li><strong>Head-To-Head Stats</strong> - Get accurate head-to-head stats between any two teams with various filtering options and a list games played.</li>
                             </ul>
@@ -216,9 +309,8 @@
                         </div>
                         <div class="qa-answer">
                             <p>Looking at past season standings is now easy. All you have to do is pick a league, and choose a season with the dropdown menu. You'll get the accurate standings from that season. If you want to filter by just home results, uncheck the away box in Match Results.</p>
-                            <img src="QAImages/TheLeagueTable1.png" alt="Past League Seasons interface showing league and season selection" class="qa-screenshot">
-                            <img src="QAImages/TheLeagueTable2.png" alt="Past League Seasons results showing historical league standings" class="qa-screenshot">
-                            <img src="QAImages/TheLeagueTable3.png" alt="Past League Seasons with home/away match results filtering" class="qa-screenshot">
+                            <img src="QAImages/league-tables-01-past-season.png" alt="The Bundesliga 2023-24 final table, picked with the league and season" class="qa-screenshot" loading="lazy">
+                            <img src="QAImages/league-tables-02-home-only.png" alt="Ligue 1 2022-23 with only home results counted" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
@@ -229,9 +321,9 @@
                         </div>
                         <div class="qa-answer">
                             <p>If you want to look at the standings between a custom date range, enter a start date and end date in the appropriate box. The league standings for that range will then be fetched. You can now easily find the league standings since when a particular coach was appointed. For example, Pep Guardiola on July 1st, 2016.</p>
-                            <p>To view the all-time standings for the Premier League, you can go to season and choose Premier League Era, and the dates will adjust adjust automatically.</p>
-                            <img src="QAImages/TheLeagueTable4.png" alt="Custom Date Ranges interface with start and end date selection" class="qa-screenshot">
-                            <img src="QAImages/TheLeagueTable5.png" alt="Premier League Era all-time standings example" class="qa-screenshot">
+                            <p>To view the all-time standings for the Premier League, you can go to season and choose Premier League Era, and the dates will adjust automatically.</p>
+                            <img src="QAImages/league-tables-03-date-range.png" alt="The Premier League table since July 1st, 2016" class="qa-screenshot" loading="lazy">
+                            <img src="QAImages/league-tables-04-premier-league-era.png" alt="The all-time Premier League era table" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
@@ -242,12 +334,11 @@
                         </div>
                         <div class="qa-answer">
                             <p>Get the detailed all-time record for a team. All you have to do is choose a Team 1 in the drop down menu. You'll get home, away, and overall splits. And a list of matches underneath.</p>
-                            <p>You'll also get a list of matches between the teams, which can be sorted how you like.</p>
-                            <img src="QAImages/TheLeagueTable6.png" alt="Team Record Stats interface showing team selection and record splits" class="qa-screenshot">
-                            <img src="QAImages/TheLeagueTable7.png" alt="Match history list with sorting options" class="qa-screenshot">
+                            <p>The list of matches can be sorted how you like, and "Most Recent Matches" narrows everything to the team's last few games.</p>
+                            <img src="QAImages/league-tables-05-team-record.png" alt="Borussia Dortmund's overall, home and away Bundesliga record" class="qa-screenshot" loading="lazy">
+                            <img src="QAImages/league-tables-06-match-history.png" alt="Borussia Dortmund's match history, newest first" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
-
 
                     <div class="qa-item" data-category="league-tables">
                         <div class="qa-question">
@@ -257,8 +348,19 @@
                         <div class="qa-answer">
                             <p>Get the detailed all time record between 2 teams. All you have to do is choose a Team 1 and Team 2. You'll get home, away, and overall splits. And the league table in head-to-head matchups.</p>
                             <p>You'll also get a list of matches between the teams, which can be sorted how you like.</p>
-                            <img src="QAImages/TheLeagueTable8.png" alt="Head-to-Head Stats interface showing team selection and record splits" class="qa-screenshot">
-                            <img src="QAImages/TheLeagueTable9.png" alt="Head-to-Head match history list with sorting options" class="qa-screenshot">
+                            <img src="QAImages/league-tables-07-head-to-head.png" alt="Real Madrid vs Atlético Madrid head-to-head record" class="qa-screenshot" loading="lazy">
+                            <img src="QAImages/league-tables-08-head-to-head-matches.png" alt="Real Madrid vs Atlético Madrid match list" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="league-tables">
+                        <div class="qa-question">
+                            <h3><span class="icon-team mr-2"></span>Several opponents at once</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Team 2 can be more than one club. Click "+ Add team" under Team 2 to add another, or pick the Big 6 in the Premier League. Each opponent then gets its own row with Team 1's record against them - handy for seeing how a club does against all its rivals in one table.</p>
+                            <img src="QAImages/league-tables-10-several-opponents.png" alt="Inter's record against Juventus, AC Milan, AS Roma and SSC Napoli, one row each" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
@@ -270,24 +372,22 @@
                         <div class="qa-answer">
                             <p>You can combine multiple filters to get data which you can't anywhere else. Let's take this example. We only want the results of the last 20 games where Arsenal is the away team and Chelsea is the home team.</p>
                             <p>We choose Arsenal as Team 1, Chelsea as Team 2. We unselect the home checkbox, and in the Head-to-Head Record bar, we select 20 in the drop down menu, giving only the outcome for the 20 most recent matchups. As you can see, in all of the matches, Chelsea is home and Arsenal is away, and there are exactly 20 results filtered out.</p>
-                            <img src="QAImages/TheLeagueTable9.png" alt="Complex Filters interface showing filter selection for Arsenal away vs Chelsea home" class="qa-screenshot">
-                            <img src="QAImages/TheLeagueTable10.png" alt="Complex Filters results showing last 12 Arsenal away matches at Chelsea" class="qa-screenshot">
+                            <img src="QAImages/league-tables-09-complex-filters.png" alt="Arsenal's last 20 away games at Chelsea" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
+                    <!-- Seasons -->
                     <div class="qa-item" data-category="team-seasons">
                         <div class="qa-question">
-                            <h3><span class="icon-calendar mr-2"></span>How does the Team Seasons tab work?</h3>
+                            <h3><span class="icon-calendar mr-2"></span>How does the Seasons tab work?</h3>
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>Team Seasons provides a list of team performances across multiple seasons. You can:</p>
+                            <p>The Seasons tab looks at whole seasons, with three views picked by the buttons at the top:</p>
                             <ul>
-                                <li>View a team's performance across all available seasons.</li>
-                                <li>Filter out a team's seasons by league positions.</li>
-                                <li>Find out how many times a team finished in a position, and when was the last time.</li>
-                                <li>See which teams finished in specific positions across seasons.</li>
-                                <li>Find out which teams have finished in a position the most times.</li>
+                                <li><strong>Team History</strong> - a season's final table, a team's season-by-season finishes, or every team that finished in a position.</li>
+                                <li><strong>Team Records</strong> - every club's season ranked by a stat: the most points, the fewest goals conceded and so on.</li>
+                                <li><strong>League History</strong> - every season of the league, with all its clubs added up: goals, how often the home side won, and how close the title race was.</li>
                             </ul>
                         </div>
                     </div>
@@ -298,9 +398,10 @@
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>Getting a club's historical seasons is as easy as selecting a league, and choosing a team from the dropdown menu.</p>
-                            <p>You can see all the historic places of the team now. You can either sort the table by the various columns, or use "Filter by Position:", to only select the seasons a team finished an exact position.</p>
-                            <img src="QAImages/TeamSeasons1.png" alt="Team Seasons interface showing a team's historical league positions" class="qa-screenshot">
+                            <p>In Team History, getting a club's historical seasons is as easy as selecting a league, and choosing a team from the dropdown menu.</p>
+                            <p>You can see all the historic places of the team now. You can either sort the table by the various columns, or use "Filter by Position:", to only select the seasons a team finished an exact position. Count tells you how many times they've done it, and the line under the filter says when it last happened. Click the arrow at the start of a row to see that season's matches.</p>
+                            <p>In Italy and Germany, champions were crowned before Serie A (1929) and the Bundesliga (1963). "Include Historic Seasons" adds those to the list.</p>
+                            <img src="QAImages/seasons-01-team-history.png" alt="Olympique Lyonnais's Ligue 1 seasons in Team History" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
@@ -310,11 +411,53 @@
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>To get an entire league's historical places, all you have to do is choose a league, and pick a position. If you pick 2nd, you'll get a list of all the second place teams. Count tells you how many times that team has done it.</p>
-                            <img src="QAImages/TeamSeasons2.png" alt="League's Historical Places interface showing teams that finished in selected position" class="qa-screenshot">
+                            <p>To get an entire league's historical places, all you have to do is choose a league in Team History, and pick a position. If you pick 2nd, you'll get a list of all the second place teams. Count tells you how many times that team has done it.</p>
+                            <img src="QAImages/seasons-02-position.png" alt="Every Bundesliga runner-up in Team History" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
+                    <div class="qa-item" data-category="team-seasons">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>Team Records: the best and worst seasons</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Team Records ranks every club's season by the Stat you pick - Points, Wins, Draws, Losses, Goals Scored, Goals Conceded or Goal Difference - with Order set to Most or Fewest. So "most points in a season" or "fewest goals conceded" is one click.</p>
+                            <p>Narrow it down with:</p>
+                            <ul>
+                                <li><strong>Finishing Position</strong> - only teams that finished in that place, like the most points by a team that finished 2nd. Tick "Include better finishes" for that place or higher (the top 4, say).</li>
+                                <li><strong>Seasons</strong> - all seasons, or one era such as the Premier League.</li>
+                                <li><strong>Team</strong> - one club's own best and worst seasons.</li>
+                            </ul>
+                            <p>Click the arrow at the start of a row to see that season's matches.</p>
+                            <img src="QAImages/seasons-03-team-records.png" alt="The most points by a team finishing 2nd in the Premier League" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="team-seasons">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>League History: how the league has changed</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>League History has one row per season, with every club added up: matches, goals, and how often the home side won, drew or lost. It also shows the title race - the points gap between 1st and 2nd, and their average points. A gap of 0 means the title was decided on a tie-break.</p>
+                            <p>Rank by any of these to find record seasons - the highest-scoring season, the closest title race, when home advantage was weakest - or keep it newest first to see how the league has changed. Click the arrow at the start of a row for that season's final table.</p>
+                            <img src="QAImages/seasons-04-league-history.png" alt="La Liga's closest title races, with 1930-31's final table opened" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+                    <div class="qa-item" data-category="team-seasons">
+                        <div class="qa-question">
+                            <h3><span class="icon-calendar mr-2"></span>Per game and 3 Points for all Wins</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>Leagues have changed size over the years - 30 games one season, 42 another - so totals don't always compare fairly. Tick "Per game" in Team Records or League History to show every number per match instead.</p>
+                            <p>Older seasons also gave only 2 points for a win. Tick "3 Points for all Wins" to count every win as 3, so points from different eras can be compared.</p>
+                        </div>
+                    </div>
+
+                    <!-- Match Finder -->
                     <div class="qa-item" data-category="match-finder">
                         <div class="qa-question">
                             <h3><span class="icon-calendar mr-2"></span>How does the Match Finder tab work?</h3>
@@ -324,6 +467,7 @@
                             <p>Match Finder digs out individual matches for a team. Pick a league and a Team 1, then a category: Biggest Victories, Biggest Defeats, Highest-Scoring Draws, Most or Least Total Goals, a Specific Scoreline, or Most Recent.</p>
                             <p>Optionally, pick a Team 2 (one club, several, the Big 6 in the Premier League, or every club from a country in the Champions League), and narrow it down by season, dates, day of the week, or Home and Away.</p>
                             <p>Leave Team 1 empty to search the whole league instead: the biggest win in its history, the highest-scoring game, every 0-0. Pick only a Team 2 to see every club's matches against them - like the biggest wins over Chelsea.</p>
+                            <img src="QAImages/match-finder-01-biggest-victories.png" alt="AC Milan's biggest Serie A victories" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
@@ -336,30 +480,34 @@
                             <p>Most Recent lists your team's matches newest first. Above the table you get their last win, last draw and last loss, and how many days ago each one was. Click one of those to only show that result, and click it again to show everything.</p>
                             <p>Use Result to pick a win, draw or loss, or "didn't win" and "didn't lose". Score finds an exact score from your team's side, at home or away - put 0 and 5 to find the last time they lost 5-0.</p>
                             <p>This replaces "The Last Time When..." tab, and old links to it open here.</p>
+                            <img src="QAImages/match-finder-02-most-recent.png" alt="Atlético Madrid's most recent matches, with their last win, draw and loss" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
-                    <div class="qa-item" data-category="match-finder">
+                    <div class="qa-item" data-category="match-finder champions-league">
                         <div class="qa-question">
                             <h3><span class="icon-team mr-2"></span>Two-legged ties (Champions League)</h3>
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
                             <p>In the Champions League, switch to Double-Legged Tie to look at whole ties on aggregate instead of single matches: biggest aggregate wins and defeats, ties decided after extra time, on away goals or on penalties, the most recent ties a team won or lost, and Comebacks - ties won after losing the first leg, biggest deficit first. Leave Team 1 empty for every club's ties - the biggest aggregate win ever, or the biggest comeback.</p>
+                            <img src="QAImages/match-finder-03-comebacks.png" alt="The biggest Champions League comebacks after losing the first leg" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
+                    <!-- Team Streaks -->
                     <div class="qa-item" data-category="team-streaks">
                         <div class="qa-question">
                             <h3><span class="icon-team mr-2"></span>How does the Team Streaks tab work?</h3>
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>Team Streaks help you filter streaks between a club and other clubs You can:</p>
+                            <p>Team Streaks finds runs of results in a row for a club, against everyone or one opponent. You can:</p>
                             <ul>
+                                <li>Look at Active streaks (still going) or Historic ones (every streak, longest first).</li>
                                 <li>Filter between Home, Away, or Both types of Games.</li>
-                                <li>Filter between one club against all opponents or against a specific opponent. </li>
-                                <li>Filter with four types of streaks: Winning, Unbeaten, Winless, or Losing.</li>
+                                <li>Filter between one club against all opponents or against a specific opponent - or leave Team 1 empty for every club's streaks.</li>
+                                <li>Pick from nine streak types: Winning, Unbeaten, Draw, Winless and Losing, or Clean Sheet, Goals Conceded, Scoring and Failed to Score.</li>
                             </ul>
                         </div>
                     </div>
@@ -370,10 +518,10 @@
                             <span class="qa-icon">+</span>
                         </div>
                         <div class="qa-answer">
-                            <p>This feature allows you to find out current streaks between one or more clubs. Let's take this example. We want to find out how many times in a row Manchester United has failed to win at Liverpool.</p>
-                            <p>We select Active Streak for Status, Winless Streak for Streak Type, Manchester United for Team 1, and Liverpool for Team 2. This gives you the list of matches for the streak, and how many days ago the streak started. It also gives you the last opposite result.</p>
-                            <img src="QAImages/TeamStreaks1.png" alt="Active Streaks interface showing current streak between teams" class="qa-screenshot">
-                            <img src="QAImages/TeamStreaks2.png" alt="Active Streaks results showing match history and streak details" class="qa-screenshot">
+                            <p>This feature allows you to find out current streaks between one or more clubs. Let's take this example. We want to find out how many times in a row Tottenham Hotspur have failed to win at Chelsea.</p>
+                            <p>We select Active Streak for Status, Away for Location, Winless Streak for Streak Type, Tottenham Hotspur for Team 1, and Chelsea for Team 2. This gives you the list of matches for the streak, and how many days ago the streak started. It also gives you the last opposite result.</p>
+                            <img src="QAImages/team-streaks-01-active-controls.png" alt="Team Streaks set to Tottenham Hotspur's active away winless streak against Chelsea" class="qa-screenshot" loading="lazy">
+                            <img src="QAImages/team-streaks-02-active-result.png" alt="Tottenham Hotspur's 8-match winless streak at Chelsea, and their last win there" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
@@ -384,12 +532,32 @@
                         </div>
                         <div class="qa-answer">
                             <p>This feature allows you to find the longest streaks all time for either 1 team, or between two. For this scenario, let's find Bayern Munich's longest unbeaten home streaks.</p>
-                            <p>We select Bundesliga as our league, then choose Historic Streaks, Unbeaten Streak, and Bayern Munich as Team 1. What we're listed is the start date, end date, number of the matches and days the streak lasted for. Every streak this team has had is listed, and you can sort these streaks how you like.</p>
-                            <img src="QAImages/TeamStreaks3.png" alt="Historic Streaks interface showing Bayern Munich's unbeaten home streaks" class="qa-screenshot">
+                            <p>We select Bundesliga as our league, then choose Historic Streaks, Home, Unbeaten Streak, and Bayern Munich as Team 1. Every streak of 3 or more games is listed, with its start and end date, goals for and against, clean sheets, points per game, the number of matches and how many days it lasted. Sort the streaks how you like, and click the arrow at the start of a row to see its matches.</p>
+                            <img src="QAImages/team-streaks-03-historic.png" alt="Bayern München's longest unbeaten home streaks" class="qa-screenshot" loading="lazy">
                         </div>
                     </div>
 
-                    
+                    <!-- Champions League -->
+                    <div class="qa-item" data-category="champions-league">
+                        <div class="qa-question">
+                            <h3><span class="icon-stats mr-2"></span>What's different on the Champions League page?</h3>
+                            <span class="qa-icon">+</span>
+                        </div>
+                        <div class="qa-answer">
+                            <p>The same tabs work for the Champions League, with a few extras for a cup competition:</p>
+                            <ul>
+                                <li><strong>Competition Stage</strong> - narrow anything to the League/Group Stage, the Knock-Out Stage, one round such as the Semi-Finals, or the qualifying rounds.</li>
+                                <li><strong>Exclude Qualifiers / Exclude Main Stage</strong> - leave out the qualifying rounds, or look at nothing but them.</li>
+                                <li><strong>One season</strong> - League Tables shows each group, or the league phase, as its own table.</li>
+                                <li><strong>A whole country as Team 2</strong> - see a club's record against every club from Spain, say.</li>
+                                <li><strong>How far a club got</strong> - in Seasons, a campaign is measured by the stage reached (Final, Semi-Finals...) instead of a league position.</li>
+                            </ul>
+                            <img src="QAImages/champions-league-01-one-season.png" alt="The 2018-19 Champions League groups, one table each" class="qa-screenshot" loading="lazy">
+                            <img src="QAImages/champions-league-02-qualifiers.png" alt="The 2016-17 qualifying play-offs, picked with Stage" class="qa-screenshot" loading="lazy">
+                        </div>
+                    </div>
+
+
                 <!-- No Results Message -->
                 <div id="noResults" class="text-center py-8 hidden">
                     <p class="text-xl text-gray-500">No questions found matching your search.</p>
@@ -466,7 +634,7 @@
                     qaItems.forEach(item => {
                         const itemCategory = item.dataset.category;
                         
-                        if (itemCategory === selectedCategory) {
+                        if (itemCategory.split(" ").includes(selectedCategory)) {
                             item.style.display = 'block';
                             visibleCount++;
                         } else {

@@ -48,3 +48,13 @@ empty `answer`, then `npm run check:update` and check what it recorded; or
 
 `search/compare-routing.js` compares routing with a git ref instead of the
 snapshot (`node search/compare-routing.js main`).
+
+## Q&A screenshots
+
+`npm run qa-screenshots` retakes every image the Q&A page uses
+(`QAImages/<section>-<nn>-<what>.png`) from the live pages - after a layout
+change, say. `npm run qa-screenshots -- streaks` retakes only the shots
+whose name contains "streaks". Each shot (page, clicks, crop) is listed in
+`qa-screenshots.js`; look through the images before committing them.
+Shots marked `byHand` (the two search ones, which need club crests) are
+kept as they are unless you add `--force`.
