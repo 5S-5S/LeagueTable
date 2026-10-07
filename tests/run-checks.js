@@ -12,7 +12,8 @@
 // 2. Pages: the four sport pages (desktop, and phone width for the Mobile
 //    pages) in headless Chrome - every tab and Seasons sub-tab clicked, no
 //    script error, Team Records and League History draw rows; and League
-//    Tables filter combinations that once showed nothing.
+//    Tables filter combinations that once showed nothing; the home page's
+//    upcoming matches (from a fixed fixture list).
 // 3. Exact answers (checks/answers.json "exact"): questions about the past,
 //    whose answer can't change - the answer line and its note, word for
 //    word.
@@ -173,6 +174,44 @@ async function checkPages(browser, base) {
         errors.forEach(e => fail('pages', `report link: ${e}`));
         await page.close();
         console.log('Pages: report link');
+    }
+
+    // Upcoming matches on the home page, from a fixed fixture list (the
+    // live one changes daily and is empty in international breaks): the
+    // strip shows its cards, a card opens that match's view (table,
+    // head-to-head, streaks) and Back returns to the strip
+    {
+        const page = await browser.newPage();
+        const errors = [];
+        page.on('pageerror', err => errors.push(String(err.message || err).split('\n')[0]));
+        await page.setViewport({ width: 1300, height: 900 });
+        const kickoff = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().slice(0, 19) + 'Z';
+        const fixtures = [
+            { matchId: 1, div: 'E0', utcDate: kickoff, homeTeam: 'Arsenal FC', awayTeam: 'Chelsea FC', matchday: 8, competitionPhase: null, status: 'TIMED', fetchedAt: kickoff },
+            { matchId: 2, div: 'SP1', utcDate: kickoff, homeTeam: 'Real Madrid', awayTeam: 'FC Barcelona', matchday: 8, competitionPhase: null, status: 'TIMED', fetchedAt: kickoff }
+        ];
+        await page.setRequestInterception(true);
+        page.on('request', req => req.url().includes('/api/upcoming')
+            ? req.respond({ status: 200, contentType: 'application/json', headers: { 'Access-Control-Allow-Origin': '*' }, body: JSON.stringify({ fixtures }) })
+            : req.continue());
+        await page.goto(`${base}/index.html`, { waitUntil: 'networkidle2', timeout: 45000 });
+        const cards = await page.waitForFunction(() => document.querySelectorAll('#upcomingStrip .um-card').length, { timeout: 20000 })
+            .then(h => h.jsonValue()).catch(() => 0);
+        if (cards !== 2) fail('pages', `upcoming strip: ${cards} cards, expected 2`);
+        else {
+            await page.click('#upcomingStrip .um-card');
+            const opened = await page.waitForFunction(() => /[?&]match=1\b/.test(location.search)
+                && document.querySelectorAll('#matchView .h2h-viz-bar').length > 0
+                && document.querySelectorAll('#matchView .um-table tbody tr').length === 2, { timeout: 30000 }).then(() => true).catch(() => false);
+            if (!opened) fail('pages', 'upcoming strip: the match view did not open with its table and head-to-head');
+            await page.click('#matchView [data-back]');
+            const back = await page.waitForFunction(() => !location.search && document.getElementById('matchView').hidden
+                && getComputedStyle(document.querySelector('.search-card')).display !== 'none', { timeout: 10000 }).then(() => true).catch(() => false);
+            if (!back) fail('pages', 'upcoming strip: Back did not return to the home page');
+        }
+        errors.forEach(e => fail('pages', `upcoming strip: ${e}`));
+        await page.close();
+        console.log('Pages: upcoming matches');
     }
 }
 

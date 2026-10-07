@@ -1,0 +1,846 @@
+/* Upcoming matches on the home page (upcoming.js): the strip above the
+   search bar, and one match's view in place of the search card. The
+   tables, bars, chevrons and highlight pills further down are the sport
+   pages' own rules (DomesticEurope.css), copied here so index.html doesn't
+   need that whole stylesheet - keep them in step if those change. */
+
+/* index.css and the sport pages define --bg-white / --bg-gray-50 the other
+   way round in dark mode; these follow the sport pages, where the copied
+   rules come from */
+:root {
+    --um-bg: #ffffff;
+    --um-bg-alt: #f9fafb;
+    --um-text: #1f2937;
+    --um-positive: #059669;
+}
+
+[data-theme="dark"] {
+    --um-bg: #222222;
+    --um-bg-alt: #333333;
+    --um-text: #ffffff;
+    --um-positive: #34d399;
+}
+
+/* --- The strip ----------------------------------------------------- */
+
+.um-strip {
+    text-align: left;
+    margin-bottom: 1.75rem;
+}
+
+.um-strip[hidden] {
+    display: none;
+}
+
+.um-strip-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.um-strip-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.um-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.um-chip {
+    padding: 0.3rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    background: var(--um-bg);
+    color: #374151;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.um-chip:hover {
+    border-color: #10b981;
+}
+
+.um-chip.active {
+    background: #059669;
+    border-color: #059669;
+    color: white;
+}
+
+.um-days {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+    scrollbar-width: none;
+}
+
+.um-day-tab {
+    padding: 0.45rem 0.85rem;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    background: none;
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.um-day-tab:hover {
+    color: #047857;
+}
+
+.um-day-tab.active {
+    color: #047857;
+    border-bottom-color: #059669;
+}
+
+.um-status {
+    margin: 0.25rem 0 0.6rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* One row of cards, scrolled sideways */
+.um-row {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.1rem 0.6rem;
+    scroll-snap-type: x proximity;
+}
+
+.um-card {
+    flex: 0 0 18.5rem;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: var(--um-bg);
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.um-card:hover,
+.um-card:focus-visible {
+    border-color: #10b981;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    outline: none;
+}
+
+.um-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.um-card-comp {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.um-kickoff {
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+}
+
+/* Home team, then away: crest, name, position, and the form dots */
+.um-card-teams {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.35rem 0.6rem;
+}
+
+.um-team {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.um-team img {
+    width: 1.6rem;
+    height: 1.6rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.um-team-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.um-team-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.um-position {
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.um-form {
+    display: flex;
+    gap: 0.15rem;
+    flex-shrink: 0;
+}
+
+.um-form-dot {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 1rem;
+    text-align: center;
+}
+
+.um-form-dot.W { background: #16a34a; }
+.um-form-dot.D { background: #9ca3af; }
+.um-form-dot.L { background: #dc2626; }
+
+/* --- One match's view ---------------------------------------------- */
+
+/* The view takes the search card's place */
+body.um-viewing .search-card {
+    display: none;
+}
+
+.um-view {
+    max-width: 72rem;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    padding: 1.5rem 2rem 2rem;
+    color: #1f2937;
+}
+
+.um-view[hidden] {
+    display: none;
+}
+
+.um-view-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.um-back {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.6rem;
+    background: var(--um-bg);
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.um-back:hover {
+    border-color: #10b981;
+    color: #047857;
+}
+
+.um-updated {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.um-view-head {
+    text-align: center;
+    padding: 0.5rem 0 1.25rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+
+.um-view-meta {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #4b5563;
+}
+
+.um-view-when {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 0.15rem;
+}
+
+.um-view-teams {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.um-view-team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.um-view-crest {
+    width: 4rem;
+    height: 4rem;
+    object-fit: contain;
+}
+
+.um-view-name {
+    font-size: 1.35rem;
+    font-weight: 800;
+    white-space: normal;
+    text-align: center;
+}
+
+.um-view-vs {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #9ca3af;
+}
+
+.um-view h3 {
+    margin: 1.25rem 0 0.5rem;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #374151;
+}
+
+.um-era {
+    margin: 1rem 0 0;
+}
+
+.um-era + h3 {
+    margin-top: 0.75rem;
+}
+
+/* Head-to-head bars (all meetings; this match's way round), and each
+   team's record, side by side (home team left) */
+.um-h2h,
+.um-records {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.um-h2h .h2h-segment {
+    min-width: 1.5rem;
+}
+
+.um-bar-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+
+.um-record + .um-record {
+    margin-top: 0.75rem;
+}
+
+.um-record-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.um-record-numbers {
+    font-size: 0.85rem;
+    color: #4b5563;
+    white-space: nowrap;
+}
+
+.um-h2h-note {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.um-streaks {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+}
+
+.um-streaks th,
+.um-streaks td {
+    padding: 0.5rem 0.6rem;
+    white-space: nowrap;
+}
+
+.um-streaks th {
+    cursor: default;
+}
+
+.um-table td {
+    padding: 0.4rem 0.6rem;
+}
+
+.um-table .points-badge {
+    font-size: 1rem;
+}
+
+.um-cell-team {
+    display: flex;
+    align-items: center;
+}
+
+.um-cell-center {
+    justify-content: center;
+}
+
+.um-view .league-table img {
+    width: 1.25rem;
+    height: 1.25rem;
+    object-fit: contain;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Streak tables show crests without names (hover for the name) */
+.um-view .um-logo-cell img {
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-right: 0;
+}
+
+.um-none {
+    font-size: 0.85rem;
+    color: #6b7280;
+    padding: 0.25rem 0;
+}
+
+.um-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+}
+
+.um-links a {
+    padding: 0.45rem 0.85rem;
+    border-radius: 0.5rem;
+    background: #4b5563;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.um-links a:hover {
+    background: #374151;
+}
+
+/* Utility classes the copied table markup uses that index.css lacks */
+.um-view .border-b { border-bottom: 1px solid #e5e7eb; }
+.um-view .font-semibold { font-weight: 600; }
+
+/* --- Phone width ----------------------------------------------------- */
+
+@media (max-width: 640px) {
+    .um-strip-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .um-filters {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        max-width: 100%;
+        scrollbar-width: none;
+    }
+
+    .um-card {
+        flex-basis: 15.5rem;
+    }
+
+    /* Clear of the fixed menu and dark-mode buttons */
+    .um-view {
+        margin-top: 3.25rem;
+        padding: 1rem;
+        border-radius: 1rem;
+    }
+
+    /* The view's switches wrap rather than scroll */
+    .um-view .um-filters {
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
+
+    .um-view-crest {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .um-view-name {
+        font-size: 1.05rem;
+    }
+
+    .um-h2h,
+    .um-records {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+/* --- Dark mode ----------------------------------------------------- */
+
+[data-theme="dark"] .um-strip-title,
+[data-theme="dark"] .um-view-meta { color: #f3f4f6; }
+[data-theme="dark"] .um-chip { color: #e5e7eb; border-color: #555; }
+[data-theme="dark"] .um-chip.active { color: white; border-color: #059669; }
+[data-theme="dark"] .um-days { border-color: #444; }
+[data-theme="dark"] .um-day-tab { color: #9ca3af; }
+[data-theme="dark"] .um-day-tab.active,
+[data-theme="dark"] .um-day-tab:hover { color: #34d399; }
+[data-theme="dark"] .um-status,
+[data-theme="dark"] .um-card-top,
+[data-theme="dark"] .um-view-when,
+[data-theme="dark"] .um-record-numbers,
+[data-theme="dark"] .um-h2h-note,
+[data-theme="dark"] .um-none { color: #9ca3af; }
+[data-theme="dark"] .um-kickoff,
+[data-theme="dark"] .um-view h3 { color: #d1d5db; }
+[data-theme="dark"] .um-card,
+[data-theme="dark"] .um-streaks,
+[data-theme="dark"] .um-view-head { border-color: #444; }
+[data-theme="dark"] .um-view {
+    background: #2a2a2a;
+    color: #e5e7eb;
+}
+[data-theme="dark"] .um-back { color: #e5e7eb; border-color: #555; }
+[data-theme="dark"] .um-view .border-b { border-color: #444; }
+[data-theme="dark"] .um-view .text-green-700 { color: #34d399; }
+[data-theme="dark"] .um-view .text-red-600 { color: #f87171; }
+
+/* --- Copied from DomesticEurope.css: tables, bars, chevrons, pills --- */
+
+[data-theme="dark"] .league-table td,
+[data-theme="dark"] .league-table th {
+    color: var(--um-text);
+}
+
+.win-score {
+    color: var(--um-positive) !important;
+}
+
+[data-theme="dark"] .league-table td[style*="#059669"] {
+    color: var(--um-positive) !important;
+}
+
+.league-table {
+    background: var(--um-bg);
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+[data-theme="dark"] .league-table {
+    border: 1px solid #444;
+}
+
+.league-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.league-table th {
+    background: linear-gradient(to right, #374151, #1f2937);
+    color: white;
+    padding: 1rem 0.75rem;
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.league-table th:hover {
+    background: #4b5563;
+}
+
+.league-table td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.league-table tr:hover {
+    background: var(--um-bg-alt);
+}
+
+.league-table tr.highlight {
+    background: #f0fdf4;
+}
+
+.season-expand-btn {
+    display: inline-block;
+    width: 1.5rem;
+    margin-right: 0.25rem;
+}
+
+.season-expand-btn {
+    height: 1.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    background: transparent;
+    color: #6b7280;
+    font-size: 0.875rem;
+    line-height: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.season-expand-btn:hover {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.season-expand-btn.expanded {
+    transform: rotate(90deg);
+}
+
+[data-theme="dark"] .season-expand-btn {
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .season-expand-btn:hover {
+    background: #444;
+    color: white;
+}
+
+.league-table .season-matches-row > td {
+    padding: 0.5rem 1rem 1.25rem 2.5rem;
+    background: var(--um-bg-alt);
+}
+
+.league-table .season-matches-row:hover {
+    background: none;
+}
+
+.league-table.season-matches {
+    border-radius: 0.75rem;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
+}
+
+.league-table.season-matches th {
+    padding: 0.625rem 0.75rem;
+    cursor: default;
+}
+
+.league-table.season-matches td {
+    padding: 0.625rem 0.75rem;
+}
+
+[data-theme="dark"] .league-table.season-matches {
+    border-color: #444;
+}
+
+.points-badge {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: #1d4ed8;
+    background: #dbeafe;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+}
+
+.team1-highlight {
+    font-size: 1rem;
+    font-weight: 700;
+    background: #dcfce7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border-radius: 0.375rem;
+}
+
+.team2-highlight {
+    font-size: 1rem;
+    font-weight: 700;
+    background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border-radius: 0.375rem;
+}
+
+#tableBody.team1-selected td div.team-clickable span.team-name-text:not(.team1-highlight):not(.team2-highlight) {
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+    background: transparent !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+[data-theme="dark"] #tableBody.team1-selected td div.team-clickable span.team-name-text:not(.team1-highlight):not(.team2-highlight) {
+    background: transparent !important;
+    color: white !important;
+}
+
+.h2h-viz-bar {
+    display: flex;
+    width: 100%;
+    height: 2rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.h2h-segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.h2h-segment:first-child {
+    border-top-left-radius: 0.75rem;
+    border-bottom-left-radius: 0.75rem;
+}
+
+.h2h-segment:last-child {
+    border-top-right-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
+
+.h2h-wins {
+    background: linear-gradient(135deg, #1f2937, #374151);
+}
+
+.h2h-wins:hover {
+    background: linear-gradient(135deg, #374151, #4b5563);
+}
+
+.h2h-draws {
+    background: linear-gradient(135deg, #6b7280, #9ca3af);
+}
+
+.h2h-draws:hover {
+    background: linear-gradient(135deg, #9ca3af, #d1d5db);
+}
+
+.h2h-losses {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    color: #1f2937;
+    border-left: 1px solid #d1d5db;
+}
+
+.h2h-losses:hover {
+    background: linear-gradient(135deg, #e5e7eb, #d1d5db);
+}
+
+[data-theme="dark"] .h2h-losses {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    color: var(--um-text);
+    border-left-color: #555;
+}
+
+[data-theme="dark"] .h2h-losses:hover {
+    background: linear-gradient(135deg, #374151, #1f2937);
+}
+
+#teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    font-family: inherit !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    font-style: normal !important;
+    text-decoration: none !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    line-height: normal !important;
+    background: transparent !important;
+    border-radius: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+[data-theme="dark"] #teamStreaksResults td div.flex.items-center.justify-center span:not(.team1-highlight):not(.team2-highlight) {
+    background: transparent !important;
+    color: white !important;
+}
+
+.league-table td.records-stat-col {
+    font-weight: 700;
+    background-color: rgba(5, 150, 105, 0.08);
+}
+
+.league-table th.records-stat-header {
+    background: #047857;
+}
+
+[data-theme="dark"] .league-table td.records-stat-col {
+    background-color: rgba(52, 211, 153, 0.12);
+}
+

@@ -1,0 +1,80 @@
+name: Update upcoming fixtures
+
+# Refreshes the `fixtures` table in D1 (upcoming matches for the next few
+# weeks, all five leagues + Champions League) from football-data.org - see
+# scripts/update_fixtures.py. Runs after the score updates (06:00/06:15),
+# independent of the results sync (06:30), which never touches fixtures.
+on:
+  schedule:
+    - cron: "20 6 * * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days ahead to fetch"
+        required: false
+        default: "21"
+      dry_run:
+        description: "Dry run (fetch and map, don't write to D1)"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  update-fixtures:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Refresh fixtures in D1
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_DATABASE_ID: ${{ secrets.CLOUDFLARE_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          ARGS="--days ${{ github.event.inputs.days || '21' }}"
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python3 scripts/update_fixtures.py $ARGS
+      - name: File or update a GitHub issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- update-fixtures-failure-tracker -->';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'fixtures-failure',
+            });
+            const existing = issues.find(i => i.body && i.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `Failed again on ${today}: ${runUrl}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: 'update-fixtures workflow failed - upcoming fixtures are not refreshing',
+                labels: ['fixtures-failure'],
+                body: `${marker}\nThe daily fixtures refresh failed on ${today}: ${runUrl}\n\n` +
+                  `The home page's upcoming matches keep showing the last successful refresh (the script ` +
+                  `never clears the table on a failed run), so fixtures slowly go stale. Check the run ` +
+                  `log first - likely causes: football-data.org rate limits or an expired key, or ` +
+                  `D1's free-tier daily quota.\n\n` +
+                  `This issue stays open and collects a comment per failed day until someone closes it.`,
+              });
+            }

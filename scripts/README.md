@@ -41,3 +41,29 @@ Once that's clean, the GitHub Actions workflows
 every day at 06:00 and 06:15 UTC respectively. Either can also be triggered
 manually from the Actions tab ("Run workflow") with custom `days` / `dry_run`
 inputs.
+
+## Upcoming fixtures
+
+`update_fixtures.py` feeds the upcoming-matches strip on the home page. Unlike the score
+scripts it doesn't touch any gist: it pulls not-yet-played matches for the
+next 21 days (all five leagues + Champions League, one API call each) and
+writes them straight to the `fixtures` table in D1 (see
+`backend/worker/schema.sql`), then bumps the `fixtures-version` KV key that
+the Worker's `/api/upcoming` cache is keyed on.
+
+It reuses the team-name mappings (and the Champions League stage map) from
+the two score scripts, so an unmapped name is fixed in the same place for
+both results and fixtures. Each run upserts what it fetched and only then
+deletes fixtures that weren't in the fetch, so a failed run leaves the
+previous day's fixtures in place. It also creates the table (and its index) if they
+don't exist yet, so there's no separate migration step.
+
+Secrets: `FOOTBALL_DATA_API_KEY` plus the D1 sync's `CLOUDFLARE_ACCOUNT_ID`,
+`CLOUDFLARE_DATABASE_ID` and `CLOUDFLARE_API_TOKEN` (already set for
+`sync-d1.yml`). Runs daily at 06:20 UTC via
+`.github/workflows/update-fixtures.yml`, which files a `fixtures-failure`
+issue if it fails. Dry run (no D1 credentials needed):
+
+```
+FOOTBALL_DATA_API_KEY=... python3 scripts/update_fixtures.py --dry-run
+```
