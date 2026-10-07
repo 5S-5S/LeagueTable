@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-06)
+## Priority (ranked 2026-10-03, updated 2026-10-07)
 
 Most to least important; details are in each item below.
 
@@ -23,10 +23,10 @@ Most to least important; details are in each item below.
 10. Recent searches
 11. Pinned / favourite team
 12. Road to the final
-13. Head-to-head by decade
-14. More competitions (depends on the data)
+13. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
+14. Head-to-head by decade
 15. "On this day"
 16. Trivia mode
 17. Side-by-side Team Seasons
