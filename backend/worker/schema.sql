@@ -58,3 +58,25 @@ CREATE INDEX IF NOT EXISTS idx_matches_div_away_team ON matches(div, away_team);
 -- matches without re-writing the whole table (D1's free tier caps writes
 -- at 100,000 rows/day - well under our 166k+ total row count).
 CREATE UNIQUE INDEX IF NOT EXISTS idx_matches_unique ON matches(div, date, home_team, away_team);
+
+-- Upcoming fixtures for the home page's upcoming-matches strip - deliberately a
+-- separate table from `matches`, which only ever holds played results
+-- (every query there assumes a score). Refreshed daily by
+-- scripts/update_fixtures.py from football-data.org: each run upserts
+-- what it fetched (stamped with that run's fetched_at), then deletes rows
+-- that weren't in the fetch (played, postponed or dropped) - so a run that
+-- fails part-way leaves the previous day's fixtures in place rather than
+-- an empty table. Team names are already mapped to the site's own names.
+CREATE TABLE IF NOT EXISTS fixtures (
+    match_id INTEGER PRIMARY KEY,     -- football-data.org match id (stable across reschedules)
+    div TEXT NOT NULL,                -- E0/SP1/I1/D1/F1/C1, same codes as `matches`
+    utc_date TEXT NOT NULL,           -- kick-off, ISO 8601 UTC ('2026-10-10T11:30:00Z')
+    home_team TEXT NOT NULL,
+    away_team TEXT NOT NULL,
+    matchday INTEGER,                 -- NULL when the API has none (e.g. CL knockouts)
+    competition_phase TEXT,           -- Continental only, same strings as matches.competition_phase
+    status TEXT NOT NULL,             -- 'SCHEDULED' or 'TIMED' (kick-off time confirmed)
+    fetched_at TEXT NOT NULL          -- the run that last wrote this row
+);
+
+CREATE INDEX IF NOT EXISTS idx_fixtures_utc_date ON fixtures(utc_date);

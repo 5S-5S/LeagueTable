@@ -17,6 +17,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="stylesheet" href="search.css">
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="upcoming.css">
 </head>
 <body>
     <!-- Hamburger Menu Button -->
@@ -99,12 +100,17 @@
     <main class="search-page">
         <div class="search-card">
             <h1 class="hero-title">League Table Statistics</h1>
+            <section id="upcomingStrip" class="um-strip" aria-label="Upcoming matches" hidden></section>
             <div id="searchMount"></div>
             <div id="searchExamples" class="search-examples"></div>
         </div>
+        <!-- One upcoming match, in the search card's place (upcoming.js) -->
+        <div id="matchView" class="um-view" hidden></div>
     </main>
 
     <script src="search.js"></script>
+    <script src="team-registry.js"></script>
+    <script src="upcoming.js"></script>
     <script>
         function renderSearchExamples(search) {
             // The same example questions the empty search bar suggests
@@ -200,6 +206,10 @@
             initHamburgerMenu();
             initDarkMode();
             initSearch();
+            UpcomingMatches.mount({
+                strip: document.getElementById('upcomingStrip'),
+                view: document.getElementById('matchView')
+            });
         });
     </script>
 </body>

@@ -19,6 +19,12 @@
 //   ContinentalEurope.html for why, and backend/README.md's migration
 //   status for the fuller writeup.
 //
+// GET /api/upcoming
+//   -> { fixtures: [{ matchId, div, utcDate, homeTeam, awayTeam, matchday, competitionPhase, status, fetchedAt }, ...] }
+//   The home page's upcoming-matches strip: the `fixtures` table
+//   (scripts/update_fixtures.py, refreshed daily), soonest first. Cached
+//   under the 'fixtures-version' KV key that refresh bumps.
+//
 // GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=&excludeQualifiers=&excludeMainStage=&competitionStage=
 //   -> { div, matchCount, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
 //   excludeQualifiers/excludeMainStage/competitionStage are Continental-
@@ -586,6 +592,59 @@ async function handleDateRange(url, env) {
     return jsonResponse({ div, matchDateRange });
 }
 
+// The home page's upcoming-matches strip: every fixture in the `fixtures`
+// table (the next three weeks, all six competitions), soonest first.
+// scripts/update_fixtures.py refreshes the table daily and then bumps the
+// 'fixtures-version' KV key, which this cache is keyed on - a separate key
+// from 'cache-version', so a fixtures refresh doesn't throw away the
+// standings caches (and a results sync doesn't throw away this one).
+// Fixtures that have kicked off stay in the table until the next refresh;
+// the page drops them itself. Before the table exists (the refresh has
+// never run), the answer is an empty list rather than an error.
+async function handleUpcoming(env) {
+    let key = null;
+    try {
+        key = `f${await getKvSetting(env, 'fixtures-version')}:upcoming`;
+        const cached = await env.CACHE.get(key);
+        if (cached !== null) return jsonResponse(JSON.parse(cached));
+    } catch (err) {
+        console.error('Cache read failed - answering from D1:', err);
+        key = null;
+    }
+
+    let fixtures = [];
+    try {
+        const { results } = await env.DB.prepare(
+            `SELECT match_id, div, utc_date, home_team, away_team, matchday, competition_phase, status, fetched_at
+             FROM fixtures ORDER BY utc_date, div, home_team`
+        ).all();
+        fixtures = results.map(row => ({
+            matchId: row.match_id,
+            div: row.div,
+            utcDate: row.utc_date,
+            homeTeam: row.home_team,
+            awayTeam: row.away_team,
+            matchday: row.matchday,
+            competitionPhase: row.competition_phase,
+            status: row.status,
+            fetchedAt: row.fetched_at,
+        }));
+    } catch (err) {
+        if (!/no such table/i.test(err.message)) throw err;
+        key = null; // don't cache "no table yet" past the first refresh
+    }
+
+    const body = { fixtures };
+    if (key) {
+        try {
+            await env.CACHE.put(key, JSON.stringify(body), { expirationTtl: CACHE_TTL_SECONDS });
+        } catch (err) {
+            console.error('Failed to write cache entry:', err);
+        }
+    }
+    return jsonResponse(body);
+}
+
 async function handleSeasonMatches(url, env) {
     const div = url.searchParams.get('div');
     if (!div) {
@@ -798,6 +857,10 @@ export default {
 
             if (url.pathname === '/api/season-matches') {
                 return await handleSeasonMatches(url, env);
+            }
+
+            if (url.pathname === '/api/upcoming') {
+                return await handleUpcoming(env);
             }
 
             if (url.pathname === '/api/season-standings' && request.method === 'POST') {
