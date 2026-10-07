@@ -71,10 +71,16 @@
         gf: { label: 'GF', title: 'Goals For' },
         ga: { label: 'GA', title: 'Goals Against' },
         gd: { label: 'GD', title: 'Goal Difference' },
-        cleanSheets: { label: 'Clean Sheets', title: 'Clean Sheets' },
-        failedToScore: { label: 'Failed to Score', title: 'Failed to Score' },
+        cleanSheets: { label: 'Clean Sheets', short: 'CS', title: 'Clean Sheets' },
+        failedToScore: { label: 'Failed to Score', short: 'FTS', title: 'Failed to Score' },
         ppg: { label: 'PPG', title: 'Points Per Game' }
     };
+
+    // At phone width the view's tables take the Mobile pages' compact
+    // layouts (merged W-D-L and GF:GA columns, crest-only team columns,
+    // H:A scores) - rendered rather than restyled, since the columns
+    // themselves differ. The breakpoint is upcoming.css's phone one.
+    const phoneQuery = window.matchMedia('(max-width: 640px)');
 
     const state = {
         fixtures: [],          // from /api/upcoming
@@ -479,6 +485,7 @@
             .filter(row => full || isFocus(row.team));
         const toggle = chipGroup('table-view', [['two', 'These two teams'], ['full', 'Full table']], full ? 'full' : 'two');
         if (!rows.length) return toggle + '<p class="um-none">No matches played yet this season.</p>';
+        const phone = phoneQuery.matches;
 
         const body = rows.map((row, i) => {
             const focus = isFocus(row.team);
@@ -489,30 +496,36 @@
             return `
                 <tr class="border-b ${background}${focus ? ' um-table-focus' : ''}">
                     <td class="text-center font-bold text-gray-600">${row.position}</td>
-                    <td><div class="um-cell-team">${logoImg(row.team, fixture.div)}<span style="${nameStyle}">${escapeHtml(row.team)}</span></div></td>
+                    <td><div class="um-cell-team">${logoImg(row.team, fixture.div)}<span class="um-cell-name" style="${nameStyle}">${escapeHtml(row.team)}</span></div></td>
                     <td class="text-center">${row.played}</td>
+                    ${phone ? `
+                    <td class="text-center">${row.won}-${row.drawn}-${row.lost}</td>
+                    <td class="text-center">${row.gf}:${row.ga}</td>` : `
                     <td class="text-center">${row.won}</td>
                     <td class="text-center">${row.drawn}</td>
                     <td class="text-center">${row.lost}</td>
                     <td class="text-center">${row.gf}</td>
-                    <td class="text-center">${row.ga}</td>
+                    <td class="text-center">${row.ga}</td>`}
                     <td class="text-center"><span class="font-bold ${gd > 0 ? 'text-green-700' : gd < 0 ? 'text-red-600' : ''}">${gd > 0 ? '+' : ''}${gd}</span></td>
                     <td class="text-center"><span class="points-badge">${row.points}</span></td>
                 </tr>`;
         }).join('');
         return `
             ${toggle}
-            <div class="league-table um-streaks um-table">
+            <div class="league-table um-streaks um-table${phone ? ' um-phone' : ''}">
                 <table>
                     <thead><tr>
                         <th class="text-center">Pos</th>
                         <th style="text-align: left;">Team</th>
                         <th class="text-center">P</th>
+                        ${phone ? `
+                        <th class="text-center">W-D-L</th>
+                        <th class="text-center">GF:GA</th>` : `
                         <th class="text-center">W</th>
                         <th class="text-center">D</th>
                         <th class="text-center">L</th>
                         <th class="text-center">GF</th>
-                        <th class="text-center">GA</th>
+                        <th class="text-center">GA</th>`}
                         <th class="text-center">GD</th>
                         <th class="text-center">Pts</th>
                     </tr></thead>
@@ -608,6 +621,16 @@
     // tab's chevron lists use: separate score columns (winner's score green,
     // loser's red, draws grey), the winner's name and crest in the Result
     // column, and the usual team1/team2 highlight pills
+    // A team's crest alone (name on hover); the name itself if there's no crest
+    function crestOnly(team, div) {
+        const url = getTeamLogoUrl(team, slugOf(div));
+        if (!url) {
+            const color = getTeamColor(team, slugOf(div));
+            return `<span style="font-weight: bold; ${color ? `color: ${pickTeamTextColor(color, '')};` : ''}">${escapeHtml(team)}</span>`;
+        }
+        return `<img src="${url}" alt="${escapeHtml(team)}" title="${escapeHtml(team)}" onerror="this.replaceWith(Object.assign(document.createElement('span'), { textContent: this.alt, style: 'font-weight: bold' }))">`;
+    }
+
     function streakMatchesRow(streak, fixture, section, colspan) {
         const focus = streak.team || fixture.homeTeam;
         // Head-to-head lists highlight both sides, as the Team Streaks tab
@@ -615,6 +638,7 @@
         const opponent = section === 'h2h' ? (focus === fixture.homeTeam ? fixture.awayTeam : fixture.homeTeam) : null;
         const slug = slugOf(fixture.div);
         const isCL = fixture.div === 'C1';
+        const phone = phoneQuery.matches;
         const teamSpan = (team, highlight) => {
             const color = getTeamColor(team, slug);
             const style = color ? `color: ${pickTeamTextColor(color, highlight)} !important; font-weight: bold;` : 'font-weight: bold;';
@@ -637,6 +661,19 @@
                 result = '<span style="color: #9ca3af !important; font-weight: bold;">Draw</span>';
             }
             const background = streak.matches.length >= 3 && i % 2 === 1 ? 'bg-gray-50' : 'bg-white';
+            if (phone) {
+                // The Mobile pages' match list: crests, one H:A score, the
+                // winner's crest or D
+                return `
+                <tr class="border-b ${background}">
+                    <td class="text-center">${m.dateObj.toLocaleDateString()}</td>
+                    ${isCL ? `<td class="text-center">${escapeHtml(m.CompetitionPhase || '')}</td>` : ''}
+                    <td class="text-center">${crestOnly(m.HomeTeam, fixture.div)}</td>
+                    <td class="text-center um-score"><span class="${homeScoreClass}">${m.FTHG}</span>:<span class="${awayScoreClass}">${m.FTAG}</span></td>
+                    <td class="text-center">${crestOnly(m.AwayTeam, fixture.div)}</td>
+                    <td class="text-center">${winner ? crestOnly(winner, fixture.div) : '<span style="color: #9ca3af !important; font-weight: bold;">D</span>'}</td>
+                </tr>`;
+            }
             return `
                 <tr class="border-b ${background}">
                     <td class="text-center text-sm">${m.dateObj.toLocaleDateString()}</td>
@@ -651,15 +688,19 @@
         return `
             <tr class="season-matches-row streak-matches-row">
                 <td colspan="${colspan}">
-                    <div class="league-table season-matches">
+                    <div class="league-table season-matches${phone ? ` um-phone${isCL ? ' um-with-stage' : ''}` : ''}">
                         <table>
                             <thead><tr>
                                 <th class="text-center">Date</th>
                                 ${isCL ? '<th class="text-center">Stage</th>' : ''}
+                                ${phone ? `
+                                <th class="text-center">Home</th>
+                                <th class="text-center">H:A</th>
+                                <th class="text-center">Away</th>` : `
                                 <th class="text-center">Home Team</th>
                                 <th class="text-center">Home Score</th>
                                 <th class="text-center">Away Team</th>
-                                <th class="text-center">Away Score</th>
+                                <th class="text-center">Away Score</th>`}
                                 <th class="text-center">Result</th>
                             </tr></thead>
                             <tbody class="team1-selected">${rows}</tbody>
@@ -673,21 +714,17 @@
         if (streaks === null) return '<p class="um-none">Loading streaks...</p>';
         if (streaks === 'error') return '<p class="um-none">Couldn\'t load these streaks.</p>';
         if (streaks.length === 0) return `<p class="um-none">No active streaks of ${MIN_STREAK}+ games.</p>`;
-        const slug = slugOf(fixture.div);
-        // Crest only (name on hover); the name itself if there's no crest
-        const teamCell = team => {
-            const url = getTeamLogoUrl(team, slug);
-            const color = getTeamColor(team, slug);
-            const style = color ? `color: ${pickTeamTextColor(color, '')};` : '';
-            return `<td class="text-center um-logo-cell" title="${escapeHtml(team)}">${url
-                ? `<img src="${url}" alt="${escapeHtml(team)}" onerror="this.replaceWith(Object.assign(document.createElement('span'), { textContent: this.alt, style: 'font-weight: bold' }))">`
-                : `<span style="font-weight: bold; ${style}">${escapeHtml(team)}</span>`}</td>`;
-        };
+        const phone = phoneQuery.matches;
+        const teamCell = team => `<td class="text-center um-logo-cell">${crestOnly(team, fixture.div)}</td>`;
         // Head-to-head: Team 1 is the side on the streak (the home side for
         // a shared draw streak); team tables: just that team
         const teamColumns = section === 'h2h' ? 2 : 1;
-        // chevron, Streak, team(s), Count, Start Date, stats, Length (Days)
-        const colspan = 1 + 1 + teamColumns + 1 + 1 + AGGREGATE_KEYS.length + 1;
+        // On phone, GF and GA share one "GF:GA" column, as on the Mobile
+        // pages' streak tables
+        const statColumns = phone ? ['gf:ga', ...AGGREGATE_KEYS.filter(k => k !== 'gf' && k !== 'ga')] : AGGREGATE_KEYS;
+        // chevron, Streak, team(s), Count, Start Date, stats, Length (Days);
+        // on phone the chevron shares Team 1's cell
+        const colspan = (phone ? 0 : 1) + 1 + teamColumns + 1 + 1 + statColumns.length + 1;
         // Length runs from the streak's first match to this match's (local)
         // date: how old the streak will be at kick-off. Both are local
         // midnights; round() absorbs a daylight-saving change.
@@ -702,30 +739,43 @@
             const lengthInDays = Math.round((kickoffDay - start) / (1000 * 60 * 60 * 24));
             const stats = streakAggregates(streak.matches, team1);
             const shown = STREAK_AGGREGATE_COLUMNS[streak.type];
+            const statCell = k => k === 'gf:ga'
+                ? (shown.includes('gf') || shown.includes('ga') ? `${stats.gf}:${stats.ga}` : '–')
+                : (shown.includes(k) ? formatAggregate(k, stats[k]) : '–');
+            const chevron = `<button type="button" class="season-expand-btn${isOpen ? ' expanded' : ''}" data-streak="${escapeHtml(key)}" aria-expanded="${isOpen}" title="Show this streak's matches">▸</button>`;
             return `
                 <tr>
-                    <td style="width: 2rem;"><button type="button" class="season-expand-btn${isOpen ? ' expanded' : ''}" data-streak="${escapeHtml(key)}" aria-expanded="${isOpen}" title="Show this streak's matches">▸</button></td>
+                    ${phone ? `
+                    <td class="um-logo-cell"><div class="um-cell-team um-cell-center">${chevron}${crestOnly(team1, fixture.div)}</div></td>
+                    ${section === 'h2h' ? teamCell(team2) : ''}
+                    <td class="text-center">${STREAK_LABELS[streak.type]}</td>` : `
+                    <td style="width: 2rem;">${chevron}</td>
                     <td class="text-center">${STREAK_LABELS[streak.type]}</td>
                     ${teamCell(team1)}
-                    ${section === 'h2h' ? teamCell(team2) : ''}
+                    ${section === 'h2h' ? teamCell(team2) : ''}`}
                     <td class="text-center font-bold">${streak.matches.length}</td>
                     <td class="text-center">${start.toLocaleDateString()}</td>
-                    ${AGGREGATE_KEYS.map(k => `<td class="text-center">${shown.includes(k) ? formatAggregate(k, stats[k]) : '–'}</td>`).join('')}
+                    ${statColumns.map(k => `<td class="text-center">${statCell(k)}</td>`).join('')}
                     <td class="text-center">${lengthInDays}</td>
                 </tr>
                 ${isOpen ? streakMatchesRow(streak, fixture, section, colspan) : ''}`;
         }).join('');
+        const statHeader = k => k === 'gf:ga'
+            ? '<th class="text-center" title="Goals For : Goals Against">GF:GA</th>'
+            : `<th class="text-center" title="${AGGREGATE_LABELS[k].title}">${phone && AGGREGATE_LABELS[k].short || AGGREGATE_LABELS[k].label}</th>`;
         return `
-            <div class="league-table um-streaks">
+            <div class="league-table um-streaks${phone ? ` um-streak-phone um-teams-${teamColumns}` : ''}">
                 <table>
                     <thead><tr>
+                        ${phone ? `<th></th>${section === 'h2h' ? '<th></th>' : ''}
+                        <th class="text-center">Streak</th>` : `
                         <th></th>
                         <th class="text-center">Streak</th>
-                        ${section === 'h2h' ? '<th class="text-center">Team 1</th><th class="text-center">Team 2</th>' : '<th class="text-center">Team</th>'}
+                        ${section === 'h2h' ? '<th class="text-center">Team 1</th><th class="text-center">Team 2</th>' : '<th class="text-center">Team</th>'}`}
                         <th class="text-center">Count</th>
-                        <th class="text-center">Start Date</th>
-                        ${AGGREGATE_KEYS.map(k => `<th class="text-center" title="${AGGREGATE_LABELS[k].title}">${AGGREGATE_LABELS[k].label}</th>`).join('')}
-                        <th class="text-center" title="Days from the streak's first match to this match">Length (Days)</th>
+                        <th class="text-center">${phone ? 'Start' : 'Start Date'}</th>
+                        ${statColumns.map(statHeader).join('')}
+                        <th class="text-center" title="Days from the streak's first match to this match">${phone ? 'Days' : 'Length (Days)'}</th>
                     </tr></thead>
                     <tbody>${rows}</tbody>
                 </table>
@@ -971,6 +1021,8 @@
         });
         // Team text colors depend on the theme
         new MutationObserver(renderAll).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        // The view's tables have their own phone layout
+        phoneQuery.addEventListener('change', renderView);
         state.match = matchFromUrl();
         renderView();
         loadFixtures();
