@@ -13,7 +13,7 @@ Most to least important; details are in each item below.
 4. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch**
-5. Match Finder upgrades (what's left)
+5. Match Finder: a country's clubs as the subject (on hold)
 6. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
@@ -36,9 +36,10 @@ Most to least important; details are in each item below.
 21. Team progression chart (after League History)
 22. "/" to search
 23. Penalty shootout leaderboard (team and head-to-head answers done)
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
+24. "Won on penalties" in Match Finder
+25. Lighter pages (small gain - see the item)
+26. Knockout Stage bracket view (on hold)
+27. Country vs Country
 
 ## Items
 
@@ -73,12 +74,11 @@ Most to least important; details are in each item below.
     page's current filters, so clicking a card rewords it. Q&A: "The Last
     Time When" section replaced by a Match Finder one (no screenshots yet).
   - Still to do:
-    - "Won on penalties": a shootout game is a draw at full time, so
-      Match Finder can't tell a shootout win from a loss - the search
-      gives the last game decided on penalties.
-    - A country's clubs as the subject ("last time an English club won
-      the UCL") - Team 1 is always one club.
-    - ("City" / "United" alone: split into its own Tier 3 item.)
+    - On hold (2026-10-07): a country's clubs as the subject ("last time
+      an English club won the UCL") - Team 1 is always one club. Overlaps
+      Country vs Country (Tier 4).
+    - ("City" / "United" alone: its own Tier 3 item. "Won on penalties":
+      its own Tier 4 item.)
 
 - Later (before launch): **Self-host the club crests** — noted 2026-10-07,
   after the Q&A audit. The crests are hotlinked from s.hs-data.com, which
@@ -307,6 +307,14 @@ Most to least important; details are in each item below.
   ALIAS_ERAS, ERA_NAMES, ERA_TITLE_NOTES, LEAGUE_ERAS and ERA_SWITCHES in
   search.js ("Did you mean the Europa League only?" / "the UEFA Cup and
   Europa League together?"), plus the page's era seasons.
+
+- Maybe: **"Won on penalties" in Match Finder** — split from Match Finder
+  upgrades 2026-10-07. A shootout game is a draw at full time, so Match
+  Finder can't tell a shootout win from a loss - "when did Liverpool last
+  win on penalties" gives the last game decided on penalties, either way.
+  The search's shootout answers already read the shootout scores; Most
+  Recent could use them to filter shootout wins / losses. Fine as it is
+  for now.
 
 - Partly done: **Penalty shootout records** — noted 2026-10-03. Done
   2026-10-06: the search answers a team's or a head-to-head's shootouts
