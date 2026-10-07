@@ -13,34 +13,33 @@ Most to least important; details are in each item below.
 4. About / sources page
 
 **Tier 2 - high value, soon after launch**
-5. Season records, title races and league trends
-6. "Report a data error" link
-7. Bug: Continental one-season qualifiers view is empty
-8. Match Finder upgrades (what's left)
-9. API caching (what's left - the outage-preventing parts are done)
+5. "Report a data error" link
+6. Bug: Continental one-season qualifiers view is empty
+7. Match Finder upgrades (what's left)
+8. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-10. Typo tolerance in search
-11. Upcoming matches (home page strip)
-12. Recent searches
-13. Pinned / favourite team
-14. Road to the final
-15. Head-to-head by decade
-16. More competitions (depends on the data)
+9. Typo tolerance in search
+10. Upcoming matches (home page strip)
+11. Recent searches
+12. Pinned / favourite team
+13. Road to the final
+14. Head-to-head by decade
+15. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-17. "On this day"
-18. Trivia mode
-19. Side-by-side Team Seasons
-20. League History chart
-21. Team Records: date ranges, bottom / relegated, home / away
-22. A club's title races
-23. Team progression chart (after League History)
-24. "/" to search
-25. Penalty shootout leaderboard (team and head-to-head answers done)
-26. Lighter pages (small gain - see the item)
-27. Knockout Stage bracket view (on hold)
-28. Country vs Country
+16. "On this day"
+17. Trivia mode
+18. Side-by-side Team Seasons
+19. League History chart
+20. Team Records: date ranges, bottom / relegated, home / away
+21. A club's title races
+22. Team progression chart (after League History)
+23. "/" to search
+24. Penalty shootout leaderboard (team and head-to-head answers done)
+25. Lighter pages (small gain - see the item)
+26. Knockout Stage bracket view (on hold)
+27. Country vs Country
 
 ## Items
 
@@ -156,71 +155,6 @@ Most to least important; details are in each item below.
   extra 100k visits). Check Cloudflare's pricing page - figures as of
   2026-10. Usage to watch: Cloudflare dashboard -> Workers & Pages ->
   leaguetable-api -> Metrics; KV / D1 -> Metrics.
-
-- Partly done: **Season records, title races and league trends** — noted
-  2026-10-03, shaped 2026-10-06 (League trends merged in). Needs care -
-  many kinds of question; design before building.
-  - Progress (branch `seasons-records`, 2026-10-06): the Seasons tab with
-    Team History / Team Records sub-tabs on all four pages, Team Records
-    with stat, most / fewest, position (Domestic) or stage reached and
-    matches (Continental), era, team, Per game and 3 Points for all
-    Wins; League History (step 3: every season added up, rankable).
-    Search (2026-10-06): record questions ("most points in a season",
-    "fewest goals conceded by a champion", "closest title race", "has
-    home advantage shrunk") open Team Records / League History with a
-    one-line answer. The chart is its own lower-priority item. Dropped 2026-10-06:
-    grouping to the best row per position or per club - the Position
-    filter and Team History already answer those.
-  - Home: the Team Seasons tab renamed **Seasons** (everything in it is
-    per season, and one sub-tab is about the whole league), with three
-    sub-tabs - names agreed 2026-10-06:
-    - **Team History** = everything Team Seasons does today (one club's
-      seasons, every club at a position).
-    - **Team Records** = team-season rows ranked by a stat.
-    - **League History** = league-season rows: in season order by
-      default (how the league has changed, with a chart), any column
-      click ranks them.
-    Team History / League History mirror each other (a club across the
-    seasons, the league across the seasons), with Team Records between.
-    Three rather than two so no view needs a switch that changes its
-    columns, filters and order underneath; each has one kind of row.
-    Phones: three 12-14 character labels are tight at 390px - two-line
-    labels or a compact segmented control.
-  - Team Records: one row per club per season - P W D L GF GA
-    GD Pts and final position. Every club in every season by default,
-    whatever they finished - position is a column and an optional
-    filter, so a runner-up or 4th-placed side ranks wherever its numbers
-    put it. Most / fewest Pts, W, D, L, GF, GA, GD; filtered by position
-    (fewest points by a champion, most by a relegated side, most by a
-    team finishing 4th).
-  - League History: one row per league per season, every club
-    added up - games, goals (2025-26: 1,045), goals per game (2.75), home
-    win / draw / away win %, champion and runner-up, the gap between them
-    (points, or GD when level), the top two's average points, champion's
-    points. In season order it shows evolution ("has home advantage
-    shrunk"); ranked, it gives highest-scoring seasons, closest title
-    races, best title races (highest top-two average), biggest winning
-    margins. A chart draws any one column over time.
-  - Totals / Per game for every stat - Pts or PPG, W or win %, GF or
-    goals per game - since seasons ran 34-42 games and leagues changed
-    size (22 clubs / 462 games, then 20 / 380). Tables show both; the
-    toggle picks which one ranks or charts.
-  - Search maps a question onto the controls: "most points by a team
-    finishing 4th in the Premier League" = Team Records, Pts, most, position
-    4; "highest-scoring team" opens Team Records, "highest-scoring
-    season" or "has home advantage shrunk" opens League History.
-  - Care points: the points system (points awarded, or every season at
-    3 for a win - the existing toggle); final positions must reuse Team
-    Seasons' logic (deductions, stripped titles, ranking overrides); the
-    unfinished current season left out of records and shown as in
-    progress in League History; joint records shown as joint; Domestic first
-    (Champions League has no positions or title races - team-season
-    stats there could come later).
-  - Build order: 1. the Seasons tab and its sub-tabs, with Team Records
-    (done); 2. per game and 3 points for a win (done); 3. League
-    History's table (evolution order, ranked records, title races - done);
-    4. search for Team Records and League History (done). (League
-    History's chart moved to Tier 4.)
 
 - Later: **Bug: Continental League Tables, one season with Exclude Main
   Stage shows nothing** — noted 2026-10-06. e.g. 2016-17 with Exclude
@@ -417,6 +351,20 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Season records, title races and league trends~~ — done (2026-10-06),
+  live on all four pages. Team Seasons became **Seasons** with three
+  sub-tabs: Team History (as before), Team Records (every club-season
+  ranked by a stat - position / stage reached or better, era, team,
+  matches, per game, 3 points for a win) and League History (every
+  season added up - goals, home / draw / away %, points gap and top two;
+  in season order or ranked; each season opens its table). Search
+  answers record questions with "did you mean" links for the ambiguous
+  ones; tests/search/compare-routing.js checks routing. Fixed on the
+  way: Champions League qualifiers by a 1 June - 31 May window (late-June
+  rounds and 2020-21's had landed in the wrong season, or none). Later
+  parts are their own items: League History chart, Team Records filters,
+  a club's title races.
 
 - ~~Matches on a date~~ — done (2026-10-04), in the search. A single
   date, no club named and match words ("matches / games / results /
