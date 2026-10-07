@@ -72,61 +72,58 @@
       "answer": "Arsenal FC had a W26 D12 L0 record in the Premier League in 2003-04, scoring 73 and conceding 26."
     },
     {
-      "q": "Arsenal top 4",
-      "scope": "premier-league",
-      "answer": "Arsenal FC have finished in the top 4 of the English top flight 47 times, first in 1925-26 and most recently in 2025-26."
-    },
-    {
       "q": "most points in a First Division season",
       "scope": "premier-league",
       "answer": "Everton FC (1984-85) and Liverpool FC (1987-88) share the record for the most points in a First Division season: 90 points.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the First Division and Premier League together?"
     },
     {
       "q": "fewest points in a First Division season",
       "scope": "premier-league",
       "answer": "Stoke City hold the record for the fewest points in a First Division season: 10 points in 1889-90.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the First Division and Premier League together?"
     },
     {
       "q": "highest scoring First Division season",
       "scope": "premier-league",
       "answer": "The highest-scoring First Division season was 1930-31, with 1,823 goals.",
-      "note": "Did you mean the highest-scoring club seasons?"
+      "note": "Did you mean the highest-scoring club seasons or the First Division and Premier League together?"
     },
     {
       "q": "closest First Division title race",
       "scope": "premier-league",
       "answer": "5 First Division title races ended level on points, decided by a tie-break - most recently 1988-89, Arsenal FC ahead of Liverpool FC.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the biggest title-winning margins or the best title races by points?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the biggest title-winning margins, the best title races by points or the First Division and Premier League together?"
     },
     {
       "q": "most points by a team finishing 4th",
       "scope": "premier-league",
       "answer": "Arsenal FC hold the record for the most points in an English top flight season by a team finishing 4th: 79 points in 2013-14.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean any team in the top 4?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean any team in the top 4 or the Premier League only?"
     },
     {
       "q": "fewest points in a season",
       "scope": "premier-league",
       "answer": "Stoke City hold the record for the fewest points in an English top flight season: 10 points in 1889-90.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the Premier League only?"
     },
     {
       "q": "highest scoring Aston Villa seasons",
       "scope": "premier-league",
-      "answer": "Aston Villa's most goals in an English top flight season: 128 goals, in 1930-31."
+      "answer": "Aston Villa's most goals in an English top flight season: 128 goals, in 1930-31.",
+      "note": "Did you mean the Premier League only?"
     },
     {
       "q": "has home advantage shrunk",
       "scope": "premier-league",
-      "answer": "Home sides won least often in 2020-21: 37.9% of English top flight matches."
+      "answer": "Home sides won least often in 2020-21: 37.9% of English top flight matches.",
+      "note": "Did you mean the Premier League only?"
     },
     {
       "q": "best title race by points",
       "scope": "premier-league",
       "answer": "The English top flight title race with the most points was 2018-19: Manchester City and Liverpool FC averaged 97.5 points.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the closest title races?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the closest title races or the Premier League only?"
     },
     {
       "q": "season with the most draws",
@@ -165,30 +162,31 @@
       "q": "most goals in a European Cup campaign",
       "scope": "champions-league",
       "answer": "AC Milan hold the record for the most goals in a European Cup campaign: 33 goals in 1962-63.",
-      "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
+      "note": "Did you mean the highest-scoring league seasons (every club's goals added up) or the European Cup and Champions League together?"
     },
     {
       "q": "highest scoring European Cup season",
       "scope": "champions-league",
       "answer": "The highest-scoring European Cup season was 1965-66, with 227 goals.",
-      "note": "Did you mean the highest-scoring club seasons?"
+      "note": "Did you mean the highest-scoring club seasons or the European Cup and Champions League together?"
     },
     {
       "q": "most goals in a campaign reached final",
       "scope": "champions-league",
       "answer": "Paris Saint-Germain hold the record for the most goals in a European Cup or Champions League campaign by a club that reached the final: 45 goals in 2025-26.",
-      "note": "Did you mean only beaten finalists?"
+      "note": "Did you mean only beaten finalists or the Champions League only?"
     },
     {
       "q": "most goals by a beaten finalist",
       "scope": "champions-league",
       "answer": "Liverpool FC hold the record for the most goals in a European Cup or Champions League campaign by a beaten finalist: 41 goals in 2017-18.",
-      "note": "Did you mean finalists and winners?"
+      "note": "Did you mean finalists and winners or the Champions League only?"
     },
     {
       "q": "Liverpool lost in the final",
       "scope": "champions-league",
-      "answer": "Liverpool FC have lost the final of the European Cup and Champions League 4 times, first in 1984-85 and most recently in 2021-22."
+      "answer": "Liverpool FC have lost the final of the European Cup and Champions League 4 times, first in 1984-85 and most recently in 2021-22.",
+      "note": "Did you mean the Champions League only?"
     },
     {
       "q": "Ajax European Cup titles",
@@ -207,7 +205,7 @@
       "scope": "premier-league",
       "answer": "Arsenal FC hold the record for the most points in an English top flight season by a team finishing 4th: 79 points in 2013-14.",
       "phone": true,
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean any team in the top 4?"
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean any team in the top 4 or the Premier League only?"
     },
     {
       "q": "Champions League 2004-05",
@@ -229,7 +227,8 @@
     {
       "q": "Real Madrid titles",
       "scope": "champions-league",
-      "answer": "Real Madrid have won the European Cup and Champions League 15 times, first in 1955-56 and most recently in 2023-24."
+      "answer": "Real Madrid have won the European Cup and Champions League 15 times, first in 1955-56 and most recently in 2023-24.",
+      "note": "Did you mean the Champions League only?"
     },
     {
       "q": "most goals in a season",
@@ -298,6 +297,11 @@
       "q": "Premier League table",
       "scope": "premier-league",
       "pattern": "^.+ have the most points in the Premier League: [\\d,]+ from [\\d,]+ games\\.$"
+    },
+    {
+      "q": "Arsenal top 4",
+      "scope": "premier-league",
+      "pattern": "^Arsenal FC have finished in the top 4 of the English top flight \\d+ times, first in 1925-26 and most recently in \\d{4}-\\d{2}\\.$"
     }
   ]
 }

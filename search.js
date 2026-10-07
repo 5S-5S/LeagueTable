@@ -2675,6 +2675,62 @@
             : `Points are as awarded: 2 for a win until ${lastSeason}. <a href="${escapeSearchHtml(href)}">Count every win as 3 points</a>?`;
     }
 
+    // The two eras together, or the new one alone: an answer over every
+    // season can offer "the Premier League only", and one for an era "the
+    // First Division and Premier League together". [new era, its name
+    // added to a question, the names taken out, labels]
+    const ERA_SWITCHES = {
+        'premier-league': {
+            newEra: 'premier-league-era-1992-2025', add: 'Premier League', neutral: 'English',
+            names: ['english first division', 'first division', 'premier league', 'epl'],
+            only: 'the Premier League only', both: 'the First Division and Premier League together'
+        },
+        'champions-league': {
+            newEra: 'champions-league-era-1992-2026', add: 'Champions League', neutral: 'in Europe',
+            names: ['european cup', 'champions league', 'ucl', 'cl'],
+            only: 'the Champions League only', both: 'the European Cup and Champions League together'
+        }
+    };
+    const ERA_SWITCH_KINDS = ['h2h', 'team', 'table', 'match-finder', 'team-seasons', 'team-records', 'league-history'];
+
+    // The question reworded for the other span, as a link - only when that
+    // search really lands on the same view with the season switched
+    function eraSwitch(ctx, params) {
+        const sw = ERA_SWITCHES[ctx.league];
+        const kind = params.get('search');
+        const query = params.get('q') || '';
+        const scope = params.get('scope') || '';
+        if (!sw || !query || !ERA_SWITCH_KINDS.includes(kind)) return '';
+        if (['from', 'to', 'h2hN', 'mhN'].some(key => params.get(key))) return '';
+        const season = params.get('season') || '';
+        const era = !!ERA_NAMES[season];
+        if (season && !era) return ''; // one season
+        // titles in one era already point to every era's titles
+        const pos = params.get('pos');
+        if (era && ERA_TITLE_NOTES[season] && (pos === '1' || pos === 'Champions') && params.get('better') !== '1') return '';
+
+        let candidates;
+        if (era) {
+            const names = new RegExp(`\\b(?:the\\s+)?(?:${sw.names.join('|')})\\b`, 'gi');
+            const tidy = q => q.replace(/\s+/g, ' ').replace(/\b(?:in|of)\s*$/i, '').replace(/\b(in|of) (in|of)\b/gi, '$1').trim();
+            candidates = [tidy(query.replace(names, ' ')), tidy(query.replace(names, ` ${sw.neutral} `))];
+        } else {
+            candidates = [`${query} ${sw.add}`];
+        }
+        const want = era ? '' : sw.newEra;
+        const keys = ['view', 'sub', 'stat', 'rank', 'order', 'cat', 'pos', 'better', 't1', 't2', 'type', 'p3', 'pg'];
+        for (const q of candidates) {
+            const result = (searchFor(q, scope).results || [])[0];
+            if (!result || result.kind !== kind || !result.comp || result.comp.key !== ctx.league) continue;
+            const href = resultHref(result, q, scope);
+            const target = new URLSearchParams(href.split('?')[1] || '');
+            if ((target.get('season') || '') !== want) continue;
+            if (!keys.every(key => (target.get(key) || '') === (params.get(key) || ''))) continue;
+            return `<a href="${escapeSearchHtml(href)}">${escapeSearchHtml(era ? sw.both : sw.only)}</a>`;
+        }
+        return '';
+    }
+
     // "Did you mean": the other readings of an ambiguous question, as
     // links under the answer - "highest scoring seasons" can be the
     // league's or a club's, "unbeaten season" a season or a run of games.
@@ -2733,6 +2789,8 @@
             return `<a href="${escapeSearchHtml(href)}">${escapeSearchHtml(label)}</a>`;
         }).filter(Boolean);
         if (flip) links.unshift(flip);
+        const eraLink = eraSwitch(ctx, params);
+        if (eraLink) links.push(eraLink);
         if (!links.length) return '';
         const listed = links.length === 1 ? links[0] : `${links.slice(0, -1).join(', ')} or ${links[links.length - 1]}`;
         return `Did you mean ${listed}?`;
