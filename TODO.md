@@ -13,32 +13,31 @@ Most to least important; details are in each item below.
 
 **Tier 2 - high value, soon after launch**
 4. "Report a data error" link
-5. Bug: Continental one-season qualifiers view is empty
-6. Match Finder upgrades (what's left)
-7. API caching (what's left - the outage-preventing parts are done)
+5. Match Finder upgrades (what's left)
+6. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-8. Typo tolerance in search
-9. Upcoming matches (home page strip)
-10. Recent searches
-11. Pinned / favourite team
-12. Road to the final
-13. More competitions (depends on the data)
+7. Typo tolerance in search
+8. Upcoming matches (home page strip)
+9. Recent searches
+10. Pinned / favourite team
+11. Road to the final
+12. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-14. Head-to-head by decade
-15. "On this day"
-16. Trivia mode
-17. Side-by-side Team Seasons
-18. League History chart
-19. Team Records: date ranges, bottom / relegated, home / away
-20. A club's title races
-21. Team progression chart (after League History)
-22. "/" to search
-23. Penalty shootout leaderboard (team and head-to-head answers done)
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
+13. Head-to-head by decade
+14. "On this day"
+15. Trivia mode
+16. Side-by-side Team Seasons
+17. League History chart
+18. Team Records: date ranges, bottom / relegated, home / away
+19. A club's title races
+20. Team progression chart (after League History)
+21. "/" to search
+22. Penalty shootout leaderboard (team and head-to-head answers done)
+23. Lighter pages (small gain - see the item)
+24. Knockout Stage bracket view (on hold)
+25. Country vs Country
 
 ## Items
 
@@ -127,12 +126,6 @@ Most to least important; details are in each item below.
   extra 100k visits). Check Cloudflare's pricing page - figures as of
   2026-10. Usage to watch: Cloudflare dashboard -> Workers & Pages ->
   leaguetable-api -> Metrics; KV / D1 -> Metrics.
-
-- Later: **Bug: Continental League Tables, one season with Exclude Main
-  Stage shows nothing** — noted 2026-10-06. e.g. 2016-17 with Exclude
-  Main Stage: "0 total matches, 0 competition phases", though the
-  season's qualifiers load (92 matches). On the live site too, so not
-  from the Seasons work.
 
 - Later: **"Report a data error" link** — noted 2026-10-03. A small link
   on each answer / table that opens the contact page with the question
@@ -328,6 +321,15 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Bug: Continental one-season qualifiers view empty~~ — fixed
+  (2026-10-07). One season with Exclude Main Stage showed "0 total
+  matches": a single season has no "All" stage, so League/Group Stage
+  stayed selected. Ticking the box now switches the stage to All
+  Qualifiers (unticking puts the old stage back). Also fixed: one season
+  with a qualifier stage (All Qualifiers, Play-Offs (Q)...) was empty, as
+  a season hid its qualifiers before the stage filter. Both Continental
+  pages; both cases added to the checks.
 
 - ~~Era "Did you mean" (Premier League, Champions League)~~ — done
   (2026-10-07). An answer over every season offers "the Premier League /

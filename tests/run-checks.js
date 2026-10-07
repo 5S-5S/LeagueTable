@@ -11,7 +11,8 @@
 //    search/routing-snapshot.txt - any change is listed.
 // 2. Pages: the four sport pages (desktop, and phone width for the Mobile
 //    pages) in headless Chrome - every tab and Seasons sub-tab clicked, no
-//    script error, Team Records and League History draw rows.
+//    script error, Team Records and League History draw rows; and League
+//    Tables filter combinations that once showed nothing.
 // 3. Exact answers (checks/answers.json "exact"): questions about the past,
 //    whose answer can't change - the answer line and its note, word for
 //    word.
@@ -139,6 +140,25 @@ async function checkPages(browser, base) {
         console.log(`Pages: ${name} - ${errors.length ? `${errors.length} error(s)` : 'ok'}`);
         await page.close();
     }
+
+    // League Tables states that once showed nothing: [page, filters,
+    // what the info line must say]
+    const states = [
+        ['ContinentalEurope', 'season=2016-17&exM=1', /\(92 total matches\)/],
+        ['ContinentalEurope', 'season=2016-17&stage=Play-Offs+(Q)', /\(20 total matches\)/]
+    ];
+    for (const [name, filters, expect] of states) {
+        for (const phone of QUICK ? [false] : [false, true]) {
+            const pageName = phone ? `${name}Mobile` : name;
+            const { page, errors } = await openPage(browser, `${base}/${pageName}.html?view=league-filters&lg=champions-league&${filters}`, phone);
+            const ok = await page.waitForFunction(re => new RegExp(re).test(document.getElementById('tableInfoText').textContent),
+                { timeout: 30000 }, expect.source).then(() => true).catch(() => false);
+            if (!ok) fail('pages', `${pageName} ${filters}: info line "${await page.evaluate(() => document.getElementById('tableInfoText').textContent)}"`);
+            errors.forEach(e => fail('pages', `${pageName} ${filters}: ${e}`));
+            await page.close();
+        }
+    }
+    console.log(`Pages: ${states.length} League Tables states`);
 }
 
 // A question's search-mode page and its answer line ({ answer, note,

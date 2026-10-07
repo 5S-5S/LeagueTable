@@ -6481,6 +6481,18 @@
             elements.excludeMainStageCheckbox.addEventListener('click', () => {
                 state.excludeMainStage = !state.excludeMainStage;
                 elements.excludeMainStageCheckbox.className = `checkbox ${state.excludeMainStage ? 'checked' : ''}`;
+                // One season has no "All" stage, so a main-stage stage would
+                // leave nothing once the main stage is excluded (unticking puts
+                // it back, unless the stage was changed in between)
+                if (state.excludeMainStage && state.competitionStage && !isQualifierStage(state.competitionStage)) {
+                    state.stageBeforeExcludeMain = state.competitionStage;
+                    state.competitionStage = 'Qualifiers';
+                    elements.competitionStageSelect.value = 'Qualifiers';
+                } else if (!state.excludeMainStage && state.stageBeforeExcludeMain && state.competitionStage === 'Qualifiers') {
+                    state.competitionStage = state.stageBeforeExcludeMain;
+                    elements.competitionStageSelect.value = state.competitionStage;
+                }
+                if (!state.excludeMainStage) state.stageBeforeExcludeMain = '';
                 updateTable();
                 
                 // Also refresh other tabs if they have data displayed
@@ -7116,8 +7128,8 @@
                 `;
                 // If currently set to "All", change to default for individual seasons
                 if (state.competitionStage === '') {
-                    state.competitionStage = 'group-stage';
-                    elements.competitionStageSelect.value = 'group-stage';
+                    state.competitionStage = state.excludeMainStage ? 'Qualifiers' : 'group-stage';
+                    elements.competitionStageSelect.value = state.competitionStage;
                 }
             }
             
@@ -9200,6 +9212,11 @@
         // qualifying round, and each "(Q)" option its own round.
         // 'group-stage'/'knockout-stage' are the League Tables and Match
         // Finder dropdowns' names for the two category options.
+        // A Competition Stage option that is qualifying rounds only
+        function isQualifierStage(stageCategory) {
+            return stageCategory === 'Qualifiers' || /\(Q\)$/.test(stageCategory || '');
+        }
+
         function matchesStageCategory(competitionPhase, stageCategory) {
             if (!competitionPhase || !stageCategory) return false;
 
@@ -9949,7 +9966,7 @@
             // or the season has nothing but qualifier matches so far (e.g. a season whose
             // qualifying rounds are underway but League Phase hasn't started yet) — in that
             // case hiding qualifiers by default would leave nothing to show at all.
-            if (isSpecificSeason && !state.excludeMainStage) {
+            if (isSpecificSeason && !state.excludeMainStage && !isQualifierStage(state.competitionStage)) {
                 const seasonRange = getSeasonDateRange(state.selectedSeason);
                 const hasNonQualifierDataForSeason = !seasonRange || filtered.some(row =>
                     !row.isQualifier &&
