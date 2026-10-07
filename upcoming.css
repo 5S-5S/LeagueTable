@@ -531,6 +531,219 @@ body.um-viewing .search-card {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+
+    /* Bars: slimmer, as on the Mobile pages, with each record's label
+       above its W-D-L numbers */
+    .um-view .h2h-viz-bar {
+        height: 1.25rem;
+    }
+
+    .um-view .h2h-segment {
+        font-size: 0.65rem;
+        white-space: nowrap;
+        overflow: hidden;
+        padding: 0 0.15rem;
+    }
+
+    .um-h2h .h2h-segment {
+        min-width: 1.25rem;
+    }
+
+    .um-bar-label {
+        font-size: 0.75rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .um-record-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.1rem;
+        margin-bottom: 0.3rem;
+    }
+
+    .um-record-head .um-bar-label {
+        margin-bottom: 0;
+    }
+
+    .um-record-numbers,
+    .um-h2h-note {
+        font-size: 0.7rem;
+    }
+
+    .um-view .season-expand-btn {
+        width: 0.75rem;
+        height: 0.9rem;
+        margin-right: 0.15rem;
+        font-size: 0.5rem;
+        line-height: 0.9rem;
+    }
+
+    /* The tables below are upcoming.js's phone layouts (classes um-phone,
+       um-streak-phone).
+       Child combinators keep each table's column rules out of the match
+       list nested inside a streak table. */
+
+    /* League table: Pos, Team, P, W-D-L, GF:GA, GD, Pts - fixed widths,
+       with Team taking what's left and clipping a long name */
+    .um-view .um-table.um-phone > table {
+        table-layout: fixed;
+    }
+
+    .um-view .um-table.um-phone th,
+    .um-view .um-table.um-phone td {
+        font-size: 0.6rem;
+        padding: 0.4rem 0.15rem;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .um-view .um-table.um-phone th:nth-child(1) { width: 24px; }
+    .um-view .um-table.um-phone th:nth-child(3) { width: 24px; }
+    .um-view .um-table.um-phone th:nth-child(4) { width: 50px; }
+    .um-view .um-table.um-phone th:nth-child(5) { width: 42px; }
+    .um-view .um-table.um-phone th:nth-child(6) { width: 30px; }
+    .um-view .um-table.um-phone th:nth-child(7) { width: 34px; }
+
+    .um-view .um-table.um-phone .um-cell-name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .um-view .um-table.um-phone img {
+        width: 12px;
+        height: 12px;
+        margin-right: 0.2rem;
+    }
+
+    .um-view .um-table.um-phone .points-badge {
+        font-size: 0.6rem;
+        font-weight: 900;
+        padding: 0.08rem 0.2rem;
+    }
+
+    /* Streak tables: crest-only team column(s) pinned on the left (the
+       chevron beside Team 1's crest), GF:GA merged, short headers; the
+       table scrolls sideways under the pinned crests */
+    /* Under fixed layout the table grows past 100% once its column
+       widths add up to more, so every column gets a width */
+    .um-view .um-streaks.um-streak-phone > table {
+        table-layout: fixed;
+    }
+
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(9) { width: 76px; }  /* Streak */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(8) { width: 38px; }  /* Count */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(7) { width: 60px; }  /* Start */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(6) { width: 42px; }  /* GF:GA */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(5) { width: 30px; }  /* GD */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(4) { width: 28px; }  /* CS */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(3) { width: 30px; }  /* FTS */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(2) { width: 34px; }  /* PPG */
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-last-child(1) { width: 34px; }  /* Days */
+
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th,
+    .um-view .um-streaks.um-streak-phone > table > tbody > tr > td {
+        font-size: 0.6rem;
+        padding: 0.35rem 0.25rem;
+        white-space: nowrap;
+    }
+
+    .um-view .um-streaks.um-streak-phone .um-logo-cell img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .um-view .um-streaks.um-streak-phone > table > thead > tr > th:nth-child(1),
+    .um-view .um-streaks.um-streak-phone > table > tbody > tr > td:nth-child(1) {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        width: 44px;
+        min-width: 44px;
+    }
+
+    .um-view .um-streaks.um-teams-2 > table > thead > tr > th:nth-child(2),
+    .um-view .um-streaks.um-teams-2 > table > tbody > tr > td:nth-child(2) {
+        position: sticky;
+        left: 44px;
+        z-index: 2;
+        width: 30px;
+        min-width: 30px;
+    }
+
+    .um-view .um-streaks.um-teams-1 > table > tbody > tr > td:nth-child(1),
+    .um-view .um-streaks.um-teams-2 > table > tbody > tr > td:nth-child(2) {
+        background: var(--um-bg);
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .um-view .um-streaks.um-teams-2 > table > tbody > tr > td:nth-child(1) {
+        background: var(--um-bg);
+    }
+
+    .um-view .um-streaks.um-teams-1 > table > thead > tr > th:nth-child(1),
+    .um-view .um-streaks.um-teams-2 > table > thead > tr > th:nth-child(-n+2) {
+        background: linear-gradient(to right, #374151, #1f2937);
+    }
+
+    /* A streak's match list: the expanded row's one cell isn't pinned,
+       and the list inside fits the screen - Date, (Stage,) Home, H:A,
+       Away, Result */
+    .um-view .um-streaks.um-streak-phone > table > tbody > tr.streak-matches-row > td {
+        position: static;
+        width: auto;
+        min-width: 0;
+        padding: 0.25rem 0.4rem 0.6rem;
+        background: var(--um-bg-alt);
+        box-shadow: none;
+        white-space: normal;
+    }
+
+    /* The list stays in view while the streak table scrolls: pinned to
+       the left, as wide as the visible box (100cqw - the scrolling box
+       is the container) less the expanded cell's padding */
+    .um-view .um-streaks.um-streak-phone {
+        container-type: inline-size;
+    }
+
+    .um-view .season-matches.um-phone {
+        position: sticky;
+        left: 0.4rem;
+        width: calc(100cqw - 0.8rem);
+        overflow-x: visible;
+        border-radius: 0.5rem;
+    }
+
+    .um-view .season-matches.um-phone table {
+        table-layout: fixed;
+    }
+
+    .um-view .season-matches.um-phone th,
+    .um-view .season-matches.um-phone td {
+        font-size: 0.55rem;
+        padding: 0.3rem 0.05rem;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .um-view .season-matches.um-phone th:nth-child(1) { width: 26%; }
+    .um-view .season-matches.um-phone th:nth-child(n+2) { width: 18.5%; }
+    .um-view .season-matches.um-with-stage th:nth-child(1),
+    .um-view .season-matches.um-with-stage th:nth-child(2) { width: 22%; }
+    .um-view .season-matches.um-with-stage th:nth-child(n+3) { width: 14%; }
+
+    .um-view .season-matches.um-phone .um-score {
+        font-size: 0.75rem;
+    }
+
+    .um-view .season-matches.um-phone img {
+        width: 14px;
+        height: 14px;
+        margin: 0;
+        vertical-align: middle;
+    }
 }
 
 /* --- Dark mode ----------------------------------------------------- */
