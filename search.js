@@ -2643,6 +2643,38 @@
         themeWatcher.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
+    // The last season each competition gave 2 points for a win (as the
+    // Worker's winPointsFor() - Ligue 1's 1988-89 exception aside), and
+    // the eras that start after it
+    const LAST_TWO_POINT_SEASON = {
+        'premier-league': 1980, 'la-liga': 1994, 'serie-a': 1993, 'bundesliga': 1994,
+        'ligue-1': 1993, 'champions-league': 1994
+    };
+    const ERA_START_YEARS = {
+        'premier-league-era-1992-2025': 1992, 'ligue-1-era-2002-2025': 2002,
+        'champions-league-era-1992-2026': 1992
+    };
+
+    // Points as awarded mix 2 and 3 for a win across the seasons ranked -
+    // say so, with the other way as a link ('' when every season in range
+    // gave 3, or the question isn't about points)
+    function pointsSystemNote(ctx, params) {
+        const aboutPoints = (ctx.view === 'team-records' && params.get('stat') === 'points') ||
+            (ctx.view === 'league-history' && ['gap', 'topTwo'].includes(params.get('rank')));
+        const lastTwo = LAST_TWO_POINT_SEASON[ctx.league];
+        if (!aboutPoints || lastTwo === undefined) return '';
+        const eraStart = ERA_START_YEARS[params.get('season')];
+        if (eraStart !== undefined && eraStart > lastTwo) return '';
+        const lastSeason = `${lastTwo}-${String((lastTwo + 1) % 100).padStart(2, '0')}`;
+        const threePoints = params.get('p3') === '1';
+        const flipped = new URLSearchParams(params);
+        if (threePoints) flipped.delete('p3'); else flipped.set('p3', '1');
+        const href = `${window.location.pathname.split('/').pop()}?${flipped.toString()}`;
+        return threePoints
+            ? `Every win counted as 3 points here. <a href="${escapeSearchHtml(href)}">Points as awarded</a> gave 2 for a win until ${lastSeason}.`
+            : `Points are as awarded: 2 for a win until ${lastSeason}. <a href="${escapeSearchHtml(href)}">Count every win as 3 points</a>?`;
+    }
+
     // "Did you mean": the other readings of an ambiguous question, as
     // links under the answer - "highest scoring seasons" can be the
     // league's or a club's, "unbeaten season" a season or a run of games.
@@ -2720,8 +2752,8 @@
             el.innerHTML = '';
             return;
         }
-        const alternative = didYouMean(ctx, params);
-        if (alternative) answer.note = answer.note ? `${answer.note} ${alternative}` : alternative;
+        const notes = [answer.note, pointsSystemNote(ctx, params), didYouMean(ctx, params)].filter(Boolean);
+        if (notes.length) answer.note = notes.join(' ');
         const logo = answer.crestTeam && ctx.logo ? ctx.logo(answer.crestTeam) : '';
         el.innerHTML = `
             ${logo ? `<img src="${logo}" class="search-answer-crest" alt="">` : ''}
