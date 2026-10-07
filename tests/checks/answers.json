@@ -1,0 +1,303 @@
+{
+  "_about": "Expected search answers for tests/run-checks.js. exact: the answer line (and its note, links' text) word for word - questions whose answer can only change when a season ends (a past season, an all-time record over finished seasons). When one changes on purpose - a reworded answer, a record broken at a season's end - run `npm run check:update` and commit the new text with the change. shape: questions touching the current season, whose numbers move with each sync - a pattern (JavaScript regex) the answer must match. phone: true runs it on the Mobile page.",
+  "exact": [
+    {
+      "q": "Premier League 2003-04",
+      "scope": "premier-league",
+      "answer": "Arsenal FC won the 2003-04 Premier League with 90 points, 11 ahead of Chelsea FC."
+    },
+    {
+      "q": "Serie A 2005-06",
+      "scope": "serie-a",
+      "answer": "Inter won the 2005-06 Serie A with 76 points, 7 ahead of AS Roma."
+    },
+    {
+      "q": "La Liga 2010-11",
+      "scope": "la-liga",
+      "answer": "FC Barcelona won the 2010-11 La Liga with 96 points, 4 ahead of Real Madrid."
+    },
+    {
+      "q": "Bundesliga 2012-13",
+      "scope": "bundesliga",
+      "answer": "Bayern München won the 2012-13 Bundesliga with 91 points, 25 ahead of Borussia Dortmund."
+    },
+    {
+      "q": "Ligue 1 1992-93",
+      "scope": "ligue-1",
+      "answer": "Olympique Marseille finished top of the 1992-93 Ligue 1 with 53 points, but were stripped of the title - it wasn't awarded."
+    },
+    {
+      "q": "Who was top at Christmas 2003",
+      "scope": "premier-league",
+      "answer": "On December 25, 2003, Manchester United were top of the 2003-04 Premier League with 40 points from 17 games, 1 point ahead of Arsenal FC."
+    },
+    {
+      "q": "table on 1/1/2010",
+      "scope": "la-liga",
+      "answer": "On January 1, 2010, FC Barcelona were top of the 2009-10 La Liga with 39 points from 15 games, 2 points ahead of Real Madrid."
+    },
+    {
+      "q": "Matches on Boxing Day 1963",
+      "scope": "premier-league",
+      "answer": "10 games were played in the First Division on December 26, 1963, with 66 goals; the biggest win was Fulham FC 10-1 Ipswich Town."
+    },
+    {
+      "q": "Arsenal vs Chelsea between 1990 and 2010",
+      "scope": "premier-league",
+      "answer": "Arsenal FC have a W19 D12 L12 record against Chelsea FC in the English top flight between 1990 and 2010."
+    },
+    {
+      "q": "Barcelona vs Real Madrid between 2000 and 2010",
+      "scope": "la-liga",
+      "answer": "FC Barcelona have a W9 D6 L7 record against Real Madrid in La Liga between 2000 and 2010."
+    },
+    {
+      "q": "Arsenal between 1990 and 2000",
+      "scope": "premier-league",
+      "answer": "Arsenal FC have a W210 D130 L95 record in the English top flight between 1990 and 2000, scoring 670 and conceding 373."
+    },
+    {
+      "q": "Juventus vs Inter at home between 1990 and 2000",
+      "scope": "serie-a",
+      "answer": "Juventus have a W9 D1 L1 record at home against Inter in Serie A between 1990 and 2000."
+    },
+    {
+      "q": "Bayern biggest wins between 2000 and 2010",
+      "scope": "bundesliga",
+      "answer": "Bayern München's biggest win in the Bundesliga between 2000 and 2010 is 7-0 at home to Hannover 96 on April 17, 2010."
+    },
+    {
+      "q": "Arsenal 2003-04",
+      "scope": "premier-league",
+      "answer": "Arsenal FC had a W26 D12 L0 record in the Premier League in 2003-04, scoring 73 and conceding 26."
+    },
+    {
+      "q": "Arsenal top 4",
+      "scope": "premier-league",
+      "answer": "Arsenal FC have finished in the top 4 of the English top flight 47 times, first in 1925-26 and most recently in 2025-26."
+    },
+    {
+      "q": "most points in a First Division season",
+      "scope": "premier-league",
+      "answer": "Everton FC (1984-85) and Liverpool FC (1987-88) share the record for the most points in a First Division season: 90 points.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+    },
+    {
+      "q": "fewest points in a First Division season",
+      "scope": "premier-league",
+      "answer": "Stoke City hold the record for the fewest points in a First Division season: 10 points in 1889-90.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+    },
+    {
+      "q": "highest scoring First Division season",
+      "scope": "premier-league",
+      "answer": "The highest-scoring First Division season was 1930-31, with 1,823 goals.",
+      "note": "Did you mean the highest-scoring club seasons?"
+    },
+    {
+      "q": "closest First Division title race",
+      "scope": "premier-league",
+      "answer": "5 First Division title races ended level on points, decided by a tie-break - most recently 1988-89, Arsenal FC ahead of Liverpool FC.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the biggest title-winning margins or the best title races by points?"
+    },
+    {
+      "q": "most points by a team finishing 4th",
+      "scope": "premier-league",
+      "answer": "Arsenal FC hold the record for the most points in an English top flight season by a team finishing 4th: 79 points in 2013-14.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean any team in the top 4?"
+    },
+    {
+      "q": "fewest points in a season",
+      "scope": "premier-league",
+      "answer": "Stoke City hold the record for the fewest points in an English top flight season: 10 points in 1889-90.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+    },
+    {
+      "q": "highest scoring Aston Villa seasons",
+      "scope": "premier-league",
+      "answer": "Aston Villa's most goals in an English top flight season: 128 goals, in 1930-31."
+    },
+    {
+      "q": "has home advantage shrunk",
+      "scope": "premier-league",
+      "answer": "Home sides won least often in 2020-21: 37.9% of English top flight matches."
+    },
+    {
+      "q": "best title race by points",
+      "scope": "premier-league",
+      "answer": "The English top flight title race with the most points was 2018-19: Manchester City and Liverpool FC averaged 97.5 points.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean the closest title races?"
+    },
+    {
+      "q": "season with the most draws",
+      "scope": "serie-a",
+      "answer": "Serie A matches were drawn most often in 1978-79: 44.6%.",
+      "note": "Did you mean the club with the most draws in a season?"
+    },
+    {
+      "q": "closest title race",
+      "scope": "la-liga",
+      "answer": "8 La Liga title races ended level on points, decided by a tie-break - most recently 2006-07, Real Madrid ahead of FC Barcelona.",
+      "note": "Points are as awarded: 2 for a win until 1994-95. Count every win as 3 points? Did you mean the biggest title-winning margins or the best title races by points?"
+    },
+    {
+      "q": "biggest title winning margin",
+      "scope": "bundesliga",
+      "answer": "The biggest Bundesliga title-winning margin is 25 points: Bayern München over Borussia Dortmund in 2012-13.",
+      "note": "Points are as awarded: 2 for a win until 1994-95. Count every win as 3 points? Did you mean the closest title races or the best title races by points?"
+    },
+    {
+      "q": "most wins in a season",
+      "scope": "ligue-1",
+      "answer": "Paris Saint-Germain (2015-16) and AS Monaco (2016-17) share the record for the most wins in a Ligue 1 season: 30 wins."
+    },
+    {
+      "q": "Champions League 2004-05",
+      "scope": "champions-league",
+      "answer": "Liverpool FC won the 2004-05 Champions League, beating AC Milan in the final."
+    },
+    {
+      "q": "Real Madrid vs Bayern between 2000 and 2015",
+      "scope": "champions-league",
+      "answer": "Real Madrid have a W7 D1 L8 record against Bayern München in the Champions League between 2000 and 2015."
+    },
+    {
+      "q": "most goals in a European Cup campaign",
+      "scope": "champions-league",
+      "answer": "AC Milan hold the record for the most goals in a European Cup campaign: 33 goals in 1962-63.",
+      "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
+    },
+    {
+      "q": "highest scoring European Cup season",
+      "scope": "champions-league",
+      "answer": "The highest-scoring European Cup season was 1965-66, with 227 goals.",
+      "note": "Did you mean the highest-scoring club seasons?"
+    },
+    {
+      "q": "most goals in a campaign reached final",
+      "scope": "champions-league",
+      "answer": "Paris Saint-Germain hold the record for the most goals in a European Cup or Champions League campaign by a club that reached the final: 45 goals in 2025-26.",
+      "note": "Did you mean only beaten finalists?"
+    },
+    {
+      "q": "most goals by a beaten finalist",
+      "scope": "champions-league",
+      "answer": "Liverpool FC hold the record for the most goals in a European Cup or Champions League campaign by a beaten finalist: 41 goals in 2017-18.",
+      "note": "Did you mean finalists and winners?"
+    },
+    {
+      "q": "Liverpool lost in the final",
+      "scope": "champions-league",
+      "answer": "Liverpool FC have lost the final of the European Cup and Champions League 4 times, first in 1984-85 and most recently in 2021-22."
+    },
+    {
+      "q": "Ajax European Cup titles",
+      "scope": "champions-league",
+      "answer": "AFC Ajax have won the European Cup 3 times, first in 1970-71 and most recently in 1972-73.",
+      "note": "Search “AFC Ajax titles” to include the Champions League era too."
+    },
+    {
+      "q": "Premier League 2003-04",
+      "scope": "premier-league",
+      "answer": "Arsenal FC won the 2003-04 Premier League with 90 points, 11 ahead of Chelsea FC.",
+      "phone": true
+    },
+    {
+      "q": "most points by a team finishing 4th",
+      "scope": "premier-league",
+      "answer": "Arsenal FC hold the record for the most points in an English top flight season by a team finishing 4th: 79 points in 2013-14.",
+      "phone": true,
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points? Did you mean any team in the top 4?"
+    },
+    {
+      "q": "Champions League 2004-05",
+      "scope": "champions-league",
+      "answer": "Liverpool FC won the 2004-05 Champions League, beating AC Milan in the final.",
+      "phone": true
+    },
+    {
+      "q": "Juventus titles",
+      "scope": "serie-a",
+      "answer": "Juventus have won the Italian championship 36 times, first in 1905 and most recently in 2019-20."
+    },
+    {
+      "q": "Premier League champions",
+      "scope": "premier-league",
+      "answer": "Manchester United have won the Premier League the most (13 times), one of 7 clubs to do it. The most recent was Arsenal FC in 2025-26.",
+      "note": "Search “English champions” to include the First Division era too."
+    },
+    {
+      "q": "Real Madrid titles",
+      "scope": "champions-league",
+      "answer": "Real Madrid have won the European Cup and Champions League 15 times, first in 1955-56 and most recently in 2023-24."
+    },
+    {
+      "q": "most goals in a season",
+      "scope": "la-liga",
+      "answer": "Real Madrid hold the record for the most goals in a La Liga season: 121 goals in 2011-12.",
+      "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
+    }
+  ],
+  "shape": [
+    {
+      "q": "Arsenal vs Chelsea",
+      "scope": "premier-league",
+      "pattern": "^Arsenal FC have a W\\d+ D\\d+ L\\d+ record against Chelsea FC in the English top flight all.time\\.$"
+    },
+    {
+      "q": "Arsenal",
+      "scope": "premier-league",
+      "pattern": "^Arsenal FC have a W\\d+ D\\d+ L\\d+ record in the English top flight all.time, scoring [\\d,]+ and conceding [\\d,]+\\.$"
+    },
+    {
+      "q": "Arsenal last 10 games",
+      "scope": "premier-league",
+      "pattern": "^Arsenal FC have a W\\d+ D\\d+ L\\d+ record in their last 10 Premier League games, scoring \\d+ and conceding \\d+\\.$"
+    },
+    {
+      "q": "Bayern longest unbeaten run",
+      "scope": "bundesliga",
+      "pattern": "^Bayern München's longest unbeaten run in the Bundesliga is \\d+ games, from .+ to .+\\.$"
+    },
+    {
+      "q": "Last time Liverpool beat Everton away",
+      "scope": "premier-league",
+      "pattern": "^The last time Liverpool FC beat Everton FC away in the English top flight was .+: Everton FC \\d+-\\d+ Liverpool FC \\(.+\\)\\.$"
+    },
+    {
+      "q": "Arsenal penalty shootouts",
+      "scope": "champions-league",
+      "pattern": "^Arsenal FC have a W\\d+ L\\d+ penalty shootout record in the European Cup and Champions League, most recently (beating|losing) .+ in the .+ on .+\\.$"
+    },
+    {
+      "q": "Barcelona comebacks",
+      "scope": "champions-league",
+      "pattern": "^FC Barcelona's biggest comeback in the European Cup and Champions League all.time was overturning a \\d+-\\d+ first-leg defeat against .+, going through \\d+-\\d+ on aggregate"
+    },
+    {
+      "q": "Real Madrid biggest aggregate wins",
+      "scope": "champions-league",
+      "pattern": "^Real Madrid's biggest aggregate win in the European Cup and Champions League all.time is \\d+-\\d+ on aggregate against .+ in the .+\\.$"
+    },
+    {
+      "q": "Highest scoring game in Bundesliga history",
+      "scope": "bundesliga",
+      "pattern": "^The highest-scoring game in the Bundesliga all.time is .+ \\d+-\\d+ .+ on .+, \\d+ goals"
+    },
+    {
+      "q": "Longest unbeaten run against Bayern",
+      "scope": "bundesliga",
+      "pattern": "^.+ hold the longest unbeaten run against Bayern München in the Bundesliga: \\d+ games, from .+ to .+\\.$"
+    },
+    {
+      "q": "Arsenal vs Spain",
+      "scope": "champions-league",
+      "pattern": "^Arsenal FC have a W\\d+ D\\d+ L\\d+ record against clubs from Spain in the European Cup and Champions League all.time\\.$"
+    },
+    {
+      "q": "Premier League table",
+      "scope": "premier-league",
+      "pattern": "^.+ have the most points in the Premier League: [\\d,]+ from [\\d,]+ games\\.$"
+    }
+  ]
+}

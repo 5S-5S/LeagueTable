@@ -8,38 +8,37 @@ Most to least important; details are in each item below.
 
 **Tier 1 - before launch** (keep the site up and know how it's doing)
 1. Analytics, with failed searches
-2. Automated checks
-3. Error reporting
-4. About / sources page
+2. Error reporting
+3. About / sources page
 
 **Tier 2 - high value, soon after launch**
-5. "Report a data error" link
-6. Bug: Continental one-season qualifiers view is empty
-7. Match Finder upgrades (what's left)
-8. API caching (what's left - the outage-preventing parts are done)
+4. "Report a data error" link
+5. Bug: Continental one-season qualifiers view is empty
+6. Match Finder upgrades (what's left)
+7. API caching (what's left - the outage-preventing parts are done)
 
 **Tier 3 - worthwhile features**
-9. Typo tolerance in search
-10. Upcoming matches (home page strip)
-11. Recent searches
-12. Pinned / favourite team
-13. Road to the final
-14. Head-to-head by decade
-15. More competitions (depends on the data)
+8. Typo tolerance in search
+9. Upcoming matches (home page strip)
+10. Recent searches
+11. Pinned / favourite team
+12. Road to the final
+13. Head-to-head by decade
+14. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-16. "On this day"
-17. Trivia mode
-18. Side-by-side Team Seasons
-19. League History chart
-20. Team Records: date ranges, bottom / relegated, home / away
-21. A club's title races
-22. Team progression chart (after League History)
-23. "/" to search
-24. Penalty shootout leaderboard (team and head-to-head answers done)
-25. Lighter pages (small gain - see the item)
-26. Knockout Stage bracket view (on hold)
-27. Country vs Country
+15. "On this day"
+16. Trivia mode
+17. Side-by-side Team Seasons
+18. League History chart
+19. Team Records: date ranges, bottom / relegated, home / away
+20. A club's title races
+21. Team progression chart (after League History)
+22. "/" to search
+23. Penalty shootout leaderboard (team and head-to-head answers done)
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
 
 ## Items
 
@@ -95,33 +94,6 @@ Most to least important; details are in each item below.
   Where the data comes from, how often it updates, and that club names
   and crests belong to their owners. A privacy note too if analytics
   ever uses cookies.
-
-- Later (before launch): **Automated checks** — noted 2026-10-03,
-  planned 2026-10-06. A test suite run before each push, instead of
-  checking by hand. One command, headless Chrome on the Mac (the answers
-  come from each page's own JavaScript), all four pages, desktop and
-  mobile. Three levels:
-  1. Expected answers: ~50-100 questions whose answers can't change
-     (past-only - "Liverpool 2019-20", "Real Madrid vs Atletico Madrid
-     penalties", "Who was top at Christmas 2003") with the exact answer
-     line each should give. Covers every kind: tables, head-to-heads,
-     Match Finder, Team Seasons, streaks, shootouts, both scopes. Catches
-     wrong values (e.g. the shootout answers counting match results).
-  2. Shape checks for questions touching the current season, whose
-     numbers change after each sync ("Arsenal vs Chelsea since 2010"):
-     an answer appears and reads right ("... have a W_ D_ L_ record
-     against Chelsea FC ...").
-  3. Smoke checks: every search example opens on each page with no
-     script error, no empty answer and no hang.
-  When an answer changes on purpose (rewording), its expected text is
-  updated in the same commit, so the change shows in the diff.
-  Started 2026-10-06: tests/search/compare-routing.js runs 1,511
-  questions (each dropdown's examples, templates.txt per dropdown,
-  questions-from-history.txt, questions-records.txt) through search.js
-  as it is now and as it is in a git ref, listing every question whose
-  results differ - routing only, no page. The suite's question set
-  starts from these; it adds the expected answer lines (pages in
-  headless Chrome) on top.
 
 - Later (before launch): **Error reporting** — noted 2026-10-03. A small
   handler that reports visitors' JavaScript errors (to the Worker or a
@@ -351,6 +323,17 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Automated checks~~ — done (2026-10-06). `cd tests && npm run check`
+  before each push (~3 minutes; `check:quick` ~2): search routing for
+  ~1,500 questions against a snapshot, the four pages in headless Chrome
+  (every tab and Seasons sub-tab, desktop and phone, no script errors),
+  43 exact answer lines (questions that can only change at a season's
+  end), 12 answer patterns (current-season questions) and every dropdown
+  example on desktop and phone. `npm run check:update` accepts deliberate
+  changes into the snapshot / expected answers, to commit with the
+  change. Checked that it catches breakage: a routing change, a reworded
+  answer and a script error each failed it. tests/README.md.
 
 - ~~Season records, title races and league trends~~ — done (2026-10-06),
   live on all four pages. Team Seasons became **Seasons** with three
