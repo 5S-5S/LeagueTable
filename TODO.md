@@ -40,6 +40,10 @@ Most to least important; details are in each item below.
 25. Knockout Stage bracket view (on hold)
 26. Country vs Country
 27. Review upcoming matches
+28. Phone-width checks in npm run check
+29. Data-freshness alert
+30. Team-colour contrast
+31. Sitemap + Google Search Console
 
 ## Items
 
@@ -183,6 +187,37 @@ Most to least important; details are in each item below.
   - Phone layouts were checked in Chrome's iPhone emulation and once on
     the user's iPhone; worth another look on a real phone after any
     change.
+
+- Maybe: **Phone-width checks in npm run check** — noted 2026-10-07.
+  Open each page (and an upcoming match's view) at iPhone width
+  (390px, touch) and fail if the page scrolls sideways or a table is
+  wider than its box when it shouldn't be. Two phone bugs in the
+  upcoming match view (2026-10-07) were only caught by measuring by
+  hand: the league table picked up the streak tables' column rules
+  (both carry `um-streaks`), and percentage widths inside a
+  `max-content` table blew it up to ~1,000,000px. A puppeteer-core
+  script against a local http.server did the measuring.
+
+- Maybe: **Data-freshness alert** — noted 2026-10-07. Could be part of
+  Error reporting. The update workflows file an issue when they fail,
+  but not when they "succeed" with nothing new for days or when the live
+  Worker stops answering. A daily workflow could ask the live API for
+  the newest match date (and that /api/upcoming isn't empty) and file an
+  issue if it's too old or the request fails.
+
+- Maybe: **Team-colour contrast** — noted 2026-10-07. Some club colours
+  are faint as text on light backgrounds (Manchester City's light blue
+  in the upcoming match view). Darken any team colour below a minimum
+  contrast ratio, as the site already adjusts colours for dark mode
+  (pickTeamTextColor).
+
+- Maybe: **Sitemap + Google Search Console** — noted 2026-10-07, closer
+  to publication. Pages already have descriptions and link previews
+  (og:/twitter: tags, preview.png). Missing: a sitemap.xml listing the
+  pages, submitted through Search Console. robots.txt isn't needed -
+  the site is a project site under /LeagueTable/, and crawlers only
+  read it at the domain root. Answers are built in the browser, so
+  they mostly won't be indexed; the pages themselves can be.
 
 - Maybe: **Road to the final (Continental)** — noted 2026-10-03. One
   club's season as its whole path: group results, then each knockout tie
