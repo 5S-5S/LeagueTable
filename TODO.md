@@ -19,27 +19,27 @@ Most to least important; details are in each item below.
 **Tier 3 - worthwhile features**
 7. Typo tolerance in search
 8. "City" / "United" alone in search
-9. Upcoming matches (home page strip)
-10. Recent searches
-11. Pinned / favourite team
-12. Road to the final
-13. More competitions (depends on the data)
+9. Recent searches
+10. Pinned / favourite team
+11. Road to the final
+12. More competitions (depends on the data)
 
 **Tier 4 - nice to have**
-14. Head-to-head by decade
-15. "On this day"
-16. Trivia mode
-17. Side-by-side Team Seasons
-18. League History chart
-19. Team Records: date ranges, bottom / relegated, home / away
-20. A club's title races
-21. Team progression chart (after League History)
-22. "/" to search
-23. Penalty shootout leaderboard (team and head-to-head answers done)
-24. "Won on penalties" in Match Finder
-25. Lighter pages (small gain - see the item)
-26. Knockout Stage bracket view (on hold)
-27. Country vs Country
+13. Head-to-head by decade
+14. "On this day"
+15. Trivia mode
+16. Side-by-side Team Seasons
+17. League History chart
+18. Team Records: date ranges, bottom / relegated, home / away
+19. A club's title races
+20. Team progression chart (after League History)
+21. "/" to search
+22. Penalty shootout leaderboard (team and head-to-head answers done)
+23. "Won on penalties" in Match Finder
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
+27. Review upcoming matches
 
 ## Items
 
@@ -170,90 +170,19 @@ Most to least important; details are in each item below.
   single-club narrative, so a country Team 1 there means a per-club list
   view, not a straight extension of the current layout.
 
-- Later: **Upcoming matches dashboard** — noted 2026-09-29. **Direction
-  changed 2026-10-03:** upcoming matches go on the home page, in the
-  header above the search bar, not on their own page - lower priority as
-  a result. The branch's fixtures table, update script / workflow,
-  planned /api/upcoming and per-match context (below) still apply; the
-  standalone UpcomingMatches page (and its mobile twin) don't. A
-  dashboard of upcoming fixtures, where each match shows the context for
-  that meeting:
-  - all-time head-to-head record between the two teams
-  - any active streak in that head-to-head (e.g. "unbeaten in 6 vs them")
-  - each team's own active streaks regardless of opponent (winning,
-    unbeaten, scoring, clean sheets...)
-
-  Data source confirmed: the football-data.org key the score scripts
-  already use returns future fixtures - `/v4/competitions/{code}/matches`
-  with `status=SCHEDULED` and a future date range (tested on the Premier
-  League 2026-09-29: 38 fixtures over the next month, all with fixed
-  kick-off times, `SCHEDULED` also returns `TIMED`). Each fixture has a
-  stable match `id`, `utcDate`, `matchday`, `stage` and API team names that
-  the scripts' existing team mappings already handle. Free tier covers all
-  five leagues and the Champions League (not CL qualifiers), ~10
-  requests/min - one call per competition per day is plenty.
-
-  Decided (2026-09-29):
-  - A new standalone page covering all six competitions (not a tab, not
-    the landing page), with a side-menu link.
-  - Window: the next 14 days, grouped by day, then competition; kick-off
-    times in the visitor's local timezone.
-  - History is per competition: a Premier League fixture uses Premier
-    League meetings and form only, a Champions League fixture uses
-    Champions League meetings and form only.
-  - Per fixture: both teams' current league positions, last-5 form (W/D/L
-    dots), the head-to-head bars (as in the H2H panel), and three tables:
-    every active head-to-head streak of 3+ games (each with the Team
-    Streaks chevron to list its matches), every active 3+ streak for Team 1
-    (home), and the same for Team 2 (away), across all nine streak types.
-
-  Build plan:
-  1. Data: a `fixtures` table in D1 (football-data match id as key, div,
-     utc kick-off, home, away, matchday, stage, status), kept separate from
-     results. A daily `update_fixtures.py` pulls the next 14+ days for all
-     six competitions (one call each), reuses the score scripts' team-name
-     mappings, replaces the stored upcoming fixtures, and writes to D1 with
-     the sync job's Cloudflare secrets; own workflow + failure issue.
-  2. API: `/api/upcoming` returns fixtures with the per-match context
-     precomputed (positions, form, H2H record, active H2H and per-team
-     streaks with their matches), KV-cached until the next daily refresh -
-     computing it in the page would take ~3 API calls per fixture. Needs a
-     Worker copy of the streak logic, checked against Team Streaks.
-  3. Page: fixture cards, filters by competition and team, links into the
-     existing tabs via share links (League Tables H2H, Team Streaks).
-  4. Entry points: side menu; maybe a landing-page teaser and a "next
-     match" line on the Team Dashboard.
-
-  Also decided: a separate UpcomingMatchesMobile.html like every other
-  page; for Champions League fixtures, "league position" is the team's
-  place in the CL league-phase table; compact fixture cards, with the three
-  streak tables opening when a card is clicked (~150 fixtures in 14 days).
-
-  Progress (on the `upcoming-matches` branch, not merged):
-  - Phase 1 done (2026-09-29): fixtures table in schema.sql,
-    scripts/update_fixtures.py, .github/workflows/update-fixtures.yml.
-  - Desktop page done (2026-09-30), on a fixed sample fixture list
-    (upcoming-fixtures-sample.json): compact two-per-row cards; opened
-    card has the season table, H2H and record bars, Premier League era
-    switch, streak tables with an Overall / Home / Away switch.
-  - Next (after the 2026-10-03 change): /api/upcoming (Worker deploy);
-    a compact upcoming-matches strip on index.html above the search bar
-    (desktop + phone width - index.html has no separate mobile page),
-    opening each match's context; reuse what fits from the branch's
-    desktop page. The UpcomingMatchesMobile.html + redirect step is
-    dropped.
-  - **Before continuing on the branch: merge `main` into it.** `main` has
-    moved on since the branch was cut (local-format dates on all four
-    pages, the Continental Team Seasons qualifier fixes, the Main Stage /
-    Qualifiers Competition Stage dropdowns with their Worker change, and
-    the Match History stage fix, the all-teams Team Streaks lists and
-    streak pagination; merged in 2026-10-01, but since then the search
-    page / search mode, Include Better Results for every team and the
-    Worker cache key fix), so the branch's copies of those pages
-    are stale until it's brought up to date. One `git merge main` on the
-    branch brings all of it over - nothing needs reapplying by hand.
-    (The Worker is already deployed with the stage change; the branch
-    doesn't touch backend/worker/src/index.js, so no conflict there.)
+- Later: **Review upcoming matches** — noted 2026-10-07, after the
+  strip went live (see Done). Look at it again once it has run for a
+  while:
+  - Is the daily fixtures refresh (update-fixtures.yml, 06:20 UTC)
+    keeping up - no `fixtures-failure` issues, unmapped team names,
+    rescheduled or postponed matches?
+  - Parts of the original plan not built: filtering by team (the strip
+    filters by competition only), a "next match" line on the Team
+    Dashboard, a side-menu link, and links from the match view's team
+    names to their dashboards.
+  - Phone layouts were checked in Chrome's iPhone emulation and once on
+    the user's iPhone; worth another look on a real phone after any
+    change.
 
 - Maybe: **Road to the final (Continental)** — noted 2026-10-03. One
   club's season as its whole path: group results, then each knockout tie
@@ -361,6 +290,19 @@ Most to least important; details are in each item below.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Upcoming matches (home page strip)~~ — done (2026-10-07). A strip
+  above the search bar on index.html: the next 7 days of fixtures across
+  all six competitions, with day tabs and competition chips. Opening a
+  match shows both teams' position and form, the season table (these two
+  teams / full), head-to-head and record bars (Premier League era / all
+  English seasons), and active head-to-head and per-team streaks
+  (Overall / Home / Away), with "Full head-to-head →" opening the search
+  answer. At phone width the tables use the Mobile pages' layouts.
+  Data: the `fixtures` D1 table, refreshed daily by
+  scripts/update_fixtures.py (update-fixtures.yml); the Worker's
+  `/api/upcoming`. The standalone page from the `upcoming-matches`
+  branch was dropped (the branch is deleted).
 
 - ~~Q&A audit~~ — done (2026-10-07). qa.html checked against every page:
   - Text: outdated answers fixed (daily updates, the Seasons tab, nine
