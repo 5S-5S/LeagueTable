@@ -24,37 +24,36 @@ empty search box.
 **Tier 2 - high value, soon after launch** (and reasons to come back)
 5. Match Finder: a country's clubs as the subject (on hold)
 6. API caching (what's left - the outage-preventing parts are done)
-7. Recently snapped streaks (home page)
-8. "On this day"
-9. Pinned / favourite team
-10. Data-freshness alert (the home page now relies on fresh results)
+7. "On this day"
+8. Pinned / favourite team
+9. Data-freshness alert (the home page now relies on fresh results)
 
 **Tier 3 - worthwhile features**
-11. Typo tolerance in search
-12. "City" / "United" alone in search
-13. Recent searches
-14. Road to the final
-15. More competitions (depends on the data)
-16. Trivia mode
-17. Streak-ending social account (after #7; closer to launch)
+10. Typo tolerance in search
+11. "City" / "United" alone in search
+12. Recent searches
+13. Road to the final
+14. More competitions (depends on the data)
+15. Trivia mode
+16. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-18. Head-to-head by decade
-19. Side-by-side Team Seasons
-20. League History chart
-21. Team Records: date ranges, bottom / relegated, home / away
-22. A club's title races
-23. Team progression chart (after League History)
-24. "/" to search
-25. Penalty shootout leaderboard (team and head-to-head answers done)
-26. "Won on penalties" in Match Finder
-27. Lighter pages (small gain - see the item)
-28. Knockout Stage bracket view (on hold)
-29. Country vs Country
-30. Review upcoming matches
-31. Phone-width checks in npm run check
-32. Team-colour contrast
-33. Sitemap + Google Search Console
+17. Head-to-head by decade
+18. Side-by-side Team Seasons
+19. League History chart
+20. Team Records: date ranges, bottom / relegated, home / away
+21. A club's title races
+22. Team progression chart (after League History)
+23. "/" to search
+24. Penalty shootout leaderboard (team and head-to-head answers done)
+25. "Won on penalties" in Match Finder
+26. Lighter pages (small gain - see the item)
+27. Knockout Stage bracket view (on hold)
+28. Country vs Country
+29. Review upcoming matches
+30. Phone-width checks in npm run check
+31. Team-colour contrast
+32. Sitemap + Google Search Console
 
 ## Items
 
@@ -230,17 +229,6 @@ empty search box.
   read it at the domain root. Answers are built in the browser, so
   they mostly won't be indexed; the pages themselves can be.
 
-- Next: **Recently snapped streaks (home page)** — noted 2026-10-09. A
-  home page card under the upcoming matches: notable runs that ended
-  (and ones that reached a milestone) in the last few days, e.g.
-  "Chelsea's 14-game home unbeaten run, ended by Brighton". Each entry
-  opens the streak view for that run (share-link filters), so the card
-  doubles as a guide to Team Streaks. Builds on historic streaks'
-  `endedBy`. Needs a notability bar - one of the club's 10 longest runs
-  of that type, or the longest active run in its league - or it's
-  noise. Results arrive within minutes of full time (live results,
-  2026-10-09 - see backend/README.md).
-
 - Later: **Streak-ending social account** — noted 2026-10-09, closer to
   launch, after the snapped-streaks card. An X (and Bluesky) account
   that posts when a notable streak ends, within about an hour of full
@@ -248,9 +236,9 @@ empty search box.
   - Live results - done 2026-10-09: a Worker cron records finished
     matches a minute or two after full time (77 seconds on the first
     night), so football-data.org's free tier isn't the bottleneck.
-  - Each team's live streaks precomputed into D1 after the daily sync,
-    so a new result is a lookup, not a recalculation in the Worker.
-  - Same notability bar as the card.
+  - The snapped streaks list - done 2026-10-09 (see Done): the account
+    would post entries that are new since the last rebuild, with the
+    same wording as the card.
   - Start with drafts approved by one click, and go automatic once a few
     weeks of drafts have all been right - a wrong post is public.
   - To check first: the X API's current free posting limits (they keep
@@ -366,6 +354,37 @@ empty search box.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Recently snapped streaks (home page)~~ — done (2026-10-09). A card
+  under the search card on index.html (snapped.js / snapped.css):
+  every statistically significant streak that ended in the last year,
+  newest first, the last 7 days outlined in green, a competition
+  filter, 20 a page with Team Streaks' Previous / Next. Each entry says
+  what happened ("Sevilla FC beat FC Barcelona for the first time in 19
+  meetings"), why it's listed (club record / longest since 1990 / rare
+  for the club / top 0.4% in La Liga), start, end, games, days, the
+  match that ended it, and - for runs across years out of the
+  competition - a small note ("Includes 2001-2026 outside the Premier
+  League"). Clicking opens the match that ended it and the run's matches
+  (Team Streaks' historic layout) and a button asking the search for
+  every run of that kind ("Sevilla FC longest winless runs vs FC
+  Barcelona").
+  - Club streaks and head-to-head (one club against one opponent), every
+    type, overall / home / away. The bars, picked by replaying three
+    seasons week by week (about 6 a week, ~290 a year): rare in the
+    league since 1995, the club's longest in 10+ years, unusual for the
+    club itself (a big club's slump), and head-to-head - with a looser bar
+    for result runs against a list of big clubs. Details in
+    backend/migration/snapped-lib.mjs.
+  - Worked out from every competition's full history by a GitHub Actions
+    job (snapped-streaks.yml -> backend/migration/snapped-streaks.mjs,
+    ~1 second), stored in KV, served by /api/snapped-streaks. Runs after
+    each daily sync, and after the Worker records live results once a
+    GITHUB_DISPATCH_TOKEN Worker secret is set (backend/README.md).
+  - Also: the upcoming match view's match lists now give unhighlighted
+    teams the transparent highlight, as the sport pages do.
+  - Not done: runs reaching a milestone while still going (the TODO
+    item's other half) - a later addition if the card wants it.
 
 - ~~Upcoming matches (home page strip)~~ — done (2026-10-07). A strip
   above the search bar on index.html: the next 7 days of fixtures across

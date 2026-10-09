@@ -232,6 +232,35 @@ arrives the daily way. Needs the `FOOTBALL_DATA_API_KEY` Worker secret
 (`npx wrangler secret put FOOTBALL_DATA_API_KEY`). First night: three
 matches, the last of them in D1 77 seconds after the final whistle.
 
+### Snapped streaks (2026-10-09)
+
+The home page's "Streaks snapped" card (`snapped.js`) lists every
+significant streak that ended in the last year. Working that out needs
+every competition's whole history (each run is compared with every run
+of its kind since 1995), far past a Worker's CPU limit, so a GitHub
+Actions job does it: `.github/workflows/snapped-streaks.yml` runs
+`migration/snapped-streaks.mjs`, which reads the matches from the live
+API, applies `findSnappedStreaks()` (`migration/snapped-lib.mjs` - the
+significance bars are documented there) and writes the list (~100 KB) to
+KV as `snapped-streaks`. `/api/snapped-streaks` serves it unchanged.
+
+The job runs after every daily sync and, optionally, after the Worker
+records live results: `recordFinishedMatches()` sends a
+`repository_dispatch` (`results-recorded`) to GitHub when it inserted
+anything. That needs a GitHub token as a Worker secret - a fine-grained
+personal access token for this repository only, with **Contents: read
+and write** (what `repository_dispatch` requires):
+
+```
+npx wrangler secret put GITHUB_DISPATCH_TOKEN
+```
+
+Without it, nothing fails; the card just updates after the daily sync.
+The job waits 70 seconds before reading (the Worker's cache version is
+memoised for a minute per isolate) and a newer run cancels an older one.
+`node snapped-streaks.mjs --dry-run --out list.json` computes locally
+without writing.
+
 ### Activating the daily sync
 
 The workflow file exists but won't run correctly yet — it needs three

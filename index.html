@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="search.css">
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="upcoming.css">
+    <link rel="stylesheet" href="snapped.css">
 </head>
 <body>
     <!-- Hamburger Menu Button -->
@@ -104,6 +105,8 @@
             <div id="searchMount"></div>
             <div id="searchExamples" class="search-examples"></div>
         </div>
+        <!-- Streaks snapped in the last year (snapped.js); a .search-card so it hides with it while a match is open -->
+        <section id="snappedStreaks" class="search-card ss-card" aria-label="Streaks snapped" hidden></section>
         <!-- One upcoming match, in the search card's place (upcoming.js) -->
         <div id="matchView" class="um-view" hidden></div>
     </main>
@@ -111,6 +114,7 @@
     <script src="search.js"></script>
     <script src="team-registry.js"></script>
     <script src="upcoming.js"></script>
+    <script src="snapped.js"></script>
     <script>
         function renderSearchExamples(search) {
             // The same example questions the empty search bar suggests
@@ -210,6 +214,7 @@
                 strip: document.getElementById('upcomingStrip'),
                 view: document.getElementById('matchView')
             });
+            SnappedStreaks.mount(document.getElementById('snappedStreaks'));
         });
     </script>
 </body>
