@@ -826,7 +826,102 @@ async function handleSeasonStandings(request, env) {
     return jsonResponse(responseBody);
 }
 
+// Live results: a cron trigger (wrangler.toml) records finished matches
+// in `matches` within minutes of full time, instead of waiting for the
+// next morning's gist update + sync. It reads the `fixtures` table for
+// matches that kicked off long enough ago to be over, asks
+// football-data.org about just those, and inserts the FINISHED ones -
+// so outside match windows it makes no API call at all.
+//
+// The rows match what the daily path writes later (fixtures' team names
+// and stages come from the score scripts' own mappings; the date is the
+// kick-off's UK date, as update_*_scores.py write it), so the sync's
+// INSERT OR IGNORE skips them as duplicates. A match this misses
+// (postponed, API down, Worker failing) still arrives the next morning.
+const LIVE_POLL_FROM_MINUTES = 105;   // earliest a match can be over
+const LIVE_POLL_UNTIL_HOURS = 6;      // give up; the daily path takes over
+const FOOTBALL_DATA_BASE = 'https://api.football-data.org/v4';
+
+const ukDateFormat = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/London', year: 'numeric', month: '2-digit', day: '2-digit',
+});
+
+// Same rules as score_and_additional_info() in
+// scripts/update_champions_league_scores.py: football-data.org's fullTime
+// folds a shootout into the goals, so a shootout's score is rebuilt from
+// regular + extra time. Domestic matches never go past fullTime.
+function finalScore(score) {
+    if (score.duration === 'PENALTY_SHOOTOUT') {
+        const reg = score.regularTime || {};
+        const et = score.extraTime || {};
+        const pens = score.penalties || {};
+        return {
+            home: (reg.home || 0) + (et.home || 0),
+            away: (reg.away || 0) + (et.away || 0),
+            additionalInfo: `pso ${pens.home}:${pens.away}`,
+        };
+    }
+    const ft = score.fullTime || {};
+    return { home: ft.home, away: ft.away, additionalInfo: score.duration === 'EXTRA_TIME' ? 'aet' : null };
+}
+
+async function recordFinishedMatches(env) {
+    if (!env.FOOTBALL_DATA_API_KEY) {
+        console.log('FOOTBALL_DATA_API_KEY not set - skipping live results');
+        return;
+    }
+    const now = Date.now();
+    const iso = ms => new Date(ms).toISOString().replace(/\.\d{3}Z$/, 'Z');
+    const { results: due } = await env.DB.prepare(
+        `SELECT match_id, div, utc_date, home_team, away_team, competition_phase
+         FROM fixtures WHERE utc_date <= ? AND utc_date >= ?`
+    ).bind(iso(now - LIVE_POLL_FROM_MINUTES * 60 * 1000), iso(now - LIVE_POLL_UNTIL_HOURS * 60 * 60 * 1000)).all();
+    if (due.length === 0) return;
+
+    const res = await fetch(`${FOOTBALL_DATA_BASE}/matches?ids=${due.map(f => f.match_id).join(',')}`, {
+        headers: { 'X-Auth-Token': env.FOOTBALL_DATA_API_KEY },
+    });
+    if (!res.ok) {
+        console.error(`football-data.org answered ${res.status}: ${await res.text()}`);
+        return;
+    }
+    const byId = new Map((await res.json()).matches.map(m => [m.id, m]));
+
+    const statements = [];
+    const recorded = [];
+    for (const fixture of due) {
+        const match = byId.get(fixture.match_id);
+        if (!match || match.status !== 'FINISHED') continue;
+        const { home, away, additionalInfo } = finalScore(match.score || {});
+        if (home == null || away == null) continue;
+        statements.push(
+            env.DB.prepare(
+                `INSERT OR IGNORE INTO matches (div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)`
+            ).bind(fixture.div, ukDateFormat.format(new Date(fixture.utc_date)), fixture.home_team, fixture.away_team,
+                home, away, fixture.competition_phase, additionalInfo),
+            // Played - stop polling it. The daily fixtures refresh would drop it anyway.
+            env.DB.prepare('DELETE FROM fixtures WHERE match_id = ?').bind(fixture.match_id),
+        );
+        recorded.push(`${fixture.div} ${fixture.home_team} ${home}-${away} ${fixture.away_team}`);
+    }
+    if (statements.length === 0) {
+        console.log(`${due.length} due, none finished yet`);
+        return;
+    }
+    await env.DB.batch(statements);
+    console.log(`Recorded: ${recorded.join('; ')}`);
+
+    // Same invalidation as sync.mjs's bumpCacheVersion() - cached answers
+    // touching the current season are recomputed with the new results.
+    await env.CACHE.put('cache-version', new Date().toISOString());
+}
+
 export default {
+    async scheduled(event, env, ctx) {
+        ctx.waitUntil(recordFinishedMatches(env));
+    },
+
     async fetch(request, env) {
         if (request.method === 'OPTIONS') {
             return new Response(null, { headers: CORS_HEADERS });
