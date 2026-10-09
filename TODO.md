@@ -2,9 +2,18 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-07)
+## Priority (ranked 2026-10-03, updated 2026-10-09)
 
 Most to least important; details are in each item below.
+
+Re-ranked 2026-10-09 around giving people a reason to come back: the
+site answers questions well, but only ones visitors arrive with. The
+home page should hand them answers tied to the football calendar -
+before matches (upcoming matches, done), after matches (streaks
+snapped), between matches (On this day, trivia) - and each one should
+open the tool that found it, with the filters set, so people learn
+what the site can do by following an answer rather than facing an
+empty search box.
 
 **Tier 1 - before launch** (keep the site up and know how it's doing)
 1. Analytics, with failed searches
@@ -12,38 +21,40 @@ Most to least important; details are in each item below.
 3. About / sources page (closer to publication, with the crests)
 4. Self-host the club crests (closer to publication)
 
-**Tier 2 - high value, soon after launch**
+**Tier 2 - high value, soon after launch** (and reasons to come back)
 5. Match Finder: a country's clubs as the subject (on hold)
 6. API caching (what's left - the outage-preventing parts are done)
+7. Recently snapped streaks (home page)
+8. "On this day"
+9. Pinned / favourite team
+10. Data-freshness alert (the home page now relies on fresh results)
 
 **Tier 3 - worthwhile features**
-7. Typo tolerance in search
-8. "City" / "United" alone in search
-9. Recent searches
-10. Pinned / favourite team
-11. Road to the final
-12. More competitions (depends on the data)
+11. Typo tolerance in search
+12. "City" / "United" alone in search
+13. Recent searches
+14. Road to the final
+15. More competitions (depends on the data)
+16. Trivia mode
+17. Streak-ending social account (after #7; closer to launch)
 
 **Tier 4 - nice to have**
-13. Head-to-head by decade
-14. "On this day"
-15. Trivia mode
-16. Side-by-side Team Seasons
-17. League History chart
-18. Team Records: date ranges, bottom / relegated, home / away
-19. A club's title races
-20. Team progression chart (after League History)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. "Won on penalties" in Match Finder
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
-27. Review upcoming matches
-28. Phone-width checks in npm run check
-29. Data-freshness alert
-30. Team-colour contrast
-31. Sitemap + Google Search Console
+18. Head-to-head by decade
+19. Side-by-side Team Seasons
+20. League History chart
+21. Team Records: date ranges, bottom / relegated, home / away
+22. A club's title races
+23. Team progression chart (after League History)
+24. "/" to search
+25. Penalty shootout leaderboard (team and head-to-head answers done)
+26. "Won on penalties" in Match Finder
+27. Lighter pages (small gain - see the item)
+28. Knockout Stage bracket view (on hold)
+29. Country vs Country
+30. Review upcoming matches
+31. Phone-width checks in npm run check
+32. Team-colour contrast
+33. Sitemap + Google Search Console
 
 ## Items
 
@@ -219,6 +230,36 @@ Most to least important; details are in each item below.
   read it at the domain root. Answers are built in the browser, so
   they mostly won't be indexed; the pages themselves can be.
 
+- Next: **Recently snapped streaks (home page)** — noted 2026-10-09. A
+  home page card under the upcoming matches: notable runs that ended
+  (and ones that reached a milestone) in the last few days, e.g.
+  "Chelsea's 14-game home unbeaten run, ended by Brighton". Each entry
+  opens the streak view for that run (share-link filters), so the card
+  doubles as a guide to Team Streaks. Builds on historic streaks'
+  `endedBy`. Needs a notability bar - one of the club's 10 longest runs
+  of that type, or the longest active run in its league - or it's
+  noise. Results currently arrive once a day (06:00 UTC), which is fine
+  for the site; the social account below needs them faster.
+
+- Later: **Streak-ending social account** — noted 2026-10-09, closer to
+  launch, after the snapped-streaks card. An X (and Bluesky) account
+  that posts when a notable streak ends, within about an hour of full
+  time - a way to reach people who aren't on the site. Needs a faster
+  results path than the daily score scripts:
+  - A Worker cron trigger polls football-data.org only for matches
+    that kicked off ~2 hours ago (kickoff times are in the `fixtures`
+    table) until they're FINISHED, well inside the free tier's 10
+    requests / minute.
+  - Each team's live streaks precomputed into D1 after the daily sync,
+    so a new result is a lookup, not a recalculation in the Worker.
+  - Same notability bar as the card.
+  - Start with drafts approved by one click, and go automatic once a few
+    weeks of drafts have all been right - a wrong post is public.
+  - To check first: football-data.org's score delay on the free tier
+    (reportedly 5 minutes, unverified), and the X API's current free
+    posting limits (they keep changing; Bluesky's API is free).
+  The faster path also makes the home page card near-live.
+
 - Maybe: **Road to the final (Continental)** — noted 2026-10-03. One
   club's season as its whole path: group results, then each knockout tie
   on aggregate ("Liverpool 2018-19 run"). The tie code already pairs
@@ -290,11 +331,15 @@ Most to least important; details are in each item below.
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
-  match data with a date filter.
+  match data with a date filter. Moved to Tier 2 on 2026-10-09: it fills
+  the days without matches. Each match should open the tool it came
+  from (head-to-head, Match Finder), like the snapped-streaks card.
 
 - Maybe: **Pinned/favorite team** — remember a user's team via
   `localStorage` so the landing-page search can offer a one-click shortcut
-  back to their dashboard instead of retyping every visit.
+  back to their dashboard instead of retyping every visit. Moved to
+  Tier 2 on 2026-10-09: it lets the home page cards (upcoming, snapped
+  streaks, On this day) lead with the visitor's club.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter

@@ -179,7 +179,7 @@ def bump_fixtures_version(account_id, token, fetched_at):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--days", type=int, default=21,
-                        help="How many days ahead to fetch (default 21; the page shows 14)")
+                        help="How many days ahead to fetch (default 21; the home page strip shows 7)")
     parser.add_argument("--dry-run", action="store_true", help="Fetch and map, but don't write to D1")
     parser.add_argument("--json-out", metavar="FILE",
                         help="Also save the fetched fixtures to FILE as JSON (same shape as the D1 rows)")
