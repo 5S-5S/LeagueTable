@@ -4,7 +4,7 @@
 // so a naive daily full re-insert would blow past that limit immediately).
 //
 // Strategy: for each competition (div), find the most recent date already
-// in D1, then only consider gist rows on or after that date - so the
+// in D1, then only consider gist rows from a week before that date - so the
 // candidate set is always small (roughly the last day or two of matches),
 // not the whole history. INSERT OR IGNORE plus the unique index on
 // (div, date, home_team, away_team) is a safety net against re-inserting
@@ -74,6 +74,14 @@ async function runD1Query(sql, params = []) {
     return json.result[0];
 }
 
+const LOOKBACK_DAYS = 7;
+
+function isoDaysBefore(isoDate, days) {
+    const d = new Date(`${isoDate}T00:00:00Z`);
+    d.setUTCDate(d.getUTCDate() - days);
+    return d.toISOString().slice(0, 10);
+}
+
 async function getWatermarks() {
     const { results } = await runD1Query('SELECT div, MAX(date) as max_date FROM matches GROUP BY div');
     const watermarks = new Map();
@@ -110,11 +118,16 @@ async function main() {
     // is what keeps the daily write volume small. A div with no watermark
     // yet (shouldn't happen post-backfill, but just in case) gets no
     // filter, so a brand new competition would still fully seed itself.
+    // Looks back LOOKBACK_DAYS before the watermark too: the Worker's live
+    // results (recordFinishedMatches() in backend/worker/src/index.js) can
+    // move the watermark past a match it missed - Sunday's results in, one
+    // of Saturday's not - and that match would otherwise never be synced.
+    // INSERT OR IGNORE skips everything already there.
     const candidates = all.filter(m => {
         const watermark = watermarks.get(m.div);
-        return !watermark || m.date >= watermark;
+        return !watermark || m.date >= isoDaysBefore(watermark, LOOKBACK_DAYS);
     });
-    log(`${candidates.length} candidate rows on/after each div's watermark`);
+    log(`${candidates.length} candidate rows from ${LOOKBACK_DAYS} days before each div's watermark`);
 
     if (candidates.length === 0) {
         log('Nothing to sync.');

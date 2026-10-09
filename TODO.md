@@ -238,27 +238,23 @@ empty search box.
   doubles as a guide to Team Streaks. Builds on historic streaks'
   `endedBy`. Needs a notability bar - one of the club's 10 longest runs
   of that type, or the longest active run in its league - or it's
-  noise. Results currently arrive once a day (06:00 UTC), which is fine
-  for the site; the social account below needs them faster.
+  noise. Results arrive within minutes of full time (live results,
+  2026-10-09 - see backend/README.md).
 
 - Later: **Streak-ending social account** — noted 2026-10-09, closer to
   launch, after the snapped-streaks card. An X (and Bluesky) account
   that posts when a notable streak ends, within about an hour of full
-  time - a way to reach people who aren't on the site. Needs a faster
-  results path than the daily score scripts:
-  - A Worker cron trigger polls football-data.org only for matches
-    that kicked off ~2 hours ago (kickoff times are in the `fixtures`
-    table) until they're FINISHED, well inside the free tier's 10
-    requests / minute.
+  time - a way to reach people who aren't on the site. Builds on:
+  - Live results - done 2026-10-09: a Worker cron records finished
+    matches a minute or two after full time (77 seconds on the first
+    night), so football-data.org's free tier isn't the bottleneck.
   - Each team's live streaks precomputed into D1 after the daily sync,
     so a new result is a lookup, not a recalculation in the Worker.
   - Same notability bar as the card.
   - Start with drafts approved by one click, and go automatic once a few
     weeks of drafts have all been right - a wrong post is public.
-  - To check first: football-data.org's score delay on the free tier
-    (reportedly 5 minutes, unverified), and the X API's current free
-    posting limits (they keep changing; Bluesky's API is free).
-  The faster path also makes the home page card near-live.
+  - To check first: the X API's current free posting limits (they keep
+    changing; Bluesky's API is free).
 
 - Maybe: **Road to the final (Continental)** — noted 2026-10-03. One
   club's season as its whole path: group results, then each knockout tie
