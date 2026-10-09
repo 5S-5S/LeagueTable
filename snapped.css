@@ -1,0 +1,285 @@
+/* Snapped streaks on the home page (snapped.js): a card under the search
+   card. The competition chips, match lists and the button under them use
+   upcoming.css's rules (.um-chip, .league-table / .season-matches, .um-links),
+   so this file loads after it. */
+
+.ss-card {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.ss-card[hidden] {
+    display: none;
+}
+
+.ss-head {
+    margin-bottom: 0.75rem;
+}
+
+.ss-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
+}
+
+.ss-sub,
+.ss-count {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.ss-chips {
+    margin-bottom: 0.6rem;
+}
+
+.ss-count {
+    margin-bottom: 0.5rem;
+}
+
+/* Two entries a row where they fit at 24rem each, otherwise one */
+.ss-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr));
+    gap: 0.6rem;
+}
+
+.ss-item {
+    min-width: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: var(--um-bg);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ss-item:hover {
+    border-color: #10b981;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* Snapped in the last 7 days */
+.ss-item.recent {
+    border-color: #10b981;
+}
+
+/* An open entry takes the whole row for its match lists */
+.ss-item.open {
+    grid-column: 1 / -1;
+    border-color: #10b981;
+}
+
+.ss-summary {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding: 0.7rem 0.85rem;
+    cursor: pointer;
+}
+
+.ss-summary:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: -2px;
+    border-radius: 0.75rem;
+}
+
+/* The club's crest, with the opponent's small in the corner (head-to-head) */
+.ss-crests {
+    position: relative;
+    flex: 0 0 2.4rem;
+    height: 2.4rem;
+}
+
+.ss-crests img {
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+}
+
+.ss-crests img + img {
+    position: absolute;
+    right: -0.2rem;
+    bottom: -0.3rem;
+    width: 1.35rem;
+    height: 1.35rem;
+    padding: 1px;
+    border-radius: 50%;
+    background: var(--um-bg);
+}
+
+.ss-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ss-headline {
+    font-weight: 700;
+    font-size: 0.92rem;
+    line-height: 1.3;
+    color: #1f2937;
+}
+
+.ss-chevron {
+    flex: 0 0 auto;
+    margin-top: 0.15rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    transition: transform 0.15s ease;
+}
+
+.ss-item.open .ss-chevron {
+    transform: rotate(90deg);
+    color: #059669;
+}
+
+.ss-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.3rem 0.5rem;
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.ss-score {
+    font-weight: 700;
+    color: #374151;
+}
+
+.ss-stats {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    gap: 0 1.1rem;
+    margin-top: 0.45rem;
+    font-size: 0.75rem;
+}
+
+.ss-stats dt {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+}
+
+.ss-stats dd {
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+}
+
+/* Why it's listed */
+.ss-pill {
+    padding: 0.05rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.ss-pill.record { background: #fef3c7; color: #92400e; }
+.ss-pill.since { background: #dbeafe; color: #1e40af; }
+.ss-pill.rare { background: #dcfce7; color: #166534; }
+.ss-pill.h2h { background: #ede9fe; color: #5b21b6; }
+
+/* Years out of the competition inside the run */
+.ss-note {
+    margin-top: 0.3rem;
+    font-size: 0.68rem;
+    font-style: italic;
+    color: #9ca3af;
+}
+
+.ss-empty,
+.ss-loading {
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* The run's matches */
+.ss-matches {
+    padding: 0 0.85rem 0.85rem;
+    overflow-x: auto;
+}
+
+.ss-matches .um-links {
+    margin-top: 0.9rem;
+}
+
+.ss-card .streak-ended-note {
+    margin: 0.4rem 0 1.1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+/* Previous / Next, as the sport pages' .btn .btn-secondary */
+.ss-card .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.ss-card .btn-secondary {
+    background: #4b5563;
+    color: white;
+}
+
+.ss-card .btn-secondary:hover {
+    background: #374151;
+}
+
+@media (max-width: 640px) {
+    .ss-card {
+        padding: 1.25rem 1rem;
+    }
+
+    .ss-summary {
+        padding: 0.65rem 0.7rem;
+    }
+
+    .ss-stats {
+        grid-template-columns: auto auto;
+        gap: 0.25rem 1.5rem;
+    }
+
+    .ss-matches {
+        padding: 0 0.4rem 0.6rem;
+    }
+
+    /* The match view pins its phone match lists inside a scrolling table;
+       here the list just fills the entry */
+    .ss-card .season-matches.um-phone {
+        position: static;
+        width: auto;
+    }
+
+    .ss-card .season-matches.um-phone table {
+        width: 100%;
+    }
+}
+
+[data-theme="dark"] .ss-title,
+[data-theme="dark"] .ss-headline { color: #f9fafb; }
+[data-theme="dark"] .ss-score,
+[data-theme="dark"] .ss-stats dd { color: #e5e7eb; }
+[data-theme="dark"] .ss-sub,
+[data-theme="dark"] .ss-count,
+[data-theme="dark"] .ss-meta,
+[data-theme="dark"] .ss-stats dt,
+[data-theme="dark"] .ss-empty,
+[data-theme="dark"] .ss-loading { color: #9ca3af; }
+[data-theme="dark"] .ss-card .streak-ended-note { color: #ccc; }
+[data-theme="dark"] .ss-item { border-color: #4b5563; }
+[data-theme="dark"] .ss-item.recent,
+[data-theme="dark"] .ss-item.open { border-color: #34d399; }
+[data-theme="dark"] .ss-pill.record { background: #78350f; color: #fde68a; }
+[data-theme="dark"] .ss-pill.since { background: #1e3a8a; color: #bfdbfe; }
+[data-theme="dark"] .ss-pill.rare { background: #14532d; color: #bbf7d0; }
+[data-theme="dark"] .ss-pill.h2h { background: #4c1d95; color: #ddd6fe; }

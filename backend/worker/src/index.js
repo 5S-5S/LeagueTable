@@ -25,6 +25,15 @@
 //   (scripts/update_fixtures.py, refreshed daily), soonest first. Cached
 //   under the 'fixtures-version' KV key that refresh bumps.
 //
+// GET /api/snapped-streaks
+//   -> { generatedAt, from, to, streaks: [{ kind, div, team, opp, loc, type, count, start, end, endedBy, pct, longestSince, source, gaps }, ...] }
+//   The home page's "Streaks snapped" card: every significant streak that
+//   ended in the last year, newest first. Worked out from the whole match
+//   history by backend/migration/snapped-streaks.mjs (a GitHub Actions job,
+//   far past a Worker's CPU limit) and stored in KV under
+//   'snapped-streaks'; this just serves it. Before the job has ever run,
+//   the list is empty.
+//
 // GET /api/standings?div=E0&dateFrom=&dateTo=&dayOfWeek=&threePointSystem=&homeFilter=&awayFilter=&excludeQualifiers=&excludeMainStage=&competitionStage=
 //   -> { div, matchCount, matchDateRange: {start, end} | null, standings: [{ team, played, won, drawn, lost, goalsFor, goalsAgainst, points }, ...] }
 //   excludeQualifiers/excludeMainStage/competitionStage are Continental-
@@ -645,6 +654,19 @@ async function handleUpcoming(env) {
     return jsonResponse(body);
 }
 
+// The job writes the whole list as one KV value; read as text and passed
+// straight through (no parse/stringify of ~100 KB per request)
+async function handleSnappedStreaks(env) {
+    const stored = await env.CACHE.get('snapped-streaks');
+    return new Response(stored || '{"streaks":[]}', {
+        headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': `public, max-age=${BROWSER_MAX_AGE_SECONDS}`,
+            ...CORS_HEADERS,
+        },
+    });
+}
+
 async function handleSeasonMatches(url, env) {
     const div = url.searchParams.get('div');
     if (!div) {
@@ -915,6 +937,34 @@ async function recordFinishedMatches(env) {
     // Same invalidation as sync.mjs's bumpCacheVersion() - cached answers
     // touching the current season are recomputed with the new results.
     await env.CACHE.put('cache-version', new Date().toISOString());
+
+    await requestSnappedStreaksUpdate(env);
+}
+
+// New results can snap streaks: asks GitHub Actions to rerun
+// snapped-streaks.yml (a repository_dispatch event). Optional - without
+// the GITHUB_DISPATCH_TOKEN secret (a fine-grained token for this repo with
+// Contents: read and write) the list just updates after the daily sync.
+// A failure is logged, never thrown: the results are already recorded.
+const GITHUB_REPO = '5S-5S/LeagueTable';
+
+async function requestSnappedStreaksUpdate(env) {
+    if (!env.GITHUB_DISPATCH_TOKEN) return;
+    try {
+        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/dispatches`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+                Accept: 'application/vnd.github+json',
+                'User-Agent': 'leaguetable-api',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ event_type: 'results-recorded' }),
+        });
+        if (!res.ok) console.error(`GitHub dispatch answered ${res.status}: ${await res.text()}`);
+    } catch (err) {
+        console.error('GitHub dispatch failed:', err);
+    }
 }
 
 export default {
@@ -956,6 +1006,10 @@ export default {
 
             if (url.pathname === '/api/upcoming') {
                 return await handleUpcoming(env);
+            }
+
+            if (url.pathname === '/api/snapped-streaks') {
+                return await handleSnappedStreaks(env);
             }
 
             if (url.pathname === '/api/season-standings' && request.method === 'POST') {

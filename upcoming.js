@@ -651,7 +651,7 @@
                 : winner === m.HomeTeam
                     ? ['font-bold win-score', 'text-red-600 font-bold']
                     : ['text-red-600 font-bold', 'font-bold win-score'];
-            const highlight = team => team === focus ? 'team1-highlight' : team === opponent ? 'team2-highlight' : '';
+            const highlight = team => team === focus ? 'team1-highlight' : team === opponent ? 'team2-highlight' : 'team-transparent-highlight';
             let result;
             if (winner) {
                 const color = getTeamColor(winner, slug);

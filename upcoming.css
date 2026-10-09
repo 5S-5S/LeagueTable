@@ -2,7 +2,9 @@
    search bar, and one match's view in place of the search card. The
    tables, bars, chevrons and highlight pills further down are the sport
    pages' own rules (DomesticEurope.css), copied here so index.html doesn't
-   need that whole stylesheet - keep them in step if those change. */
+   need that whole stylesheet - keep them in step if those change. The
+   snapped streaks card (snapped.js, .ss-card) uses the match list rules
+   too. */
 
 /* index.css and the sport pages define --bg-white / --bg-gray-50 the other
    way round in dark mode; these follow the sport pages, where the copied
@@ -439,7 +441,7 @@ body.um-viewing .search-card {
     justify-content: center;
 }
 
-.um-view .league-table img {
+:is(.um-view, .ss-card) .league-table img {
     width: 1.25rem;
     height: 1.25rem;
     object-fit: contain;
@@ -482,8 +484,8 @@ body.um-viewing .search-card {
 }
 
 /* Utility classes the copied table markup uses that index.css lacks */
-.um-view .border-b { border-bottom: 1px solid #e5e7eb; }
-.um-view .font-semibold { font-weight: 600; }
+:is(.um-view, .ss-card) .border-b { border-bottom: 1px solid #e5e7eb; }
+:is(.um-view, .ss-card) .font-semibold { font-weight: 600; }
 
 /* --- Phone width ----------------------------------------------------- */
 
@@ -706,7 +708,7 @@ body.um-viewing .search-card {
         container-type: inline-size;
     }
 
-    .um-view .season-matches.um-phone {
+    :is(.um-view, .ss-card) .season-matches.um-phone {
         position: sticky;
         left: 0.4rem;
         width: calc(100cqw - 0.8rem);
@@ -714,12 +716,12 @@ body.um-viewing .search-card {
         border-radius: 0.5rem;
     }
 
-    .um-view .season-matches.um-phone table {
+    :is(.um-view, .ss-card) .season-matches.um-phone table {
         table-layout: fixed;
     }
 
-    .um-view .season-matches.um-phone th,
-    .um-view .season-matches.um-phone td {
+    :is(.um-view, .ss-card) .season-matches.um-phone th,
+    :is(.um-view, .ss-card) .season-matches.um-phone td {
         font-size: 0.55rem;
         padding: 0.3rem 0.05rem;
         text-align: center;
@@ -728,17 +730,17 @@ body.um-viewing .search-card {
         text-overflow: ellipsis;
     }
 
-    .um-view .season-matches.um-phone th:nth-child(1) { width: 26%; }
-    .um-view .season-matches.um-phone th:nth-child(n+2) { width: 18.5%; }
-    .um-view .season-matches.um-with-stage th:nth-child(1),
-    .um-view .season-matches.um-with-stage th:nth-child(2) { width: 22%; }
-    .um-view .season-matches.um-with-stage th:nth-child(n+3) { width: 14%; }
+    :is(.um-view, .ss-card) .season-matches.um-phone th:nth-child(1) { width: 26%; }
+    :is(.um-view, .ss-card) .season-matches.um-phone th:nth-child(n+2) { width: 18.5%; }
+    :is(.um-view, .ss-card) .season-matches.um-with-stage th:nth-child(1),
+    :is(.um-view, .ss-card) .season-matches.um-with-stage th:nth-child(2) { width: 22%; }
+    :is(.um-view, .ss-card) .season-matches.um-with-stage th:nth-child(n+3) { width: 14%; }
 
-    .um-view .season-matches.um-phone .um-score {
+    :is(.um-view, .ss-card) .season-matches.um-phone .um-score {
         font-size: 0.75rem;
     }
 
-    .um-view .season-matches.um-phone img {
+    :is(.um-view, .ss-card) .season-matches.um-phone img {
         width: 14px;
         height: 14px;
         margin: 0;
@@ -772,9 +774,9 @@ body.um-viewing .search-card {
     color: #e5e7eb;
 }
 [data-theme="dark"] .um-back { color: #e5e7eb; border-color: #555; }
-[data-theme="dark"] .um-view .border-b { border-color: #444; }
-[data-theme="dark"] .um-view .text-green-700 { color: #34d399; }
-[data-theme="dark"] .um-view .text-red-600 { color: #f87171; }
+[data-theme="dark"] :is(.um-view, .ss-card) .border-b { border-color: #444; }
+[data-theme="dark"] :is(.um-view, .ss-card) .text-green-700 { color: #34d399; }
+[data-theme="dark"] :is(.um-view, .ss-card) .text-red-600 { color: #f87171; }
 
 /* --- Copied from DomesticEurope.css: tables, bars, chevrons, pills --- */
 
@@ -925,6 +927,23 @@ body.um-viewing .search-card {
     font-size: 1rem;
     font-weight: 700;
     background: #dbeafe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    border-radius: 0.375rem;
+}
+
+/* Teams that aren't highlighted in a match list: the same box with no
+   background, so names line up with the highlighted ones (as on the sport
+   pages, which add it to every other team) */
+.team-transparent-highlight {
+    font-size: 1rem;
+    font-weight: 700;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;

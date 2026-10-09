@@ -13,7 +13,8 @@
 //    pages) in headless Chrome - every tab and Seasons sub-tab clicked, no
 //    script error, Team Records and League History draw rows; and League
 //    Tables filter combinations that once showed nothing; the home page's
-//    upcoming matches (from a fixed fixture list).
+//    upcoming matches (from a fixed fixture list) and snapped streaks (the
+//    live list).
 // 3. Exact answers (checks/answers.json "exact"): questions about the past,
 //    whose answer can't change - the answer line and its note, word for
 //    word.
@@ -212,6 +213,39 @@ async function checkPages(browser, base) {
         errors.forEach(e => fail('pages', `upcoming strip: ${e}`));
         await page.close();
         console.log('Pages: upcoming matches');
+    }
+
+    // Snapped streaks on the home page, from the live list (rebuilt by
+    // snapped-streaks.yml - it only empties if that job stops running): the
+    // card lists entries, and the first one opens into the match that
+    // ended the run, the run's own matches (as many as the entry says) and
+    // the search button
+    {
+        const page = await browser.newPage();
+        const errors = [];
+        page.on('pageerror', err => errors.push(String(err.message || err).split('\n')[0]));
+        await page.setViewport({ width: 1300, height: 900 });
+        await page.goto(`${base}/index.html`, { waitUntil: 'networkidle2', timeout: 45000 });
+        const entries = await page.waitForFunction(() => document.querySelectorAll('#snappedStreaks .ss-item').length, { timeout: 20000 })
+            .then(h => h.jsonValue()).catch(() => 0);
+        if (!entries) fail('pages', 'snapped streaks: no entries (has snapped-streaks.yml stopped writing the list?)');
+        else {
+            const games = await page.evaluate(() => {
+                const first = document.querySelector('#snappedStreaks .ss-item');
+                first.querySelector('.ss-summary').click();
+                const stat = [...first.querySelectorAll('.ss-stats div')].find(d => d.querySelector('dt').textContent === 'Games');
+                return Number(stat.querySelector('dd').textContent);
+            });
+            const opened = await page.waitForFunction(games => {
+                const tables = document.querySelectorAll('#snappedStreaks .ss-item.open .ss-matches tbody');
+                return tables.length === 2 && tables[0].rows.length === 1 && tables[1].rows.length === games
+                    && document.querySelector('#snappedStreaks .ss-item.open .um-links a');
+            }, { timeout: 30000 }, games).then(() => true).catch(() => false);
+            if (!opened) fail('pages', `snapped streaks: the first entry did not open into its ending match and ${games} run matches`);
+        }
+        errors.forEach(e => fail('pages', `snapped streaks: ${e}`));
+        await page.close();
+        console.log('Pages: snapped streaks');
     }
 }
 
