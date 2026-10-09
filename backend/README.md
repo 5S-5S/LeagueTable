@@ -192,8 +192,10 @@ then only writes rows D1 doesn't already have.
 rows/day**, and our dataset is 166,519 rows — so re-inserting everything
 daily would blow the free tier on day one. `sync.mjs` avoids this by
 finding each competition's most recent date already in D1 (a "watermark")
-and only considering gist rows on/after that date as candidates — daily
-volume in practice is a few dozen rows, not the whole dataset.
+and only considering gist rows from a week before that date as candidates
+— daily volume in practice is a few dozen rows, not the whole dataset.
+(The week's look-back is for live results, below: they can move the
+watermark past a match the Worker missed.)
 `INSERT OR IGNORE` plus the unique index is a safety net for the
 boundary date (matches on the exact watermark date that are already
 present get silently skipped rather than erroring).
@@ -213,6 +215,22 @@ actually got inserted" when using `INSERT OR IGNORE` — it was observed
 reporting non-zero even when every row in a batch was an ignored
 duplicate. `sync.mjs` instead compares a `SELECT COUNT(*)` before and
 after to get the real number.
+
+### Live results (2026-10-09)
+
+The Worker also records results itself, minutes after full time, so the
+site doesn't wait for the next day's gist update + sync (whose "06:00"
+GitHub schedule has been running around 12:30 UTC). A cron trigger
+(`wrangler.toml`, every 2 minutes) runs `recordFinishedMatches()` in
+`src/index.js`: fixtures that kicked off 105 minutes to 6 hours ago are
+looked up on football-data.org (one request, by match id - none when
+nothing is due), FINISHED ones are inserted into `matches` and deleted
+from `fixtures`, and `cache-version` is bumped. Team names, stages and
+the UK date come out the same as the score scripts' gist rows, so the
+next sync skips them as duplicates; anything the Worker misses still
+arrives the daily way. Needs the `FOOTBALL_DATA_API_KEY` Worker secret
+(`npx wrangler secret put FOOTBALL_DATA_API_KEY`). First night: three
+matches, the last of them in D1 77 seconds after the final whistle.
 
 ### Activating the daily sync
 
