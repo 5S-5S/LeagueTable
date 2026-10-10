@@ -371,11 +371,31 @@ empty search box.
   Barcelona").
   - Club streaks and head-to-head (one club against one opponent), every
     type, overall / home / away. The bars, picked by replaying three
-    seasons week by week (about 6 a week, ~290 a year): rare in the
-    league since 1995, the club's longest in 10+ years, unusual for the
-    club itself (a big club's slump), and head-to-head - with a looser bar
-    for result runs against a list of big clubs. Details in
-    backend/migration/snapped-lib.mjs.
+    seasons week by week (about 6 a week, ~290 a year; code in
+    backend/migration/snapped-lib.mjs). A streak is listed if any holds:
+    - Club, rare in the league: longer than 99.5% of the competition's
+      runs of that type and location since 1995 (top 0.5%).
+    - Club, rare for its history: its longest of that kind in 10+ years
+      (or ever), in the league's top 5%, and 6+ games.
+    - Club, unusual for the club: in the top 2% of its own runs of that
+      kind over the previous 20 years (it needs 40+ of them), 5+ games -
+      a big club's slump (Liverpool's 6 without a win) that the league
+      bar never reaches.
+    - Head-to-head: in the league's top 1% of head-to-head runs of that
+      type and location, 6+ games.
+    - Head-to-head against a big club (domestic only): winning /
+      unbeaten / winless / losing runs in the top 3%, 5+ games ("first
+      win against Liverpool in 10"). Big clubs: Arsenal, Chelsea,
+      Liverpool, Man City, Man United, Spurs, Newcastle, Aston Villa;
+      Barcelona, Atlético, Real Madrid, Athletic Club, Valencia, Sevilla,
+      Real Sociedad, Betis; Juventus, Inter, Milan, Roma, Napoli, Lazio,
+      Atalanta; Bayern, Dortmund, Schalke, Köln, Frankfurt, Hamburg,
+      Stuttgart, Gladbach; Marseille, Monaco, Lyon, Lille, PSG
+      (BIG_CLUBS - review once a season).
+    Each club shows once per match (its strongest run), and each
+    head-to-head meeting once. Near miss for scale: Dortmund's 6-game
+    winning run, ended 2026-10-09, beat 98.3% of Bundesliga winning runs
+    - not listed.
   - Worked out from every competition's full history by a GitHub Actions
     job (snapped-streaks.yml -> backend/migration/snapped-streaks.mjs,
     ~1 second), stored in KV, served by /api/snapped-streaks. Runs after
