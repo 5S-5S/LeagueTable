@@ -11,7 +11,10 @@ site's own names using the score scripts' mappings, and writes them to the
 
   1. Upsert every fetched fixture, stamped with this run's fetched_at.
   2. Only once all of those succeeded, delete fixtures from earlier runs
-     that weren't in this fetch (played, postponed or dropped). A run that
+     that weren't in this fetch (played, postponed or dropped) - except
+     ones that kicked off in the last 6 hours, which are only missing
+     because they're in play: the Worker's live-results cron still needs
+     their rows to record them at full time. A run that
      fails part-way therefore leaves yesterday's fixtures in place instead
      of an empty table.
   3. Bump the 'fixtures-version' key in KV, which the Worker's
@@ -57,6 +60,9 @@ CACHE_KV_NAMESPACE_ID = "b2fa8b93e59540749923768aaf1fc08d"
 COLUMNS = ["match_id", "div", "utc_date", "home_team", "away_team",
            "matchday", "competition_phase", "status", "fetched_at"]
 ROWS_PER_INSERT = 100 // len(COLUMNS)
+# Same window as the Worker's LIVE_POLL_UNTIL_HOURS: how long after kickoff
+# the live-results cron keeps looking for a fixture's result
+LIVE_RESULTS_HOURS = 6
 
 
 def fetch_upcoming(fd_code, api_key, date_from, date_to):
@@ -163,8 +169,15 @@ def write_fixtures(fixtures, fetched_at, account_id, database_id, token):
         run_d1(sql, params, account_id, database_id, token)
 
     # Only now, with every fetched fixture written: drop the ones this run
-    # didn't see (played, postponed or dropped since the last refresh)
-    result = run_d1("DELETE FROM fixtures WHERE fetched_at != ?", [fetched_at], account_id, database_id, token)
+    # didn't see (played, postponed or dropped since the last refresh).
+    # Matches that kicked off in the last few hours stay: they're missing
+    # only because they're in play, and the Worker's live-results cron
+    # (which reads this table) records and removes them at full time.
+    kept_since = (datetime.strptime(fetched_at, "%Y-%m-%dT%H:%M:%SZ")
+                  - timedelta(hours=LIVE_RESULTS_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    result = run_d1(
+        "DELETE FROM fixtures WHERE fetched_at != ? AND NOT (utc_date >= ? AND utc_date <= ?)",
+        [fetched_at, kept_since, fetched_at], account_id, database_id, token)
     return result["result"][0].get("meta", {}).get("changes", 0)
 
 
