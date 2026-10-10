@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-09)
+## Priority (ranked 2026-10-03, updated 2026-10-10)
 
 Most to least important; details are in each item below.
 
@@ -18,15 +18,15 @@ empty search box.
 **Tier 1 - before launch** (keep the site up and know how it's doing)
 1. Analytics, with failed searches
 2. Error reporting
-3. About / sources page (closer to publication, with the crests)
-4. Self-host the club crests (closer to publication)
+3. Data-freshness alert (the home page now relies on fresh results)
+4. About / sources page (closer to publication, with the crests)
+5. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-5. Match Finder: a country's clubs as the subject (on hold)
-6. API caching (what's left - the outage-preventing parts are done)
-7. "On this day"
-8. Pinned / favourite team
-9. Data-freshness alert (the home page now relies on fresh results)
+6. Match Finder: a country's clubs as the subject (on hold)
+7. API caching (what's left - the outage-preventing parts are done)
+8. "On this day"
+9. Pinned / favourite team
 
 **Tier 3 - worthwhile features**
 10. Typo tolerance in search
@@ -208,12 +208,24 @@ empty search box.
   `max-content` table blew it up to ~1,000,000px. A puppeteer-core
   script against a local http.server did the measuring.
 
-- Maybe: **Data-freshness alert** — noted 2026-10-07. Could be part of
-  Error reporting. The update workflows file an issue when they fail,
-  but not when they "succeed" with nothing new for days or when the live
-  Worker stops answering. A daily workflow could ask the live API for
-  the newest match date (and that /api/upcoming isn't empty) and file an
-  issue if it's too old or the request fails.
+- **Data-freshness alert** — noted 2026-10-07; moved to Tier 1 on
+  2026-10-10. Could be part of Error reporting. The update workflows
+  file an issue when they fail, but not when they "succeed" with nothing
+  new for days or when the live Worker stops answering - and the Worker's
+  live-results cron has no failure alert at all (a broken API key or an
+  expired GITHUB_DISPATCH_TOKEN would go unnoticed).
+  - Why it moved up: on 2026-10-10 the fixtures job (running ~12:30 UTC)
+    deleted Arsenal v Leeds while it was in play, so live results never
+    recorded it; it was only noticed by eye. (Fixed: in-play fixtures
+    now stay.)
+  - The check: rather than "newest match date is too old" (false alarms
+    in international breaks), look for fixtures that kicked off more
+    than 6 hours ago with no result in `matches` - that only fires when
+    a match was played and not recorded, whichever path failed. Also
+    that the live API answers, and a warning ahead of the dispatch
+    token's expiry. A daily workflow filing an issue, as the others do.
+  - Possibly also: the cron logs a warning when a match is still
+    unrecorded as its 6-hour window closes.
 
 - Maybe: **Team-colour contrast** — noted 2026-10-07. Some club colours
   are faint as text on light backgrounds (Manchester City's light blue
