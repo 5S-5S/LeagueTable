@@ -23,37 +23,38 @@ empty search box.
 5. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-6. Match Finder: a country's clubs as the subject (on hold)
-7. API caching (what's left - the outage-preventing parts are done)
-8. "On this day"
-9. Pinned / favourite team
+6. Streaks on the line (a toggle on the snapped streaks card)
+7. Match Finder: a country's clubs as the subject (on hold)
+8. API caching (what's left - the outage-preventing parts are done)
+9. "On this day"
+10. Pinned / favourite team
 
 **Tier 3 - worthwhile features**
-10. Typo tolerance in search
-11. "City" / "United" alone in search
-12. Recent searches
-13. Road to the final
-14. More competitions (depends on the data)
-15. Trivia mode
-16. Streak-ending social account (closer to launch)
+11. Typo tolerance in search
+12. "City" / "United" alone in search
+13. Recent searches
+14. Road to the final
+15. More competitions (depends on the data)
+16. Trivia mode
+17. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-17. Head-to-head by decade
-18. Side-by-side Team Seasons
-19. League History chart
-20. Team Records: date ranges, bottom / relegated, home / away
-21. A club's title races
-22. Team progression chart (after League History)
-23. "/" to search
-24. Penalty shootout leaderboard (team and head-to-head answers done)
-25. "Won on penalties" in Match Finder
-26. Lighter pages (small gain - see the item)
-27. Knockout Stage bracket view (on hold)
-28. Country vs Country
-29. Review upcoming matches
-30. Phone-width checks in npm run check
-31. Team-colour contrast
-32. Sitemap + Google Search Console
+18. Head-to-head by decade
+19. Side-by-side Team Seasons
+20. League History chart
+21. Team Records: date ranges, bottom / relegated, home / away
+22. A club's title races
+23. Team progression chart (after League History)
+24. "/" to search
+25. Penalty shootout leaderboard (team and head-to-head answers done)
+26. "Won on penalties" in Match Finder
+27. Lighter pages (small gain - see the item)
+28. Knockout Stage bracket view (on hold)
+29. Country vs Country
+30. Review upcoming matches
+31. Phone-width checks in npm run check
+32. Team-colour contrast
+33. Sitemap + Google Search Console
 
 ## Items
 
@@ -324,6 +325,31 @@ empty search box.
   to do: a leaderboard with no team - "most shootouts won", "best
   shootout record" - which needs a new all-clubs list. Moved to Tier 4
   on 2026-10-06 (low priority).
+
+- **Streaks on the line** — noted 2026-10-10. The before-match half of
+  the snapped streaks card: significant streaks still running that a
+  match in the next 7 days could extend or end ("Bayern unbeaten in 22
+  away - at Augsburg on Saturday"). A reason to visit before the
+  weekend, and again after to see whether it snapped.
+  - On the same card, with a toggle between "On the line" and "Snapped"
+    (the competition chips, pagination and entry layout shared).
+  - Each entry names the upcoming fixture (kickoff, opponent) and opens
+    its matches so far, like a snapped entry; the button runs the same
+    search ("<team> longest ... runs").
+  - Same significance bars as snapped (see the snapped streaks entry),
+    judged on the run's current length - so a run qualifies once it
+    would qualify if it ended now. Possibly also near-misses: a run one
+    win from a club record.
+  - Head-to-head runs too: only when the fixture is against that
+    opponent (Liverpool's home unbeaten run v Newcastle, the week they
+    play).
+  - Computed by the same GitHub Actions job (snapped-lib.mjs already
+    walks every run - the ones still open after a club's latest match
+    are the live streaks) against the fixtures table; stored next to
+    the snapped list in KV. Refreshes with the fixtures job and after
+    live results.
+  - Pairs with Milestones coming up ("2 wins from a 1,000th Premier
+    League win") as a later addition.
 
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
