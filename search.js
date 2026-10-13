@@ -681,7 +681,7 @@
         'Halmstads BK': 940,
         'Hammarby IF': 946,
         'Hamrun Spartans': 18495,
-        'Hapoel Be\'er Sheva': 1184,
+        'Hapoel Be\'er Sheva': 17757,
         'Hapoel Haifa': 17852,
         'Hapoel Tel Aviv': 956,
         'Heart of Midlothian': 965,
