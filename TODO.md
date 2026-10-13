@@ -2,16 +2,17 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-10)
+## Priority (ranked 2026-10-03, updated 2026-10-12)
 
 Most to least important; details are in each item below.
 
 Re-ranked 2026-10-09 around giving people a reason to come back: the
 site answers questions well, but only ones visitors arrive with. The
 home page should hand them answers tied to the football calendar -
-before matches (upcoming matches, done), after matches (streaks
-snapped), between matches (On this day, trivia) - and each one should
-open the tool that found it, with the filters set, so people learn
+before matches (upcoming matches and streaks on the line, done),
+after matches (streaks snapped, done), between matches (On this day,
+trivia) - and each one should open the tool that found it, with the
+filters set, so people learn
 what the site can do by following an answer rather than facing an
 empty search box.
 
@@ -23,38 +24,37 @@ empty search box.
 5. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-6. Streaks on the line (a toggle on the snapped streaks card)
-7. Match Finder: a country's clubs as the subject (on hold)
-8. API caching (what's left - the outage-preventing parts are done)
-9. "On this day"
-10. Pinned / favourite team
+6. Match Finder: a country's clubs as the subject (on hold)
+7. API caching (what's left - the outage-preventing parts are done)
+8. "On this day"
+9. Pinned / favourite team
 
 **Tier 3 - worthwhile features**
-11. Typo tolerance in search
-12. "City" / "United" alone in search
-13. Recent searches
-14. Road to the final
-15. More competitions (depends on the data)
-16. Trivia mode
-17. Streak-ending social account (closer to launch)
+10. Typo tolerance in search
+11. "City" / "United" alone in search
+12. Recent searches
+13. Road to the final
+14. More competitions (depends on the data)
+15. Trivia mode
+16. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-18. Head-to-head by decade
-19. Side-by-side Team Seasons
-20. League History chart
-21. Team Records: date ranges, bottom / relegated, home / away
-22. A club's title races
-23. Team progression chart (after League History)
-24. "/" to search
-25. Penalty shootout leaderboard (team and head-to-head answers done)
-26. "Won on penalties" in Match Finder
-27. Lighter pages (small gain - see the item)
-28. Knockout Stage bracket view (on hold)
-29. Country vs Country
-30. Review upcoming matches
-31. Phone-width checks in npm run check
-32. Team-colour contrast
-33. Sitemap + Google Search Console
+17. Head-to-head by decade
+18. Side-by-side Team Seasons
+19. League History chart
+20. Team Records: date ranges, bottom / relegated, home / away
+21. A club's title races
+22. Team progression chart (after League History)
+23. "/" to search
+24. Penalty shootout leaderboard (team and head-to-head answers done)
+25. "Won on penalties" in Match Finder
+26. Lighter pages (small gain - see the item)
+27. Knockout Stage bracket view (on hold)
+28. Country vs Country
+29. Review upcoming matches
+30. Phone-width checks in npm run check
+31. Team-colour contrast
+32. Sitemap + Google Search Console
 
 ## Items
 
@@ -326,31 +326,6 @@ empty search box.
   shootout record" - which needs a new all-clubs list. Moved to Tier 4
   on 2026-10-06 (low priority).
 
-- **Streaks on the line** — noted 2026-10-10. The before-match half of
-  the snapped streaks card: significant streaks still running that a
-  match in the next 7 days could extend or end ("Bayern unbeaten in 22
-  away - at Augsburg on Saturday"). A reason to visit before the
-  weekend, and again after to see whether it snapped.
-  - On the same card, with a toggle between "On the line" and "Snapped"
-    (the competition chips, pagination and entry layout shared).
-  - Each entry names the upcoming fixture (kickoff, opponent) and opens
-    its matches so far, like a snapped entry; the button runs the same
-    search ("<team> longest ... runs").
-  - Same significance bars as snapped (see the snapped streaks entry),
-    judged on the run's current length - so a run qualifies once it
-    would qualify if it ended now. Possibly also near-misses: a run one
-    win from a club record.
-  - Head-to-head runs too: only when the fixture is against that
-    opponent (Liverpool's home unbeaten run v Newcastle, the week they
-    play).
-  - Computed by the same GitHub Actions job (snapped-lib.mjs already
-    walks every run - the ones still open after a club's latest match
-    are the live streaks) against the fixtures table; stored next to
-    the snapped list in KV. Refreshes with the fixtures job and after
-    live results.
-  - Pairs with Milestones coming up ("2 wins from a 1,000th Premier
-    League win") as a later addition.
-
 - Maybe: **"On this day"** — a small widget (dashboard or landing page)
   showing historical matches that happened on today's date, using existing
   match data with a date filter. Moved to Tier 2 on 2026-10-09: it fills
@@ -392,6 +367,32 @@ empty search box.
   possibly with a second team overlaid for comparison.
 
 ## Done
+
+- ~~Streaks on the line (home page)~~ — done (2026-10-12). The snapped
+  streaks card's other view, with an "On the line / Snapped" toggle
+  beside the title (it opens on On the line when there's anything on
+  it): every significant streak still going that a match in the next 7
+  days could end, soonest kickoff first, the next 24 hours outlined.
+  Each entry says what's running ("Arsenal FC are unbeaten in their last
+  16 matches"), why it's listed, start / latest match / games / days and
+  the fixture; it opens into the matches so far, with buttons to the
+  fixture's match view and the same "longest ... runs" search as
+  snapped. "In play" from kickoff until the live result reruns the job
+  (dropped after 3 hours without one).
+  - Worked out by the snapped streaks job (findStreaks() in
+    snapped-lib.mjs) from the runs still open after a club's latest
+    match, paired with its next fixture at that location (against that
+    opponent, head-to-head), and stored next to the snapped list in KV
+    (`onTheLine`). The job now also runs after each fixtures refresh.
+  - Same bars as snapped, judged as if the run ended at that fixture,
+    plus a run level with its club record ("One more: club record").
+    Scoring and conceding runs need a club record or the league's top
+    0.5% (they were two thirds of the list), which took a typical week
+    from about 43 entries to about 31.
+  - Runs across decades out of a competition count like any other -
+    a streak is its games, not its days (decided 2026-10-12).
+  - Still to do, later: Milestones coming up ("2 wins from a 1,000th
+    Premier League win").
 
 - ~~Recently snapped streaks (home page)~~ — done (2026-10-09). A card
   under the search card on index.html (snapped.js / snapped.css):

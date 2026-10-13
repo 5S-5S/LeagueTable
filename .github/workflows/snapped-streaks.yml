@@ -1,9 +1,10 @@
 name: Update snapped streaks
 
 on:
-  # After each daily D1 sync (new results from the gists)
+  # After each daily D1 sync (new results from the gists) and each
+  # fixtures refresh (new fixtures put streaks on the line)
   workflow_run:
-    workflows: ["Sync D1 database"]
+    workflows: ["Sync D1 database", "Update upcoming fixtures"]
     types: [completed]
   # After the Worker records live results (requestSnappedStreaksUpdate in
   # backend/worker/src/index.js)
