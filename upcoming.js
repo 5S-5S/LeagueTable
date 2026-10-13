@@ -390,8 +390,11 @@
         return { days: all.slice(0, 1), waiting: all.length > 0 };
     }
 
-    function cardHtml(fixture) {
+    // withDay: the date as well as the time (the team overview's card,
+    // which isn't under a day tab)
+    function cardHtml(fixture, withDay = false) {
         const comp = COMPETITIONS[fixture.div];
+        const when = withDay ? `${dayLabel(new Date(fixture.utcDate))} · ${kickoffTime(fixture)}` : kickoffTime(fixture);
         // Crest, the name with its league position underneath, form dots
         const teamLine = team => `
             <span class="um-team">
@@ -406,7 +409,7 @@
             <button type="button" class="um-card" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fixture.homeTeam} vs ${fixture.awayTeam}, ${kickoffTime(fixture)}`)}">
                 <span class="um-card-top">
                     <span class="um-card-comp">${comp.flag} ${escapeHtml(comp.name)}</span>
-                    <span class="um-kickoff">${escapeHtml(kickoffTime(fixture))}</span>
+                    <span class="um-kickoff">${escapeHtml(when)}</span>
                 </span>
                 <span class="um-card-teams">
                     ${teamLine(fixture.homeTeam)}
@@ -993,7 +996,13 @@
         pick('streak', key => { state.openStreaks.has(key) ? state.openStreaks.delete(key) : state.openStreaks.add(key); });
     }
 
-    async function loadFixtures() {
+    let fixturesLoad = null;
+    function loadFixtures() {
+        if (!fixturesLoad) fixturesLoad = fetchFixtures();
+        return fixturesLoad;
+    }
+
+    async function fetchFixtures() {
         try {
             const data = await fetchJson(`${API_BASE}/api/upcoming`);
             state.fixtures = data.fixtures || [];
@@ -1028,5 +1037,25 @@
         loadFixtures();
     }
 
-    window.UpcomingMatches = { mount, openMatch };
+    // For the team overview (team.js), which shows a club's next match as
+    // one of the strip's cards and its active streaks the view's way
+    const overviewParts = {
+        competitions: COMPETITIONS,
+        fixtures: () => loadFixtures().then(() => state.fixtures),
+        seasonData: div => loadSeasonData(div).then(() => state.seasonData[div]),
+        cardHtml,
+        toMatchRows,
+        // A chevron's expanded row: one club's matches (a streak's, or a
+        // season's) in the streak tables' match list
+        matchListRow: (matches, team, div, colspan) =>
+            streakMatchesRow({ team, matches }, { homeTeam: team, awayTeam: null, div }, 'team', colspan),
+        // Every kind of active streak of MIN_STREAK+ games, longest first
+        activeStreaks: (matches, team) => activeStreaks(matches, team, STREAK_TYPES).sort((a, b) => b.matches.length - a.matches.length),
+        streakLabels: STREAK_LABELS,
+        minStreak: MIN_STREAK,
+        premierLeagueEraStart: PREMIER_LEAGUE_ERA_START,
+        eraLabels: ERA_LABELS
+    };
+
+    window.UpcomingMatches = { mount, openMatch, overview: overviewParts };
 })();

@@ -1,0 +1,394 @@
+/* Team overview on the home page (team.js): a card under the search card,
+   built from upcoming.css's match view classes (.um-view, its headings,
+   switches, record bars and tables), so this file loads after it and only
+   adds what the overview has of its own. */
+
+/* While the overview shows, the home page's own strip, examples and
+   streaks card step aside; the match view (opened from its next-match
+   card) hides the overview in turn */
+body.to-viewing #upcomingStrip,
+body.to-viewing #searchExamples,
+body.to-viewing #snappedStreaks {
+    display: none !important;
+}
+
+body.um-viewing .to-view {
+    display: none;
+}
+
+.to-view {
+    margin-top: 1.5rem;
+}
+
+.to-head {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.25rem 0 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.to-crest {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+}
+
+.to-title {
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1.15;
+}
+
+.to-team-name {
+    font-weight: 600;
+}
+
+/* This season: the next match beside the table */
+.to-now {
+    display: grid;
+    grid-template-columns: 19rem minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.to-now.to-now-table {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.to-next {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.to-next .um-card {
+    flex: none;
+}
+
+/* The Team Seasons tab's finish cell: a coloured block, as there */
+.to-view .league-table td.to-finish {
+    white-space: nowrap;
+}
+
+/* All-time record beside titles and finishes */
+.to-pair {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: 0 2rem;
+}
+
+/* The overview's tables are denser than the sport pages' */
+.to-view .league-table th {
+    padding: 0.55rem 0.6rem;
+}
+
+.to-view .league-table td {
+    padding: 0.4rem 0.6rem;
+}
+
+.to-view .league-table.season-matches:not(.um-phone) th,
+.to-view .league-table.season-matches:not(.um-phone) td {
+    padding: 0.4rem 0.6rem;
+}
+
+.to-view .league-table .season-matches-row > td {
+    padding: 0.4rem 0.75rem 0.9rem 2.25rem;
+}
+
+.to-streaks > table > tbody > tr:not(.season-matches-row) > td {
+    white-space: nowrap;
+}
+
+/* Domestic / Continental, and which one the sections below are */
+.to-switch {
+    margin: 1.75rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.to-side-label {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.to-side-label + h3 {
+    margin-top: 0.4rem;
+}
+
+.to-switch + h3 {
+    margin-top: 0.9rem;
+}
+
+/* What a table under a heading is */
+.to-sub {
+    margin: 0.25rem 0 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #6b7280;
+}
+
+/* A section's headline numbers */
+.to-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    margin: 0.25rem 0 0.9rem;
+}
+
+.to-stats dt {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+}
+
+.to-stats dd {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
+    white-space: nowrap;
+}
+
+.to-dim {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+.to-so-far {
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+/* Tables that only need a few columns don't stretch across the card */
+.to-narrow {
+    max-width: 28rem;
+}
+
+/* Title seasons, each opening that season's table */
+.to-years {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+}
+
+.to-years-label {
+    font-weight: 700;
+    color: #4b5563;
+    margin-right: 0.15rem;
+}
+
+.to-year {
+    padding: 0.1rem 0.5rem;
+    border-radius: 0.4rem;
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+a.to-year:hover {
+    background: #fde68a;
+}
+
+/* Biggest win, heaviest defeat, most goals */
+.to-matches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 0.6rem;
+}
+
+.to-match {
+    padding: 0.65rem 0.8rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: var(--um-bg);
+    min-width: 0;
+}
+
+.to-match-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+.to-match-teams {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.35rem 0 0.2rem;
+    font-size: 0.9rem;
+}
+
+.to-match-side {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.to-match-side.to-home {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.to-match-side img {
+    width: 1.4rem;
+    height: 1.4rem;
+    object-fit: contain;
+    flex: none;
+}
+
+.to-match-side .to-team-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.to-match-score {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #1f2937;
+}
+
+.to-match-when {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* Questions to ask next: links to their answers in search */
+.to-asks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.to-ask {
+    padding: 0.3rem 0.8rem;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background: var(--um-bg);
+    color: #374151;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.to-ask:hover {
+    border-color: #059669;
+    color: #047857;
+}
+
+.to-foot {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.85rem;
+}
+
+.to-foot a {
+    color: #047857;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.to-foot a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+    .to-now,
+    .to-pair {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .to-next {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .to-view {
+        margin-top: 1rem;
+    }
+
+    .to-title {
+        font-size: 1.3rem;
+    }
+
+    .to-crest {
+        width: 2.75rem;
+        height: 2.75rem;
+    }
+
+    .to-stats {
+        gap: 0.5rem 1.25rem;
+    }
+
+    .to-stats dd {
+        font-size: 1rem;
+    }
+
+    .to-narrow {
+        max-width: none;
+    }
+
+    /* Seasons on phone: Season (its chevron), P, W-D-L, GF:GA, GD, Pts,
+       finish - its own widths (child combinators keep them off a
+       chevron's match list inside); the slice is the match view's table */
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(1) { width: 64px; }
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(2) { width: 24px; }
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(3) { width: 50px; }
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(4) { width: 42px; }
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(5) { width: 30px; }
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(6) { width: 34px; }
+    .um-view .um-table.um-phone.to-seasons > table > thead > tr > th:nth-child(7) { width: auto; }
+    .um-view .um-table.um-phone.to-seasons > table > tbody > tr > td:first-child { white-space: normal; line-height: 1.2; }
+    .um-view .um-table.um-phone.to-seasons > table > tbody > tr > td.to-finish { white-space: normal; line-height: 1.15; }
+    .to-so-far { display: block; font-size: 0.7rem; }
+
+    /* A chevron's match list on phone: the expanded cell isn't one of the
+       fixed-width columns, and the list inside fits the screen (upcoming.css
+       sizes it to its container, the table's scrolling box) */
+    .to-view .to-seasons.um-phone,
+    .to-view .to-streaks {
+        container-type: inline-size;
+    }
+
+    .to-view .league-table > table > tbody > .season-matches-row > td {
+        padding: 0.25rem 0.4rem 0.6rem;
+        white-space: normal;
+    }
+}
+
+[data-theme="dark"] .to-head,
+[data-theme="dark"] .to-switch,
+[data-theme="dark"] .to-foot { border-color: #444; }
+[data-theme="dark"] .to-stats dd,
+[data-theme="dark"] .to-match-score { color: #f3f4f6; }
+[data-theme="dark"] .to-stats dt,
+[data-theme="dark"] .to-side-label,
+[data-theme="dark"] .to-sub,
+[data-theme="dark"] .to-match-label,
+[data-theme="dark"] .to-match-when,
+[data-theme="dark"] .to-years-label { color: #9ca3af; }
+[data-theme="dark"] .to-match { border-color: #4b5563; }
+[data-theme="dark"] .to-year { background: #78350f; color: #fde68a; }
+[data-theme="dark"] a.to-year:hover { background: #92400e; }
+[data-theme="dark"] .to-ask { border-color: #555; color: #e5e7eb; }
+[data-theme="dark"] .to-ask:hover { border-color: #10b981; color: #34d399; }
+[data-theme="dark"] .to-foot a { color: #34d399; }

@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="upcoming.css">
     <link rel="stylesheet" href="snapped.css">
+    <link rel="stylesheet" href="team.css">
 </head>
 <body>
     <!-- Hamburger Menu Button -->
@@ -107,6 +108,8 @@
         </div>
         <!-- Streaks snapped in the last year (snapped.js); a .search-card so it hides with it while a match is open -->
         <section id="snappedStreaks" class="search-card ss-card" aria-label="Streaks snapped" hidden></section>
+        <!-- One club's overview (team.js, ?team=), under the search bar in place of the strip and streaks card -->
+        <div id="teamView" class="um-view to-view" hidden></div>
         <!-- One upcoming match, in the search card's place (upcoming.js) -->
         <div id="matchView" class="um-view" hidden></div>
     </main>
@@ -115,6 +118,9 @@
     <script src="team-registry.js"></script>
     <script src="upcoming.js"></script>
     <script src="snapped.js"></script>
+    <script src="season-rules-domestic.js"></script>
+    <script src="season-rules-continental.js"></script>
+    <script src="team.js"></script>
     <script>
         function renderSearchExamples(search) {
             // The same example questions the empty search bar suggests
@@ -128,10 +134,16 @@
         }
 
         // Search bar (search.js); the examples follow the dropdown and fill
-        // in a search when clicked
+        // in a search when clicked. On a team overview (?team=) it starts
+        // with the club and its competition, without focus, so its results
+        // don't open over the overview.
         function initSearch() {
+            const params = new URLSearchParams(window.location.search);
+            const team = params.get('team');
             const search = LeagueSearch.mount(document.getElementById('searchMount'), {
-                autofocus: true,
+                autofocus: !team,
+                query: team || '',
+                scope: team ? params.get('lg') || '' : '',
                 onScopeChange: () => renderSearchExamples(search)
             });
             renderSearchExamples(search);
@@ -215,6 +227,7 @@
                 view: document.getElementById('matchView')
             });
             SnappedStreaks.mount(document.getElementById('snappedStreaks'));
+            TeamOverview.mount(document.getElementById('teamView'));
         });
     </script>
 </body>

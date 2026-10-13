@@ -36,7 +36,7 @@ domestic | Highest scoring game in Bundesliga history
     match-finder | All clubs · Most total goals | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&cat=totalGoals
 domestic | Arsenal
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
@@ -59,7 +59,7 @@ domestic | Arsenal seasons
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
 domestic | Arsenal relegated
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
@@ -92,21 +92,21 @@ domestic | Arsenal away record
     team | Arsenal FC · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=premier-league&home=0&t1=Arsenal+FC
 domestic | Arsenal last 10 games
     team | Arsenal FC · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=premier-league&mhN=10&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
 domestic | Arsenal on a Sunday
     team | Arsenal FC · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=premier-league&day=0&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&day=0&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&day=0
 domestic | Arsenal 2003-04
     team | Arsenal FC · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&season=2003-04&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&season=2003-04
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&season=2003-04&cat=recent
@@ -187,7 +187,7 @@ domestic | Arsenal 3-3 draws
     match-finder | Arsenal FC · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 domestic | Arsenal penalty shootouts
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&cat=recent
@@ -206,42 +206,42 @@ domestic | Arsenal european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 domestic | Arsenal at home
     team | Arsenal FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning&loc=home
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&away=0&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&away=0
 domestic | Arsenal away
     team | Arsenal FC · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=premier-league&home=0&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning&loc=away
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&home=0&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&home=0
 domestic | Arsenal in the 90s
     team | Arsenal FC · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=1999-12-31&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&from=1990-01-01&to=1999-12-31
 domestic | Arsenal between 1990 and 2000
     team | Arsenal FC · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=2000-12-31&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&from=1990-01-01&to=2000-12-31
 domestic | Arsenal with 2 points for a win
     team | Arsenal FC · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=premier-league&p3=0&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
 domestic | Arsenal without deductions
     team | Arsenal FC · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=premier-league&ded=0&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
@@ -326,7 +326,7 @@ domestic | Arsenal best record
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
 domestic | Arsenal goals
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
@@ -343,7 +343,7 @@ domestic | Arsenal biggest home win
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&away=0
 domestic | Barcelona
     team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
@@ -366,7 +366,7 @@ domestic | Barcelona seasons
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
 domestic | Barcelona relegated
     team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
@@ -399,21 +399,21 @@ domestic | Barcelona away record
     team | FC Barcelona · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=la-liga&home=0&t1=FC+Barcelona
 domestic | Barcelona last 10 games
     team | FC Barcelona · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=la-liga&mhN=10&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona
 domestic | Barcelona on a Sunday
     team | FC Barcelona · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=la-liga&day=0&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&day=0&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&day=0
 domestic | Barcelona 2003-04
     team | FC Barcelona · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&season=2003-04&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona&season=2003-04
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&season=2003-04&cat=recent
@@ -424,7 +424,7 @@ domestic | Barcelona 3-3 draws
     match-finder | FC Barcelona · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 domestic | Barcelona penalty shootouts
     team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&cat=recent
@@ -443,42 +443,42 @@ domestic | Barcelona european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 domestic | Barcelona at home
     team | FC Barcelona · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning&loc=home
     match-finder | Last time FC Barcelona won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&away=0&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&away=0
 domestic | Barcelona away
     team | FC Barcelona · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=la-liga&home=0&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning&loc=away
     match-finder | Last time FC Barcelona won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&home=0&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&home=0
 domestic | Barcelona in the 90s
     team | FC Barcelona · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=1999-12-31&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&from=1990-01-01&to=1999-12-31
 domestic | Barcelona between 1990 and 2000
     team | FC Barcelona · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=2000-12-31&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&from=1990-01-01&to=2000-12-31
 domestic | Barcelona with 2 points for a win
     team | FC Barcelona · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=la-liga&p3=0&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona
 domestic | Barcelona without deductions
     team | FC Barcelona · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=la-liga&ded=0&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
@@ -519,7 +519,7 @@ domestic | Barcelona best record
     team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
 domestic | Barcelona goals
     team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
+    dashboard | FC Barcelona | Team overview | index.html?team=FC+Barcelona&lg=la-liga
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
@@ -534,7 +534,7 @@ domestic | Barcelona biggest home win
     match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&away=0
 domestic | Juventus
     team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
@@ -557,7 +557,7 @@ domestic | Juventus seasons
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
 domestic | Juventus relegated
     team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
@@ -590,21 +590,21 @@ domestic | Juventus away record
     team | Juventus · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=serie-a&home=0&t1=Juventus
 domestic | Juventus last 10 games
     team | Juventus · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=serie-a&mhN=10&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus
 domestic | Juventus on a Sunday
     team | Juventus · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=serie-a&day=0&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&day=0&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&day=0
 domestic | Juventus 2003-04
     team | Juventus · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&season=2003-04&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&season=2003-04
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&season=2003-04&cat=recent
@@ -615,7 +615,7 @@ domestic | Juventus 3-3 draws
     match-finder | Juventus · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 domestic | Juventus penalty shootouts
     team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&cat=recent
@@ -634,42 +634,42 @@ domestic | Juventus european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 domestic | Juventus at home
     team | Juventus · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=serie-a&away=0&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning&loc=home
     match-finder | Last time Juventus won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&away=0&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&away=0
 domestic | Juventus away
     team | Juventus · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=serie-a&home=0&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning&loc=away
     match-finder | Last time Juventus won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&home=0&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&home=0
 domestic | Juventus in the 90s
     team | Juventus · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=1999-12-31&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&from=1990-01-01&to=1999-12-31
 domestic | Juventus between 1990 and 2000
     team | Juventus · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=2000-12-31&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&from=1990-01-01&to=2000-12-31
 domestic | Juventus with 2 points for a win
     team | Juventus · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=serie-a&p3=0&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus
 domestic | Juventus without deductions
     team | Juventus · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=serie-a&ded=0&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
@@ -710,7 +710,7 @@ domestic | Juventus best record
     team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
 domestic | Juventus goals
     team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    dashboard | Juventus | Team overview | index.html?team=Juventus&lg=serie-a
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
@@ -759,7 +759,7 @@ premier-league | Matches on Boxing Day 1963
     match-finder | First Division matches · December 26, 1963 | Match Finder · On December 26, 1963 | DomesticEurope.html?view=match-finder&lg=premier-league&from=1963-12-26&to=1963-12-26&cat=recent
 premier-league | Liverpool
     team | Liverpool FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
@@ -782,7 +782,7 @@ premier-league | Liverpool seasons
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
 premier-league | Liverpool relegated
     team | Liverpool FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
@@ -815,21 +815,21 @@ premier-league | Liverpool away record
     team | Liverpool FC · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=premier-league&home=0&t1=Liverpool+FC
 premier-league | Liverpool last 10 games
     team | Liverpool FC · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=premier-league&mhN=10&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC
 premier-league | Liverpool on a Sunday
     team | Liverpool FC · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=premier-league&day=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&day=0&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&day=0
 premier-league | Liverpool 2003-04
     team | Liverpool FC · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&season=2003-04&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&season=2003-04
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&season=2003-04&cat=recent
@@ -870,7 +870,7 @@ premier-league | Liverpool 3-3 draws
     match-finder | Liverpool FC · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 premier-league | Liverpool penalty shootouts
     team | Liverpool FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&cat=recent
@@ -889,42 +889,42 @@ premier-league | Liverpool european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 premier-league | Liverpool at home
     team | Liverpool FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning&loc=home
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&away=0&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&away=0
 premier-league | Liverpool away
     team | Liverpool FC · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=premier-league&home=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning&loc=away
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&home=0&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&home=0
 premier-league | Liverpool in the 90s
     team | Liverpool FC · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=1999-12-31&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&from=1990-01-01&to=1999-12-31
 premier-league | Liverpool between 1990 and 2000
     team | Liverpool FC · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=2000-12-31&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&from=1990-01-01&to=2000-12-31
 premier-league | Liverpool with 2 points for a win
     team | Liverpool FC · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=premier-league&p3=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC
 premier-league | Liverpool without deductions
     team | Liverpool FC · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=premier-league&ded=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
@@ -981,7 +981,7 @@ premier-league | Liverpool best record
     team | Liverpool FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Liverpool+FC
 premier-league | Liverpool goals
     team | Liverpool FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=premier-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
@@ -998,7 +998,7 @@ premier-league | Liverpool biggest home win
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&away=0
 premier-league | Aston Villa
     team | Aston Villa · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
@@ -1021,7 +1021,7 @@ premier-league | Aston Villa seasons
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
 premier-league | Aston Villa relegated
     team | Aston Villa · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
@@ -1054,21 +1054,21 @@ premier-league | Aston Villa away record
     team | Aston Villa · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=premier-league&home=0&t1=Aston+Villa
 premier-league | Aston Villa last 10 games
     team | Aston Villa · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=premier-league&mhN=10&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa
 premier-league | Aston Villa on a Sunday
     team | Aston Villa · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=premier-league&day=0&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&day=0&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&day=0
 premier-league | Aston Villa 2003-04
     team | Aston Villa · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&season=2003-04&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa&season=2003-04
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&season=2003-04&cat=recent
@@ -1079,7 +1079,7 @@ premier-league | Aston Villa 3-3 draws
     match-finder | Aston Villa · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 premier-league | Aston Villa penalty shootouts
     team | Aston Villa · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&cat=recent
@@ -1098,42 +1098,42 @@ premier-league | Aston Villa european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 premier-league | Aston Villa at home
     team | Aston Villa · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning&loc=home
     match-finder | Last time Aston Villa won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&away=0&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&away=0
 premier-league | Aston Villa away
     team | Aston Villa · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=premier-league&home=0&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning&loc=away
     match-finder | Last time Aston Villa won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&home=0&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&home=0
 premier-league | Aston Villa in the 90s
     team | Aston Villa · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=1999-12-31&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&from=1990-01-01&to=1999-12-31
 premier-league | Aston Villa between 1990 and 2000
     team | Aston Villa · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=2000-12-31&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&from=1990-01-01&to=2000-12-31
 premier-league | Aston Villa with 2 points for a win
     team | Aston Villa · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=premier-league&p3=0&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa
 premier-league | Aston Villa without deductions
     team | Aston Villa · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=premier-league&ded=0&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
@@ -1174,7 +1174,7 @@ premier-league | Aston Villa best record
     team | Aston Villa · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Aston+Villa
 premier-league | Aston Villa goals
     team | Aston Villa · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
+    dashboard | Aston Villa | Team overview | index.html?team=Aston+Villa&lg=premier-league
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
@@ -1217,7 +1217,7 @@ la-liga | Biggest win in La Liga history
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga
 la-liga | Real Madrid
     team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
@@ -1240,7 +1240,7 @@ la-liga | Real Madrid seasons
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
 la-liga | Real Madrid relegated
     team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
@@ -1273,21 +1273,21 @@ la-liga | Real Madrid away record
     team | Real Madrid · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=la-liga&home=0&t1=Real+Madrid
 la-liga | Real Madrid last 10 games
     team | Real Madrid · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=la-liga&mhN=10&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid
 la-liga | Real Madrid on a Sunday
     team | Real Madrid · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=la-liga&day=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&day=0&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&day=0
 la-liga | Real Madrid 2003-04
     team | Real Madrid · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&season=2003-04&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&season=2003-04
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&season=2003-04&cat=recent
@@ -1328,7 +1328,7 @@ la-liga | Real Madrid 3-3 draws
     match-finder | Real Madrid · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 la-liga | Real Madrid penalty shootouts
     team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&cat=recent
@@ -1347,42 +1347,42 @@ la-liga | Real Madrid european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 la-liga | Real Madrid at home
     team | Real Madrid · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning&loc=home
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&away=0&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&away=0
 la-liga | Real Madrid away
     team | Real Madrid · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=la-liga&home=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning&loc=away
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&home=0&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&home=0
 la-liga | Real Madrid in the 90s
     team | Real Madrid · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=1999-12-31&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&from=1990-01-01&to=1999-12-31
 la-liga | Real Madrid between 1990 and 2000
     team | Real Madrid · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=2000-12-31&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&from=1990-01-01&to=2000-12-31
 la-liga | Real Madrid with 2 points for a win
     team | Real Madrid · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=la-liga&p3=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid
 la-liga | Real Madrid without deductions
     team | Real Madrid · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=la-liga&ded=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
@@ -1439,7 +1439,7 @@ la-liga | Real Madrid best record
     team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
 la-liga | Real Madrid goals
     team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=la-liga
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
@@ -1486,7 +1486,7 @@ serie-a | Highest scoring draws in Serie A
     match-finder | All clubs · Highest-scoring draws | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&cat=draws
 serie-a | AC Milan
     team | AC Milan · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
@@ -1509,7 +1509,7 @@ serie-a | AC Milan seasons
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
 serie-a | AC Milan relegated
     team | AC Milan · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
@@ -1542,21 +1542,21 @@ serie-a | AC Milan away record
     team | AC Milan · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=serie-a&home=0&t1=AC+Milan
 serie-a | AC Milan last 10 games
     team | AC Milan · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=serie-a&mhN=10&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan
 serie-a | AC Milan on a Sunday
     team | AC Milan · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=serie-a&day=0&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&day=0&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&day=0
 serie-a | AC Milan 2003-04
     team | AC Milan · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&season=2003-04&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan&season=2003-04
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&season=2003-04&cat=recent
@@ -1597,7 +1597,7 @@ serie-a | AC Milan 3-3 draws
     match-finder | AC Milan · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 serie-a | AC Milan penalty shootouts
     team | AC Milan · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&cat=recent
@@ -1616,42 +1616,42 @@ serie-a | AC Milan european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 serie-a | AC Milan at home
     team | AC Milan · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=serie-a&away=0&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning&loc=home
     match-finder | Last time AC Milan won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&away=0&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&away=0
 serie-a | AC Milan away
     team | AC Milan · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=serie-a&home=0&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning&loc=away
     match-finder | Last time AC Milan won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&home=0&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&home=0
 serie-a | AC Milan in the 90s
     team | AC Milan · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=1999-12-31&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&from=1990-01-01&to=1999-12-31
 serie-a | AC Milan between 1990 and 2000
     team | AC Milan · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=2000-12-31&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&from=1990-01-01&to=2000-12-31
 serie-a | AC Milan with 2 points for a win
     team | AC Milan · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=serie-a&p3=0&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan
 serie-a | AC Milan without deductions
     team | AC Milan · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=serie-a&ded=0&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
@@ -1708,7 +1708,7 @@ serie-a | AC Milan best record
     team | AC Milan · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=AC+Milan
 serie-a | AC Milan goals
     team | AC Milan · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
+    dashboard | AC Milan | Team overview | index.html?team=AC+Milan&lg=serie-a
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
@@ -1731,7 +1731,7 @@ bundesliga | Bundesliga table since 2010
     table | Bundesliga table · Since 2010 | League table | DomesticEurope.html?view=league-filters&lg=bundesliga&from=2010-01-01
 bundesliga | Bayer Leverkusen 2023-24
     team | Bayer Leverkusen · 2023-24 | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&season=2023-24&t1=Bayer+Leverkusen
-    dashboard | Bayer Leverkusen | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayer%20Leverkusen
+    dashboard | Bayer Leverkusen | Team overview | index.html?team=Bayer+Leverkusen&lg=bundesliga
     team-seasons | Bayer Leverkusen · Season-by-season finishes | Team Seasons · 2023-24 | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayer+Leverkusen&season=2023-24
     team-streaks | Bayer Leverkusen · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayer+Leverkusen&type=winning
     match-finder | Last time Bayer Leverkusen won | Match Finder · 2023-24 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayer+Leverkusen&res=win&season=2023-24&cat=recent
@@ -1758,7 +1758,7 @@ bundesliga | Biggest win in Bundesliga history
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga
 bundesliga | Bayern
     team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
@@ -1781,7 +1781,7 @@ bundesliga | Bayern seasons
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
 bundesliga | Bayern relegated
     team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
@@ -1814,21 +1814,21 @@ bundesliga | Bayern away record
     team | Bayern München · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=bundesliga&home=0&t1=Bayern+M%C3%BCnchen
 bundesliga | Bayern last 10 games
     team | Bayern München · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=bundesliga&mhN=10&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen
 bundesliga | Bayern on a Sunday
     team | Bayern München · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=bundesliga&day=0&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&day=0&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&day=0
 bundesliga | Bayern 2003-04
     team | Bayern München · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&season=2003-04&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen&season=2003-04
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&season=2003-04&cat=recent
@@ -1869,7 +1869,7 @@ bundesliga | Bayern 3-3 draws
     match-finder | Bayern München · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 bundesliga | Bayern penalty shootouts
     team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&cat=recent
@@ -1888,42 +1888,42 @@ bundesliga | Bayern european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 bundesliga | Bayern at home
     team | Bayern München · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=bundesliga&away=0&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning&loc=home
     match-finder | Last time Bayern München won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&away=0&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&away=0
 bundesliga | Bayern away
     team | Bayern München · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=bundesliga&home=0&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning&loc=away
     match-finder | Last time Bayern München won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&home=0&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&home=0
 bundesliga | Bayern in the 90s
     team | Bayern München · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&from=1990-01-01&to=1999-12-31&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&from=1990-01-01&to=1999-12-31
 bundesliga | Bayern between 1990 and 2000
     team | Bayern München · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&from=1990-01-01&to=2000-12-31&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&from=1990-01-01&to=2000-12-31
 bundesliga | Bayern with 2 points for a win
     team | Bayern München · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=bundesliga&p3=0&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen
 bundesliga | Bayern without deductions
     team | Bayern München · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=bundesliga&ded=0&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
@@ -1980,7 +1980,7 @@ bundesliga | Bayern best record
     team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
 bundesliga | Bayern goals
     team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    dashboard | Bayern München | Team overview | index.html?team=Bayern+M%C3%BCnchen&lg=bundesliga
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
@@ -2003,7 +2003,7 @@ ligue-1 | Ligue 1 1992-93
     team-seasons | Ligue 1 table · 1992-93 | Final standings | DomesticEurope.html?view=team-seasons&lg=ligue-1&season=1992-93
 ligue-1 | Lille 2010-11
     team | Lille OSC · 2010-11 | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&season=2010-11&t1=Lille+OSC
-    dashboard | Lille OSC | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Lille%20OSC
+    dashboard | Lille OSC | Team overview | index.html?team=Lille+OSC&lg=ligue-1
     team-seasons | Lille OSC · Season-by-season finishes | Team Seasons · 2010-11 | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Lille+OSC&season=2010-11
     team-streaks | Lille OSC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Lille+OSC&type=winning
     match-finder | Last time Lille OSC won | Match Finder · 2010-11 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Lille+OSC&res=win&season=2010-11&cat=recent
@@ -2030,7 +2030,7 @@ ligue-1 | Biggest win in Ligue 1 history
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1
 ligue-1 | PSG
     team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
@@ -2053,7 +2053,7 @@ ligue-1 | PSG seasons
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
 ligue-1 | PSG relegated
     team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
@@ -2086,21 +2086,21 @@ ligue-1 | PSG away record
     team | Paris Saint-Germain · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=ligue-1&home=0&t1=Paris+Saint-Germain
 ligue-1 | PSG last 10 games
     team | Paris Saint-Germain · All seasons | Record and match history · Last 10 | DomesticEurope.html?view=league-filters&lg=ligue-1&mhN=10&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · All seasons · Last 10 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain
 ligue-1 | PSG on a Sunday
     team | Paris Saint-Germain · All seasons | Record and match history · Sundays | DomesticEurope.html?view=league-filters&lg=ligue-1&day=0&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&day=0&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · All seasons · Sundays | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&day=0
 ligue-1 | PSG 2003-04
     team | Paris Saint-Germain · 2003-04 | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&season=2003-04&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · 2003-04 | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain&season=2003-04
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · 2003-04 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&season=2003-04&cat=recent
@@ -2141,7 +2141,7 @@ ligue-1 | PSG 3-3 draws
     match-finder | Paris Saint-Germain · 3-3 matches | Home score - away score · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 ligue-1 | PSG penalty shootouts
     team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&cat=recent
@@ -2160,42 +2160,42 @@ ligue-1 | PSG european cup
     message: Champions League isn't part of this search - pick it in the dropdown.
 ligue-1 | PSG at home
     team | Paris Saint-Germain · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=ligue-1&away=0&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning&loc=home
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&away=0&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&away=0
 ligue-1 | PSG away
     team | Paris Saint-Germain · All seasons | Record and match history · Away games | DomesticEurope.html?view=league-filters&lg=ligue-1&home=0&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning&loc=away
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&home=0&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · All seasons · Away games | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&home=0
 ligue-1 | PSG in the 90s
     team | Paris Saint-Germain · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&from=1990-01-01&to=1999-12-31&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&from=1990-01-01&to=1999-12-31
 ligue-1 | PSG between 1990 and 2000
     team | Paris Saint-Germain · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&from=1990-01-01&to=2000-12-31&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&from=1990-01-01&to=2000-12-31
 ligue-1 | PSG with 2 points for a win
     team | Paris Saint-Germain · All seasons | Record and match history · 2 points for a win | DomesticEurope.html?view=league-filters&lg=ligue-1&p3=0&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · All seasons · 2 points for a win | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain
 ligue-1 | PSG without deductions
     team | Paris Saint-Germain · All seasons | Record and match history · No deductions | DomesticEurope.html?view=league-filters&lg=ligue-1&ded=0&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons · No deductions | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
@@ -2252,7 +2252,7 @@ ligue-1 | PSG best record
     team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
 ligue-1 | PSG goals
     team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
+    dashboard | Paris Saint-Germain | Team overview | index.html?team=Paris+Saint-Germain&lg=ligue-1
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
@@ -2301,7 +2301,7 @@ champions-league | Biggest wins all-time
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league
 champions-league | Real Madrid
     team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
@@ -2324,7 +2324,7 @@ champions-league | Real Madrid seasons
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
 champions-league | Real Madrid relegated
     team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
@@ -2357,21 +2357,21 @@ champions-league | Real Madrid away record
     team | Real Madrid · All seasons | Record and match history · Away games | ContinentalEurope.html?view=league-filters&lg=champions-league&home=0&t1=Real+Madrid
 champions-league | Real Madrid last 10 games
     team | Real Madrid · All seasons | Record and match history · Last 10 | ContinentalEurope.html?view=league-filters&lg=champions-league&mhN=10&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Last 10 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Last 10 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid
 champions-league | Real Madrid on a Sunday
     team | Real Madrid · All seasons | Record and match history · Sundays | ContinentalEurope.html?view=league-filters&lg=champions-league&day=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Sundays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&day=0&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Sundays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&day=0
 champions-league | Real Madrid 2003-04
     team | Real Madrid · 2003-04 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=2003-04&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · 2003-04 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&season=2003-04
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · 2003-04 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&season=2003-04&cat=recent
@@ -2412,7 +2412,7 @@ champions-league | Real Madrid 3-3 draws
     match-finder | Real Madrid · 3-3 matches | Home score - away score · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 champions-league | Real Madrid penalty shootouts
     team | Real Madrid · All seasons | Record and match history · Penalty shootouts | ContinentalEurope.html?view=league-filters&lg=champions-league&mhPso=1&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Penalty shootouts | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&cat=recent&pso=1
@@ -2429,49 +2429,49 @@ champions-league | Real Madrid champions league titles
     team-seasons | Real Madrid · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&season=champions-league-era-1992-2026&pos=Champions
 champions-league | Real Madrid european cup
     team | Real Madrid · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&season=european-cup-era-1955-1992
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&season=european-cup-era-1955-1992&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&season=european-cup-era-1955-1992
 champions-league | Real Madrid at home
     team | Real Madrid · All seasons | Record and match history · Home games | ContinentalEurope.html?view=league-filters&lg=champions-league&away=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks · Home games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning&loc=home
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&away=0&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&away=0
 champions-league | Real Madrid away
     team | Real Madrid · All seasons | Record and match history · Away games | ContinentalEurope.html?view=league-filters&lg=champions-league&home=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks · Away games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning&loc=away
     match-finder | Last time Real Madrid won | Match Finder · All seasons · Away games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&home=0&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Away games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&home=0
 champions-league | Real Madrid in the 90s
     team | Real Madrid · In the 1990s | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=1999-12-31&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&from=1990-01-01&to=1999-12-31
 champions-league | Real Madrid between 1990 and 2000
     team | Real Madrid · Between 1990 and 2000 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=2000-12-31&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&from=1990-01-01&to=2000-12-31
 champions-league | Real Madrid with 2 points for a win
     team | Real Madrid · All seasons | Record and match history · 2 points for a win | ContinentalEurope.html?view=league-filters&lg=champions-league&p3=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · 2 points for a win | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · 2 points for a win | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid
 champions-league | Real Madrid without deductions
     team | Real Madrid · All seasons | Record and match history · No deductions | ContinentalEurope.html?view=league-filters&lg=champions-league&ded=0&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons · No deductions | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
@@ -2528,7 +2528,7 @@ champions-league | Real Madrid best record
     team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
 champions-league | Real Madrid goals
     team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    dashboard | Real Madrid | Team overview | index.html?team=Real+Madrid&lg=champions-league
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
@@ -2545,7 +2545,7 @@ champions-league | Real Madrid biggest home win
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&away=0
 champions-league | Liverpool
     team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
@@ -2568,7 +2568,7 @@ champions-league | Liverpool seasons
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
 champions-league | Liverpool relegated
     team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
@@ -2601,21 +2601,21 @@ champions-league | Liverpool away record
     team | Liverpool FC · All seasons | Record and match history · Away games | ContinentalEurope.html?view=league-filters&lg=champions-league&home=0&t1=Liverpool+FC
 champions-league | Liverpool last 10 games
     team | Liverpool FC · All seasons | Record and match history · Last 10 | ContinentalEurope.html?view=league-filters&lg=champions-league&mhN=10&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Last 10 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Last 10 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC
 champions-league | Liverpool on a Sunday
     team | Liverpool FC · All seasons | Record and match history · Sundays | ContinentalEurope.html?view=league-filters&lg=champions-league&day=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Sundays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&day=0&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Sundays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&day=0
 champions-league | Liverpool 2003-04
     team | Liverpool FC · 2003-04 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=2003-04&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · 2003-04 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&season=2003-04
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · 2003-04 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&season=2003-04&cat=recent
@@ -2626,7 +2626,7 @@ champions-league | Liverpool 3-3 draws
     match-finder | Liverpool FC · 3-3 matches | Home score - away score · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 champions-league | Liverpool penalty shootouts
     team | Liverpool FC · All seasons | Record and match history · Penalty shootouts | ContinentalEurope.html?view=league-filters&lg=champions-league&mhPso=1&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Penalty shootouts | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&cat=recent&pso=1
@@ -2643,49 +2643,49 @@ champions-league | Liverpool champions league titles
     team-seasons | Liverpool FC · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&season=champions-league-era-1992-2026&pos=Champions
 champions-league | Liverpool european cup
     team | Liverpool FC · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&season=european-cup-era-1955-1992
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&season=european-cup-era-1955-1992&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&season=european-cup-era-1955-1992
 champions-league | Liverpool at home
     team | Liverpool FC · All seasons | Record and match history · Home games | ContinentalEurope.html?view=league-filters&lg=champions-league&away=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks · Home games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning&loc=home
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&away=0&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&away=0
 champions-league | Liverpool away
     team | Liverpool FC · All seasons | Record and match history · Away games | ContinentalEurope.html?view=league-filters&lg=champions-league&home=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks · Away games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning&loc=away
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · Away games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&home=0&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Away games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&home=0
 champions-league | Liverpool in the 90s
     team | Liverpool FC · In the 1990s | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=1999-12-31&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&from=1990-01-01&to=1999-12-31
 champions-league | Liverpool between 1990 and 2000
     team | Liverpool FC · Between 1990 and 2000 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=2000-12-31&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&from=1990-01-01&to=2000-12-31
 champions-league | Liverpool with 2 points for a win
     team | Liverpool FC · All seasons | Record and match history · 2 points for a win | ContinentalEurope.html?view=league-filters&lg=champions-league&p3=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · 2 points for a win | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · 2 points for a win | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC
 champions-league | Liverpool without deductions
     team | Liverpool FC · All seasons | Record and match history · No deductions | ContinentalEurope.html?view=league-filters&lg=champions-league&ded=0&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons · No deductions | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
@@ -2726,7 +2726,7 @@ champions-league | Liverpool best record
     team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
 champions-league | Liverpool goals
     team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    dashboard | Liverpool FC | Team overview | index.html?team=Liverpool+FC&lg=champions-league
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
@@ -2741,7 +2741,7 @@ champions-league | Liverpool biggest home win
     match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&away=0
 champions-league | Celtic
     team | Celtic FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
@@ -2764,7 +2764,7 @@ champions-league | Celtic seasons
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
 champions-league | Celtic relegated
     team | Celtic FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
@@ -2797,21 +2797,21 @@ champions-league | Celtic away record
     team | Celtic FC · All seasons | Record and match history · Away games | ContinentalEurope.html?view=league-filters&lg=champions-league&home=0&t1=Celtic+FC
 champions-league | Celtic last 10 games
     team | Celtic FC · All seasons | Record and match history · Last 10 | ContinentalEurope.html?view=league-filters&lg=champions-league&mhN=10&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons · Last 10 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · All seasons · Last 10 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC
 champions-league | Celtic on a Sunday
     team | Celtic FC · All seasons | Record and match history · Sundays | ContinentalEurope.html?view=league-filters&lg=champions-league&day=0&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons · Sundays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&day=0&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · All seasons · Sundays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&day=0
 champions-league | Celtic 2003-04
     team | Celtic FC · 2003-04 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=2003-04&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · 2003-04 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC&season=2003-04
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · 2003-04 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&season=2003-04&cat=recent
@@ -2822,7 +2822,7 @@ champions-league | Celtic 3-3 draws
     match-finder | Celtic FC · 3-3 matches | Home score - away score · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&cat=scoreline&hsOp=exactly&hsVal=3&asOp=exactly&asVal=3
 champions-league | Celtic penalty shootouts
     team | Celtic FC · All seasons | Record and match history · Penalty shootouts | ContinentalEurope.html?view=league-filters&lg=champions-league&mhPso=1&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons · Penalty shootouts | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&cat=recent&pso=1
@@ -2839,49 +2839,49 @@ champions-league | Celtic champions league titles
     team-seasons | Celtic FC · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC&season=champions-league-era-1992-2026&pos=Champions
 champions-league | Celtic european cup
     team | Celtic FC · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC&season=european-cup-era-1955-1992
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&season=european-cup-era-1955-1992&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&season=european-cup-era-1955-1992
 champions-league | Celtic at home
     team | Celtic FC · All seasons | Record and match history · Home games | ContinentalEurope.html?view=league-filters&lg=champions-league&away=0&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks · Home games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning&loc=home
     match-finder | Last time Celtic FC won | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&away=0&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&away=0
 champions-league | Celtic away
     team | Celtic FC · All seasons | Record and match history · Away games | ContinentalEurope.html?view=league-filters&lg=champions-league&home=0&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks · Away games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning&loc=away
     match-finder | Last time Celtic FC won | Match Finder · All seasons · Away games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&home=0&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · All seasons · Away games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&home=0
 champions-league | Celtic in the 90s
     team | Celtic FC · In the 1990s | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=1999-12-31&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&from=1990-01-01&to=1999-12-31
 champions-league | Celtic between 1990 and 2000
     team | Celtic FC · Between 1990 and 2000 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=2000-12-31&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&from=1990-01-01&to=2000-12-31
 champions-league | Celtic with 2 points for a win
     team | Celtic FC · All seasons | Record and match history · 2 points for a win | ContinentalEurope.html?view=league-filters&lg=champions-league&p3=0&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons · 2 points for a win | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · All seasons · 2 points for a win | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC
 champions-league | Celtic without deductions
     team | Celtic FC · All seasons | Record and match history · No deductions | ContinentalEurope.html?view=league-filters&lg=champions-league&ded=0&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons · No deductions | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
@@ -2922,7 +2922,7 @@ champions-league | Celtic best record
     team | Celtic FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Celtic+FC
 champions-league | Celtic goals
     team | Celtic FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
+    dashboard | Celtic FC | Team overview | index.html?team=Celtic+FC&lg=champions-league
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
@@ -2997,21 +2997,21 @@ champions-league | an away run
     team-streaks | All teams · Winning streaks | Active streaks · Away games | ContinentalEurope.html?view=team-streaks&lg=champions-league&type=winning&loc=away
 domestic | Arsenal penalty shootouts
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
 premier-league | Arsenal penalty shootouts
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=premier-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
 champions-league | Arsenal penalty shootouts
     team | Arsenal FC · All seasons | Record and match history · Penalty shootouts | ContinentalEurope.html?view=league-filters&lg=champions-league&mhPso=1&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | ContinentalEurope.html?team=Arsenal%20FC
+    dashboard | Arsenal FC | Team overview | index.html?team=Arsenal+FC&lg=champions-league
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Arsenal+FC
     team-streaks | Arsenal FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · All seasons · Penalty shootouts | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Arsenal+FC&cat=recent&pso=1
@@ -3306,21 +3306,21 @@ champions-league | league::teamName
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 domestic | level with Manchester United
     team | Manchester United · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Manchester+United
-    dashboard | Manchester United | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Manchester%20United
+    dashboard | Manchester United | Team overview | index.html?team=Manchester+United&lg=premier-league
     team-seasons | Manchester United · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Manchester+United
     team-streaks | Manchester United · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Manchester+United&type=winning
     match-finder | Last time Manchester United won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Manchester+United&res=win&cat=recent
     match-finder | Manchester United · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Manchester+United
 premier-league | level with Manchester United
     team | Manchester United · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Manchester+United
-    dashboard | Manchester United | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Manchester%20United
+    dashboard | Manchester United | Team overview | index.html?team=Manchester+United&lg=premier-league
     team-seasons | Manchester United · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Manchester+United
     team-streaks | Manchester United · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Manchester+United&type=winning
     match-finder | Last time Manchester United won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Manchester+United&res=win&cat=recent
     match-finder | Manchester United · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Manchester+United
 champions-league | level with Manchester United
     team | Manchester United · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Manchester+United
-    dashboard | Manchester United | Team Dashboard (full page) | ContinentalEurope.html?team=Manchester%20United
+    dashboard | Manchester United | Team overview | index.html?team=Manchester+United&lg=champions-league
     team-seasons | Manchester United · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Manchester+United
     team-streaks | Manchester United · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Manchester+United&type=winning
     match-finder | Last time Manchester United won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Manchester+United&res=win&cat=recent
@@ -3409,7 +3409,7 @@ champions-league | No Team
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 domestic | not yet merged to main
     team | 1. FSV Mainz 05 · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=1.+FSV+Mainz+05
-    dashboard | 1. FSV Mainz 05 | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=1.%20FSV%20Mainz%2005
+    dashboard | 1. FSV Mainz 05 | Team overview | index.html?team=1.+FSV+Mainz+05&lg=bundesliga
     team-seasons | 1. FSV Mainz 05 · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=1.+FSV+Mainz+05
     team-streaks | 1. FSV Mainz 05 · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=1.+FSV+Mainz+05&type=winning
     match-finder | Last time 1. FSV Mainz 05 won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=1.+FSV+Mainz+05&res=win&cat=recent
@@ -3509,12 +3509,12 @@ champions-league | Scoreline:
 domestic | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
     team | Valencia CF · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=Valencia+CF
     team | Valenciennes FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=ligue-1&away=0&t1=Valenciennes+FC
-    dashboard | Valencia CF | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Valencia%20CF
+    dashboard | Valencia CF | Team overview | index.html?team=Valencia+CF&lg=la-liga
     team-seasons | Valencia CF · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Valencia+CF
     team-streaks | Valencia CF · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Valencia+CF&type=winning&loc=home
     match-finder | Last time Valencia CF won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Valencia+CF&res=win&away=0&cat=recent
     match-finder | Valencia CF · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Valencia+CF&away=0
-    dashboard | Valenciennes FC | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Valenciennes%20FC
+    dashboard | Valenciennes FC | Team overview | index.html?team=Valenciennes+FC&lg=ligue-1
     team-seasons | Valenciennes FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Valenciennes+FC
     team-streaks | Valenciennes FC · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Valenciennes+FC&type=winning&loc=home
 premier-league | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
@@ -3524,12 +3524,12 @@ champions-league | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
     team | Valletta FC · All seasons | Record and match history · Home games | ContinentalEurope.html?view=league-filters&lg=champions-league&away=0&t1=Valletta+FC
     team | Valmiera FC · All seasons | Record and match history · Home games | ContinentalEurope.html?view=league-filters&lg=champions-league&away=0&t1=Valmiera+FC
     team | Vålerenga IF · All seasons | Record and match history · Home games | ContinentalEurope.html?view=league-filters&lg=champions-league&away=0&t1=V%C3%A5lerenga+IF
-    dashboard | Valencia CF | Team Dashboard (full page) | ContinentalEurope.html?team=Valencia%20CF
+    dashboard | Valencia CF | Team overview | index.html?team=Valencia+CF&lg=champions-league
     team-seasons | Valencia CF · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Valencia+CF
     team-streaks | Valencia CF · Winning streaks | Active streaks · Home games | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Valencia+CF&type=winning&loc=home
     match-finder | Last time Valencia CF won | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Valencia+CF&res=win&away=0&cat=recent
     match-finder | Valencia CF · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Valencia+CF&away=0
-    dashboard | Valletta FC | Team Dashboard (full page) | ContinentalEurope.html?team=Valletta%20FC
+    dashboard | Valletta FC | Team overview | index.html?team=Valletta+FC&lg=champions-league
 domestic | search every league for champions-league
     message: Champions League isn't part of this search - pick it in the dropdown.
 premier-league | search every league for champions-league
@@ -3684,7 +3684,7 @@ premier-league | Viking FC
     message: No results for Viking FC in Premier League.
 champions-league | Viking FC
     team | Viking FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Viking+FC
-    dashboard | Viking FC | Team Dashboard (full page) | ContinentalEurope.html?team=Viking%20FC
+    dashboard | Viking FC | Team overview | index.html?team=Viking+FC&lg=champions-league
     team-seasons | Viking FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Viking+FC
     team-streaks | Viking FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Viking+FC&type=winning
     match-finder | Last time Viking FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Viking+FC&res=win&cat=recent
@@ -3695,7 +3695,7 @@ premier-league | Viking FK
     message: No results for Viking FK in Premier League.
 champions-league | Viking FK
     team | Viking FK · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Viking+FK
-    dashboard | Viking FK | Team Dashboard (full page) | ContinentalEurope.html?team=Viking%20FK
+    dashboard | Viking FK | Team overview | index.html?team=Viking+FK&lg=champions-league
     team-seasons | Viking FK · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Viking+FK
     team-streaks | Viking FK · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Viking+FK&type=winning
     match-finder | Last time Viking FK won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Viking+FK&res=win&cat=recent
