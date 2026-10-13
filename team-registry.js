@@ -652,7 +652,7 @@ function getTeamColors() {
             ['FBK Kaunas', '#0BB363', 588, 'Lithuania'],
             ['F91 Dudelange', '#F2D21D', 12922, 'Luxembourg'],
             ['Pyunik FC', '#A50034', 12923, 'Armenia'],
-            ['Hapoel Be\'er Sheva', '#FF0000', 1184, 'Israel'],
+            ['Hapoel Be\'er Sheva', '#FF0000', 17757, 'Israel'],
             ['Lincoln Red Imps', '#FF0000', 39614, 'Gibraltar'],
             ['FCI Levadia', '#006600', 1204, 'Estonia'],
             ['Neftchi Baku PFK', '#CC9933', 1348, 'Azerbaijan'],

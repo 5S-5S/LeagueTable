@@ -2341,7 +2341,7 @@
                     ['FBK Kaunas', '#0BB363', 588, 'Lithuania'],
                     ['F91 Dudelange', '#F2D21D', 12922, 'Luxembourg'],
                     ['Pyunik FC', '#A50034', 12923, 'Armenia'],
-                    ['Hapoel Be\'er Sheva', '#FF0000', 1184, 'Israel'],
+                    ['Hapoel Be\'er Sheva', '#FF0000', 17757, 'Israel'],
                     ['Lincoln Red Imps', '#FF0000', 39614, 'Gibraltar'],
                     ['FCI Levadia', '#006600', 1204, 'Estonia'],
                     ['Neftchi Baku PFK', '#CC9933', 1348, 'Azerbaijan'],
@@ -3040,7 +3040,10 @@
                 }
                 const stage = params.get('stage');
                 if (stage) {
-                    elements.competitionStageSelect.value = stage;
+                    // Search writes stages as the data does ("Round Of 16");
+                    // the dropdown's values are "Round of 16"
+                    const option = [...elements.competitionStageSelect.options].find(o => o.value.toLowerCase() === stage.toLowerCase());
+                    elements.competitionStageSelect.value = option ? option.value : stage;
                     elements.competitionStageSelect.dispatchEvent(new Event('change'));
                 }
                 if (params.get('exQ') === '1' && !state.excludeQualifiers) {
@@ -3649,12 +3652,17 @@
         // Update Team Streaks team dropdowns
         function updateTeamStreaksSelects() {
             const leagueTeams = getLeagueTeams(state.selectedLeague);
+            // A rebuild (a roster arriving) keeps Team 1 when it's still a
+            // choice - a shared link may have just set it
+            const keep = elements.teamStreaksTeam1Select.value;
+            const kept = keep && leagueTeams.includes(keep) ? keep : '';
 
             const teamOptions = ['<option value="">Select Team</option>']
                 .concat(leagueTeams.map(team => `<option value="${team}">${team}</option>`))
                 .join('');
 
             elements.teamStreaksTeam1Select.innerHTML = teamOptions;
+            elements.teamStreaksTeam1Select.value = kept;
 
             // Keep the visible Combobox widgets in sync - they're a separate
             // rendering layer from the native <select>s above (which exist
@@ -3670,6 +3678,7 @@
                     { value: '', text: 'Select Team 1' },
                     ...leagueTeams.map(team => ({ value: team, text: team }))
                 ]);
+                if (kept) teamStreaksTeam1Combobox.setValue(kept, kept);
             }
             refreshTeam2CountryOptions();
         }
@@ -7144,9 +7153,12 @@
                         <option value="Preliminary Round (Q)">Preliminary Round (Q)</option>
                     </optgroup>
                 `;
-                // If currently set to "All", change to default for individual seasons
+                // If currently set to "All", change to default for individual seasons:
+                // the group/league stage from 1991-92 (when the Champions League
+                // first had one), else the knock-out rounds
                 if (state.competitionStage === '') {
-                    state.competitionStage = state.excludeMainStage ? 'Qualifiers' : 'group-stage';
+                    const hadGroups = parseInt(state.selectedSeason, 10) >= 1991;
+                    state.competitionStage = state.excludeMainStage ? 'Qualifiers' : (hadGroups ? 'group-stage' : 'knockout-stage');
                     elements.competitionStageSelect.value = state.competitionStage;
                 }
             }

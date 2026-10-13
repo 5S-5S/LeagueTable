@@ -55,6 +55,8 @@ empty search box.
 30. Phone-width checks in npm run check
 31. Team-colour contrast
 32. Sitemap + Google Search Console
+33. Club names that differ from worldfootball.net
+34. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -125,6 +127,24 @@ empty search box.
   Where the data comes from, how often it updates, and that club names
   and crests belong to their owners. A privacy note too if analytics
   ever uses cookies. Do it closer to publication, with the crests.
+  - How results are counted (the rules decided 2026-10-13, TODO.md item
+    34, and EuropaLeagueTODO.md on the europa-league branch), so visitors know why a record can differ
+    from another site's:
+    - Awarded results use the awarded score (e.g. Marseille 3-0 Milan
+      1991, abandoned with Milan off the pitch).
+    - A walkover leg counts 0-3 when the other leg was played (Derry City
+      v Anderlecht 1965). Ties where neither leg was played are left out.
+    - Voided and replayed matches count only the replay (Lokomotiv v
+      Tirol 2001).
+    - Expulsions keep the results as played, though the other side went
+      through.
+    - Finals at neutral grounds: one side is listed as home.
+    - Penalty shootouts are shown as a note, not in the score.
+    - Clubs appear under one name for their whole history.
+    - Europa League (when added): from the 1971-72 UEFA Cup, without the
+      Inter-Cities Fairs Cup.
+    - Sources: UEFA's match data and RSSSF for checking. Name the
+      sources the site actually credits.
   - Crests, as discussed 2026-10-07 (general picture, not legal advice):
     a disclaimer helps but doesn't grant the right to use them - crests
     are trademarks, often copyrighted artwork. It shows the site isn't
@@ -309,6 +329,20 @@ empty search box.
   ALIAS_ERAS, ERA_NAMES, ERA_TITLE_NOTES, LEAGUE_ERAS and ERA_SWITCHES in
   search.js ("Did you mean the Europa League only?" / "the UEFA Cup and
   Europa League together?"), plus the page's era seasons.
+  **Europa League: built, then shelved 2026-10-13.** No free source gives its
+  fixtures and results automatically. That rules out football-data.org (paid
+  only), TheSportsDB's free key, openfootball, Zafronix, API-Football's free
+  plan (seasons 2022-24 only) and UEFA (its terms forbid scripted
+  collection). Without automated updates it can't meet the site's
+  requirement of replicable, consistent, automated data. The work is on the
+  `europa-league` branch:
+  - pages, search, crests and colours, and checks
+  - the plan, sources and decisions in its `EuropaLeagueTODO.md`
+  - the match history (1971-72 to 2026-27 matchday 1, from Wikipedia,
+    checked against RSSSF), in D1 as div `E1` (unused by the site) and in
+    two secret gists
+
+  Resume if an automated source turns up.
 
 - Maybe: **"Won on penalties" in Match Finder** — split from Match Finder
   upgrades 2026-10-07. A shootout game is a draw at full time, so Match
@@ -365,6 +399,79 @@ empty search box.
 - Maybe: **Team progression chart** — a line chart (points or league
   position per season) on the Team Dashboard for Domestic and Continental,
   possibly with a second team overlaid for comparison.
+
+- Later: **Club names that differ from worldfootball.net** — noted
+  2026-10-13 while building the Europa League club list. worldfootball's
+  all-time Europa League tables are the names we want, but 18 clubs
+  already in our Champions League data are spelled differently there.
+  For now the Europa League keeps our C1 names (decided 2026-10-13); look
+  at whether to rename them everywhere (C1 gist, D1, the pages' team
+  lists, team-registry.js, search). Ours -> worldfootball:
+  1. FC Nürnberg -> 1. FC Nuremberg; 1899 Hoffenheim -> TSG Hoffenheim;
+  Bayern München -> Bayern Munich; DWS Amsterdam -> AFC DWS; Deportivo
+  La Coruña -> Deportivo A Coruña; Dinamo Kiev -> Dynamo Kyiv; FC
+  København -> FC Copenhagen; FC Steaua Bucureşti -> FCSB; Girondins
+  Bordeaux -> Girondins de Bordeaux; Inter Club d'Escaldes -> Inter Club
+  d’Escaldes (curly apostrophe only); Lokomotiv Moskva -> Lokomotiv Moscow;
+  Olympique Marseille -> Olympique de Marseille; Panathinaikos ->
+  Panathinaikos A.O.; RC Strasbourg -> Racing Strasbourg; TSV 1860
+  München -> 1860 Munich; Zbrojovka Brno -> FC Zbrojovka Brno; sc
+  Heerenveen -> Sc Heerenveen; ÍBV Vestmannaeyjar -> ÍB Vestmannaeyjar.
+  Three domestic-only clubs too: Sassuolo Calcio -> US Sassuolo, AC
+  Perugia -> AC Perugia Calcio, ESTAC Troyes -> ES Troyes AC.
+  Checked against worldfootball's Champions League all-time tables too
+  (saved copies: ~/Downloads/Champions.html, ChampionsQual.html): the same
+  18, plus Araks Ararat -> Avshar Ararat and FC Maxline Vitebsk -> FK
+  Maxline Vitebsk. All 20 have identical records on both sides, so it's
+  only the spelling. Universitatea Craiova is a split, not a spelling:
+  worldfootball has FC Universitatea Craiova (the original club, 12 C1
+  matches 1974-1991, 50 in the Europa League) and CS Universitatea Craiova
+  (from 2017; 4 C1 matches in 2026, 15 in the Europa League). Our C1 data
+  calls all 16 CS Universitatea Craiova. The Europa League follows
+  whatever is decided here.
+  Related bug found at the same time: Hapoel Be'er Sheva's crest number
+  in the team lists was 1184, which is Landskrona BoIS's. worldfootball has
+  Hapoel Be'er Sheva as 17757. Fixed 2026-10-13 in every copy of the team
+  list (both Continental pages, team-registry.js, search.js).
+
+- Soon: **Champions League data fixes** — found 2026-10-13 by checking
+  every C1 match against UEFA's own match data (match.uefa.com), with
+  RSSSF (rsssf.org/ec) to settle disagreements. 8,886 of 8,910 matches
+  agree exactly. Confirmed mistakes in ours:
+  1. 1967-11-29 Real Madrid 3-1 Hvidovre IF -> 4-1 (UEFA, RSSSF).
+  2. 2026-08-11 Olympique Lyonnais 2-0 Sparta Prague -> 3-0 (UEFA,
+     Flashscore; 4-2 on aggregate). In clqualifiers.csv.
+  3. 1974-03-20 Újpest FC v Spartak Trnava `pso 3:4` -> `pso 4:3`. Újpest
+     won the shootout and went through (UEFA).
+  4. 2009-07-07 UE Sant Julià v SP Tre Fiori `pso 6:5` -> `pso 5:4` (UEFA,
+     RSSSF). In clqualifiers.csv.
+  5. 1973-09-20 FC Basel 1893 6-2 Fram Reykjavík -> Fram Reykjavík 2-6 FC
+     Basel 1893. It was Fram's home leg, played in Olten (RSSSF).
+  6. Dates (UEFA and RSSSF agree): 1996-11-28 -> 1996-11-20 (Fenerbahçe v
+     Rapid Vienna, Manchester United v Juventus, Rosenborg v IFK Göteborg);
+     1996-03-05 -> 1996-03-06 (all four quarter-final first legs);
+     2000-05-02 -> 05-03 and 2000-05-10 -> 05-09 (Real Madrid v Bayern).
+  7. 50 more date differences, mostly 1950s-80s and mostly 1 day; RSSSF
+     has no dates for those seasons. Where RSSSF does have dates, UEFA has
+     been right every time.
+  Not mistakes: finals at neutral grounds where UEFA lists the other side
+  as home; awarded results (ours already uses them, e.g. Marseille 3-0
+  Milan 1991, Roma 0-3 Dynamo Kyiv 2004); expulsions where the scores
+  stand (Dinamo Tbilisi 1993, Dinamo Kyiv 1995, Metalist 2013); voided
+  and replayed matches (ours already leaves out Lokomotiv v Tirol, Aug 22
+  2001, and keeps the replay).
+  Walkovers (decided 2026-10-13): a leg that wasn't played counts 0-3,
+  as Derry City 0-3 RSC Anderlecht 1965 already did; added Linfield FC 0-3
+  1. FC Frankfurt (Oder), 1961-09-28. Ties where neither leg was played
+  (15 from 1958-86, e.g. Beşiktaş v Olympiacos 1958, the 1968 Warsaw Pact
+  withdrawals) are left out - no rows (decided 2026-10-13).
+  Dates (decided 2026-10-13): UEFA's, for all 63.
+  Status 2026-10-13: both gists fixed (championsleague.csv, clqualifiers.csv;
+  generated by the scratchpad c1_fix.py). D1 updated 2026-10-13 (fix-c1.sh,
+  run by the user; caches bumped); the live API now matches the gists
+  exactly, all 8,911 C1 matches. Only the expected differences from UEFA
+  remain (awarded results, walkovers, Basel v Fram home side per RSSSF,
+  UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
 
