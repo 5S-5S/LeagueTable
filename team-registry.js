@@ -155,7 +155,8 @@ function getTeamColors() {
             ['AC Carpi', '#DE1616', 17647, 'Italy'],
             ['AC Ancona', '#FB090B', 13742, 'Italy'],
             ['US Pistoiese', '#BD6615', 17651, 'Italy'],
-            ['ACD Treviso', '#D4EFFC', 1932, 'Italy']
+            ['ACD Treviso', '#D4EFFC', 1932, 'Italy'],
+            ['Novese', '#000000', 21471]
         ],
         
         // La Liga
@@ -282,7 +283,12 @@ function getTeamColors() {
             ['Holstein Kiel', '#0F5787', 995, 'Germany'],
             ['Blau-Weiß 90 Berlin', '#1709DB', 18101, 'Germany'],
             ['1. FC Lok Leipzig', '#1F357F', 13031, 'Germany'],
-            ['SV Tasmania Berlin', '#0000FF', 17842, 'Germany']
+            ['SV Tasmania Berlin', '#0000FF', 17842, 'Germany'],
+            ['SV Elversberg', '#000000', 13214],
+            ['Dresdner SC', '#000000', 17856],
+            ['Viktoria Berlin', '#000000', 31115],
+            ['Freiburger FC', '#000000', 17501],
+            ['Karlsruher FV', '#000000', 18750]
         ],
         
         // Ligue 1
