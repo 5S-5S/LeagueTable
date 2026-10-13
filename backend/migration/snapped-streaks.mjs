@@ -1,12 +1,14 @@
 // Rebuilds the home page's snapped streaks list (the "Streaks snapped"
 // card, snapped.js): every significant streak that ended in the last 365
-// days, worked out from each competition's full match history by
-// findSnappedStreaks() (snapped-lib.mjs), stored as one JSON value in the
+// days - and the "On the line" view, the significant streaks still going
+// that a match in the next 7 days could end - worked out from each
+// competition's full match history and /api/upcoming's fixtures by
+// findStreaks() (snapped-lib.mjs), stored as one JSON value in the
 // Worker's KV namespace under 'snapped-streaks', which /api/snapped-streaks
 // serves as-is.
 //
-// Run by .github/workflows/snapped-streaks.yml after each daily D1 sync
-// and after the Worker records live results. The whole history is needed
+// Run by .github/workflows/snapped-streaks.yml after each daily D1 sync,
+// after each fixtures refresh and after the Worker records live results. The whole history is needed
 // for the significance bars (how a run compares with every run of its kind
 // since 1995), which is far past a Worker's CPU limit - hence a job.
 //
@@ -23,11 +25,16 @@
 // token sync.mjs uses for the cache-version key).
 
 import fs from 'node:fs';
-import { findSnappedStreaks } from './snapped-lib.mjs';
+import { findStreaks } from './snapped-lib.mjs';
 
 const API_BASE = 'https://leaguetable-api.league-table-api.workers.dev';
 const DIVS = ['E0', 'SP1', 'I1', 'D1', 'F1', 'C1'];
 const WINDOW_DAYS = 365;
+// On the line: fixtures kicking off in the next 7 days, and ones that
+// kicked off in the last 6 hours with no result yet (in play - the card
+// says so until the live result reruns this)
+const AHEAD_DAYS = 7;
+const IN_PLAY_HOURS = 6;
 // Same namespace as sync.mjs's CACHE_KV_NAMESPACE_ID (not a secret)
 const CACHE_KV_NAMESPACE_ID = 'b2fa8b93e59540749923768aaf1fc08d';
 const KV_KEY = 'snapped-streaks';
@@ -49,6 +56,17 @@ async function fetchDivision(div) {
             await new Promise(r => setTimeout(r, 5000 * attempt));
         }
     }
+}
+
+async function fetchFixtures(now) {
+    const res = await fetch(`${API_BASE}/api/upcoming`);
+    if (!res.ok) throw new Error(`Fetching fixtures failed: ${res.status} ${res.statusText}`);
+    const earliest = now - IN_PLAY_HOURS * 3600 * 1000;
+    const latest = now + AHEAD_DAYS * 24 * 3600 * 1000;
+    return (await res.json()).fixtures.filter(f => {
+        const kickoff = new Date(f.utcDate).getTime();
+        return kickoff >= earliest && kickoff <= latest;
+    });
 }
 
 async function writeToKv(body) {
@@ -79,8 +97,11 @@ async function main() {
         console.log(`${div}: ${matchesByDiv[div].length} matches, latest ${matchesByDiv[div].at(-1)?.date}`);
     }
 
+    const fixtures = await fetchFixtures(argValue('--to') ? new Date(`${to}T12:00:00Z`).getTime() : Date.now());
+    console.log(`${fixtures.length} fixtures on the line`);
+
     const started = Date.now();
-    const streaks = findSnappedStreaks(matchesByDiv, { from, to });
+    const { snapped: streaks, onTheLine } = findStreaks(matchesByDiv, { from, to, fixtures });
     console.log(`${streaks.length} snapped streaks from ${from} to ${to} (${((Date.now() - started) / 1000).toFixed(1)}s)`);
     const byDiv = {};
     for (const s of streaks) byDiv[s.div] = (byDiv[s.div] || 0) + 1;
@@ -89,7 +110,12 @@ async function main() {
         console.log(`  ${s.end} ${s.div} ${s.team}${s.opp ? ` v ${s.opp}` : ''} ${s.type}/${s.loc} ${s.count}`);
     }
 
-    const body = JSON.stringify({ generatedAt: new Date().toISOString(), from, to, streaks });
+    console.log(`${onTheLine.length} streaks on the line`);
+    for (const s of onTheLine.slice(0, 5)) {
+        console.log(`  ${s.fixture.utcDate} ${s.div} ${s.team}${s.opp ? ` v ${s.opp}` : ''} ${s.type}/${s.loc} ${s.count} (${s.source})`);
+    }
+
+    const body = JSON.stringify({ generatedAt: new Date().toISOString(), from, to, streaks, onTheLine });
     const out = argValue('--out');
     if (out) fs.writeFileSync(out, body);
     if (dryRun) {

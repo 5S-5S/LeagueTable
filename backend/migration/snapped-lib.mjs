@@ -1,7 +1,9 @@
 // Snapped streaks: every statistically significant streak that ended in a
-// date window, for the home page's "Streaks snapped" card (snapped.js).
-// Pure - takes each division's matches, returns the list - so it can be
-// run against any data (snapped-streaks.mjs reads the live API).
+// date window, for the home page's "Streaks snapped" card (snapped.js) -
+// and the ones still going that an upcoming fixture puts on the line.
+// Pure - takes each division's matches (and the fixtures), returns the
+// lists - so it can be run against any data (snapped-streaks.mjs reads the
+// live API).
 //
 // A streak is the sport pages' own: one club's consecutive matches within
 // one competition that fit a type (checkStreakContinuation() in
@@ -27,6 +29,18 @@
 //     - "first win against Liverpool in 10".
 // Each club appears once per match (its strongest run), and so does each
 // head-to-head meeting.
+//
+// Streaks on the line (the card's other view): runs still going after a
+// club's latest match that one of its upcoming fixtures could extend or
+// end - a home run only by a home fixture, a head-to-head run only by a
+// fixture against that opponent, and only the next such fixture. They're
+// judged by the same bars as if they ended at that fixture. Also listed: a
+// run level with the club's record for its kind, if one more would pass
+// the league-wide bars as a new club record ("near-record"). Scoring and
+// conceding runs (SCORE_TYPES) have a higher bar on the line - long ones
+// are common, and "conceded in 14 in a row" is less of a reason to watch:
+// only a club record or the league's top 0.5%, never "rare for the club"
+// or near-record (picked on 2026-10-12; they were two thirds of the list).
 
 export const STREAK_TYPES = {
     'winning': (result) => result === 'win',
@@ -42,6 +56,7 @@ export const STREAK_TYPES = {
 
 const LOCATIONS = ['all', 'home', 'away'];
 const RESULT_TYPES = new Set(['winning', 'unbeaten', 'winless', 'losing']);
+const SCORE_TYPES = new Set(['scoring', 'goals-conceded']);
 
 // Clubs whose head-to-head result runs get the looser bar: a run against
 // them is news because of who they are. Names as the data spells them.
@@ -78,8 +93,9 @@ function countBelow(sorted, value) {
 
 // Every run in one list of a club's matches (oldest first), for every type.
 // onRun(type, firstIndex, count, endIndex) - endIndex is the match that
-// snapped it; runs still going at the end of the list are not reported.
-function forEachSnappedRun(list, team, onRun) {
+// snapped it. onOpen(type, firstIndex, count) - the run still going at the
+// end of the list, if any, after that type's snapped runs.
+function forEachRun(list, team, onRun, onOpen = null) {
     for (const [type, fits] of Object.entries(STREAK_TYPES)) {
         let first = -1;
         for (let i = 0; i < list.length; i++) {
@@ -95,6 +111,7 @@ function forEachSnappedRun(list, team, onRun) {
             if (first >= 0) onRun(type, first, i - first, i);
             first = -1;
         }
+        if (first >= 0 && onOpen) onOpen(type, first, list.length - first);
     }
 }
 
@@ -103,12 +120,71 @@ function atLocation(list, team, loc) {
     return list.filter(m => (loc === 'home') === (m.homeTeam === team));
 }
 
+// Which bar a run passes (null: none) - see the top of the file. c needs
+// kind, div, opp, type, count, pct and (club) longestSince, ownRuns,
+// ownPct; end is the date it's judged on.
+function sourceOf(c, end) {
+    if (c.kind === 'club') {
+        const yearsSince = c.longestSince ? (new Date(end) - new Date(c.longestSince)) / YEAR_MS : Infinity;
+        if (c.pct >= 0.995 || (yearsSince >= 10 && c.pct >= 0.95 && c.count >= 6)) return 'league';
+        if (c.ownRuns >= 40 && c.ownPct >= 0.98 && c.count >= 5) return 'club';
+        return null;
+    }
+    if (c.pct >= 0.99 && c.count >= 6) return 'league';
+    if (c.div !== 'C1' && BIG_CLUBS.has(c.opp) && RESULT_TYPES.has(c.type) && c.pct >= 0.97 && c.count >= 5) return 'big-opponent';
+    return null;
+}
+
+// The club's past runs of one kind against a run of `count` judged on
+// `end`: the latest at least as long, and where it falls among the ones
+// that ended in the 20 years before
+function clubHistory(past, count, end) {
+    let longestSince = null;
+    for (const r of past) if (r.count >= count && (!longestSince || r.end > longestSince)) longestSince = r.end;
+    const twentyYearsBefore = `${Number(end.slice(0, 4)) - 20}${end.slice(4)}`;
+    const own = past.filter(r => r.end >= twentyYearsBefore).map(r => r.count).sort((x, y) => x - y);
+    return { longestSince, ownRuns: own.length, ownPct: own.length ? countBelow(own, count) / own.length : 0 };
+}
+
+// One per club per match, one per head-to-head meeting: the league-wide
+// bars first, then the rarest, then the longest. matchKey names the match
+// (the date that snapped it, or the fixture on the line).
+function bestPerMatch(picked, matchKey) {
+    const best = new Map();
+    const rank = s => (s.source === 'league' ? 1 : 0);
+    for (const s of picked) {
+        const key = s.kind === 'club'
+            ? `club|${s.div}|${s.team}|${matchKey(s)}`
+            : `h2h|${s.div}|${matchKey(s)}|${[s.team, s.opp].sort().join('|')}`;
+        const b = best.get(key);
+        if (!b || rank(s) > rank(b) || (rank(s) === rank(b) && (s.pct > b.pct || (s.pct === b.pct && s.count > b.count)))) best.set(key, s);
+    }
+    return [...best.values()];
+}
+
+// Breaks of more than a summer (or two, head-to-head home/away) between
+// a run's matches
+function gapsIn(s, matches) {
+    const dates = matches.map(m => m.date);
+    const limit = s.kind === 'club' ? GAP_DAYS.club : s.loc === 'all' ? GAP_DAYS.h2hAll : GAP_DAYS.h2hVenue;
+    const gaps = [];
+    for (let i = 1; i < dates.length; i++) {
+        if (daysBetween(dates[i - 1], dates[i]) > limit) gaps.push({ from: dates[i - 1], to: dates[i] });
+    }
+    return gaps;
+}
+
 // matchesByDiv: { E0: [{ date, homeTeam, awayTeam, homeGoals, awayGoals, competitionPhase }], ... }
-// Returns the significant runs snapped between from and to (ISO dates,
-// inclusive), newest first.
-export function findSnappedStreaks(matchesByDiv, { from, to }) {
+// fixtures: upcoming matches ([{ matchId, div, utcDate, homeTeam, awayTeam,
+// competitionPhase }], /api/upcoming's) - the ones already in the results
+// are skipped, so a list a day old is fine.
+// Returns { snapped: the significant runs snapped between from and to (ISO
+// dates, inclusive), newest first; onTheLine: the significant runs still
+// going that a fixture could end, soonest kickoff first }.
+export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
     const groups = new Map();   // `${kind}|${div}|${type}|${loc}` -> run lengths since 1995
     const candidates = [];      // runs that snapped inside the window
+    const open = [];            // runs still going, with the fixture on the line
 
     const addToGroup = (key, count, endDate) => {
         if (endDate < ERA_START) return;
@@ -131,29 +207,59 @@ export function findSnappedStreaks(matchesByDiv, { from, to }) {
             }
         }
 
+        // This competition's fixtures not yet in the results (a result is
+        // dated by local kickoff, so up to a day off the UTC date), soonest
+        // first
+        const played = new Set(matches.map(m => `${m.date}|${m.homeTeam}|${m.awayTeam}`));
+        const dayAround = (iso, days) => {
+            const d = new Date(`${iso}T12:00:00Z`);
+            d.setUTCDate(d.getUTCDate() + days);
+            return d.toISOString().slice(0, 10);
+        };
+        const upcoming = fixtures
+            .filter(f => f.div === div)
+            .filter(f => ![-1, 0, 1].some(days => played.has(`${dayAround(f.utcDate.slice(0, 10), days)}|${f.homeTeam}|${f.awayTeam}`)))
+            .sort((a, b) => a.utcDate.localeCompare(b.utcDate));
+        // The next fixture that could end a run: the club's next one at
+        // that location (against that opponent, head-to-head)
+        const nextFixture = (team, opp, loc) => upcoming.find(f => {
+            if (f.homeTeam !== team && f.awayTeam !== team) return false;
+            if (opp && f.homeTeam !== opp && f.awayTeam !== opp) return false;
+            return loc === 'all' || (loc === 'home') === (f.homeTeam === team);
+        });
+
         // Club runs: also the club's own history of each kind, for "longest
         // since" and "unusual for the club"
         for (const [team, teamMatches] of byTeam) {
             for (const loc of LOCATIONS) {
                 const list = atLocation(teamMatches, team, loc);
                 const history = {}; // type -> [{ end, count }] in order
-                forEachSnappedRun(list, team, (type, first, count, endIndex) => {
+                forEachRun(list, team, (type, first, count, endIndex) => {
                     const end = list[endIndex].date;
                     const start = list[first].date;
                     addToGroup(`club|${div}|${type}|${loc}`, count, end);
                     const past = history[type] || (history[type] = []);
                     if (end >= from && end <= to) {
-                        let longestSince = null;
-                        for (const r of past) if (r.count >= count && (!longestSince || r.end > longestSince)) longestSince = r.end;
-                        const twentyYearsBefore = `${Number(end.slice(0, 4)) - 20}${end.slice(4)}`;
-                        const own = past.filter(r => r.end >= twentyYearsBefore).map(r => r.count).sort((x, y) => x - y);
                         candidates.push({
                             kind: 'club', div, team, opp: null, loc, type, count, start, end,
-                            longestSince, ownRuns: own.length, ownPct: own.length ? countBelow(own, count) / own.length : 0,
+                            ...clubHistory(past, count, end),
                             list, first, endIndex,
                         });
                     }
                     past.push({ end, count });
+                }, (type, first, count) => {
+                    const fixture = nextFixture(team, null, loc);
+                    if (!fixture) return;
+                    const past = history[type] || [];
+                    const on = fixture.utcDate.slice(0, 10);
+                    const record = past.length ? Math.max(...past.map(r => r.count)) : null;
+                    open.push({
+                        kind: 'club', div, team, opp: null, loc, type, count, start: list[first].date, on,
+                        ...clubHistory(past, count, on), record,
+                        // Level with the club record: one more is a new one
+                        next: record === count ? clubHistory(past, count + 1, on) : null,
+                        list, first, fixture,
+                    });
                 });
             }
         }
@@ -163,58 +269,51 @@ export function findSnappedStreaks(matchesByDiv, { from, to }) {
             const [team, opp] = pairKey.split('\u0000');
             for (const loc of LOCATIONS) {
                 const list = atLocation(pairMatches, team, loc);
-                forEachSnappedRun(list, team, (type, first, count, endIndex) => {
+                forEachRun(list, team, (type, first, count, endIndex) => {
                     const end = list[endIndex].date;
                     addToGroup(`h2h|${div}|${type}|${loc}`, count, end);
                     if (end >= from && end <= to) {
                         candidates.push({ kind: 'h2h', div, team, opp, loc, type, count, start: list[first].date, end, list, first, endIndex });
                     }
+                }, (type, first, count) => {
+                    const fixture = nextFixture(team, opp, loc);
+                    if (!fixture) return;
+                    open.push({ kind: 'h2h', div, team, opp, loc, type, count, start: list[first].date, on: fixture.utcDate.slice(0, 10), list, first, fixture });
                 });
             }
         }
     }
 
     for (const arr of groups.values()) arr.sort((x, y) => x - y);
+    const pctOf = (c, count) => {
+        const group = groups.get(`${c.kind}|${c.div}|${c.type}|${c.loc}`) || [];
+        return group.length ? countBelow(group, count) / group.length : 0;
+    };
 
     const picked = [];
     for (const c of candidates) {
-        const group = groups.get(`${c.kind}|${c.div}|${c.type}|${c.loc}`) || [];
-        c.pct = group.length ? countBelow(group, c.count) / group.length : 0;
-        let source = null;
-        if (c.kind === 'club') {
-            const yearsSince = c.longestSince ? (new Date(c.end) - new Date(c.longestSince)) / YEAR_MS : Infinity;
-            if (c.pct >= 0.995 || (yearsSince >= 10 && c.pct >= 0.95 && c.count >= 6)) source = 'league';
-            else if (c.ownRuns >= 40 && c.ownPct >= 0.98 && c.count >= 5) source = 'club';
-        } else if (c.pct >= 0.99 && c.count >= 6) {
-            source = 'league';
-        } else if (c.div !== 'C1' && BIG_CLUBS.has(c.opp) && RESULT_TYPES.has(c.type) && c.pct >= 0.97 && c.count >= 5) {
-            source = 'big-opponent';
-        }
+        c.pct = pctOf(c, c.count);
+        const source = sourceOf(c, c.end);
         if (source) picked.push({ ...c, source });
     }
 
-    // One per club per match, one per head-to-head meeting: the league-wide
-    // bars first, then the rarest, then the longest
-    const best = new Map();
-    const rank = s => (s.source === 'league' ? 1 : 0);
-    for (const s of picked) {
-        const key = s.kind === 'club'
-            ? `club|${s.div}|${s.team}|${s.end}`
-            : `h2h|${s.div}|${s.end}|${[s.team, s.opp].sort().join('|')}`;
-        const b = best.get(key);
-        if (!b || rank(s) > rank(b) || (rank(s) === rank(b) && (s.pct > b.pct || (s.pct === b.pct && s.count > b.count)))) best.set(key, s);
+    const pickedOpen = [];
+    for (const c of open) {
+        c.pct = pctOf(c, c.count);
+        let source = sourceOf(c, c.on);
+        if (!source && c.next && sourceOf({ ...c, ...c.next, count: c.count + 1, pct: pctOf(c, c.count + 1) }, c.on) === 'league') {
+            source = 'near-record';
+        }
+        if (SCORE_TYPES.has(c.type) && !(source === 'league' && (c.pct >= 0.995 || (c.kind === 'club' && !c.longestSince)))) {
+            source = null;
+        }
+        if (source) pickedOpen.push({ ...c, source });
     }
 
-    return [...best.values()]
+    const snapped = bestPerMatch(picked, s => s.end)
         .sort((a, b) => b.end.localeCompare(a.end) || b.pct - a.pct)
         .map(s => {
             const ended = s.list[s.endIndex];
-            const dates = s.list.slice(s.first, s.endIndex + 1).map(m => m.date);
-            const limit = s.kind === 'club' ? GAP_DAYS.club : s.loc === 'all' ? GAP_DAYS.h2hAll : GAP_DAYS.h2hVenue;
-            const gaps = [];
-            for (let i = 1; i < dates.length; i++) {
-                if (daysBetween(dates[i - 1], dates[i]) > limit) gaps.push({ from: dates[i - 1], to: dates[i] });
-            }
             return {
                 kind: s.kind, div: s.div, team: s.team, opp: s.opp, loc: s.loc, type: s.type,
                 count: s.count, start: s.start, end: s.end,
@@ -225,7 +324,33 @@ export function findSnappedStreaks(matchesByDiv, { from, to }) {
                 pct: Math.round(s.pct * 10000) / 10000,
                 longestSince: s.kind === 'club' ? s.longestSince : undefined,
                 source: s.source,
-                gaps,
+                gaps: gapsIn(s, s.list.slice(s.first, s.endIndex + 1)),
             };
         });
+
+    const onTheLine = bestPerMatch(pickedOpen, s => s.fixture.matchId)
+        .sort((a, b) => a.fixture.utcDate.localeCompare(b.fixture.utcDate) || b.pct - a.pct)
+        .map(s => {
+            const f = s.fixture;
+            return {
+                kind: s.kind, div: s.div, team: s.team, opp: s.opp, loc: s.loc, type: s.type,
+                count: s.count, start: s.start, last: s.list[s.list.length - 1].date,
+                fixture: {
+                    matchId: f.matchId, utcDate: f.utcDate, homeTeam: f.homeTeam, awayTeam: f.awayTeam,
+                    competitionPhase: f.competitionPhase || null,
+                },
+                pct: Math.round(s.pct * 10000) / 10000,
+                longestSince: s.kind === 'club' ? s.longestSince : undefined,
+                // The club's longest run of this kind before this one (null: none)
+                record: s.kind === 'club' ? s.record : undefined,
+                source: s.source,
+                gaps: gapsIn(s, s.list.slice(s.first)),
+            };
+        });
+
+    return { snapped, onTheLine };
+}
+
+export function findSnappedStreaks(matchesByDiv, { from, to }) {
+    return findStreaks(matchesByDiv, { from, to }).snapped;
 }

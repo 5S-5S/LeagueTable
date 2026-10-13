@@ -5,7 +5,13 @@
 // match that ended it (Team Streaks' historic layout) and a button that
 // asks the search for every run of that kind.
 //
-// The list comes ready-made from /api/snapped-streaks: working it out
+// A toggle switches it to "On the line": the significant streaks still
+// going that a match in the next 7 days could end, soonest kickoff first,
+// the next 24 hours outlined - each naming the fixture, opening into the
+// run's matches so far, and linking to the fixture's match view
+// (upcoming.js). It opens on that view when there's anything on it.
+//
+// Both lists come ready-made from /api/snapped-streaks: working them out
 // needs every competition's whole history, so a GitHub Actions job does it
 // (backend/migration/snapped-streaks.mjs, which also documents what counts
 // as significant). An expanded entry's matches come from the same
@@ -18,6 +24,11 @@
     const PAGE_SIZE = 20;
     const RECENT_DAYS = 7;
     const WINDOW_DAYS = 365;
+    const SOON_HOURS = 24;
+    // A fixture that kicked off this long ago without its result reaching
+    // the list (the live result normally reruns the job within minutes) is
+    // dropped rather than shown as in play
+    const IN_PLAY_HOURS = 3;
 
     const COMPETITIONS = {
         E0: { slug: 'premier-league', name: 'Premier League', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', page: 'DomesticEurope.html', inText: 'the Premier League' },
@@ -40,6 +51,8 @@
 
     const state = {
         streaks: [],
+        onTheLine: [],
+        view: 'line',           // 'line' | 'snapped'
         filterDiv: 'all',
         page: 1,
         open: new Set(),        // keys of expanded entries
@@ -80,11 +93,17 @@
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Days the way Team Streaks counts them: first match to the match that
-    // ended the run, inclusive
-    const lengthInDays = s => Math.round((toDate(s.end) - toDate(s.start)) / 86400000) + 1;
+    const kickoffLabel = utc => new Date(utc).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' });
 
-    const keyOf = s => [s.kind, s.div, s.team, s.opp || '', s.type, s.loc, s.end].join('|');
+    // Days the way Team Streaks counts them: first match to the match that
+    // ended the run (or the latest one, still going), inclusive
+    const lengthInDays = s => Math.round((toDate(s.end || s.last) - toDate(s.start)) / 86400000) + 1;
+
+    // On the line entries have a fixture instead of an end
+    const isLive = s => Boolean(s.fixture);
+    const judgedOn = s => isLive(s) ? s.fixture.utcDate.slice(0, 10) : s.end;
+
+    const keyOf = s => [s.kind, s.div, s.team, s.opp || '', s.type, s.loc, isLive(s) ? `f${s.fixture.matchId}` : s.end].join('|');
 
     function teamStyle(team, div, highlight = '') {
         const color = getTeamColor(team, COMPETITIONS[div].slug);
@@ -138,20 +157,47 @@
         }[s.type];
     }
 
+    // A run still going, in words: what the club has done in its last n
+    // matches (at home, away, against the opponent)
+    function liveHeadline(s) {
+        const T = teamName(s.team, s.div);
+        const n = s.count;
+        const games = s.kind === 'club'
+            ? { all: 'matches', home: 'home matches', away: 'away matches' }[s.loc]
+            : { all: `meetings with ${teamName(s.opp, s.div)}`, home: `home games against ${teamName(s.opp, s.div)}`, away: `visits to ${teamName(s.opp, s.div)}` }[s.loc];
+        const last = `their last ${n} ${games}`;
+        return {
+            'winning': `${T} have won ${last}`,
+            'unbeaten': `${T} are unbeaten in ${last}`,
+            'draw': `${T} have drawn ${last}`,
+            'winless': `${T} haven't won any of ${last}`,
+            'losing': `${T} have lost ${last}`,
+            'clean-sheet': `${T} have kept a clean sheet in ${last}`,
+            'goals-conceded': `${T} have conceded in ${last}`,
+            'scoring': `${T} have scored in ${last}`,
+            'no-score': `${T} haven't scored in any of ${last}`
+        }[s.type];
+    }
+
     // Why it's listed: a club record, its longest in 10+ years, rare for
-    // the club, or rare in the league
+    // the club, or rare in the league - on the line, also a run level with
+    // the club record (one more sets a new one)
     function pills(s) {
         const league = COMPETITIONS[s.div].name;
         const top = Math.max(0.1, Math.ceil((1 - s.pct) * 1000) / 10);
         const rare = `<span class="ss-pill rare" title="Longer than ${(s.pct * 100).toFixed(1)}% of ${escapeHtml(league)} runs of this kind since 1995">Top ${top}% in ${escapeHtml(league)}</span>`;
         if (s.kind === 'h2h') return `${rare}<span class="ss-pill h2h">Head-to-head</span>`;
+        const nextRecord = isLive(s) && s.record === s.count
+            ? `<span class="ss-pill record" title="Level with ${escapeHtml(s.team)}'s longest run of this kind in ${escapeHtml(league)} (${s.record})">One more: club record</span>`
+            : '';
+        if (s.source === 'near-record') return nextRecord + rare;
         if (!s.longestSince) return '<span class="ss-pill record">Club record</span>';
-        const years = (toDate(s.end) - toDate(s.longestSince)) / (365.25 * 86400000);
-        if (years >= 10) return `<span class="ss-pill since">Longest since ${s.longestSince.slice(0, 4)}</span>`;
+        const years = (toDate(judgedOn(s)) - toDate(s.longestSince)) / (365.25 * 86400000);
+        if (years >= 10) return `<span class="ss-pill since">Longest since ${s.longestSince.slice(0, 4)}</span>${nextRecord}`;
         if (s.source === 'club') {
-            return `<span class="ss-pill since" title="In the top 2% of ${escapeHtml(s.team)}'s own runs of this kind over the last 20 years">Rare for ${escapeHtml(s.team)}</span>`;
+            return `<span class="ss-pill since" title="In the top 2% of ${escapeHtml(s.team)}'s own runs of this kind over the last 20 years">Rare for ${escapeHtml(s.team)}</span>${nextRecord}`;
         }
-        return rare;
+        return rare + nextRecord;
     }
 
     // Runs that carry on across years out of the competition (or years
@@ -170,7 +216,7 @@
 
     // The club's (or the pair's) matches from the sport pages' endpoints,
     // cut to the run: same location, from its first match to the one that
-    // ended it
+    // ended it (to the latest, still going)
     async function loadMatches(s) {
         const key = keyOf(s);
         if (state.matches.has(key)) return;
@@ -183,8 +229,14 @@
             const data = await fetchJson(url);
             const inRun = (data.matches || [])
                 .filter(m => s.loc === 'all' || (s.loc === 'home') === (m.homeTeam === s.team))
-                .filter(m => m.date >= s.start && m.date <= s.end)
+                .filter(m => m.date >= s.start && m.date <= (s.end || s.last))
                 .sort((a, b) => a.date.localeCompare(b.date));
+            if (isLive(s)) {
+                if (!inRun.length) throw new Error('the run\'s matches are missing');
+                state.matches.set(key, { status: 'ready', run: inRun.reverse() });
+                render();
+                return;
+            }
             const endedIndex = inRun.findIndex(m => m.date === s.end);
             if (endedIndex < 0) throw new Error('the match that ended the run is missing');
             state.matches.set(key, {
@@ -283,6 +335,10 @@
             body = '<p class="ss-loading">Loading the matches...</p>';
         } else if (loaded.status === 'error') {
             body = '<p class="ss-loading">The matches couldn\'t be loaded. Try again later.</p>';
+        } else if (isLive(s)) {
+            body = `
+                <p class="streak-ended-note">The ${s.count} matches so far, newest first</p>
+                ${matchTable(loaded.run, s)}`;
         } else {
             body = `
                 ${matchTable([loaded.ended], s)}
@@ -292,7 +348,40 @@
         return `
             <div class="ss-matches">
                 ${body}
-                <div class="um-links"><a href="${escapeHtml(streaksHref(s))}">${escapeHtml(searchQuestion(s))} →</a></div>
+                <div class="um-links">${isLive(s) ? `<a href="?match=${s.fixture.matchId}" data-match="${s.fixture.matchId}">${escapeHtml(s.fixture.homeTeam)} v ${escapeHtml(s.fixture.awayTeam)}: the match →</a>` : ''}<a href="${escapeHtml(streaksHref(s))}">${escapeHtml(searchQuestion(s))} →</a></div>
+            </div>`;
+    }
+
+    // On the line: the run so far and the fixture that could end it
+    function liveEntryHtml(s, now) {
+        const key = keyOf(s);
+        const open = state.open.has(key);
+        const kickoff = new Date(s.fixture.utcDate).getTime();
+        const inPlay = kickoff <= now;
+        const soon = kickoff - now <= SOON_HOURS * 3600000;
+        const f = s.fixture;
+        return `
+            <div class="ss-item${open ? ' open' : ''}${soon ? ' recent' : ''}" data-key="${escapeHtml(key)}"${soon ? ` title="${inPlay ? 'In play' : 'Kicks off in the next 24 hours'}"` : ''}>
+                <div class="ss-summary" role="button" tabindex="0" aria-expanded="${open}">
+                    <div class="ss-crests">${crest(s.team, s.div)}${s.opp ? crest(s.opp, s.div) : ''}</div>
+                    <div class="ss-text">
+                        <div class="ss-headline">${liveHeadline(s)}</div>
+                        <div class="ss-meta">${pills(s)}</div>
+                        <dl class="ss-stats">
+                            <div><dt>Start</dt><dd>${fullDate(s.start)}</dd></div>
+                            <div><dt>Latest</dt><dd>${fullDate(s.last)}</dd></div>
+                            <div><dt>Games</dt><dd>${s.count}</dd></div>
+                            <div><dt>Days</dt><dd>${lengthInDays(s).toLocaleString()}</dd></div>
+                        </dl>
+                        <div class="ss-meta">
+                            <span>${COMPETITIONS[s.div].flag} ${inPlay ? '<span class="ss-pill live">In play</span>' : escapeHtml(kickoffLabel(f.utcDate))}</span>
+                            <span class="ss-score">${escapeHtml(f.homeTeam)} v ${escapeHtml(f.awayTeam)}</span>
+                        </div>
+                        ${gapNote(s)}
+                    </div>
+                    <span class="ss-chevron" aria-hidden="true">▶</span>
+                </div>
+                ${open ? expandedHtml(s) : ''}
             </div>`;
     }
 
@@ -328,15 +417,28 @@
 
     // --- The card ---------------------------------------------------------------
 
+    function snappedList() {
+        const yearAgo = isoDaysAgo(WINDOW_DAYS);
+        return state.streaks.filter(s => s.end > yearAgo && COMPETITIONS[s.div]);
+    }
+
+    // Kicked off within the last IN_PLAY_HOURS, or still to come
+    function lineList(now) {
+        return state.onTheLine.filter(s => COMPETITIONS[s.div] && new Date(s.fixture.utcDate).getTime() > now - IN_PLAY_HOURS * 3600000);
+    }
+
     function render() {
         if (!els) return;
-        const yearAgo = isoDaysAgo(WINDOW_DAYS);
-        const all = state.streaks.filter(s => s.end > yearAgo && COMPETITIONS[s.div]);
-        if (all.length === 0) {
+        const now = Date.now();
+        const snapped = snappedList();
+        const line = lineList(now);
+        if (snapped.length === 0 && line.length === 0) {
             els.section.hidden = true;
             return;
         }
         els.section.hidden = false;
+        const onLine = state.view === 'line';
+        const all = onLine ? line : snapped;
 
         const present = new Set(all.map(s => s.div));
         const chips = [['all', 'All'], ...COMPETITION_ORDER.filter(div => present.has(div)).map(div => [div, `${COMPETITIONS[div].flag} ${COMPETITIONS[div].name}`])];
@@ -348,7 +450,7 @@
         const recentFrom = isoDaysAgo(RECENT_DAYS);
 
         const where = state.filterDiv === 'all' ? '' : ` in ${COMPETITIONS[state.filterDiv].name}`;
-        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} in the last year${totalPages > 1 ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
+        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
         // Previous / Page X of Y / Next, as Team Streaks' historic list
         const controls = totalPages > 1 ? `
             <div class="flex items-center justify-center gap-4 py-4">
@@ -357,18 +459,26 @@
                 <button type="button" class="btn btn-secondary" data-page="1" ${state.page >= totalPages ? 'disabled' : ''}>Next</button>
             </div>` : '';
 
+        const views = [['line', 'On the line'], ['snapped', 'Snapped']];
         els.section.innerHTML = `
             <div class="ss-head">
-                <h2 class="ss-title">Streaks snapped</h2>
-                <p class="ss-sub">Notable runs that ended in the last year, newest first. Outlined: the last 7 days. Click one for its matches.</p>
+                <div class="ss-title-row">
+                    <h2 class="ss-title">${onLine ? 'Streaks on the line' : 'Streaks snapped'}</h2>
+                    <div class="ss-views" role="group" aria-label="Which streaks">
+                        ${views.map(([view, label]) => `<button type="button" class="${state.view === view ? 'active' : ''}" data-view="${view}" aria-pressed="${state.view === view}">${label}</button>`).join('')}
+                    </div>
+                </div>
+                <p class="ss-sub">${onLine
+                    ? 'Notable runs still going that a match in the next 7 days could end, soonest first. Outlined: the next 24 hours. Click one for its matches so far.'
+                    : 'Notable runs that ended in the last year, newest first. Outlined: the last 7 days. Click one for its matches.'}</p>
             </div>
             <div class="um-filters ss-chips">
                 ${chips.map(([div, label]) => `<button type="button" class="um-chip${state.filterDiv === div ? ' active' : ''}" data-div="${div}">${label}</button>`).join('')}
             </div>
             <p class="ss-count">${count}</p>
             ${pageStreaks.length
-                ? `<div class="ss-list">${pageStreaks.map(s => entryHtml(s, recentFrom)).join('')}</div>`
-                : `<p class="ss-empty">No notable streaks snapped${where} in the last year.</p>`}
+                ? `<div class="ss-list">${pageStreaks.map(s => onLine ? liveEntryHtml(s, now) : entryHtml(s, recentFrom)).join('')}</div>`
+                : `<p class="ss-empty">${onLine ? `No notable streaks on the line${where} in the next 7 days.` : `No notable streaks snapped${where} in the last year.`}</p>`}
             ${controls}`;
     }
 
@@ -377,13 +487,31 @@
             state.open.delete(key);
         } else {
             state.open.add(key);
-            const streak = state.streaks.find(s => keyOf(s) === key);
+            const streak = [...state.streaks, ...state.onTheLine].find(s => keyOf(s) === key);
             if (streak) loadMatches(streak);
         }
         render();
     }
 
     function handleClick(event) {
+        const viewButton = event.target.closest('[data-view]');
+        if (viewButton) {
+            if (state.view === viewButton.dataset.view) return;
+            state.view = viewButton.dataset.view;
+            state.page = 1;
+            render();
+            return;
+        }
+        // The fixture's match view, in place (upcoming.js) - a plain link
+        // to ?match= without it
+        const matchLink = event.target.closest('a[data-match]');
+        if (matchLink) {
+            if (window.UpcomingMatches && UpcomingMatches.openMatch) {
+                event.preventDefault();
+                UpcomingMatches.openMatch(Number(matchLink.dataset.match));
+            }
+            return;
+        }
         const chip = event.target.closest('[data-div]');
         if (chip) {
             state.filterDiv = chip.dataset.div;
@@ -416,10 +544,14 @@
         try {
             const data = await fetchJson(`${API_BASE}/api/snapped-streaks`);
             state.streaks = data.streaks || [];
+            state.onTheLine = data.onTheLine || [];
         } catch (err) {
             console.error('Snapped streaks failed:', err);
             state.streaks = [];
+            state.onTheLine = [];
         }
+        // Opens on what's coming up, unless nothing is
+        state.view = lineList(Date.now()).length ? 'line' : 'snapped';
         render();
     }
 

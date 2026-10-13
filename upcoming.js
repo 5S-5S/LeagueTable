@@ -1028,5 +1028,5 @@
         loadFixtures();
     }
 
-    window.UpcomingMatches = { mount };
+    window.UpcomingMatches = { mount, openMatch };
 })();

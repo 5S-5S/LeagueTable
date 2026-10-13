@@ -1,5 +1,5 @@
 /* Snapped streaks on the home page (snapped.js): a card under the search
-   card. The competition chips, match lists and the button under them use
+   card, with a toggle to the streaks on the line. The competition chips, match lists and the button under them use
    upcoming.css's rules (.um-chip, .league-table / .season-matches, .um-links),
    so this file loads after it. */
 
@@ -20,6 +20,50 @@
     font-size: 1.15rem;
     font-weight: 800;
     color: #1f2937;
+}
+
+/* The title, with the On the line / Snapped toggle beside it (under it
+   when there's no room) */
+.ss-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem 0.75rem;
+    margin-bottom: 0.15rem;
+}
+
+.ss-views {
+    display: inline-flex;
+    padding: 0.15rem;
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    background: var(--um-bg);
+}
+
+.ss-views button {
+    padding: 0.25rem 0.85rem;
+    border: none;
+    border-radius: 9999px;
+    background: transparent;
+    color: #374151;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ss-views button:hover {
+    color: #059669;
+}
+
+.ss-views button.active {
+    background: #059669;
+    color: white;
+}
+
+.ss-views button:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: 1px;
 }
 
 .ss-sub,
@@ -180,6 +224,7 @@
 .ss-pill.since { background: #dbeafe; color: #1e40af; }
 .ss-pill.rare { background: #dcfce7; color: #166534; }
 .ss-pill.h2h { background: #ede9fe; color: #5b21b6; }
+.ss-pill.live { background: #fee2e2; color: #b91c1c; }
 
 /* Years out of the competition inside the run */
 .ss-note {
@@ -283,3 +328,8 @@
 [data-theme="dark"] .ss-pill.since { background: #1e3a8a; color: #bfdbfe; }
 [data-theme="dark"] .ss-pill.rare { background: #14532d; color: #bbf7d0; }
 [data-theme="dark"] .ss-pill.h2h { background: #4c1d95; color: #ddd6fe; }
+[data-theme="dark"] .ss-pill.live { background: #7f1d1d; color: #fecaca; }
+[data-theme="dark"] .ss-views { border-color: #4b5563; }
+[data-theme="dark"] .ss-views button { color: #d1d5db; }
+[data-theme="dark"] .ss-views button:hover { color: #34d399; }
+[data-theme="dark"] .ss-views button.active { background: #059669; color: white; }

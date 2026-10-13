@@ -26,9 +26,11 @@
 //   under the 'fixtures-version' KV key that refresh bumps.
 //
 // GET /api/snapped-streaks
-//   -> { generatedAt, from, to, streaks: [{ kind, div, team, opp, loc, type, count, start, end, endedBy, pct, longestSince, source, gaps }, ...] }
-//   The home page's "Streaks snapped" card: every significant streak that
-//   ended in the last year, newest first. Worked out from the whole match
+//   -> { generatedAt, from, to, streaks: [{ kind, div, team, opp, loc, type, count, start, end, endedBy, pct, longestSince, source, gaps }, ...],
+//        onTheLine: [{ kind, div, team, opp, loc, type, count, start, last, fixture, pct, longestSince, record, source, gaps }, ...] }
+//   The home page's streaks card: every significant streak that ended in
+//   the last year, newest first, and the ones still going that a match in
+//   the next 7 days could end, soonest first. Worked out from the whole match
 //   history by backend/migration/snapped-streaks.mjs (a GitHub Actions job,
 //   far past a Worker's CPU limit) and stored in KV under
 //   'snapped-streaks'; this just serves it. Before the job has ever run,
