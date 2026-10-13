@@ -2554,12 +2554,15 @@
         };
     }
 
+    // A club on its own: its overview on the home page (team.js), a bit
+    // of everything with questions to ask next. The old full-page Team
+    // Dashboard (dashboardUrl) is linked from the overview's foot.
     function dashboardResult(comp, team) {
         return {
             kind: 'dashboard', icon: '', crestTeam: team, comp,
             title: team,
-            detail: 'Team Dashboard (full page)',
-            href: dashboardUrl(comp, team)
+            detail: 'Team overview',
+            href: `index.html?${new URLSearchParams({ team, lg: comp.key })}`
         };
     }
 
@@ -4862,5 +4865,31 @@
         };
     }
 
-    window.LeagueSearch = { mount, searchFor, suggestFor, renderAnswer, examples, reportHref, bindReportLinks, readRecent, addRecent, clearRecent };
+    // For the team overview (team.js): where a question's top answer opens
+    // (null if the search doesn't answer it), and what search knows about
+    // a club - its domestic league, whether it has Champions League
+    // matches, and the old dashboard's link - once the Champions League
+    // clubs are in
+    function answerHref(query, scopeKey) {
+        const top = (searchFor(query, scopeKey).results || [])[0];
+        return top ? resultHref(top, query, scopeKey) : null;
+    }
+
+    function teamInfo(name) {
+        return new Promise(resolve => {
+            loadContinentalTeams(() => {});
+            continentalTeamsRequest.then(() => {
+                const team = SEARCH_TEAMS.get(name);
+                if (!team) { resolve(null); return; }
+                const domestic = team.league ? SEARCH_SCOPES[team.league][0] : null;
+                const continental = SEARCH_SCOPES['champions-league'][0];
+                resolve({
+                    name, league: team.league || null, continental: !!team.continental,
+                    dashboardUrl: dashboardUrl(domestic || continental, name)
+                });
+            });
+        });
+    }
+
+    window.LeagueSearch = { mount, searchFor, suggestFor, renderAnswer, examples, reportHref, bindReportLinks, readRecent, addRecent, clearRecent, answerHref, teamInfo };
 })();

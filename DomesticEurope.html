@@ -1209,10 +1209,10 @@
     <script src="season-rules-domestic.js"></script>
     <script src="search.js"></script>
     <script>
-        // Season dates, point deductions, ranking overrides and stripped
-        // titles: shared with the home page's team overview
+        // Season dates, point deductions, ranking overrides, stripped
+        // titles and pre-league seasons: shared with the home page's team overview
         // (season-rules-domestic.js)
-        const { getRankingOverrides, applyRankingOverrides, strippedChampions, isStrippedChampion, pointDeductions, seasons, seasonFinalTable } = window.DomesticSeasonRules;
+        const { getRankingOverrides, applyRankingOverrides, strippedChampions, isStrippedChampion, pointDeductions, seasons, seasonFinalTable, historicSeasonsData } = window.DomesticSeasonRules;
 
         // Application state
         const state = {
@@ -2144,97 +2144,6 @@
             matchFinderPageInfo: document.getElementById('matchFinderPageInfo'),
             matchFinderNextPageBtn: document.getElementById('matchFinderNextPageBtn')
         };
-
-        // Historic Seasons Data Structure
-        // Format: [season, leagueId, position, teamName, gamesPlayed, wins, draws, losses, goalsFor, goalsAgainst, goalDifference, points]
-        const historicSeasonsData = [
-            // Example entries - replace with actual historic data
-            ["1928-29", "I1", 1, "Bologna FC", 30, 22, 5, 3, 84, 32, 52, 49],
-            ["1927-28", "I1", 1, "Torino FC", 34, 22, 5, 7, 111, 37, 74, 49],
-            ["1925-26", "I1", 1, "Juventus", 24, 19, 3, 2, 80, 15, 65, 41],
-            ["1924-25", "I1", 1, "Bologna FC", 24, 15, 4, 5, 53, 22, 31, 34],
-            ["1923-24", "I1", 1, "Genoa CFC", 22, 14, 5, 3, 50, 13, 37, 33],
-            ["1922-23", "I1", 1, "Genoa CFC", 22, 17, 5, 0, 61, 18, 43, 39],
-            ["1921-22", "I1", 1, "Pro Vercelli", 22, 17, 2, 3, 61, 14, 47, 36],
-            ["1921-22", "I1", 1, "Novese", 8, 6, 2, 0, 18, 1, 17, 14],
-            ["1920-21", "I1", 1, "Pro Vercelli", 16, 11, 1, 4, 37, 14, 23, 23],
-            ["1919-20", "I1", 1, "Inter", 22, 16, 5, 1, 81, 26, 55, 37],
-            ["1914-15", "I1", 1, "Genoa CFC", 21, 17, 1, 3, 99, 21, 78, 35],
-            ["1913-14", "I1", 1, "Casale", 28, 23, 1, 4, 80, 17, 63, 47],
-            ["1912-13", "I1", 1, "Pro Vercelli", 20, 17, 3, 0, 60, 3, 57, 37],
-            ["1911-12", "I1", 1, "Pro Vercelli", 18, 15, 2, 1, 50, 12, 38, 32],
-            ["1910-11", "I1", 1, "Pro Vercelli", 16, 12, 3, 1, 44, 8, 36, 27],
-            ["1909-10", "I1", 1, "Inter", 16, 12, 1, 3, 55, 26, 29, 25],
-            ["1909", "I1", 1, "Pro Vercelli", 6, 4, 2, 0, 11, 6, 5, 10],
-            ["1908", "I1", 1, "Pro Vercelli", 4, 2, 2, 0, 4, 2, 2, 6],
-            ["1907", "I1", 1, "AC Milan", 4, 2, 2, 0, 10, 3, 7, 6],
-            ["1906", "I1", 1, "AC Milan", 4, 2, 1, 1, 7, 4, 3, 5],
-            ["1905", "I1", 1, "Juventus", 4, 2, 2, 0, 9, 3, 6, 6],
-            ["1904", "I1", 1, "Genoa CFC", 1, 1, 0, 0, 1, 0, 1, 2],
-            ["1903", "I1", 1, "Genoa CFC", 1, 1, 0, 0, 3, 0, 3, 2],
-            ["1902", "I1", 1, "Genoa CFC", 4, 4, 0, 0, 11, 4, 7, 8],
-            ["1901", "I1", 1, "AC Milan", 3, 3, 0, 0, 8, 2, 6, 6],
-            ["1900", "I1", 1, "Genoa CFC", 2, 2, 0, 0, 10, 1, 9, 4],
-            ["1899", "I1", 1, "Genoa CFC", 1, 1, 0, 0, 3, 1, 2, 2],
-            ["1898", "I1", 1, "Genoa CFC", 2, 1, 0, 0, 4, 1, 3, 4],
-
-            ["1963", "D1", 1, "Borussia Dortmund", 4, 2, 1, 1, 15, 7, 8, 3],
-            ["1962", "D1", 1, "1. FC Köln", 3, 3, 0, 0, 14, 1, 13, 6],
-            ["1961", "D1", 1, "1. FC Nürnberg", 6, 4, 2, 0, 18, 9, 9, 10],
-            ["1960", "D1", 1, "Hamburger SV", 6, 4, 1, 1, 22, 11, 11, 9],
-            ["1959", "D1", 1, "Eintracht Frankfurt", 6, 6, 0, 0, 26, 11, 15, 12],
-            ["1958", "D1", 1, "FC Schalke 04", 3, 3, 0, 0, 16, 1, 15, 6],
-            ["1957", "D1", 1, "Borussia Dortmund", 3, 3, 0, 0, 7, 4, 3, 6],
-            ["1956", "D1", 1, "Borussia Dortmund", 6, 4, 1, 1, 19, 4, 15, 9],
-            ["1955", "D1", 1, "Rot-Weiss Essen", 6, 4, 2, 0, 16, 5, 11, 10],
-            ["1954", "D1", 1, "Hannover 96", 2, 2, 0, 0, 5, 2, 3, 4],
-            ["1953", "D1", 1, "1. FC Kaiserslautern", 6, 5, 1, 0, 16, 7, 9, 11],
-            ["1952", "D1", 1, "VfB Stuttgart", 6, 3, 2, 1, 14, 8, 6, 8],
-            ["1951", "D1", 1, "1. FC Kaiserslautern", 6, 4, 1, 1, 14, 8, 6, 9],
-            ["1950", "D1", 1, "VfB Stuttgart", 4, 4, 0, 0, 13, 5, 8, 8],
-            ["1949", "D1", 1, "Waldhof Mannheim", 3, 3, 0, 0, 10, 3, 7, 6],
-            ["1948", "D1", 1, "1. FC Nürnberg", 2, 2, 0, 0, 5, 3, 2, 4],
-            ["1944", "D1", 1, "Dresdner SC", 5, 5, 0, 0, 28, 7, 21, 10],
-            ["1943", "D1", 1, "Dresdner SC", 5, 5, 0, 0, 16, 2, 14, 10],
-            ["1942", "D1", 1, "FC Schalke 04", 5, 5, 0, 0, 25, 3, 22, 10],
-            ["1941", "D1", 1, "Rapid Vienna", 8, 6, 1, 1, 30, 7, 23, 13],
-            ["1940", "D1", 1, "FC Schalke 04", 8, 6, 2, 0, 39, 6, 33, 14],
-            ["1939", "D1", 1, "FC Schalke 04", 8, 7, 0, 1, 31, 8, 3, 14],
-            ["1938", "D1", 1, "Hannover 96", 8, 8, 0, 0, 26, 13, 13, 16],
-            ["1937", "D1", 1, "FC Schalke 04", 8, 7, 1, 0, 37, 7, 30, 15],
-            ["1936", "D1", 1, "1. FC Nürnberg", 8, 7, 1, 0, 23, 5, 18, 15],
-            ["1935", "D1", 1, "FC Schalke 04", 8, 7, 0, 1, 36, 12, 24, 14],
-            ["1934", "D1", 1, "FC Schalke 04", 8, 6, 0, 2, 23, 10, 13, 12],
-            ["1933", "D1", 1, "Fortuna Düsseldorf", 4, 4, 0, 0, 19, 0, 19, 8],
-
-            ["1932", "D1", 1, "Bayern München", 4, 4, 0, 0, 11, 4, 7, 8],
-            ["1931", "D1", 1, "Hertha BSC", 4, 4, 0, 0, 14, 7, 7, 8],
-            ["1930", "D1", 1, "Hertha BSC", 4, 4, 0, 0, 23, 11, 12, 8],
-            ["1929", "D1", 1, "SpVgg Greuther Fürth", 4, 4, 0, 0, 16, 4, 12, 8],
-            ["1928", "D1", 1, "Hamburger SV", 4, 4, 0, 0, 21, 6, 15, 8],
-            ["1927", "D1", 1, "1. FC Nürnberg", 4, 4, 0, 0, 15, 3, 12, 8],
-            ["1926", "D1", 1, "SpVgg Greuther Fürth", 4, 4, 0, 0, 16, 2, 14, 8],
-            ["1925", "D1", 1, "1. FC Nürnberg", 4, 4, 0, 0, 10, 1, 9, 8],
-            ["1924", "D1", 1, "1. FC Nürnberg", 3, 3, 0, 0, 11, 2, 9, 6],
-            ["1923", "D1", 1, "Hamburger SV", 3, 3, 0, 0, 8, 2, 6, 6],
-            ["1921", "D1", 1, "1. FC Nürnberg", 2, 2, 0, 0, 10, 1, 9, 4],
-            ["1920", "D1", 1, "1. FC Nürnberg", 3, 3, 0, 0, 7, 0, 7, 6],
-            ["1914", "D1", 1, "SpVgg Greuther Fürth", 3, 3, 0, 0, 8, 6, 2, 6],
-            ["1913", "D1", 1, "1. FC Lok Leipzig", 3, 3, 0, 0, 11, 2, 9, 6],
-            ["1912", "D1", 1, "Holstein Kiel", 3, 3, 0, 0, 5, 1, 4, 6],
-            ["1911", "D1", 1, "Viktoria Berlin", 2, 2, 0, 0, 7, 1, 6, 4],
-            ["1910", "D1", 1, "Karlsruher FV", 3, 3, 0, 0, 4, 1, 3, 6],
-            ["1909", "D1", 1, "Karlsruher SC", 3, 3, 0, 0, 18, 3, 15, 6],
-            ["1908", "D1", 1, "Viktoria Berlin", 3, 3, 0, 0, 14, 1, 13, 6],
-            ["1907", "D1", 1, "Freiburger FC", 2, 2, 0, 0, 6, 3, 3, 4],
-            ["1906", "D1", 1, "1. FC Lok Leipzig", 3, 3, 0, 0, 14, 4, 10, 6],
-            ["1905", "D1", 1, "Blau-Weiß 90 Berlin", 3, 3, 0, 0, 11, 3, 8, 6],
-            ["1903", "D1", 1, "1. FC Lok Leipzig", 3, 3, 0, 0, 16, 6, 10, 6],
-
-
-
-            // Add more historic seasons here...
-        ];
 
         // Create Team Streaks league buttons
         function createTeamStreaksLeagueButtons() {

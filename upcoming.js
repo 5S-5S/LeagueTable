@@ -1279,5 +1279,25 @@
         update();
     }
 
-    window.UpcomingMatches = { mount, mountRow, openMatch };
+    // For the team overview (team.js), which shows a club's next match as
+    // one of the strip's cards and its active streaks the view's way
+    const overviewParts = {
+        competitions: COMPETITIONS,
+        fixtures: () => ensureFixtures().then(() => state.fixtures),
+        seasonData: div => loadSeasonData(div).then(() => state.seasonData[div]),
+        cardHtml,
+        toMatchRows,
+        // A chevron's expanded row: one club's matches (a streak's, or a
+        // season's) in the streak tables' match list
+        matchListRow: (matches, team, div, colspan) =>
+            streakMatchesRow({ team, matches }, { homeTeam: team, awayTeam: null, div }, 'team', colspan),
+        // Every kind of active streak of MIN_STREAK+ games, longest first
+        activeStreaks: (matches, team) => activeStreaks(matches, team, STREAK_TYPES).sort((a, b) => b.matches.length - a.matches.length),
+        streakLabels: STREAK_LABELS,
+        minStreak: MIN_STREAK,
+        premierLeagueEraStart: PREMIER_LEAGUE_ERA_START,
+        eraLabels: ERA_LABELS
+    };
+
+    window.UpcomingMatches = { mount, mountRow, openMatch, overview: overviewParts };
 })();
