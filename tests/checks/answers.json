@@ -235,6 +235,43 @@
       "scope": "la-liga",
       "answer": "Real Madrid hold the record for the most goals in a La Liga season: 121 goals in 2011-12.",
       "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
+    },
+    {
+      "q": "highest scoring club seasons 38 games",
+      "scope": "premier-league",
+      "answer": "Manchester City hold the record for the most goals in a 38-game English top flight season: 106 goals in 2017-18.",
+      "note": "Did you mean the highest-scoring league seasons (every club's goals added up) or the Premier League only?"
+    },
+    {
+      "q": "most points in a season since 1992",
+      "scope": "premier-league",
+      "answer": "Since 1992-93, Manchester City hold the record for the most points in a Premier League season: 100 points in 2017-18.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+    },
+    {
+      "q": "highest scoring seasons in the 90s",
+      "scope": "serie-a",
+      "answer": "From 1990-91 to 1999-00, the highest-scoring Serie A season was 1992-93, with 858 goals.",
+      "note": "Did you mean the highest-scoring club seasons?"
+    },
+    {
+      "q": "fewest points in a 38 game season between 2015 and 2021",
+      "scope": "ligue-1",
+      "answer": "From 2015-16 to 2021-22, ESTAC Troyes hold the record for the fewest points in a 38-game Ligue 1 season: 18 points in 2015-16.",
+      "note": "Points are as awarded: 2 for a win until 1993-94. Count every win as 3 points?"
+    },
+    {
+      "q": "most goals in a campaign between 2000 and 2009",
+      "scope": "champions-league",
+      "answer": "From 2000-01 to 2009-10, Real Madrid (2000-01) and Real Madrid (2001-02) share the record for the most goals in a Champions League campaign: 35 goals.",
+      "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
+    },
+    {
+      "q": "most goals in a 38-game season since 2000",
+      "scope": "la-liga",
+      "answer": "Since 2000-01, Real Madrid hold the record for the most goals in a 38-game La Liga season: 121 goals in 2011-12.",
+      "phone": true,
+      "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
     }
   ],
   "shape": [

@@ -4448,3 +4448,29 @@ premier-league | closest title races in the 2010s
     league-history | Premier League · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
 champions-league | closest title races in the 2010s
     message: Title races are a league's - the Champions League is decided by knockouts. Pick a league in the dropdown.
+domestic | highest scoring club seasons 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&games=38
+premier-league | highest scoring club seasons 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+champions-league | highest scoring club seasons 38 games
+    team-records | All clubs · Most goals scored in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most
+domestic | most goals in seasons with 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&games=38
+premier-league | most goals in seasons with 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+champions-league | most goals in seasons with 38 games
+    team-records | All clubs · Most goals scored in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most
+domestic | Arsenal unbeaten in the last 38 games this season
+    team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten
+premier-league | Arsenal unbeaten in the last 38 games this season
+    team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten
+champions-league | Arsenal unbeaten in the last 38 games this season
+    team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Arsenal+FC&type=unbeaten

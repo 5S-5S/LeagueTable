@@ -1802,6 +1802,12 @@
         if (length || lengthAfter) {
             filters.games = String(Number(length ? length[1] : lengthAfter[2]));
             text = text.replace((length || lengthAfter)[0], ` ${(length || lengthAfter)[length ? 2 : 1]} `);
+        } else if (/\b(seasons?|campaigns?)\b/.test(text)) {
+            // "highest scoring club seasons 38 games" - left in the query,
+            // and only Team Records and League History read it (not a run
+            // "in the last 38 games")
+            const bare = text.match(/(?<!\b(?:last|past|previous|first|row|of the)\s)\b(\d{2})[- ](?:games|matches)\b/);
+            if (bare) filters.games = String(Number(bare[1]));
         }
         const dateRange = extractDateRange(text);
         if (dateRange) {
@@ -3558,10 +3564,33 @@
 
     // "a Premier League season", "an English top flight season", "a
     // European Cup or Champions League campaign"
-    function recordScope(competition, continental) {
-        const name = competition.replace(/^the /, '').replace(' and ', ' or ');
-        // "an English", but "a European" (a "you" sound)
-        return `${/^[aeiou]/i.test(name) && !/^(eu|uni|one)/i.test(name) ? 'an' : 'a'} ${name} ${continental ? 'campaign' : 'season'}`;
+    function recordScope(competition, continental, games) {
+        const name = `${games ? `${games}-game ` : ''}${competition.replace(/^the /, '').replace(' and ', ' or ')}`;
+        // "an English", but "a European" (a "you" sound); "an 18-game"
+        const an = /^[aeiou]/i.test(name) ? !/^(eu|uni|one)/i.test(name) : /^(8|11|18|8\d)-/.test(name);
+        return `${an ? 'an' : 'a'} ${name} ${continental ? 'campaign' : 'season'}`;
+    }
+
+    // Team Records' and League History's From / To (season keys) at the
+    // start of the answer: "Since 2000-01, ", "From 1990-91 to 1999-00, "
+    function recordRangePrefix(params) {
+        let from = params.get('from') || '', to = params.get('to') || '';
+        // Only season keys - other views' from / to are dates
+        if (!/^\d{4}-\d{2}$/.test(from)) from = '';
+        if (!/^\d{4}-\d{2}$/.test(to)) to = '';
+        if (from && to && from > to) [from, to] = [to, from];
+        if (from && to) return from === to ? `In ${from}, ` : `From ${from} to ${to}, `;
+        if (from) return `Since ${from}, `;
+        if (to) return `Up to ${to}, `;
+        return '';
+    }
+
+    // An answer with the range in front ("The ..." becomes "Since 2000-01,
+    // the ...", names stay capitalised)
+    function withRecordRange(answer, prefix) {
+        if (!answer || !prefix || /^No /.test(answer.html)) return answer;
+        const html = /^(The|Home|Away) /.test(answer.html) ? answer.html[0].toLowerCase() + answer.html.slice(1) : answer.html;
+        return { ...answer, html: prefix + html };
     }
 
     function joinNames(items) {
@@ -3575,7 +3604,8 @@
         const r = ctx.records;
         if (!r || !r.rows) return null;
         const most = r.order !== 'fewest';
-        const scope = recordScope(competition, r.continental) + (r.threePoints && r.stat === 'points' ? ' (3 points for a win)' : '');
+        const games = r.continental ? '' : (params.get('games') || '');
+        const scope = recordScope(competition, r.continental, games) + (r.threePoints && r.stat === 'points' ? ' (3 points for a win)' : '');
         const rate = ['won', 'drawn', 'lost'].includes(r.stat) && r.perGame;
         const statPhrase = rate
             ? `the ${most ? 'highest' : 'lowest'} ${{ won: 'win', drawn: 'draw', lost: 'loss' }[r.stat]} rate`
@@ -3749,8 +3779,14 @@
 
         if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
         if (ctx.view === 'team-streaks') return describeStreaks(ctx, params, { b, competition });
-        if (ctx.view === 'team-records') return describeTeamRecords(ctx, params, { b, competition });
-        if (ctx.view === 'league-history') return describeLeagueHistory(ctx, params, { b, competition });
+        if (ctx.view === 'team-records') return withRecordRange(describeTeamRecords(ctx, params, { b, competition }), recordRangePrefix(params));
+        if (ctx.view === 'league-history') {
+            const games = params.get('games');
+            const prefix = recordRangePrefix(params);
+            // "In 38-game seasons since 2000-01, the ..."
+            const lead = games ? `In ${games}-game seasons${prefix ? ` ${prefix[0].toLowerCase()}${prefix.slice(1)}` : ', '}` : prefix;
+            return withRecordRange(describeLeagueHistory(ctx, params, { b, competition }), lead);
+        }
         if (ctx.view === 'team-seasons') {
             // With the pre-Bundesliga / pre-Serie A champions it's the
             // national championship, not the league
