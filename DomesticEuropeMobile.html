@@ -544,7 +544,7 @@
                     <!-- Description -->
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3 seasons-records-only">
                         <p class="text-gray-700 text-sm leading-relaxed w-full">
-                            Every club's season in the league, ranked by the stat you pick - most points, fewest goals conceded and so on, whatever position they finished. Narrow it to a finishing position, an era or one team. Click on the button on the left side of a row to get a list of matches played.
+                            Every club's season in the league, ranked by the stat you pick - most points, fewest goals conceded and so on, whatever position they finished. Narrow it to a finishing position, an era or a range of seasons, a season length (38-game seasons, say) or one team. Click on the button on the left side of a row to get a list of matches played.
                         </p>
                         <div class="copy-link-stack">
                             <button id="copyLinkBtnTeamRecords" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
@@ -553,7 +553,7 @@
                     </div>
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex flex-col items-start gap-3 seasons-league-only">
                         <p class="text-gray-700 text-sm leading-relaxed w-full">
-                            Every season of the league, all clubs added up - matches, goals, how often the home side won - and the title race: the points gap between 1st and 2nd, and their average points. Newest first, to see how the league has changed; rank by any column for record seasons and the closest title races. Open a season with the button on the left of its row for its final table.
+                            Every season of the league, all clubs added up - matches, goals, how often the home side won - and the title race: the points gap between 1st and 2nd, and their average points. Newest first, to see how the league has changed; rank by any column for record seasons and the closest title races, and narrow it to a range of seasons or a season length. Open a season with the button on the left of its row for its final table.
                         </p>
                         <div class="copy-link-stack">
                             <button id="copyLinkBtnLeagueHistory" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
@@ -703,6 +703,26 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="records-controls mt-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsFromSelect">From:</label>
+                                <select id="recordsFromSelect" class="form-input w-full">
+                                    <option value="">Earliest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsToSelect">To:</label>
+                                <select id="recordsToSelect" class="form-input w-full">
+                                    <option value="">Latest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsGamesSelect">Games per team:</label>
+                                <select id="recordsGamesSelect" class="form-input w-full">
+                                    <option value="">Any length</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="records-toggles mt-4">
                             <label id="recordsBetterLabel" class="flex items-center cursor-pointer hidden">
                                 <div id="recordsBetterCheckbox" class="checkbox"></div>
@@ -775,6 +795,26 @@
                                 <label class="block text-sm font-semibold text-gray-700 mb-2" for="leagueHistoryEraSelect">Seasons:</label>
                                 <select id="leagueHistoryEraSelect" class="form-input w-full">
                                     <option value="">All seasons</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="records-controls mt-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="leagueHistoryFromSelect">From:</label>
+                                <select id="leagueHistoryFromSelect" class="form-input w-full">
+                                    <option value="">Earliest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="leagueHistoryToSelect">To:</label>
+                                <select id="leagueHistoryToSelect" class="form-input w-full">
+                                    <option value="">Latest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="leagueHistoryGamesSelect">Games per team:</label>
+                                <select id="leagueHistoryGamesSelect" class="form-input w-full">
+                                    <option value="">Any length</option>
                                 </select>
                             </div>
                         </div>
@@ -1104,6 +1144,9 @@
             recordsOrder: 'most',
             recordsPosition: '',
             recordsEra: '',
+            recordsFrom: '',
+            recordsTo: '',
+            recordsGames: '',
             recordsTeam: '',
             recordsPage: 1,
             recordsPerGame: false, // every column per game (W / D / L as a percentage)
@@ -1112,6 +1155,9 @@
             leagueHistoryRank: 'season',
             leagueHistoryOrder: 'most', // 'most' = newest first / highest
             leagueHistoryEra: '',
+            leagueHistoryFrom: '',
+            leagueHistoryTo: '',
+            leagueHistoryGames: '',
             leagueHistoryPerGame: false,
             leagueHistoryThreePoints: false,
             leagueHistoryMatches: 'main', // Continental: 'main' | 'all' | 'qualifiers'
@@ -2643,6 +2689,9 @@
             recordsOrderSelect: document.getElementById('recordsOrderSelect'),
             recordsPositionSelect: document.getElementById('recordsPositionSelect'),
             recordsEraSelect: document.getElementById('recordsEraSelect'),
+            recordsFromSelect: document.getElementById('recordsFromSelect'),
+            recordsToSelect: document.getElementById('recordsToSelect'),
+            recordsGamesSelect: document.getElementById('recordsGamesSelect'),
             recordsInfo: document.getElementById('recordsInfo'),
             teamRecordsTitle: document.getElementById('teamRecordsTitle'),
             teamRecordsHeader: document.getElementById('teamRecordsHeader'),
@@ -2659,6 +2708,9 @@
             leagueHistoryRankSelect: document.getElementById('leagueHistoryRankSelect'),
             leagueHistoryOrderSelect: document.getElementById('leagueHistoryOrderSelect'),
             leagueHistoryEraSelect: document.getElementById('leagueHistoryEraSelect'),
+            leagueHistoryFromSelect: document.getElementById('leagueHistoryFromSelect'),
+            leagueHistoryToSelect: document.getElementById('leagueHistoryToSelect'),
+            leagueHistoryGamesSelect: document.getElementById('leagueHistoryGamesSelect'),
             leagueHistoryPerGameCheckbox: document.getElementById('leagueHistoryPerGameCheckbox'),
             leagueHistoryInfo: document.getElementById('leagueHistoryInfo'),
             leagueHistoryTitle: document.getElementById('leagueHistoryTitle'),
@@ -6150,7 +6202,8 @@
                 if (button) setSeasonsSubTab(button.dataset.sub);
             });
             [['recordsStatSelect', 'recordsStat'], ['recordsOrderSelect', 'recordsOrder'],
-                ['recordsPositionSelect', 'recordsPosition'], ['recordsEraSelect', 'recordsEra']].forEach(([el, key]) => {
+                ['recordsPositionSelect', 'recordsPosition'], ['recordsEraSelect', 'recordsEra'],
+                ['recordsFromSelect', 'recordsFrom'], ['recordsToSelect', 'recordsTo'], ['recordsGamesSelect', 'recordsGames']].forEach(([el, key]) => {
                 elements[el].addEventListener('change', (e) => {
                     state[key] = e.target.value;
                     state.recordsPage = 1;
@@ -6166,7 +6219,8 @@
                 renderTeamRecords();
             });
             // League History controls
-            [['leagueHistoryRankSelect', 'leagueHistoryRank'], ['leagueHistoryOrderSelect', 'leagueHistoryOrder'], ['leagueHistoryEraSelect', 'leagueHistoryEra']].forEach(([el, key]) => {
+            [['leagueHistoryRankSelect', 'leagueHistoryRank'], ['leagueHistoryOrderSelect', 'leagueHistoryOrder'], ['leagueHistoryEraSelect', 'leagueHistoryEra'],
+                ['leagueHistoryFromSelect', 'leagueHistoryFrom'], ['leagueHistoryToSelect', 'leagueHistoryTo'], ['leagueHistoryGamesSelect', 'leagueHistoryGames']].forEach(([el, key]) => {
                 elements[el].addEventListener('change', (e) => {
                     state[key] = e.target.value;
                     // a new ranking starts at its highest (season: newest)
@@ -8640,6 +8694,9 @@
                 params.set('rank', state.leagueHistoryRank);
                 params.set('order', state.leagueHistoryOrder);
                 if (state.leagueHistoryEra) params.set('season', state.leagueHistoryEra);
+                if (state.leagueHistoryFrom) params.set('from', state.leagueHistoryFrom);
+                if (state.leagueHistoryTo) params.set('to', state.leagueHistoryTo);
+                if (state.leagueHistoryGames) params.set('games', state.leagueHistoryGames);
                 if (state.leagueHistoryPerGame) params.set('pg', '1');
                 if (state.leagueHistoryThreePoints) params.set('p3', '1');
             } else if (view === 'team-seasons' && state.seasonsSubTab === 'records') {
@@ -8653,6 +8710,9 @@
                 if (state.recordsPosition) params.set('pos', state.recordsPosition);
                 if (state.recordsPosition && state.recordsBetter) params.set('better', '1');
                 if (state.recordsEra) params.set('season', state.recordsEra);
+                if (state.recordsFrom) params.set('from', state.recordsFrom);
+                if (state.recordsTo) params.set('to', state.recordsTo);
+                if (state.recordsGames) params.set('games', state.recordsGames);
                 if (state.recordsTeam) params.set('t1', state.recordsTeam);
             } else if (view === 'team-seasons') {
                 if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
@@ -8794,6 +8854,9 @@
                 if (LEAGUE_HISTORY_RANKS[params.get('rank')]) state.leagueHistoryRank = params.get('rank');
                 state.leagueHistoryOrder = params.get('order') === 'fewest' ? 'fewest' : 'most';
                 state.leagueHistoryEra = params.get('season') || '';
+                state.leagueHistoryFrom = params.get('from') || '';
+                state.leagueHistoryTo = params.get('to') || '';
+                state.leagueHistoryGames = /^\d+$/.test(params.get('games') || '') ? params.get('games') : '';
                 state.leagueHistoryPerGame = params.get('pg') === '1';
                 state.leagueHistoryThreePoints = params.get('p3') === '1';
                 setSeasonsSubTab('league');
@@ -8805,6 +8868,9 @@
                 state.recordsPosition = params.get('pos') || '';
                 state.recordsBetter = params.get('better') === '1';
                 state.recordsEra = params.get('season') || '';
+                state.recordsFrom = params.get('from') || '';
+                state.recordsTo = params.get('to') || '';
+                state.recordsGames = /^\d+$/.test(params.get('games') || '') ? params.get('games') : '';
                 state.recordsTeam = params.get('t1') || '';
                 state.recordsPage = 1;
                 setSeasonsSubTab('records');
@@ -10972,6 +11038,7 @@
             elements.leagueHistoryEraSelect.innerHTML = '<option value="">All seasons</option>' +
                 eras.map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
             elements.leagueHistoryEraSelect.value = state.leagueHistoryEra;
+            fillSeasonFilters('leagueHistory', getLeagueDivCode(league) === state.seasonStandingsApiCacheKey && !state.seasonStandingsApiLoading ? state.seasonStandingsApiCache : null);
             elements.leagueHistoryRankSelect.value = state.leagueHistoryRank;
             const bySeason = state.leagueHistoryRank === 'season';
             elements.leagueHistoryOrderSelect.innerHTML = `
@@ -10996,6 +11063,8 @@
                 const seasonDates = withSelectedLeague(league, () => getSeasonDateRange(season));
                 if (!seasonStandings || !seasonDates || !seasonStandings.matchCount) return;
                 if (era && (seasonDates.start < era.start || seasonDates.end > era.end)) return;
+                if (!inSeasonRange(season, state.leagueHistoryFrom, state.leagueHistoryTo)) return;
+                if (state.leagueHistoryGames && seasonLength(seasonStandings, seasonDates.end > today) !== Number(state.leagueHistoryGames)) return;
                 const games = seasonStandings.matchCount;
                 const base = {
                     season,
@@ -11088,6 +11157,8 @@
                         : `${low ? 'Lowest' : 'Highest'} ${label.toLowerCase()}${perGameWords}`];
             const eraLabel = recordsEraOptions(league).find(([k]) => k === state.leagueHistoryEra);
             if (eraLabel) titleParts.push(eraLabel[1]);
+            if (state.leagueHistoryFrom || state.leagueHistoryTo) titleParts.push(seasonRangeLabel(state.leagueHistoryFrom, state.leagueHistoryTo));
+            if (state.leagueHistoryGames) titleParts.push(`${state.leagueHistoryGames}-game seasons`);
             if (state.leagueHistoryThreePoints && ['championPoints', 'gap', 'topTwo'].includes(key)) titleParts.push('3 points for a win');
             elements.leagueHistoryTitle.textContent = titleParts.join(' · ');
 
@@ -11310,6 +11381,67 @@
             return [];
         }
 
+        // From / To and Games per team: seasons narrowed alongside the era.
+        // Season keys sort as strings ('1992-93' < '2000-01'). prefix:
+        // 'records' or 'leagueHistory'; bySeason: the season standings once
+        // loaded, for the season lengths
+        function fillSeasonFilters(prefix, bySeason) {
+            const league = state.teamSeasonsSelectedLeague;
+            const seasonKeys = getAvailableSeasons(league).filter(season => !isEraSeasonKey(season));
+            [['From', 'Earliest'], ['To', 'Latest']].forEach(([end, any]) => {
+                const key = `${prefix}${end}`;
+                if (state[key] && !seasonKeys.includes(state[key])) state[key] = '';
+                elements[`${key}Select`].innerHTML = `<option value="">${any}</option>` +
+                    seasonKeys.map(season => `<option value="${season}">${season}</option>`).join('');
+                elements[`${key}Select`].value = state[key];
+            });
+            // Games per team: the lengths the league has had (once the
+            // standings are in - until then, just the one asked for)
+            const key = `${prefix}Games`;
+            const lengths = bySeason ? seasonLengths(bySeason, league) : [];
+            if (state[key] && bySeason && !lengths.includes(Number(state[key]))) state[key] = '';
+            const shown = state[key] && !lengths.includes(Number(state[key])) ? [Number(state[key])] : lengths;
+            elements[`${key}Select`].innerHTML = '<option value="">Any length</option>' +
+                shown.map(n => `<option value="${n}">${n} games</option>`).join('');
+            elements[`${key}Select`].value = state[key];
+        }
+
+        // A season within From / To (either way round)
+        function inSeasonRange(season, from, to) {
+            const [first, last] = from && to && from > to ? [to, from] : [from, to];
+            return (!first || season >= first) && (!last || season <= last);
+        }
+
+        // "1992-93 onwards", "up to 1999-00", "1990-91 to 1999-00"
+        function seasonRangeLabel(from, to) {
+            const [first, last] = from && to && from > to ? [to, from] : [from, to];
+            if (first && last) return first === last ? first : `${first} to ${last}`;
+            if (first) return `${first} onwards`;
+            if (last) return `up to ${last}`;
+            return '';
+        }
+
+        // A season's length in games per team: the most any club played, so
+        // a season cut short counts as what was played (Ligue 1 2019-20: 28,
+        // not 38); one still being played, a double round robin of its clubs
+        function seasonLength(seasonStandings, inProgress) {
+            const clubs = seasonStandings.standings;
+            return inProgress ? 2 * (clubs.length - 1) : Math.max(0, ...clubs.map(stats => stats.played));
+        }
+
+        // Every season length the league has had, longest first
+        function seasonLengths(bySeason, league) {
+            const today = localDateKey(new Date());
+            const lengths = new Set();
+            getAvailableSeasons(league).filter(season => !isEraSeasonKey(season)).forEach(season => {
+                const seasonStandings = bySeason[season];
+                const seasonDates = withSelectedLeague(league, () => getSeasonDateRange(season));
+                if (!seasonStandings || !seasonDates || !seasonStandings.standings.length) return;
+                lengths.add(seasonLength(seasonStandings, seasonDates.end > today));
+            });
+            return [...lengths].filter(Boolean).sort((a, b) => b - a);
+        }
+
         // Fill the league-dependent controls: eras, positions (as many as
         // the league's biggest season had, once the data is in) and teams
         function updateTeamRecordsControls() {
@@ -11319,6 +11451,7 @@
             elements.recordsEraSelect.innerHTML = '<option value="">All seasons</option>' +
                 eras.map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
             elements.recordsEraSelect.value = state.recordsEra;
+            fillSeasonFilters('records', getLeagueDivCode(league) === state.seasonStandingsApiCacheKey ? state.seasonStandingsApiCache : null);
 
             const divCode = getLeagueDivCode(league);
             const bySeason = state.seasonStandingsApiCacheKey === divCode ? state.seasonStandingsApiCache : {};
@@ -11377,6 +11510,8 @@
                 const seasonDates = withSelectedLeague(league, () => getSeasonDateRange(season));
                 if (!seasonStandings || !seasonDates || seasonDates.end > today) return;
                 if (era && (seasonDates.start < era.start || seasonDates.end > era.end)) return;
+                if (!inSeasonRange(season, state.recordsFrom, state.recordsTo)) return;
+                if (state.recordsGames && seasonLength(seasonStandings, false) !== Number(state.recordsGames)) return;
                 seasonFinalTable(seasonStandings, season, seasonDates, league, divCode).forEach(row => {
                     const stripped = strippedChampions.some(([team, div, s, pos]) =>
                         team === row.team && div === divCode && s === season && pos === row.position);
@@ -11414,12 +11549,13 @@
 
             const stat = state.recordsStat;
             const statInfo = RECORDS_STATS[stat];
-            const parts = [`${state.recordsOrder === 'fewest' ? 'Fewest' : 'Most'} ${statInfo.label.toLowerCase()}${state.recordsPerGame ? ' per game' : ''} in a season`];
+            const parts = [`${state.recordsOrder === 'fewest' ? 'Fewest' : 'Most'} ${statInfo.label.toLowerCase()}${state.recordsPerGame ? ' per game' : ''} in a ${state.recordsGames ? `${state.recordsGames}-game ` : ''}season`];
             if (state.recordsThreePoints && stat === 'points') parts.push('3 points for a win');
             if (state.recordsPosition) parts.push(`finishing ${getOrdinal(Number(state.recordsPosition))}${state.recordsBetter && state.recordsPosition !== '1' ? ' or better' : ''}`);
             if (state.recordsTeam) parts.push(state.recordsTeam);
             const eraLabel = recordsEraOptions(league).find(([key]) => key === state.recordsEra);
             if (eraLabel) parts.push(eraLabel[1]);
+            if (state.recordsFrom || state.recordsTo) parts.push(seasonRangeLabel(state.recordsFrom, state.recordsTo));
             elements.teamRecordsTitle.textContent = parts.join(' · ');
 
             // Phone layout: the season and games played sit under the team
@@ -11473,7 +11609,7 @@
             elements.recordsPrevPageBtn.disabled = state.recordsPage <= 1;
             elements.recordsNextPageBtn.disabled = state.recordsPage >= totalPages;
 
-            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsBetter}::${state.recordsEra}::${state.recordsTeam}::${state.recordsPage}`;
+            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsBetter}::${state.recordsEra}::${state.recordsTeam}::${state.recordsFrom}::${state.recordsTo}::${state.recordsGames}::${state.recordsPage}`;
             resetExpandedTeamSeasonsFor(viewKey);
             elements.teamRecordsBody.onclick = handleTeamSeasonExpandClick;
             const phoneValue = (row, key) => {

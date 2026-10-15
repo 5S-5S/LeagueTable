@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-12)
+## Priority (ranked 2026-10-03, updated 2026-10-15)
 
 Most to least important; details are in each item below.
 
@@ -42,7 +42,7 @@ empty search box.
 17. Head-to-head by decade
 18. Side-by-side Team Seasons
 19. League History chart
-20. Team Records: date ranges, bottom / relegated, home / away
+20. Team Records: bottom / relegated, home / away
 21. A club's title races
 22. Team progression chart (after League History)
 23. "/" to search
@@ -374,9 +374,8 @@ empty search box.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter
-  Team Records doesn't have, so it's dropped silently:
-  - Date ranges: "most points since 2000", "most goals in the 90s" -
-    Records has eras only (Premier League / First Division...).
+  Team Records doesn't have, so it's dropped silently (date ranges and
+  season length are done, 2026-10-15):
   - Bottom / relegated: "most points by a relegated team", "fewest points
     by a bottom team" - Position is one exact place; "bottom" varies by
     season (could be a "Last" option), relegation needs data we lack.
@@ -474,6 +473,19 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Team Records / League History: date ranges and season length~~ —
+  done (2026-10-15). Both sub-tabs have From / To season filters next to
+  the era, and on the Domestic page a Games per team filter: only
+  seasons of that length, the most games any club played, so a season
+  cut short counts as what was played (Ligue 1 2019-20: 28, not 38); one
+  still being played counts as a double round robin of its clubs.
+  Continental has From / To only. Copy Link params from / to (season
+  keys) and games. Search passes its date range on as seasons starting
+  within it ("since 2000" = 2000-01 on, "the 90s" = 1990-91 to 1999-00)
+  and reads "38-game season" / "seasons of 42 games"; before, these
+  parsed but were dropped, so the answer was all-time. Questions added to
+  tests/search/questions-records.txt.
 
 - ~~Streaks on the line (home page)~~ — done (2026-10-12). The snapped
   streaks card's other view, with an "On the line / Snapped" toggle

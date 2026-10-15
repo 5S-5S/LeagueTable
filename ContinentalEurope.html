@@ -760,7 +760,7 @@
                     <!-- Description -->
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex items-start justify-between gap-4 seasons-records-only">
                         <p class="text-gray-700 text-sm leading-relaxed">
-                            Every club's campaign in the competition, ranked by the stat you pick - most goals, fewest conceded and so on, however far they got. Narrow it to a stage reached, an era or one team, and choose whether qualifiers count. Click on the button on the left side of a row to get a list of matches played.
+                            Every club's campaign in the competition, ranked by the stat you pick - most goals, fewest conceded and so on, however far they got. Narrow it to a stage reached, an era or a range of seasons, or one team, and choose whether qualifiers count. Click on the button on the left side of a row to get a list of matches played.
                         </p>
                         <div class="copy-link-stack">
                             <button id="copyLinkBtnTeamRecords" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
@@ -769,7 +769,7 @@
                     </div>
                     <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg collapsible-control flex items-start justify-between gap-4 seasons-league-only">
                         <p class="text-gray-700 text-sm leading-relaxed">
-                            Every season of the competition, all clubs added up - matches, goals and how often the home side won. Newest first, to see how it has changed; rank by any column to find the record seasons. Open a season with the button on the left of its row for every club's campaign.
+                            Every season of the competition, all clubs added up - matches, goals and how often the home side won. Newest first, to see how it has changed; rank by any column to find the record seasons, and narrow it to a range of seasons. Open a season with the button on the left of its row for every club's campaign.
                         </p>
                         <div class="copy-link-stack">
                             <button id="copyLinkBtnLeagueHistory" class="btn btn-secondary copy-link-trigger copy-link-inline">🔗 Copy Link</button>
@@ -954,6 +954,18 @@
                                     <option value="qualifiers">Qualifiers only</option>
                                 </select>
                             </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsFromSelect">From:</label>
+                                <select id="recordsFromSelect" class="form-input w-full">
+                                    <option value="">Earliest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="recordsToSelect">To:</label>
+                                <select id="recordsToSelect" class="form-input w-full">
+                                    <option value="">Latest</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="records-toggles mt-4">
                             <label id="recordsBetterLabel" class="flex items-center cursor-pointer hidden">
@@ -1035,6 +1047,20 @@
                                     <option value="main">Main stage only</option>
                                     <option value="all">Including qualifiers</option>
                                     <option value="qualifiers">Qualifiers only</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="records-controls mt-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="leagueHistoryFromSelect">From:</label>
+                                <select id="leagueHistoryFromSelect" class="form-input w-full">
+                                    <option value="">Earliest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="leagueHistoryToSelect">To:</label>
+                                <select id="leagueHistoryToSelect" class="form-input w-full">
+                                    <option value="">Latest</option>
                                 </select>
                             </div>
                         </div>
@@ -1518,6 +1544,8 @@
             recordsPosition: '', // a stage reached (Continental)
             recordsMatches: 'main', // 'main' | 'all' (with qualifiers) | 'qualifiers'
             recordsEra: '',
+            recordsFrom: '',
+            recordsTo: '',
             recordsTeam: '',
             recordsPage: 1,
             recordsPerGame: false, // every column per game (W / D / L as a percentage)
@@ -1526,6 +1554,8 @@
             leagueHistoryRank: 'season',
             leagueHistoryOrder: 'most', // 'most' = newest first / highest
             leagueHistoryEra: '',
+            leagueHistoryFrom: '',
+            leagueHistoryTo: '',
             leagueHistoryPerGame: false,
             leagueHistoryThreePoints: false,
             leagueHistoryMatches: 'main', // Continental: 'main' | 'all' | 'qualifiers'
@@ -2944,6 +2974,8 @@
                 params.set('rank', state.leagueHistoryRank);
                 params.set('order', state.leagueHistoryOrder);
                 if (state.leagueHistoryEra) params.set('season', state.leagueHistoryEra);
+                if (state.leagueHistoryFrom) params.set('from', state.leagueHistoryFrom);
+                if (state.leagueHistoryTo) params.set('to', state.leagueHistoryTo);
                 if (state.leagueHistoryPerGame) params.set('pg', '1');
                 if (state.leagueHistoryMatches !== 'main') params.set('matches', state.leagueHistoryMatches);
             } else if (view === 'team-seasons' && state.seasonsSubTab === 'records') {
@@ -2958,6 +2990,8 @@
                 if (state.recordsPosition) params.set('pos', state.recordsPosition);
                 if (state.recordsPosition && state.recordsBetter) params.set('better', '1');
                 if (state.recordsEra) params.set('season', state.recordsEra);
+                if (state.recordsFrom) params.set('from', state.recordsFrom);
+                if (state.recordsTo) params.set('to', state.recordsTo);
                 if (state.recordsTeam) params.set('t1', state.recordsTeam);
                 if (state.recordsMatches !== 'main') params.set('matches', state.recordsMatches);
             } else if (view === 'team-seasons') {
@@ -3147,6 +3181,8 @@
                 if (LEAGUE_HISTORY_RANKS[params.get('rank')]) state.leagueHistoryRank = params.get('rank');
                 state.leagueHistoryOrder = params.get('order') === 'fewest' ? 'fewest' : 'most';
                 state.leagueHistoryEra = params.get('season') || '';
+                state.leagueHistoryFrom = params.get('from') || '';
+                state.leagueHistoryTo = params.get('to') || '';
                 state.leagueHistoryPerGame = params.get('pg') === '1';
                 state.leagueHistoryMatches = ['all', 'qualifiers'].includes(params.get('matches')) ? params.get('matches') : 'main';
                 setSeasonsSubTab('league');
@@ -3162,6 +3198,8 @@
                 state.recordsPosition = params.get('pos') || '';
                 state.recordsBetter = params.get('better') === '1';
                 state.recordsEra = params.get('season') || '';
+                state.recordsFrom = params.get('from') || '';
+                state.recordsTo = params.get('to') || '';
                 state.recordsTeam = params.get('t1') || '';
                 state.recordsMatches = ['all', 'qualifiers'].includes(params.get('matches')) ? params.get('matches') : 'main';
                 state.recordsPage = 1;
@@ -3534,6 +3572,8 @@
             recordsOrderSelect: document.getElementById('recordsOrderSelect'),
             recordsPositionSelect: document.getElementById('recordsPositionSelect'),
             recordsEraSelect: document.getElementById('recordsEraSelect'),
+            recordsFromSelect: document.getElementById('recordsFromSelect'),
+            recordsToSelect: document.getElementById('recordsToSelect'),
             recordsInfo: document.getElementById('recordsInfo'),
             teamRecordsTitle: document.getElementById('teamRecordsTitle'),
             teamRecordsHeader: document.getElementById('teamRecordsHeader'),
@@ -3550,6 +3590,8 @@
             leagueHistoryRankSelect: document.getElementById('leagueHistoryRankSelect'),
             leagueHistoryOrderSelect: document.getElementById('leagueHistoryOrderSelect'),
             leagueHistoryEraSelect: document.getElementById('leagueHistoryEraSelect'),
+            leagueHistoryFromSelect: document.getElementById('leagueHistoryFromSelect'),
+            leagueHistoryToSelect: document.getElementById('leagueHistoryToSelect'),
             leagueHistoryPerGameCheckbox: document.getElementById('leagueHistoryPerGameCheckbox'),
             leagueHistoryInfo: document.getElementById('leagueHistoryInfo'),
             leagueHistoryTitle: document.getElementById('leagueHistoryTitle'),
@@ -6991,7 +7033,8 @@
             });
             [['recordsStatSelect', 'recordsStat'], ['recordsOrderSelect', 'recordsOrder'],
                 ['recordsPositionSelect', 'recordsPosition'], ['recordsEraSelect', 'recordsEra'],
-                ['recordsMatchesSelect', 'recordsMatches']].forEach(([el, key]) => {
+                ['recordsMatchesSelect', 'recordsMatches'],
+                ['recordsFromSelect', 'recordsFrom'], ['recordsToSelect', 'recordsTo']].forEach(([el, key]) => {
                 elements[el].addEventListener('change', (e) => {
                     state[key] = e.target.value;
                     state.recordsPage = 1;
@@ -7007,7 +7050,8 @@
                 renderTeamRecords();
             });
             // League History controls
-            [['leagueHistoryRankSelect', 'leagueHistoryRank'], ['leagueHistoryOrderSelect', 'leagueHistoryOrder'], ['leagueHistoryEraSelect', 'leagueHistoryEra'], ['leagueHistoryMatchesSelect', 'leagueHistoryMatches']].forEach(([el, key]) => {
+            [['leagueHistoryRankSelect', 'leagueHistoryRank'], ['leagueHistoryOrderSelect', 'leagueHistoryOrder'], ['leagueHistoryEraSelect', 'leagueHistoryEra'], ['leagueHistoryMatchesSelect', 'leagueHistoryMatches'],
+                ['leagueHistoryFromSelect', 'leagueHistoryFrom'], ['leagueHistoryToSelect', 'leagueHistoryTo']].forEach(([el, key]) => {
                 elements[el].addEventListener('change', (e) => {
                     state[key] = e.target.value;
                     // a new ranking starts at its highest (season: newest)
@@ -13910,6 +13954,7 @@
             elements.leagueHistoryEraSelect.innerHTML = '<option value="">All seasons</option>' +
                 eras.map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
             elements.leagueHistoryEraSelect.value = state.leagueHistoryEra;
+            fillSeasonFilters('leagueHistory');
             elements.leagueHistoryRankSelect.value = state.leagueHistoryRank;
             const bySeason = state.leagueHistoryRank === 'season';
             elements.leagueHistoryOrderSelect.innerHTML = `
@@ -13934,6 +13979,7 @@
                 const seasonDates = withSelectedLeague(league, () => getSeasonDateRange(season));
                 if (!seasonStandings || !seasonDates || !seasonStandings.matchCount) return;
                 if (era && (seasonDates.start < era.start || seasonDates.end > era.end)) return;
+                if (!inSeasonRange(season, state.leagueHistoryFrom, state.leagueHistoryTo)) return;
                 const games = seasonStandings.matchCount;
                 const base = {
                     season,
@@ -14027,6 +14073,7 @@
                         : `${low ? 'Lowest' : 'Highest'} ${label.toLowerCase()}${perGameWords}`];
             const eraLabel = recordsEraOptions(league).find(([k]) => k === state.leagueHistoryEra);
             if (eraLabel) titleParts.push(eraLabel[1]);
+            if (state.leagueHistoryFrom || state.leagueHistoryTo) titleParts.push(seasonRangeLabel(state.leagueHistoryFrom, state.leagueHistoryTo));
             if (state.leagueHistoryMatches === 'all') titleParts.push('including qualifiers');
             if (state.leagueHistoryMatches === 'qualifiers') titleParts.push('qualifiers only');
             elements.leagueHistoryTitle.textContent = titleParts.join(' · ');
@@ -14249,6 +14296,36 @@
             return [];
         }
 
+        // From / To: seasons narrowed alongside the era. Season keys sort as
+        // strings ('1992-93' < '2000-01'). prefix: 'records' or
+        // 'leagueHistory'
+        function fillSeasonFilters(prefix) {
+            const league = state.teamSeasonsSelectedLeague;
+            const seasonKeys = getAvailableSeasons(league).filter(season => !isEraSeasonKey(season));
+            [['From', 'Earliest'], ['To', 'Latest']].forEach(([end, any]) => {
+                const key = `${prefix}${end}`;
+                if (state[key] && !seasonKeys.includes(state[key])) state[key] = '';
+                elements[`${key}Select`].innerHTML = `<option value="">${any}</option>` +
+                    seasonKeys.map(season => `<option value="${season}">${season}</option>`).join('');
+                elements[`${key}Select`].value = state[key];
+            });
+        }
+
+        // A season within From / To (either way round)
+        function inSeasonRange(season, from, to) {
+            const [first, last] = from && to && from > to ? [to, from] : [from, to];
+            return (!first || season >= first) && (!last || season <= last);
+        }
+
+        // "1992-93 onwards", "up to 1999-00", "1990-91 to 1999-00"
+        function seasonRangeLabel(from, to) {
+            const [first, last] = from && to && from > to ? [to, from] : [from, to];
+            if (first && last) return first === last ? first : `${first} to ${last}`;
+            if (first) return `${first} onwards`;
+            if (last) return `up to ${last}`;
+            return '';
+        }
+
         // The Matches filter's season-standings request flags
         function recordsMatchesFlags() {
             return {
@@ -14272,6 +14349,7 @@
             elements.recordsEraSelect.innerHTML = '<option value="">All seasons</option>' +
                 eras.map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
             elements.recordsEraSelect.value = state.recordsEra;
+            fillSeasonFilters('records');
 
             if (![...elements.recordsPositionSelect.options].some(o => o.value === state.recordsPosition)) state.recordsPosition = '';
             elements.recordsPositionSelect.value = state.recordsPosition;
@@ -14327,6 +14405,7 @@
                 const seasonDates = withSelectedLeague(league, () => getSeasonDateRange(season));
                 if (!seasonStandings || !seasonDates || seasonDates.end > today) return;
                 if (era && (seasonDates.start < era.start || seasonDates.end > era.end)) return;
+                if (!inSeasonRange(season, state.recordsFrom, state.recordsTo)) return;
                 const seasonStart = new Date(seasonDates.start);
                 const seasonEnd = new Date(seasonDates.end);
                 seasonStandings.standings.filter(stats => stats.team && stats.team.length > 1).forEach(stats => {
@@ -14412,6 +14491,7 @@
             if (state.recordsTeam) parts.push(state.recordsTeam);
             const eraLabel = recordsEraOptions(league).find(([key]) => key === state.recordsEra);
             if (eraLabel) parts.push(eraLabel[1]);
+            if (state.recordsFrom || state.recordsTo) parts.push(seasonRangeLabel(state.recordsFrom, state.recordsTo));
             elements.teamRecordsTitle.textContent = parts.join(' · ');
 
             const headers = [
@@ -14461,7 +14541,7 @@
             elements.recordsPrevPageBtn.disabled = state.recordsPage <= 1;
             elements.recordsNextPageBtn.disabled = state.recordsPage >= totalPages;
 
-            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsBetter}::${state.recordsEra}::${state.recordsTeam}::${state.recordsMatches}::${state.recordsPage}`;
+            const viewKey = `records::${league}::${stat}::${state.recordsOrder}::${state.recordsPosition}::${state.recordsBetter}::${state.recordsEra}::${state.recordsTeam}::${state.recordsFrom}::${state.recordsTo}::${state.recordsMatches}::${state.recordsPage}`;
             resetExpandedTeamSeasonsFor(viewKey);
             elements.teamRecordsBody.onclick = handleTeamSeasonExpandClick;
             const cell = (key, content) => `<td class="px-3 py-4 text-center ${key === stat ? 'records-stat-col' : ''}">${content}</td>`;

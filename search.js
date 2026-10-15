@@ -1785,7 +1785,7 @@
         const filters = {
             dateFrom: '', dateTo: '', day: '', location: '', lastN: '', points: '', deductions: '',
             stage: '', penalties: false, excludeQualifiers: false, excludeMainStage: false,
-            extraTime: false, awayGoals: false, tieMode: false
+            extraTime: false, awayGoals: false, tieMode: false, games: ''
         };
         TEXT_FILTERS.forEach(([key, value, pattern]) => {
             const m = text.match(pattern);
@@ -1794,6 +1794,15 @@
                 text = text.replace(m[0], ' ');
             }
         });
+        // A season's length: "a 38-game season", "seasons of 42 games" -
+        // Team Records' and League History's Games per team (the word
+        // season stays, so it's still a season record)
+        const length = text.match(/\b(\d{2})[- ]?(?:games?|matches|match)[- ](seasons?|campaigns?)\b/);
+        const lengthAfter = text.match(/\b(seasons?|campaigns?) (?:of|with) (\d{2}) (?:games|matches)\b/);
+        if (length || lengthAfter) {
+            filters.games = String(Number(length ? length[1] : lengthAfter[2]));
+            text = text.replace((length || lengthAfter)[0], ` ${(length || lengthAfter)[length ? 2 : 1]} `);
+        }
         const dateRange = extractDateRange(text);
         if (dateRange) {
             filters.dateFrom = dateRange.from;
@@ -2219,6 +2228,30 @@
         return era ? `${capitalize(ERA_NAMES[era].replace(/^the /, ''))} era` : 'All seasons';
     }
 
+    // Dates as Team Records' and League History's From / To: the seasons
+    // starting within them ("since 2000" = 2000-01 on, "the 90s" = 1990-91
+    // to 1999-00, "since the 2010-11 season" = 2010-11 on). A range inside
+    // one season ("in January 2010") is that season.
+    function recordSeasons(parsed) {
+        const { dateFrom, dateTo } = parsed.filters;
+        const year = date => Number(date.slice(0, 4));
+        const month = date => Number(date.slice(5, 7));
+        const to = dateTo ? seasonKey(month(dateTo) >= 7 ? year(dateTo) : year(dateTo) - 1) : '';
+        let from = dateFrom ? seasonKey(month(dateFrom) <= 8 ? year(dateFrom) : year(dateFrom) + 1) : '';
+        if (from && to && from > to) from = to;
+        return { from, to };
+    }
+
+    // The seasons a record searched: the era, or From / To, and the length
+    function recordSeasonsDetail(parsed, comp) {
+        const { from, to } = recordSeasons(parsed);
+        const range = from && to ? (from === to ? from : `${from} to ${to}`)
+            : from ? `${from} onwards` : to ? `Up to ${to}` : eraDetail(parsed, comp);
+        const games = !comp.continental && parsed.filters.games;
+        if (!games) return range;
+        return range === 'All seasons' ? `${games}-game seasons` : `${range} · ${games}-game seasons`;
+    }
+
     // Team Records, through its Copy Link parameters (sub=records)
     function teamRecordsResult(comp, team, parsed, intent) {
         const { finish } = intent;
@@ -2234,6 +2267,8 @@
             pos,
             better: better ? '1' : '',
             season: parsed.eras[comp.key] || '',
+            ...recordSeasons(parsed),
+            games: comp.continental ? '' : parsed.filters.games,
             t1: team,
             pg: intent.perGame ? '1' : '',
             p3: parsed.filters.points === '1' ? '1' : '',
@@ -2244,10 +2279,10 @@
             : `${intent.order === 'fewest' ? 'Fewest' : 'Most'} ${RECORD_STAT_NAMES[intent.stat]}${intent.perGame ? ' per game' : ''}`;
         return {
             kind: 'team-records', icon: '📈', comp, crestTeam: team || undefined,
-            title: `${team || 'All clubs'} · ${what} in a ${comp.continental ? 'campaign' : 'season'}`,
+            title: `${team || 'All clubs'} · ${what} in a ${comp.continental ? 'campaign' : `${params.games ? `${params.games}-game ` : ''}season`}`,
             detail: joinDetail([
                 'Team Records',
-                eraDetail(parsed, comp),
+                recordSeasonsDetail(parsed, comp),
                 pos ? (comp.continental ? `Reached: ${pos}${better ? ' or further' : ''}` : `Finished ${pos}${ordinalSuffix(Number(pos))}${better ? ' or better' : ''}`) : '',
                 params.p3 ? '3 points for a win' : ''
             ]),
@@ -2263,6 +2298,8 @@
             rank: intent.rank,
             order: intent.order,
             season: parsed.eras[comp.key] || '',
+            ...recordSeasons(parsed),
+            games: comp.continental ? '' : parsed.filters.games,
             pg: intent.perGame ? '1' : '',
             p3: !comp.continental && parsed.filters.points === '1' ? '1' : '',
             matches: !comp.continental ? '' : (parsed.filters.excludeMainStage ? 'qualifiers' : (intent.withQualifiers ? 'all' : ''))
@@ -2279,7 +2316,7 @@
         return {
             kind: 'league-history', icon: '📊', comp,
             title: `${comp.name} · ${what}${intent.perGame && intent.rank === 'goals' ? ' per game' : ''}`,
-            detail: joinDetail(['League History', eraDetail(parsed, comp)]),
+            detail: joinDetail(['League History', recordSeasonsDetail(parsed, comp)]),
             href: competitionUrl(comp, 'team-seasons', params)
         };
     }
