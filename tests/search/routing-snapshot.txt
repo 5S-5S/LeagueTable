@@ -4342,3 +4342,135 @@ premier-league | fewest points in the top 4
     team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th or better | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&pos=4&better=1
 champions-league | fewest points in the top 4
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | most points in a season since 1992
+    team-records | All clubs · Most points in a season | Team Records · 1992-93 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&from=1992-93
+    team-records | All clubs · Most points in a season | Team Records · 1992-93 onwards | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=most&from=1992-93
+    team-records | All clubs · Most points in a season | Team Records · 1992-93 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=most&from=1992-93
+    team-records | All clubs · Most points in a season | Team Records · 1992-93 onwards | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=most&from=1992-93
+    team-records | All clubs · Most points in a season | Team Records · 1992-93 onwards | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=most&from=1992-93
+premier-league | most points in a season since 1992
+    team-records | All clubs · Most points in a season | Team Records · 1992-93 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&from=1992-93
+champions-league | most points in a season since 1992
+    team-records | All clubs · Most points in a campaign | Team Records · 1992-93 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most&from=1992-93
+domestic | most goals in a season since 2000
+    team-records | All clubs · Most goals scored in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&from=2000-01
+    team-records | All clubs · Most goals scored in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&from=2000-01
+    team-records | All clubs · Most goals scored in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&from=2000-01
+    team-records | All clubs · Most goals scored in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&from=2000-01
+    team-records | All clubs · Most goals scored in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&from=2000-01
+premier-league | most goals in a season since 2000
+    team-records | All clubs · Most goals scored in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&from=2000-01
+champions-league | most goals in a season since 2000
+    team-records | All clubs · Most goals scored in a campaign | Team Records · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most&from=2000-01
+domestic | most goals in a season in the 90s
+    team-records | All clubs · Most goals scored in a season | Team Records · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+    team-records | All clubs · Most goals scored in a season | Team Records · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+    team-records | All clubs · Most goals scored in a season | Team Records · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+    team-records | All clubs · Most goals scored in a season | Team Records · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+    team-records | All clubs · Most goals scored in a season | Team Records · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+premier-league | most goals in a season in the 90s
+    team-records | All clubs · Most goals scored in a season | Team Records · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+champions-league | most goals in a season in the 90s
+    team-records | All clubs · Most goals scored in a campaign | Team Records · 1990-91 to 1999-00 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most&from=1990-91&to=1999-00
+domestic | Arsenal most points in a season since 2000
+    team-records | Arsenal FC · Most points in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&from=2000-01&t1=Arsenal+FC
+premier-league | Arsenal most points in a season since 2000
+    team-records | Arsenal FC · Most points in a season | Team Records · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&from=2000-01&t1=Arsenal+FC
+champions-league | Arsenal most points in a season since 2000
+    team-records | Arsenal FC · Most points in a campaign | Team Records · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most&from=2000-01&t1=Arsenal+FC
+domestic | fewest points in a season between 1990 and 2000
+    team-records | All clubs · Fewest points in a season | Team Records · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+    team-records | All clubs · Fewest points in a season | Team Records · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+    team-records | All clubs · Fewest points in a season | Team Records · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+    team-records | All clubs · Fewest points in a season | Team Records · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+    team-records | All clubs · Fewest points in a season | Team Records · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+premier-league | fewest points in a season between 1990 and 2000
+    team-records | All clubs · Fewest points in a season | Team Records · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+champions-league | fewest points in a season between 1990 and 2000
+    team-records | All clubs · Fewest points in a campaign | Team Records · 1990-91 to 2000-01 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=fewest&from=1990-91&to=2000-01
+domestic | most points in a season in the last 10 seasons
+    team-records | All clubs · Most points in a season | Team Records · 2017-18 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&from=2017-18
+    team-records | All clubs · Most points in a season | Team Records · 2017-18 onwards | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=most&from=2017-18
+    team-records | All clubs · Most points in a season | Team Records · 2017-18 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=most&from=2017-18
+    team-records | All clubs · Most points in a season | Team Records · 2017-18 onwards | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=most&from=2017-18
+    team-records | All clubs · Most points in a season | Team Records · 2017-18 onwards | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=most&from=2017-18
+premier-league | most points in a season in the last 10 seasons
+    team-records | All clubs · Most points in a season | Team Records · 2017-18 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&from=2017-18
+champions-league | most points in a season in the last 10 seasons
+    team-records | All clubs · Most points in a campaign | Team Records · 2017-18 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most&from=2017-18
+domestic | most goals in a 38-game season
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&games=38
+premier-league | most goals in a 38-game season
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+champions-league | most goals in a 38-game season
+    team-records | All clubs · Most goals scored in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most
+domestic | most goals in a 38 game season since 2000
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 2000-01 onwards · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&from=2000-01&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 2000-01 onwards · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&from=2000-01&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 2000-01 onwards · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&from=2000-01&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 2000-01 onwards · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&from=2000-01&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 2000-01 onwards · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&from=2000-01&games=38
+premier-league | most goals in a 38 game season since 2000
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 2000-01 onwards · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&from=2000-01&games=38
+champions-league | most goals in a 38 game season since 2000
+    team-records | All clubs · Most goals scored in a campaign | Team Records · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most&from=2000-01
+domestic | most points in a 42 game season
+    team-records | All clubs · Most points in a 42-game season | Team Records · 42-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&games=42
+    team-records | All clubs · Most points in a 42-game season | Team Records · 42-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=most&games=42
+    team-records | All clubs · Most points in a 42-game season | Team Records · 42-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=most&games=42
+    team-records | All clubs · Most points in a 42-game season | Team Records · 42-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=most&games=42
+    team-records | All clubs · Most points in a 42-game season | Team Records · 42-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=most&games=42
+premier-league | most points in a 42 game season
+    team-records | All clubs · Most points in a 42-game season | Team Records · 42-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&games=42
+champions-league | most points in a 42 game season
+    team-records | All clubs · Most points in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most
+domestic | highest scoring seasons since 2000
+    league-history | Premier League · Highest-scoring seasons | League History · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=goals&order=most&from=2000-01
+    league-history | La Liga · Highest-scoring seasons | League History · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=league&rank=goals&order=most&from=2000-01
+    league-history | Serie A · Highest-scoring seasons | League History · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=league&rank=goals&order=most&from=2000-01
+    league-history | Bundesliga · Highest-scoring seasons | League History · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=league&rank=goals&order=most&from=2000-01
+    league-history | Ligue 1 · Highest-scoring seasons | League History · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=league&rank=goals&order=most&from=2000-01
+premier-league | highest scoring seasons since 2000
+    league-history | Premier League · Highest-scoring seasons | League History · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=goals&order=most&from=2000-01
+champions-league | highest scoring seasons since 2000
+    league-history | Champions League · Highest-scoring seasons | League History · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=league&rank=goals&order=most&from=2000-01
+domestic | closest title races in the 2010s
+    league-history | Premier League · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
+    league-history | La Liga · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
+    league-history | Serie A · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
+    league-history | Bundesliga · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
+    league-history | Ligue 1 · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
+premier-league | closest title races in the 2010s
+    league-history | Premier League · Closest title races | League History · 2010-11 to 2019-20 | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=gap&order=fewest&from=2010-11&to=2019-20
+champions-league | closest title races in the 2010s
+    message: Title races are a league's - the Champions League is decided by knockouts. Pick a league in the dropdown.
+domestic | highest scoring club seasons 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&games=38
+premier-league | highest scoring club seasons 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+champions-league | highest scoring club seasons 38 games
+    team-records | All clubs · Most goals scored in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most
+domestic | most goals in seasons with 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsFor&order=most&games=38
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsFor&order=most&games=38
+premier-league | most goals in seasons with 38 games
+    team-records | All clubs · Most goals scored in a 38-game season | Team Records · 38-game seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&games=38
+champions-league | most goals in seasons with 38 games
+    team-records | All clubs · Most goals scored in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most
+domestic | Arsenal unbeaten in the last 38 games this season
+    team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten
+premier-league | Arsenal unbeaten in the last 38 games this season
+    team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten
+champions-league | Arsenal unbeaten in the last 38 games this season
+    team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Arsenal+FC&type=unbeaten
