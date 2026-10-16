@@ -5,8 +5,10 @@
 //
 // Two views, as the streaks card's toggle:
 // - Notable: the day's standout matches - finals and semi-finals, big wins,
-//   high scores, a big club beaten, shootouts, round anniversaries - varied
-//   so one league or club doesn't fill it.
+//   high scores, shootouts, round anniversaries - varied so one league or
+//   club doesn't fill it. Only facts about the match itself are labelled
+//   (the stage, a shootout, the anniversary); nothing that depends on how
+//   strong a club was then.
 // - Your team: every match the visitor's favourite team (favourite-team.js)
 //   played on this day, newest first, picked with the sport pages' team
 //   search box (combobox.js).
@@ -34,14 +36,6 @@
         F1: { slug: 'ligue-1', name: 'Ligue 1', flag: '🇫🇷', page: 'DomesticEurope.html' },
         C1: { slug: 'champions-league', name: 'Champions League', flag: '🇪🇺', page: 'ContinentalEurope.html' }
     };
-
-    // The clubs whose defeats make a match stand out (an upset)
-    const BIG_CLUBS = new Set([
-        'Arsenal FC', 'Chelsea FC', 'Liverpool FC', 'Manchester City', 'Manchester United', 'Tottenham Hotspur',
-        'Real Madrid', 'FC Barcelona', 'Atlético Madrid', 'Bayern München', 'Borussia Dortmund',
-        'Juventus', 'Inter', 'AC Milan', 'AS Roma', 'SSC Napoli', 'Paris Saint-Germain', 'Olympique Marseille',
-        'AFC Ajax', 'SL Benfica', 'FC Porto'
-    ]);
 
     const state = {
         md: '',             // 'MM-DD', the visitor's today
@@ -108,7 +102,8 @@
 
     // --- What makes a match stand out ---------------------------------------
 
-    // A score and the reasons for it, each reason a pill
+    // A score and the reasons for it, each reason a pill - big wins and
+    // high scores rank a match without a pill of their own
     function notability(m) {
         const margin = Math.abs(m.homeGoals - m.awayGoals);
         const total = m.homeGoals + m.awayGoals;
@@ -130,25 +125,8 @@
             reasons.push(['stage', 'Penalties']);
         }
         // Goals count up to a point, so a 10-1 doesn't bury everything else
-        if (margin >= 4) {
-            score += Math.min(margin - 3, 4) * 5;
-            reasons.push(['goals', `${margin}-goal win`]);
-        }
-        if (total >= 7) {
-            score += Math.min(total - 6, 4) * 4;
-            reasons.push(['goals', `${total} goals`]);
-        }
-        if (margin >= 2) {
-            // A big club beaten by one that isn't: by three or more, or by
-            // two at home
-            const homeLost = m.homeGoals < m.awayGoals;
-            const loser = homeLost ? m.homeTeam : m.awayTeam;
-            const winner = homeLost ? m.awayTeam : m.homeTeam;
-            if (BIG_CLUBS.has(loser) && !BIG_CLUBS.has(winner) && (margin >= 3 || homeLost)) {
-                score += 6 + margin * 3;
-                reasons.push(['upset', 'Upset']);
-            }
-        }
+        if (margin >= 4) score += Math.min(margin - 3, 4) * 5;
+        if (total >= 7) score += Math.min(total - 6, 4) * 4;
         const years = yearsAgo(m);
         const round = [50, 25, 10].find(n => years % n === 0);
         if (round && score > 0) {
@@ -295,7 +273,7 @@
             <p class="ss-sub">${teamView
                 ? (team ? `Every match ${escapeHtml(team)} played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
                     : `Pick your team to see every match it played on ${escapeHtml(day)}. It's remembered on this device.`)
-                : `Finals, big wins, high scores and upsets from ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>`;
+                : `Finals, big wins and high scores from ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>`;
 
         els.teamRow.hidden = !teamView;
         els.remove.hidden = !team;
