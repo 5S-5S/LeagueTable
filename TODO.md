@@ -26,7 +26,7 @@ empty search box.
 **Tier 2 - high value, soon after launch** (and reasons to come back)
 6. Match Finder: a country's clubs as the subject (on hold)
 7. API caching (what's left - the outage-preventing parts are done)
-8. Favourite team: the rest (On this day uses it)
+8. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
 9. Typo tolerance in search
@@ -359,15 +359,20 @@ empty search box.
   shootout record" - which needs a new all-clubs list. Moved to Tier 4
   on 2026-10-06 (low priority).
 
-- Maybe: **Favourite team: the rest** — remember a user's team via
-  `localStorage` so the landing-page search can offer a one-click shortcut
-  back to their dashboard instead of retyping every visit. Moved to
-  Tier 2 on 2026-10-09: it lets the home page cards (upcoming, snapped
-  streaks, On this day) lead with the visitor's club. Started 2026-10-15:
-  favourite-team.js keeps it (window.FavouriteTeam - get / set /
-  onChange / resolve) and On this day's "Your team" view picks and uses
-  it. Still to do: the search shortcut, upcoming matches and the streaks
-  card leading with it, the sport pages opening on it.
+- Maybe: **Expand favourite team** — the visitor's team is kept since
+  2026-10-15 (favourite-team.js: window.FavouriteTeam - get / set / clear
+  / onChange / allTeams / resolve, in localStorage) and picked and used
+  only by On this day's "Your team" view (combobox.js, the sport pages'
+  team search box). Moved to Tier 2 on 2026-10-09: it lets the home page
+  lead with the visitor's club. Where else it could go:
+  - Upcoming matches: the favourite's next fixture first (or a filter).
+  - The streaks card: a "Your team" view like On this day's, its runs on
+    the line and snapped.
+  - The search: a one-click shortcut to the favourite's dashboard, and
+    questions about "my team".
+  - The sport pages: Team 1 / Team History / Team Streaks opening on it
+    (only where the club is in that competition).
+  - One place to pick it (the header?) rather than only inside a card.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter
@@ -487,7 +492,11 @@ empty search box.
   then). Each match opens into links answered by the search: every
   meeting of the pair, every match that day, the league table that day,
   and the runs it ended in Team Streaks. Names as they were then (First
-  Division, Division 1, European Cup), streak labels included.
+  Division, Division 1, European Cup), streak labels included. A streak
+  that was a club record when it ended but has been beaten since says
+  "Club record then · now 9 (1972)" (findStreaks() keeps each club's
+  longest run of every kind across all of history - recordNow), on the
+  snapped card too.
   - Data: /api/on-this-day?md=MM-DD (Worker) - date IN (one per year)
     with idx_matches_date forced: ~1,400 rows read for a day (581
     matches on 15 October), cached under history-version, a day in the
