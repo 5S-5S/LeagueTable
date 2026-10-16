@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS matches (
 --   1. Every match for one team (home or away), within one competition   -> team history
 --   2. Every match between two specific teams                            -> head-to-head
 --   3. Every match within one competition (to build a full table)        -> standings
+--   4. Every match on one calendar day across the years                  -> on-this-day
+--      (date IN ('1888-10-15', ..., '2025-10-15'), idx_matches_date forced
+--      with INDEXED BY: ~1,400 rows read for a day instead of a full scan)
 CREATE INDEX IF NOT EXISTS idx_matches_div ON matches(div);
 CREATE INDEX IF NOT EXISTS idx_matches_date ON matches(date);
 

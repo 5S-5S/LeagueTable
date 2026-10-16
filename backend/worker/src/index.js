@@ -656,6 +656,49 @@ async function handleUpcoming(env) {
     return jsonResponse(body);
 }
 
+// The home page's On this day card: every match played on one calendar
+// day (md = 'MM-DD', the visitor's own date) in earlier years, in the six
+// competitions the home page covers. One equality per year on
+// idx_matches_date (forced - see the schema) rather than a substr() over
+// the whole table, so D1 reads only that day's rows (~1,400 for 15
+// October, against 170,000+ for a scan). The dates are built here from a
+// validated md, so they're written into the SQL (a bind per year would pass
+// D1's 100-parameter limit). Every year asked for is over, so the answer
+// is fixed: kept under history-version, a day in the browser.
+const ON_THIS_DAY_DIVS = ['E0', 'SP1', 'I1', 'D1', 'F1', 'C1'];
+const ON_THIS_DAY_FIRST_YEAR = 1888;
+
+async function handleOnThisDay(url, env) {
+    const md = url.searchParams.get('md') || '';
+    if (!/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(md)) {
+        return jsonResponse({ error: 'md (MM-DD) query param is required' }, 400);
+    }
+    const thisYear = new Date().getUTCFullYear();
+    const body = await withCache(env, ['on-this-day', md, thisYear], async () => {
+        const dates = [];
+        for (let year = ON_THIS_DAY_FIRST_YEAR; year < thisYear; year++) dates.push(`'${year}-${md}'`);
+        const { results } = await env.DB.prepare(
+            `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
+             FROM matches INDEXED BY idx_matches_date
+             WHERE date IN (${dates.join(',')}) AND div IN (${ON_THIS_DAY_DIVS.map(div => `'${div}'`).join(',')})
+             ORDER BY date DESC, div, home_team`
+        ).all();
+        const matches = results.map(row => ({
+            div: row.div,
+            date: row.date,
+            homeTeam: row.home_team,
+            awayTeam: row.away_team,
+            homeGoals: row.home_goals,
+            awayGoals: row.away_goals,
+            competitionPhase: row.competition_phase,
+            isQualifier: !!row.is_qualifier,
+            additionalInfo: row.additional_info,
+        }));
+        return { md, matches };
+    }, { fixed: true });
+    return jsonResponse(body, 200, { fixed: true });
+}
+
 // The job writes the whole list as one KV value; read as text and passed
 // straight through (no parse/stringify of ~100 KB per request)
 async function handleSnappedStreaks(env) {
@@ -1012,6 +1055,10 @@ export default {
 
             if (url.pathname === '/api/snapped-streaks') {
                 return await handleSnappedStreaks(env);
+            }
+
+            if (url.pathname === '/api/on-this-day') {
+                return await handleOnThisDay(url, env);
             }
 
             if (url.pathname === '/api/season-standings' && request.method === 'POST') {

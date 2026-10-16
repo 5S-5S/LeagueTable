@@ -13,7 +13,8 @@
 //    pages) in headless Chrome - every tab and Seasons sub-tab clicked, no
 //    script error, Team Records and League History draw rows; and League
 //    Tables filter combinations that once showed nothing; the home page's
-//    upcoming matches (from a fixed fixture list) and the streaks card,
+//    upcoming matches (from a fixed fixture list), On this day (today's
+//    matches, the first opening into its links) and the streaks card,
 //    snapped and on the line (the live lists).
 // 3. Exact answers (checks/answers.json "exact"): questions about the past,
 //    whose answer can't change - the answer line and its note, word for
@@ -228,6 +229,27 @@ async function checkPages(browser, base) {
         page.on('pageerror', err => errors.push(String(err.message || err).split('\n')[0]));
         await page.setViewport({ width: 1300, height: 900 });
         await page.goto(`${base}/index.html`, { waitUntil: 'networkidle2', timeout: 45000 });
+        // On this day: today's standout matches, and the first opening into
+        // its links (none when no match was ever played on today's date -
+        // then the card stays hidden)
+        const otdMatches = await page.evaluate(async () => {
+            const d = new Date();
+            const md = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            const res = await fetch(`https://leaguetable-api.league-table-api.workers.dev/api/on-this-day?md=${md}`);
+            return res.ok ? ((await res.json()).matches || []).length : -1;
+        });
+        if (otdMatches < 0) fail('pages', 'on this day: /api/on-this-day failed (is the Worker deployed?)');
+        else if (otdMatches > 0) {
+            const otdOpened = await page.waitForFunction(() => {
+                const first = document.querySelector('#onThisDay .ss-item');
+                if (!first) return false;
+                if (!first.classList.contains('open')) first.querySelector('.ss-summary').click();
+                return document.querySelectorAll('#onThisDay .ss-item.open .um-links a').length >= 2;
+            }, { timeout: 20000 }).then(() => true).catch(() => false);
+            if (!otdOpened) fail('pages', `on this day: ${otdMatches} matches today, but no entry opened into its links`);
+        }
+        console.log('Pages: on this day');
+
         const entries = await page.waitForFunction(() => document.querySelectorAll('#snappedStreaks .ss-item').length, { timeout: 20000 })
             .then(h => h.jsonValue()).catch(() => 0);
         if (!entries) fail('pages', 'snapped streaks: no entries (has snapped-streaks.yml stopped writing the list?)');
