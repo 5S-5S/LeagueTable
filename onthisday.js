@@ -5,16 +5,18 @@
 //
 // Two views, as the streaks card's toggle:
 // - Notable: the day's standout matches - finals and semi-finals, big wins,
-//   high scores, the big clubs meeting or one of them beaten, shootouts,
-//   round anniversaries - varied so one league or club doesn't fill it.
+//   high scores, a big club beaten, shootouts, round anniversaries - varied
+//   so one league or club doesn't fill it.
 // - Your team: every match the visitor's favourite team (favourite-team.js)
-//   played on this day, newest first. Picking a team switches to it.
+//   played on this day, newest first, picked with the sport pages' team
+//   search box (combobox.js).
 // Each match opens into links to the tools that answer it: the full
 // head-to-head, every match that day, and (a league) the table that day -
 // through the search, so they open as answers.
 //
 // The matches come from /api/on-this-day (the visitor's own date). Needs
-// team-registry.js, favourite-team.js, and search.js for the links.
+// team-registry.js, combobox.js, favourite-team.js, and search.js for the
+// links.
 (function () {
     'use strict';
 
@@ -33,7 +35,7 @@
         C1: { slug: 'champions-league', name: 'Champions League', flag: '🇪🇺', page: 'ContinentalEurope.html' }
     };
 
-    // The clubs whose meetings (and defeats) make a match stand out
+    // The clubs whose defeats make a match stand out (an upset)
     const BIG_CLUBS = new Set([
         'Arsenal FC', 'Chelsea FC', 'Liverpool FC', 'Manchester City', 'Manchester United', 'Tottenham Hotspur',
         'Real Madrid', 'FC Barcelona', 'Atlético Madrid', 'Bayern München', 'Borussia Dortmund',
@@ -41,15 +43,12 @@
         'AFC Ajax', 'SL Benfica', 'FC Porto'
     ]);
 
-    const phoneQuery = window.matchMedia('(max-width: 640px)');
-
     const state = {
         md: '',             // 'MM-DD', the visitor's today
         matches: null,      // null while loading
         failed: false,
         view: 'notable',    // 'notable' | 'team'
         shown: NOTABLE_PAGE,
-        picking: false,     // the team box is open
         open: new Set()
     };
     let els = null;
@@ -139,17 +138,13 @@
             score += Math.min(total - 6, 4) * 4;
             reasons.push(['goals', `${total} goals`]);
         }
-        const homeBig = BIG_CLUBS.has(m.homeTeam);
-        const awayBig = BIG_CLUBS.has(m.awayTeam);
-        if (homeBig && awayBig) {
-            score += 14;
-            reasons.push(['big', 'Big match']);
-        } else if (margin >= 2) {
+        if (margin >= 2) {
             // A big club beaten by one that isn't: by three or more, or by
             // two at home
             const homeLost = m.homeGoals < m.awayGoals;
             const loser = homeLost ? m.homeTeam : m.awayTeam;
-            if (BIG_CLUBS.has(loser) && (margin >= 3 || homeLost)) {
+            const winner = homeLost ? m.awayTeam : m.homeTeam;
+            if (BIG_CLUBS.has(loser) && !BIG_CLUBS.has(winner) && (margin >= 3 || homeLost)) {
                 score += 6 + margin * 3;
                 reasons.push(['upset', 'Upset']);
             }
@@ -275,22 +270,8 @@
 
     // --- The card ---------------------------------------------------------------
 
-    function pickerHtml(team) {
-        if (!state.picking) {
-            return `<button type="button" class="otd-pick" data-pick>${team ? 'Change team' : '⭐ Pick your team'}</button>`;
-        }
-        return `
-            <form class="otd-picker" data-picker>
-                <label class="otd-picker-label" for="otdTeamInput">Your team</label>
-                <input id="otdTeamInput" class="otd-input" list="otdTeams" autocomplete="off" placeholder="Type a club, e.g. Arsenal" value="${escapeHtml(team)}">
-                <datalist id="otdTeams">${FavouriteTeam.allTeams().map(name => `<option value="${escapeHtml(name)}">`).join('')}</datalist>
-                <button type="submit" class="otd-pick">Save</button>
-                ${team ? '<button type="button" class="otd-pick otd-clear" data-clear>Remove</button>' : ''}
-                <button type="button" class="otd-pick otd-clear" data-cancel>Cancel</button>
-                <p class="otd-picker-note" data-note></p>
-            </form>`;
-    }
-
+    // The heading and the list; the team row in between stays put (its
+    // search box keeps its state) and only shows in the team view
     function render() {
         if (!els) return;
         if (state.failed || (state.matches && state.matches.length === 0)) {
@@ -300,49 +281,47 @@
         }
         els.section.hidden = false;
         const team = FavouriteTeam.get();
-        const teamView = state.view === 'team' && team;
+        const teamView = state.view === 'team';
         const day = dayAndMonth(state.md);
 
-        let body;
-        if (!state.matches) {
-            body = '<p class="ss-loading">Loading the matches...</p>';
-        } else {
-            const all = teamView ? teamList(team) : notableList();
-            const shown = all.slice(0, state.shown);
-            const more = all.length - shown.length;
-            const count = teamView
-                ? `${all.length} match${all.length === 1 ? '' : 'es'} on ${day}, newest first`
-                : `The ${shown.length === 1 ? 'standout match' : `${shown.length} standout matches`} of the ${state.matches.length.toLocaleString()} played on ${day}`;
-            body = all.length
-                ? `<p class="ss-count">${escapeHtml(count)}</p>
-                   <div class="ss-list">${shown.map(x => entryHtml(x, teamView ? team : '')).join('')}</div>
-                   ${more > 0 ? `<div class="otd-more"><button type="button" class="btn btn-secondary" data-more>Show ${Math.min(more, teamView ? TEAM_PAGE : NOTABLE_PAGE)} more</button></div>` : ''}`
-                : `<p class="ss-empty">${teamView
-                    ? `${escapeHtml(team)} haven't played on ${escapeHtml(day)} in these competitions. Switch to Notable for the day's standout matches.`
-                    : `Nothing stands out among the matches played on ${escapeHtml(day)}.`}</p>`;
-        }
-
         const views = [['notable', 'Notable'], ['team', team ? `⭐ ${team}` : '⭐ Your team']];
-        els.section.innerHTML = `
-            <div class="ss-head">
-                <div class="ss-title-row">
-                    <h2 class="ss-title">On this day · ${escapeHtml(day)}</h2>
-                    <div class="ss-views" role="group" aria-label="Which matches">
-                        ${views.map(([view, label]) => `<button type="button" class="${state.view === view ? 'active' : ''}" data-view="${view}" aria-pressed="${state.view === view}">${escapeHtml(label)}</button>`).join('')}
-                    </div>
+        els.head.innerHTML = `
+            <div class="ss-title-row">
+                <h2 class="ss-title">On this day · ${escapeHtml(day)}</h2>
+                <div class="ss-views" role="group" aria-label="Which matches">
+                    ${views.map(([view, label]) => `<button type="button" class="${state.view === view ? 'active' : ''}" data-view="${view}" aria-pressed="${state.view === view}">${escapeHtml(label)}</button>`).join('')}
                 </div>
-                <p class="ss-sub">${teamView
-                    ? `Every match ${escapeHtml(team)} played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
-                    : `Finals, big wins, high scores and upsets from ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>
-                ${state.view === 'team' || state.picking ? `<div class="otd-team-row">${pickerHtml(team)}</div>` : ''}
             </div>
-            ${state.view === 'team' && !team && !state.picking ? '' : body}`;
+            <p class="ss-sub">${teamView
+                ? (team ? `Every match ${escapeHtml(team)} played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
+                    : `Pick your team to see every match it played on ${escapeHtml(day)}. It's remembered on this device.`)
+                : `Finals, big wins, high scores and upsets from ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>`;
 
-        if (state.picking) {
-            const input = els.section.querySelector('#otdTeamInput');
-            input.focus();
-            input.select();
+        els.teamRow.hidden = !teamView;
+        els.remove.hidden = !team;
+        if (teamCombobox && teamCombobox.currentValue !== team) teamCombobox.setValue(team, team);
+
+        if (teamView && !team) {
+            els.body.innerHTML = '';
+            return;
         }
+        if (!state.matches) {
+            els.body.innerHTML = '<p class="ss-loading">Loading the matches...</p>';
+            return;
+        }
+        const all = teamView ? teamList(team) : notableList();
+        const shown = all.slice(0, state.shown);
+        const more = all.length - shown.length;
+        const count = teamView
+            ? `${all.length} match${all.length === 1 ? '' : 'es'} on ${day}, newest first`
+            : `The ${shown.length === 1 ? 'standout match' : `${shown.length} standout matches`} of the ${state.matches.length.toLocaleString()} played on ${day}`;
+        els.body.innerHTML = all.length
+            ? `<p class="ss-count">${escapeHtml(count)}</p>
+               <div class="ss-list">${shown.map(x => entryHtml(x, teamView ? team : '')).join('')}</div>
+               ${more > 0 ? `<div class="otd-more"><button type="button" class="btn btn-secondary" data-more>Show ${Math.min(more, teamView ? TEAM_PAGE : NOTABLE_PAGE)} more</button></div>` : ''}`
+            : `<p class="ss-empty">${teamView
+                ? `${escapeHtml(team)} haven't played on ${escapeHtml(day)} in these competitions. Switch to Notable for the day's standout matches.`
+                : `Nothing stands out among the matches played on ${escapeHtml(day)}.`}</p>`;
     }
 
     function toggle(key) {
@@ -355,9 +334,9 @@
         state.view = view;
         state.shown = view === 'team' ? TEAM_PAGE : NOTABLE_PAGE;
         state.open.clear();
-        // No team yet: the team view opens on the picker
-        state.picking = view === 'team' && !FavouriteTeam.get();
         render();
+        // No team yet: straight into the search box
+        if (view === 'team' && !FavouriteTeam.get()) els.input.focus();
     }
 
     function handleClick(event) {
@@ -366,19 +345,7 @@
             if (state.view !== viewButton.dataset.view) setView(viewButton.dataset.view);
             return;
         }
-        if (event.target.closest('[data-pick]')) {
-            state.picking = true;
-            render();
-            return;
-        }
-        if (event.target.closest('[data-cancel]')) {
-            state.picking = false;
-            if (!FavouriteTeam.get()) setView('notable');
-            else render();
-            return;
-        }
-        if (event.target.closest('[data-clear]')) {
-            state.picking = false;
+        if (event.target.closest('[data-remove]')) {
             FavouriteTeam.clear();
             setView('notable');
             return;
@@ -389,35 +356,11 @@
             return;
         }
         if (event.target.closest('.um-links a')) return;
-        if (event.target.closest('[data-picker]')) return;
         const summary = event.target.closest('.ss-summary');
         if (summary) toggle(summary.parentElement.dataset.key);
     }
 
-    function handleSubmit(event) {
-        const form = event.target.closest('[data-picker]');
-        if (!form) return;
-        event.preventDefault();
-        const typed = form.querySelector('#otdTeamInput').value;
-        const team = FavouriteTeam.resolve(typed);
-        if (!team) {
-            form.querySelector('[data-note]').textContent = typed.trim()
-                ? `No single club matches "${typed.trim()}" - pick one from the list.`
-                : 'Type a club\'s name.';
-            return;
-        }
-        state.picking = false;
-        FavouriteTeam.set(team);
-        setView('team');
-    }
-
     function handleKey(event) {
-        if (event.key === 'Escape' && state.picking) {
-            state.picking = false;
-            if (!FavouriteTeam.get()) setView('notable');
-            else render();
-            return;
-        }
         if (event.key !== 'Enter' && event.key !== ' ') return;
         const summary = event.target.closest('.ss-summary');
         if (!summary) return;
@@ -440,20 +383,50 @@
         render();
     }
 
+    let teamCombobox = null;
+
     // section: the card's element (a .search-card, so it hides with the
     // search card while a match is open)
     function mount(section) {
-        els = { section };
         section.hidden = true;
+        section.innerHTML = `
+            <div class="ss-head" data-head></div>
+            <div class="otd-team-row" data-team-row hidden>
+                <label class="otd-team-label" for="otdTeamInput">⭐ Your team</label>
+                <div class="otd-team-picker">
+                    <div class="combobox-container" id="otdTeamContainer">
+                        <input type="text" id="otdTeamInput" class="combobox-input" placeholder="Search for a team" autocomplete="off">
+                        <span class="combobox-arrow">▼</span>
+                        <div class="combobox-dropdown" id="otdTeamDropdown"></div>
+                    </div>
+                    <button type="button" class="otd-remove" data-remove hidden>Remove</button>
+                </div>
+            </div>
+            <div data-body></div>`;
+        els = {
+            section,
+            head: section.querySelector('[data-head]'),
+            teamRow: section.querySelector('[data-team-row]'),
+            input: section.querySelector('#otdTeamInput'),
+            remove: section.querySelector('[data-remove]'),
+            body: section.querySelector('[data-body]')
+        };
+        teamCombobox = new Combobox('otdTeamContainer', 'otdTeamInput', 'otdTeamDropdown', 'Search for a team', value => {
+            if (!value) return;
+            FavouriteTeam.set(value);
+            state.shown = TEAM_PAGE;
+            state.open.clear();
+            render();
+        }, { logoLeague: 'champions-league', allowEmpty: false });
+        teamCombobox.setOptions(FavouriteTeam.allTeams().map(team => ({ value: team, text: team })));
+
         // Opens on the favourite's matches when there is one
         state.view = FavouriteTeam.get() ? 'team' : 'notable';
         state.shown = state.view === 'team' ? TEAM_PAGE : NOTABLE_PAGE;
         section.addEventListener('click', handleClick);
-        section.addEventListener('submit', handleSubmit);
         section.addEventListener('keydown', handleKey);
         // Team text colors depend on the theme
         new MutationObserver(render).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
-        phoneQuery.addEventListener('change', render);
         FavouriteTeam.onChange(render);
         load();
     }

@@ -476,11 +476,12 @@ empty search box.
   matches played on today's date in earlier years, in the five leagues
   and the Champions League. Two views, as the streaks card's toggle:
   Notable (the day's standout matches, scored in the browser - finals and
-  semi-finals, big wins and high scores (capped), two big clubs meeting
-  or one beaten by 3+ (2+ at home), shootouts, round anniversaries, a
+  semi-finals, big wins and high scores (capped), a big club beaten by
+  one that isn't (3+, or 2+ at home), shootouts, round anniversaries, a
   little for recent ones; at most 2 per competition and no club twice in
   the first 6; Show more up to 30) and Your team (every match of the
-  favourite team, newest first, picked in the card - favourite-team.js).
+  favourite team, newest first, picked with the sport pages' team search
+  box - combobox.js, favourite-team.js).
   Each match opens into links answered by the search: every meeting of
   the pair, every match that day, the league table that day. Names as
   they were then (First Division, Division 1, European Cup).
