@@ -192,6 +192,12 @@
             ? `<span class="ss-pill record" title="Level with ${escapeHtml(s.team)}'s longest run of this kind in ${escapeHtml(league)} (${s.record})">One more: club record</span>`
             : '';
         if (s.source === 'near-record') return nextRecord + rare;
+        if (!s.longestSince && s.recordNow) {
+            // A record when it ended, beaten since
+            const r = s.recordNow;
+            const when = r.end ? r.end.slice(0, 4) : 'still going';
+            return `<span class="ss-pill since" title="${escapeHtml(s.team)}'s longest run of this kind when it ended; their longest now is ${r.count} (${fullDate(r.start)} - ${r.end ? fullDate(r.end) : 'still going'})">Club record then · now ${r.count} (${when})</span>`;
+        }
         if (!s.longestSince) return '<span class="ss-pill record">Club record</span>';
         const years = (toDate(judgedOn(s)) - toDate(s.longestSince)) / (365.25 * 86400000);
         if (years >= 10) return `<span class="ss-pill since">Longest since ${s.longestSince.slice(0, 4)}</span>${nextRecord}`;
