@@ -26,37 +26,36 @@ empty search box.
 **Tier 2 - high value, soon after launch** (and reasons to come back)
 6. Match Finder: a country's clubs as the subject (on hold)
 7. API caching (what's left - the outage-preventing parts are done)
-8. "On this day"
-9. Pinned / favourite team
+8. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-10. Typo tolerance in search
-11. "City" / "United" alone in search
-12. Recent searches
-13. Road to the final
-14. More competitions (depends on the data)
-15. Trivia mode
-16. Streak-ending social account (closer to launch)
+9. Typo tolerance in search
+10. "City" / "United" alone in search
+11. Recent searches
+12. Road to the final
+13. More competitions (depends on the data)
+14. Trivia mode
+15. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-17. Head-to-head by decade
-18. Side-by-side Team Seasons
-19. League History chart
-20. Team Records: bottom / relegated, home / away
-21. A club's title races
-22. Team progression chart (after League History)
-23. "/" to search
-24. Penalty shootout leaderboard (team and head-to-head answers done)
-25. "Won on penalties" in Match Finder
-26. Lighter pages (small gain - see the item)
-27. Knockout Stage bracket view (on hold)
-28. Country vs Country
-29. Review upcoming matches
-30. Phone-width checks in npm run check
-31. Team-colour contrast
-32. Sitemap + Google Search Console
-33. Club names that differ from worldfootball.net
-34. Champions League data fixes (found 2026-10-13)
+16. Head-to-head by decade
+17. Side-by-side Team Seasons
+18. League History chart
+19. Team Records: bottom / relegated, home / away
+20. A club's title races
+21. Team progression chart (after League History)
+22. "/" to search
+23. Penalty shootout leaderboard (team and head-to-head answers done)
+24. "Won on penalties" in Match Finder
+25. Lighter pages (small gain - see the item)
+26. Knockout Stage bracket view (on hold)
+27. Country vs Country
+28. Review upcoming matches
+29. Phone-width checks in npm run check
+30. Team-colour contrast
+31. Sitemap + Google Search Console
+32. Club names that differ from worldfootball.net
+33. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -360,17 +359,20 @@ empty search box.
   shootout record" - which needs a new all-clubs list. Moved to Tier 4
   on 2026-10-06 (low priority).
 
-- Maybe: **"On this day"** — a small widget (dashboard or landing page)
-  showing historical matches that happened on today's date, using existing
-  match data with a date filter. Moved to Tier 2 on 2026-10-09: it fills
-  the days without matches. Each match should open the tool it came
-  from (head-to-head, Match Finder), like the snapped-streaks card.
-
-- Maybe: **Pinned/favorite team** — remember a user's team via
-  `localStorage` so the landing-page search can offer a one-click shortcut
-  back to their dashboard instead of retyping every visit. Moved to
-  Tier 2 on 2026-10-09: it lets the home page cards (upcoming, snapped
-  streaks, On this day) lead with the visitor's club.
+- Maybe: **Expand favourite team** — the visitor's team is kept since
+  2026-10-15 (favourite-team.js: window.FavouriteTeam - get / set / clear
+  / onChange / allTeams / resolve, in localStorage) and picked and used
+  only by On this day's "Your team" view (combobox.js, the sport pages'
+  team search box). Moved to Tier 2 on 2026-10-09: it lets the home page
+  lead with the visitor's club. Where else it could go:
+  - Upcoming matches: the favourite's next fixture first (or a filter).
+  - The streaks card: a "Your team" view like On this day's, its runs on
+    the line and snapped.
+  - The search: a one-click shortcut to the favourite's dashboard, and
+    questions about "my team".
+  - The sport pages: Team 1 / Team History / Team Streaks opening on it
+    (only where the club is in that competition).
+  - One place to pick it (the header?) rather than only inside a card.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter
@@ -473,6 +475,39 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~"On this day"~~ — done (2026-10-15). A home page card between the
+  search card and the streaks card (onthisday.js / onthisday.css):
+  matches played on today's date in earlier years, in the five leagues
+  and the Champions League. Two views, as the streaks card's toggle:
+  Notable (the day's standout matches, scored in the browser - finals and
+  semi-finals, big wins and high scores (capped), shootouts, notable
+  streaks ended, a little for recent ones; at most 2 per competition and
+  no club twice in the first 6; Show more up to 30) and Your team (every
+  match of the favourite team, newest first, picked with the sport pages'
+  team search box - combobox.js, favourite-team.js). Only facts are
+  labelled - the stage (Final / Semi-final / Quarter-final), Penalties,
+  and the streaks a match ended; no "Big match", "Upset", goal-count or
+  anniversary labels (the first two depend on how strong a club was
+  then). Each match opens into links answered by the search: every
+  meeting of the pair, every match that day, the league table that day,
+  and the runs it ended in Team Streaks. Names as they were then (First
+  Division, Division 1, European Cup), streak labels included. A streak
+  that was a club record when it ended but has been beaten since says
+  "Club record then · now 9 (1972)" (findStreaks() keeps each club's
+  longest run of every kind across all of history - recordNow), on the
+  snapped card too.
+  - Data: /api/on-this-day?md=MM-DD (Worker) - date IN (one per year)
+    with idx_matches_date forced: ~1,400 rows read for a day (581
+    matches on 15 October), cached under history-version, a day in the
+    browser. The card hides when a day has no matches or the call fails.
+  - Streaks: snapped-streaks.mjs also runs findStreaks() over all of
+    history (~20,000 notable streaks, ~10s; the big-club head-to-head bar
+    left out) and writes 'on-this-day-streaks:MM-DD' to KV for
+    yesterday, today and tomorrow each run (3 writes); the Worker adds
+    the day's to its answer (read per request, not cached with the
+    matches). Shown with snapped.js's own headline() / pills().
+  - Checked in npm run check (today's card opens into its links).
 
 - ~~Team Records / League History: date ranges and season length~~ —
   done (2026-10-15). Both sub-tabs have From / To season filters next to

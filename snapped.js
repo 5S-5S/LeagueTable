@@ -182,8 +182,9 @@
     // Why it's listed: a club record, its longest in 10+ years, rare for
     // the club, or rare in the league - on the line, also a run level with
     // the club record (one more sets a new one)
-    function pills(s) {
-        const league = COMPETITIONS[s.div].name;
+    // league: the competition's name in the label - On this day passes
+    // the one it had then (the First Division)
+    function pills(s, league = COMPETITIONS[s.div].name) {
         const top = Math.max(0.1, Math.ceil((1 - s.pct) * 1000) / 10);
         const rare = `<span class="ss-pill rare" title="Longer than ${(s.pct * 100).toFixed(1)}% of ${escapeHtml(league)} runs of this kind since 1995">Top ${top}% in ${escapeHtml(league)}</span>`;
         if (s.kind === 'h2h') return `${rare}<span class="ss-pill h2h">Head-to-head</span>`;
@@ -191,6 +192,12 @@
             ? `<span class="ss-pill record" title="Level with ${escapeHtml(s.team)}'s longest run of this kind in ${escapeHtml(league)} (${s.record})">One more: club record</span>`
             : '';
         if (s.source === 'near-record') return nextRecord + rare;
+        if (!s.longestSince && s.recordNow) {
+            // A record when it ended, beaten since
+            const r = s.recordNow;
+            const when = r.end ? r.end.slice(0, 4) : 'still going';
+            return `<span class="ss-pill since" title="${escapeHtml(s.team)}'s longest run of this kind when it ended; their longest now is ${r.count} (${fullDate(r.start)} - ${r.end ? fullDate(r.end) : 'still going'})">Club record then · now ${r.count} (${when})</span>`;
+        }
         if (!s.longestSince) return '<span class="ss-pill record">Club record</span>';
         const years = (toDate(judgedOn(s)) - toDate(s.longestSince)) / (365.25 * 86400000);
         if (years >= 10) return `<span class="ss-pill since">Longest since ${s.longestSince.slice(0, 4)}</span>${nextRecord}`;
@@ -569,5 +576,8 @@
         load();
     }
 
-    window.SnappedStreaks = { mount };
+    // headline / pills / streaksHref / searchQuestion: one snapped streak
+    // in words, why it's listed, and its Team Streaks link - On this day
+    // (onthisday.js) shows the streaks a past match ended the same way
+    window.SnappedStreaks = { mount, headline, pills, streaksHref, searchQuestion };
 })();

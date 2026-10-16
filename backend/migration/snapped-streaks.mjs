@@ -7,6 +7,16 @@
 // Worker's KV namespace under 'snapped-streaks', which /api/snapped-streaks
 // serves as-is.
 //
+// Also the streaks for On this day (onthisday.js): every significant
+// streak in history that ended on a calendar day, in earlier years - from
+// the same findStreaks() over the whole history (about 10 seconds), less
+// the head-to-head runs judged by the big-club bar (which clubs are big
+// depends on the era). Written one KV value per day, under
+// 'on-this-day-streaks:MM-DD', and only for yesterday, today and tomorrow
+// (every visitor's today, whatever their timezone) - 3 writes a run, each
+// in place before its day starts. /api/on-this-day adds it to the day's
+// matches.
+//
 // Run by .github/workflows/snapped-streaks.yml after each daily D1 sync,
 // after each fixtures refresh and after the Worker records live results. The whole history is needed
 // for the significance bars (how a run compares with every run of its kind
@@ -38,6 +48,7 @@ const IN_PLAY_HOURS = 6;
 // Same namespace as sync.mjs's CACHE_KV_NAMESPACE_ID (not a secret)
 const CACHE_KV_NAMESPACE_ID = 'b2fa8b93e59540749923768aaf1fc08d';
 const KV_KEY = 'snapped-streaks';
+const ON_THIS_DAY_KEY = md => `on-this-day-streaks:${md}`;
 
 function argValue(name) {
     const i = process.argv.indexOf(name);
@@ -69,12 +80,12 @@ async function fetchFixtures(now) {
     });
 }
 
-async function writeToKv(body) {
+async function writeToKv(body, key = KV_KEY) {
     const { CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN } = process.env;
     if (!CLOUDFLARE_ACCOUNT_ID || !CLOUDFLARE_API_TOKEN) {
         throw new Error('Missing CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN (use --dry-run to compute without writing)');
     }
-    const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces/${CACHE_KV_NAMESPACE_ID}/values/${KV_KEY}`;
+    const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces/${CACHE_KV_NAMESPACE_ID}/values/${encodeURIComponent(key)}`;
     const res = await fetch(url, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${CLOUDFLARE_API_TOKEN}`, 'Content-Type': 'application/json' },
@@ -120,10 +131,35 @@ async function main() {
     if (out) fs.writeFileSync(out, body);
     if (dryRun) {
         console.log(`Dry run - not written (${(body.length / 1024).toFixed(0)} KB).`);
+        for (const [md, dayBody] of onThisDayBodies(matchesByDiv, to)) console.log(`  ${ON_THIS_DAY_KEY(md)}: ${(dayBody.length / 1024).toFixed(0)} KB`);
         return;
     }
     await writeToKv(body);
     console.log(`Wrote ${KV_KEY} to KV (${(body.length / 1024).toFixed(0)} KB).`);
+
+    for (const [md, dayBody] of onThisDayBodies(matchesByDiv, to)) {
+        await writeToKv(dayBody, ON_THIS_DAY_KEY(md));
+        console.log(`Wrote ${ON_THIS_DAY_KEY(md)} to KV (${(dayBody.length / 1024).toFixed(0)} KB).`);
+    }
+}
+
+// On this day's streaks for yesterday, today and tomorrow (around `to`):
+// [md, JSON body] - the streaks that ended on that calendar day before
+// this year
+function onThisDayBodies(matchesByDiv, to) {
+    const started = Date.now();
+    const { snapped } = findStreaks(matchesByDiv, { from: '1850-01-01', to, fixtures: [] });
+    const history = snapped.filter(s => s.source !== 'big-opponent');
+    const thisYear = to.slice(0, 4);
+    console.log(`On this day: ${history.length} streaks in history (${((Date.now() - started) / 1000).toFixed(1)}s)`);
+    return [-1, 0, 1].map(offset => {
+        const day = new Date(`${to}T12:00:00Z`);
+        day.setUTCDate(day.getUTCDate() + offset);
+        const md = day.toISOString().slice(5, 10);
+        const streaks = history.filter(s => s.end.slice(5) === md && s.end.slice(0, 4) < thisYear);
+        console.log(`  ${md}: ${streaks.length} streaks`);
+        return [md, JSON.stringify({ md, streaks })];
+    });
 }
 
 main().catch(err => {

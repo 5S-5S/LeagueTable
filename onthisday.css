@@ -1,0 +1,112 @@
+/* On this day on the home page (onthisday.js): the streaks card's layout
+   (snapped.css's .ss-* rules - the card, entries, pills, the view toggle)
+   with what's its own: both clubs' crests side by side, the reason pills,
+   the Your team row and Show more. Loads after snapped.css. */
+
+/* Home and away crests, the same size, side by side */
+.ss-crests.otd-crests {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.2rem;
+    height: auto;
+}
+
+.ss-crests.otd-crests img,
+.ss-crests.otd-crests img + img {
+    position: static;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+}
+
+.otd-score {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Why it stands out */
+.ss-pill.otd-final { background: #fef3c7; color: #92400e; }
+.ss-pill.otd-stage { background: #ede9fe; color: #5b21b6; }
+
+/* Your team: the sport pages' team search box (combobox.css), and Remove */
+.otd-team-row {
+    margin-bottom: 0.9rem;
+}
+
+.otd-team-row[hidden] {
+    display: none;
+}
+
+.otd-team-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.otd-team-picker {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    max-width: 30rem;
+}
+
+.otd-team-picker .combobox-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.otd-remove {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid #9ca3af;
+    border-radius: 0.75rem;
+    background: transparent;
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.otd-remove:hover {
+    background: #f3f4f6;
+}
+
+.otd-remove[hidden] {
+    display: none;
+}
+
+/* A notable streak the match ended, as the snapped streaks card words it */
+.otd-streak {
+    margin-top: 0.45rem;
+    padding: 0.35rem 0.6rem;
+    border-left: 3px solid #10b981;
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: #f0fdf4;
+    white-space: normal;
+}
+
+.otd-streak-text {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.otd-streak .ss-meta {
+    margin-top: 0.2rem;
+}
+
+.otd-more {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.9rem;
+}
+
+[data-theme="dark"] .ss-pill.otd-final { background: #78350f; color: #fde68a; }
+[data-theme="dark"] .ss-pill.otd-stage { background: #4c1d95; color: #ddd6fe; }
+[data-theme="dark"] .otd-team-label { color: #e5e7eb; }
+[data-theme="dark"] .otd-remove { border-color: #6b7280; color: #d1d5db; }
+[data-theme="dark"] .otd-remove:hover { background: #374151; }
+[data-theme="dark"] .otd-streak { background: #1f2d26; border-left-color: #34d399; }
+[data-theme="dark"] .otd-streak-text { color: #e5e7eb; }
