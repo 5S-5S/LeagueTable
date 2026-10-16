@@ -67,3 +67,24 @@ issue if it fails. Dry run (no D1 credentials needed):
 ```
 FOOTBALL_DATA_API_KEY=... python3 scripts/update_fixtures.py --dry-run
 ```
+
+## Freshness check
+
+`check_freshness.py` catches what the workflows' failure issues can't: a
+job that "succeeds" without the new results, or the Worker's live-results
+cron failing (it has no alert of its own). Daily at 05:00 UTC, before the
+score scripts, `.github/workflows/check-freshness.yml` runs it and files
+(or comments on) a `freshness-alert` issue listing what it found:
+
+- a match football-data.org has as finished, kicked off more than 6 hours
+  ago in the last 3 days, that isn't in the live API's results
+- team names or Champions League stages the score scripts can't map
+- `/api/upcoming` or `/api/snapped-streaks` not answering
+- the snapped streaks list older than 30 hours, or today's On this day
+  streaks missing from KV
+- the Worker's `GITHUB_DISPATCH_TOKEN` failing, or expiring within 14 days
+  (the Worker keeps its expiry and last failure in KV)
+
+Secrets: `FOOTBALL_DATA_API_KEY`, `CLOUDFLARE_ACCOUNT_ID` and
+`CLOUDFLARE_API_TOKEN` (already set). "Run workflow" has a dry-run option
+that prints the problems without filing an issue.

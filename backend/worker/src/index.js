@@ -1003,6 +1003,12 @@ async function recordFinishedMatches(env) {
 // the GITHUB_DISPATCH_TOKEN secret (a fine-grained token for this repo with
 // Contents: read and write) the list just updates after the daily sync.
 // A failure is logged, never thrown: the results are already recorded.
+//
+// For the daily freshness check (scripts/check_freshness.py), KV keeps
+// the token's expiry ('dispatch-token-expires', from GitHub's response
+// header, written when it changes) and the last failure
+// ('dispatch-token-error', cleared by the next success) - a few KV writes
+// a month, more only while dispatches fail.
 const GITHUB_REPO = '5S-5S/LeagueTable';
 
 async function requestSnappedStreaksUpdate(env) {
@@ -1018,7 +1024,16 @@ async function requestSnappedStreaksUpdate(env) {
             },
             body: JSON.stringify({ event_type: 'results-recorded' }),
         });
-        if (!res.ok) console.error(`GitHub dispatch answered ${res.status}: ${await res.text()}`);
+        if (!res.ok) {
+            console.error(`GitHub dispatch answered ${res.status}: ${await res.text()}`);
+            await env.CACHE.put('dispatch-token-error', JSON.stringify({ at: new Date().toISOString(), status: res.status }));
+            return;
+        }
+        const expires = res.headers.get('github-authentication-token-expiration');
+        if (expires && expires !== await env.CACHE.get('dispatch-token-expires')) {
+            await env.CACHE.put('dispatch-token-expires', expires);
+        }
+        if (await env.CACHE.get('dispatch-token-error')) await env.CACHE.delete('dispatch-token-error');
     } catch (err) {
         console.error('GitHub dispatch failed:', err);
     }

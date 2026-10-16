@@ -1,0 +1,75 @@
+name: Check data freshness
+
+# Daily: is every played match recorded, does the live API answer, are the
+# snapped streaks and On this day being rebuilt, is the Worker's dispatch
+# token working and not about to expire - see scripts/check_freshness.py.
+# Catches what the other workflows' failure issues can't: a job that
+# "succeeds" without the new results, and the Worker's live-results cron,
+# which has no alert of its own.
+#
+# 05:00 UTC, before the score scripts (06:00): a match from yesterday
+# missing now is one the live results missed; one still missing the next
+# morning is the daily path's miss too.
+on:
+  schedule:
+    - cron: "0 5 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (check and print, don't file an issue)"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  check-freshness:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check freshness
+        env:
+          FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python3 scripts/check_freshness.py --report freshness-report.md
+
+      # One open issue collects each day's problems (same as the other
+      # workflows' failure trackers)
+      - name: File or update a GitHub issue
+        if: failure() && github.event.inputs.dry_run != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- freshness-alert-tracker -->';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
+            const report = fs.existsSync('freshness-report.md')
+              ? fs.readFileSync('freshness-report.md', 'utf8')
+              : '- The check didn\'t finish - see the run log.\n';
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'freshness-alert',
+            });
+            const existing = issues.find(i => i.body && i.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number,
+                body: `Still stale on ${today} (${runUrl}):\n\n${report}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: 'Data freshness check failed - the site may be showing stale data',
+                labels: ['freshness-alert'],
+                body: `${marker}\nThe daily freshness check found problems on ${today} (${runUrl}):\n\n${report}\n` +
+                  `A match that isn't recorded can be added by rerunning the score workflow with more ` +
+                  `days, then the D1 sync. This issue stays open and collects a comment per failing day ` +
+                  `until someone closes it.`,
+              });
+            }
