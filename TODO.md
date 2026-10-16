@@ -19,43 +19,42 @@ empty search box.
 **Tier 1 - before launch** (keep the site up and know how it's doing)
 1. Analytics, with failed searches
 2. Error reporting
-3. Data-freshness alert (the home page now relies on fresh results)
-4. About / sources page (closer to publication, with the crests)
-5. Self-host the club crests (closer to publication)
+3. About / sources page (closer to publication, with the crests)
+4. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-6. Match Finder: a country's clubs as the subject (on hold)
-7. API caching (what's left - the outage-preventing parts are done)
-8. Expand favourite team (On this day uses it)
+5. Match Finder: a country's clubs as the subject (on hold)
+6. API caching (what's left - the outage-preventing parts are done)
+7. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-9. Typo tolerance in search
-10. "City" / "United" alone in search
-11. Recent searches
-12. Road to the final
-13. More competitions (depends on the data)
-14. Trivia mode
-15. Streak-ending social account (closer to launch)
+8. Typo tolerance in search
+9. "City" / "United" alone in search
+10. Recent searches
+11. Road to the final
+12. More competitions (depends on the data)
+13. Trivia mode
+14. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-16. Head-to-head by decade
-17. Side-by-side Team Seasons
-18. League History chart
-19. Team Records: bottom / relegated, home / away
-20. A club's title races
-21. Team progression chart (after League History)
-22. "/" to search
-23. Penalty shootout leaderboard (team and head-to-head answers done)
-24. "Won on penalties" in Match Finder
-25. Lighter pages (small gain - see the item)
-26. Knockout Stage bracket view (on hold)
-27. Country vs Country
-28. Review upcoming matches
-29. Phone-width checks in npm run check
-30. Team-colour contrast
-31. Sitemap + Google Search Console
-32. Club names that differ from worldfootball.net
-33. Champions League data fixes (found 2026-10-13)
+15. Head-to-head by decade
+16. Side-by-side Team Seasons
+17. League History chart
+18. Team Records: bottom / relegated, home / away
+19. A club's title races
+20. Team progression chart (after League History)
+21. "/" to search
+22. Penalty shootout leaderboard (team and head-to-head answers done)
+23. "Won on penalties" in Match Finder
+24. Lighter pages (small gain - see the item)
+25. Knockout Stage bracket view (on hold)
+26. Country vs Country
+27. Review upcoming matches
+28. Phone-width checks in npm run check
+29. Team-colour contrast
+30. Sitemap + Google Search Console
+31. Club names that differ from worldfootball.net
+32. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -227,25 +226,6 @@ empty search box.
   (both carry `um-streaks`), and percentage widths inside a
   `max-content` table blew it up to ~1,000,000px. A puppeteer-core
   script against a local http.server did the measuring.
-
-- **Data-freshness alert** — noted 2026-10-07; moved to Tier 1 on
-  2026-10-10. Could be part of Error reporting. The update workflows
-  file an issue when they fail, but not when they "succeed" with nothing
-  new for days or when the live Worker stops answering - and the Worker's
-  live-results cron has no failure alert at all (a broken API key or an
-  expired GITHUB_DISPATCH_TOKEN would go unnoticed).
-  - Why it moved up: on 2026-10-10 the fixtures job (running ~12:30 UTC)
-    deleted Arsenal v Leeds while it was in play, so live results never
-    recorded it; it was only noticed by eye. (Fixed: in-play fixtures
-    now stay.)
-  - The check: rather than "newest match date is too old" (false alarms
-    in international breaks), look for fixtures that kicked off more
-    than 6 hours ago with no result in `matches` - that only fires when
-    a match was played and not recorded, whichever path failed. Also
-    that the live API answers, and a warning ahead of the dispatch
-    token's expiry. A daily workflow filing an issue, as the others do.
-  - Possibly also: the cron logs a warning when a match is still
-    unrecorded as its 6-hour window closes.
 
 - Maybe: **Team-colour contrast** — noted 2026-10-07. Some club colours
   are faint as text on light backgrounds (Manchester City's light blue
@@ -475,6 +455,20 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Data-freshness alert~~ — done (2026-10-16). scripts/check_freshness.py,
+  run daily at 05:00 UTC by .github/workflows/check-freshness.yml (before
+  the score scripts, so a miss from yesterday is the live cron's), files
+  or comments on a `freshness-alert` issue when: a match football-data.org
+  has as finished in the last 3 days (kicked off 6+ hours ago) isn't in
+  the live API's results - only fires when a match was played and not
+  recorded, so international breaks are quiet; a team name or CL stage
+  can't be mapped; /api/upcoming or /api/snapped-streaks don't answer;
+  the snapped streaks list is over 30 hours old or today's On this day
+  streaks are missing from KV; the Worker's GITHUB_DISPATCH_TOKEN failed
+  in the last 3 days or expires within 14 (the Worker keeps both in KV
+  from GitHub's response - nothing to update by hand). Came from
+  Arsenal v Leeds going unrecorded on 2026-10-10.
 
 - ~~"On this day"~~ — done (2026-10-15). A home page card between the
   search card and the streaks card (onthisday.js / onthisday.css):
