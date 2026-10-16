@@ -476,20 +476,28 @@ empty search box.
   matches played on today's date in earlier years, in the five leagues
   and the Champions League. Two views, as the streaks card's toggle:
   Notable (the day's standout matches, scored in the browser - finals and
-  semi-finals, big wins and high scores (capped), shootouts, round
-  anniversaries, a little for recent ones; only the stage, a shootout and
-  the anniversary are labelled - no "Big match" / "Upset", which depend on
-  how strong a club was then; at most 2 per competition and no club twice in
-  the first 6; Show more up to 30) and Your team (every match of the
-  favourite team, newest first, picked with the sport pages' team search
-  box - combobox.js, favourite-team.js).
-  Each match opens into links answered by the search: every meeting of
-  the pair, every match that day, the league table that day. Names as
-  they were then (First Division, Division 1, European Cup).
+  semi-finals, big wins and high scores (capped), shootouts, notable
+  streaks ended, a little for recent ones; at most 2 per competition and
+  no club twice in the first 6; Show more up to 30) and Your team (every
+  match of the favourite team, newest first, picked with the sport pages'
+  team search box - combobox.js, favourite-team.js). Only facts are
+  labelled - the stage (Final / Semi-final / Quarter-final), Penalties,
+  and the streaks a match ended; no "Big match", "Upset", goal-count or
+  anniversary labels (the first two depend on how strong a club was
+  then). Each match opens into links answered by the search: every
+  meeting of the pair, every match that day, the league table that day,
+  and the runs it ended in Team Streaks. Names as they were then (First
+  Division, Division 1, European Cup), streak labels included.
   - Data: /api/on-this-day?md=MM-DD (Worker) - date IN (one per year)
     with idx_matches_date forced: ~1,400 rows read for a day (581
     matches on 15 October), cached under history-version, a day in the
     browser. The card hides when a day has no matches or the call fails.
+  - Streaks: snapped-streaks.mjs also runs findStreaks() over all of
+    history (~20,000 notable streaks, ~10s; the big-club head-to-head bar
+    left out) and writes 'on-this-day-streaks:MM-DD' to KV for
+    yesterday, today and tomorrow each run (3 writes); the Worker adds
+    the day's to its answer (read per request, not cached with the
+    matches). Shown with snapped.js's own headline() / pills().
   - Checked in npm run check (today's card opens into its links).
 
 - ~~Team Records / League History: date ranges and season length~~ —

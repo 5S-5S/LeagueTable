@@ -5,20 +5,22 @@
 //
 // Two views, as the streaks card's toggle:
 // - Notable: the day's standout matches - finals and semi-finals, big wins,
-//   high scores, shootouts, round anniversaries - varied so one league or
-//   club doesn't fill it. Only facts about the match itself are labelled
-//   (the stage, a shootout, the anniversary); nothing that depends on how
-//   strong a club was then.
+//   high scores, shootouts, notable streaks ended - varied so one league or
+//   club doesn't fill it. Only facts are labelled (the stage, a shootout,
+//   the streak a match ended); nothing that depends on how strong a club
+//   was then.
 // - Your team: every match the visitor's favourite team (favourite-team.js)
 //   played on this day, newest first, picked with the sport pages' team
 //   search box (combobox.js).
-// Each match opens into links to the tools that answer it: the full
-// head-to-head, every match that day, and (a league) the table that day -
-// through the search, so they open as answers.
+// A match that ended a notable streak says so, as the snapped streaks card
+// words it (snapped.js), with a link to the run in Team Streaks. Each match
+// opens into links to the tools that answer it: the full head-to-head,
+// every match that day, and (a league) the table that day - through the
+// search, so they open as answers.
 //
-// The matches come from /api/on-this-day (the visitor's own date). Needs
-// team-registry.js, combobox.js, favourite-team.js, and search.js for the
-// links.
+// The matches and streaks come from /api/on-this-day (the visitor's own
+// date; the streaks from the snapped-streaks job). Needs team-registry.js,
+// combobox.js, favourite-team.js, snapped.js, and search.js for the links.
 (function () {
     'use strict';
 
@@ -40,6 +42,7 @@
     const state = {
         md: '',             // 'MM-DD', the visitor's today
         matches: null,      // null while loading
+        streaks: new Map(), // match key -> the notable streaks it ended, strongest first
         failed: false,
         view: 'notable',    // 'notable' | 'team'
         shown: NOTABLE_PAGE,
@@ -102,8 +105,14 @@
 
     // --- What makes a match stand out ---------------------------------------
 
-    // A score and the reasons for it, each reason a pill - big wins and
-    // high scores rank a match without a pill of their own
+    // Rare in the league and long counts most; a club record only when the
+    // run was long too (5 home draws can be one)
+    function streakStrength(s) {
+        return (s.pct >= 0.995 ? 6 : 0) + (!s.longestSince && s.count >= 8 ? 6 : 0) + Math.min(s.count, 25) / 2;
+    }
+
+    // A score and the reasons for it, each reason a pill - big wins, high
+    // scores and streaks rank a match without a pill of their own
     function notability(m) {
         const margin = Math.abs(m.homeGoals - m.awayGoals);
         const total = m.homeGoals + m.awayGoals;
@@ -127,15 +136,13 @@
         // Goals count up to a point, so a 10-1 doesn't bury everything else
         if (margin >= 4) score += Math.min(margin - 3, 4) * 5;
         if (total >= 7) score += Math.min(total - 6, 4) * 4;
-        const years = yearsAgo(m);
-        const round = [50, 25, 10].find(n => years % n === 0);
-        if (round && score > 0) {
-            score += { 50: 10, 25: 7, 10: 4 }[round];
-            reasons.push(['anniversary', `${years} years ago`]);
-        }
+        // A notable streak it ended (the strongest): more for a club record
+        // and a long run
+        const ended = state.streaks.get(keyOf(m));
+        if (ended) score += 6 + streakStrength(ended[0]) + (ended.length - 1) * 2;
         // A standout match people remember counts for a little more: up to
         // 8 for this season's, nothing from 60 years back
-        if (score > 0) score += Math.max(0, 8 - years / 7.5);
+        if (score > 0) score += Math.max(0, 8 - yearsAgo(m) / 7.5);
         return { score, reasons };
     }
 
@@ -216,6 +223,12 @@
             const table = searchHref(tableQuestion, comp.slug, 'table', '');
             if (table) items.push([table, `The ${name} table that day`]);
         }
+        // The runs it ended, in Team Streaks' historic list
+        if (window.SnappedStreaks && SnappedStreaks.streaksHref) {
+            (state.streaks.get(keyOf(m)) || []).slice(0, 2).forEach(s => {
+                items.push([SnappedStreaks.streaksHref(s), SnappedStreaks.searchQuestion(s)]);
+            });
+        }
         return `<div class="ss-matches"><div class="um-links">${items.map(([href, text]) => `<a href="${escapeHtml(href)}">${escapeHtml(text)} →</a>`).join('')}</div></div>`;
     }
 
@@ -225,20 +238,26 @@
         const comp = COMPETITIONS[m.div];
         const stage = stageLabel(m);
         const years = yearsAgo(m);
-        // The anniversary pill says the years; the date line says them otherwise
-        const shownReasons = reasons.filter(([kind]) => !team || kind !== 'anniversary');
-        const anniversary = reasons.some(([kind]) => kind === 'anniversary');
+        // The streaks it ended (two at most), as the snapped streaks card
+        // words them
+        const ended = (state.streaks.get(key) || []).slice(0, 2);
+        const streakLines = window.SnappedStreaks && SnappedStreaks.headline ? ended.map(s => `
+                        <div class="otd-streak">
+                            <div class="otd-streak-text">${SnappedStreaks.headline(s)}</div>
+                            <div class="ss-meta">${SnappedStreaks.pills(s, competitionName({ div: s.div, date: s.end }))}</div>
+                        </div>`).join('') : '';
         return `
             <div class="ss-item${open ? ' open' : ''}" data-key="${escapeHtml(key)}">
                 <div class="ss-summary" role="button" tabindex="0" aria-expanded="${open}">
                     <div class="ss-crests otd-crests">${crest(m.homeTeam, m.div)}${crest(m.awayTeam, m.div)}</div>
                     <div class="ss-text">
                         <div class="ss-headline">${headline(m, team)}</div>
-                        ${shownReasons.length ? `<div class="ss-meta">${shownReasons.map(([kind, label]) => `<span class="ss-pill otd-${kind}">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
+                        ${reasons.length ? `<div class="ss-meta">${reasons.map(([kind, label]) => `<span class="ss-pill otd-${kind}">${escapeHtml(label)}</span>`).join('')}</div>` : ''}
                         <div class="ss-meta">
                             <span>${comp.flag} ${escapeHtml(competitionName(m))}${stage ? ` · ${escapeHtml(stage)}` : ''}</span>
-                            <span>${escapeHtml(fullDate(m.date))}${anniversary && !team ? '' : ` · ${years} year${years === 1 ? '' : 's'} ago`}</span>
+                            <span>${escapeHtml(fullDate(m.date))} · ${years} year${years === 1 ? '' : 's'} ago</span>
                         </div>
+                        ${streakLines}
                     </div>
                     <span class="ss-chevron" aria-hidden="true">▶</span>
                 </div>
@@ -273,7 +292,7 @@
             <p class="ss-sub">${teamView
                 ? (team ? `Every match ${escapeHtml(team)} played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
                     : `Pick your team to see every match it played on ${escapeHtml(day)}. It's remembered on this device.`)
-                : `Finals, big wins and high scores from ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>`;
+                : `Finals, big wins, high scores and the notable streaks that ended on ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>`;
 
         els.teamRow.hidden = !teamView;
         els.remove.hidden = !team;
@@ -354,6 +373,13 @@
             if (!res.ok) throw new Error(`${res.status}`);
             const data = await res.json();
             state.matches = (data.matches || []).filter(m => COMPETITIONS[m.div]);
+            // Each streak under the match that ended it
+            (data.streaks || []).filter(s => COMPETITIONS[s.div] && s.endedBy).forEach(s => {
+                const key = keyOf({ div: s.div, ...s.endedBy });
+                if (!state.streaks.has(key)) state.streaks.set(key, []);
+                state.streaks.get(key).push(s);
+            });
+            state.streaks.forEach(list => list.sort((a, b) => streakStrength(b) - streakStrength(a)));
         } catch (err) {
             console.error('On this day failed:', err);
             state.failed = true;

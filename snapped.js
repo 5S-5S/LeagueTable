@@ -182,8 +182,9 @@
     // Why it's listed: a club record, its longest in 10+ years, rare for
     // the club, or rare in the league - on the line, also a run level with
     // the club record (one more sets a new one)
-    function pills(s) {
-        const league = COMPETITIONS[s.div].name;
+    // league: the competition's name in the label - On this day passes
+    // the one it had then (the First Division)
+    function pills(s, league = COMPETITIONS[s.div].name) {
         const top = Math.max(0.1, Math.ceil((1 - s.pct) * 1000) / 10);
         const rare = `<span class="ss-pill rare" title="Longer than ${(s.pct * 100).toFixed(1)}% of ${escapeHtml(league)} runs of this kind since 1995">Top ${top}% in ${escapeHtml(league)}</span>`;
         if (s.kind === 'h2h') return `${rare}<span class="ss-pill h2h">Head-to-head</span>`;
@@ -569,5 +570,8 @@
         load();
     }
 
-    window.SnappedStreaks = { mount };
+    // headline / pills / streaksHref / searchQuestion: one snapped streak
+    // in words, why it's listed, and its Team Streaks link - On this day
+    // (onthisday.js) shows the streaks a past match ended the same way
+    window.SnappedStreaks = { mount, headline, pills, streaksHref, searchQuestion };
 })();

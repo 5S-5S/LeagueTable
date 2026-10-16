@@ -664,7 +664,8 @@ async function handleUpcoming(env) {
 // October, against 170,000+ for a scan). The dates are built here from a
 // validated md, so they're written into the SQL (a bind per year would pass
 // D1's 100-parameter limit). Every year asked for is over, so the answer
-// is fixed: kept under history-version, a day in the browser.
+// is fixed: kept under history-version, a day in the browser. The day's
+// streaks (from the snapped-streaks job's KV values) are added after.
 const ON_THIS_DAY_DIVS = ['E0', 'SP1', 'I1', 'D1', 'F1', 'C1'];
 const ON_THIS_DAY_FIRST_YEAR = 1888;
 
@@ -696,7 +697,18 @@ async function handleOnThisDay(url, env) {
         }));
         return { md, matches };
     }, { fixed: true });
-    return jsonResponse(body, 200, { fixed: true });
+    // The streaks that ended on this day, written by the snapped-streaks
+    // job for the days around today - read as they are, not cached with
+    // the matches (one that's missing would stay missing for weeks). A day
+    // without them yet is kept in the browser for minutes, not a day.
+    let streaks = null;
+    try {
+        const stored = await env.CACHE.get(`on-this-day-streaks:${md}`);
+        if (stored) streaks = JSON.parse(stored).streaks;
+    } catch (err) {
+        console.error('On this day streaks read failed:', err);
+    }
+    return jsonResponse({ ...body, streaks: streaks || [] }, 200, { fixed: !!streaks });
 }
 
 // The job writes the whole list as one KV value; read as text and passed
