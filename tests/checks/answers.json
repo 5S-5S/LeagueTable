@@ -299,7 +299,8 @@
       "q": "Tottenham champions league qualifications",
       "scope": "premier-league",
       "answer": "Tottenham Hotspur have qualified for the European Cup / Champions League from the English top flight 8 times, first in 1960-61 and most recently in 2024-25.",
-      "phone": true
+      "phone": true,
+      "note": "Did you mean the Premier League only?"
     }
   ],
   "shape": [

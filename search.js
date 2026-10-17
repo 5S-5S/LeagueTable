@@ -2594,11 +2594,14 @@
 
         const scopeComps = SEARCH_SCOPES[scopeKey] || SEARCH_SCOPES.domestic;
         let comps = scopeComps;
+        // A competition the dropdown leaves out ("Arsenal UCL" with the
+        // Premier League picked): search the one that was named
+        let outsideScope = false;
         if (parsed.competitions.length > 0) {
             comps = scopeComps.filter(comp => parsed.competitions.includes(comp.key));
             if (comps.length === 0) {
-                const named = SEARCH_COMPETITIONS.filter(comp => parsed.competitions.includes(comp.key)).map(comp => comp.name).join(' / ');
-                return { results: [], message: `${named} isn't part of this search - pick it in the dropdown.` };
+                comps = SEARCH_COMPETITIONS.filter(comp => parsed.competitions.includes(comp.key));
+                outsideScope = true;
             }
         }
         if (parsed.season !== null) {
@@ -2625,8 +2628,20 @@
             });
         });
 
+        // The Champions League named from a league's dropdown: the club's
+        // qualifications from that league too ("Arsenal UCL"), second
+        const qualifications = [];
+        if (outsideScope && parsed.competitions.includes('champions-league') && !parsed.intent.finish?.outcome) {
+            combinations.forEach(([team1]) => {
+                if (!team1) return;
+                scopeComps.filter(comp => !comp.continental && teamInCompetition(team1, comp)).forEach(comp => {
+                    qualifications.push(seasonsResult(comp, team1, parsed, { rank: '', stage: '', better: false, outcome: 'CL' }));
+                });
+            });
+        }
+
         const seen = new Set();
-        const results = [...primary, ...related].filter(result => {
+        const results = [...primary.slice(0, 1), ...qualifications, ...primary.slice(1), ...related].filter(result => {
             if (seen.has(result.href)) return false;
             seen.add(result.href);
             return true;

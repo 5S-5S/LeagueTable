@@ -196,9 +196,16 @@ domestic | Arsenal semi finals
 domestic | Arsenal knocked out in the quarter finals
     message: No results for Arsenal FC in Premier League / La Liga / Serie A / Bundesliga / Ligue 1.
 domestic | Arsenal champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Arsenal FC · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Arsenal+FC&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Arsenal FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=CL
 domestic | Arsenal european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Arsenal FC · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=CL
+    dashboard | Arsenal FC | Team Dashboard (full page) | ContinentalEurope.html?team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Arsenal+FC&season=european-cup-era-1955-1992
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Arsenal+FC&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Arsenal+FC&season=european-cup-era-1955-1992
 domestic | Arsenal at home
     team | Arsenal FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Arsenal+FC
     dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
@@ -428,9 +435,16 @@ domestic | Barcelona semi finals
 domestic | Barcelona knocked out in the quarter finals
     message: No results for FC Barcelona in Premier League / La Liga / Serie A / Bundesliga / Ligue 1.
 domestic | Barcelona champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | FC Barcelona · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=FC+Barcelona&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | FC Barcelona · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona&out=CL
 domestic | Barcelona european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | FC Barcelona · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=FC+Barcelona
+    team-seasons | FC Barcelona · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona&out=CL
+    dashboard | FC Barcelona | Team Dashboard (full page) | ContinentalEurope.html?team=FC%20Barcelona
+    team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=FC+Barcelona&season=european-cup-era-1955-1992
+    team-streaks | FC Barcelona · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=FC+Barcelona&type=winning
+    match-finder | Last time FC Barcelona won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=FC+Barcelona&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | FC Barcelona · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=FC+Barcelona&season=european-cup-era-1955-1992
 domestic | Barcelona at home
     team | FC Barcelona · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=FC+Barcelona
     dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
@@ -614,9 +628,16 @@ domestic | Juventus semi finals
 domestic | Juventus knocked out in the quarter finals
     message: No results for Juventus in Premier League / La Liga / Serie A / Bundesliga / Ligue 1.
 domestic | Juventus champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Juventus · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Juventus&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Juventus · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&out=CL
 domestic | Juventus european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Juventus · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Juventus
+    team-seasons | Juventus · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&out=CL
+    dashboard | Juventus | Team Dashboard (full page) | ContinentalEurope.html?team=Juventus
+    team-seasons | Juventus · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Juventus&season=european-cup-era-1955-1992
+    team-streaks | Juventus · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Juventus&type=winning
+    match-finder | Last time Juventus won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Juventus&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Juventus · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Juventus&season=european-cup-era-1955-1992
 domestic | Juventus at home
     team | Juventus · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=serie-a&away=0&t1=Juventus
     dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
@@ -864,9 +885,16 @@ premier-league | Liverpool semi finals
 premier-league | Liverpool knocked out in the quarter finals
     message: No results for Liverpool FC in Premier League.
 premier-league | Liverpool champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Liverpool FC · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Liverpool FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&out=CL
 premier-league | Liverpool european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Liverpool FC · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Liverpool+FC
+    team-seasons | Liverpool FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&out=CL
+    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
+    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&season=european-cup-era-1955-1992
+    team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
+    match-finder | Last time Liverpool FC won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Liverpool FC · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&season=european-cup-era-1955-1992
 premier-league | Liverpool at home
     team | Liverpool FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Liverpool+FC
     dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
@@ -1068,9 +1096,16 @@ premier-league | Aston Villa semi finals
 premier-league | Aston Villa knocked out in the quarter finals
     message: No results for Aston Villa in Premier League.
 premier-league | Aston Villa champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Aston Villa · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Aston+Villa&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Aston Villa · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa&out=CL
 premier-league | Aston Villa european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Aston Villa · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Aston+Villa
+    team-seasons | Aston Villa · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa&out=CL
+    dashboard | Aston Villa | Team Dashboard (full page) | ContinentalEurope.html?team=Aston%20Villa
+    team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Aston+Villa&season=european-cup-era-1955-1992
+    team-streaks | Aston Villa · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Aston+Villa&type=winning
+    match-finder | Last time Aston Villa won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Aston+Villa&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Aston Villa · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Aston+Villa&season=european-cup-era-1955-1992
 premier-league | Aston Villa at home
     team | Aston Villa · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Aston+Villa
     dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
@@ -1312,9 +1347,16 @@ la-liga | Real Madrid semi finals
 la-liga | Real Madrid knocked out in the quarter finals
     message: No results for Real Madrid in La Liga.
 la-liga | Real Madrid champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Real Madrid · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Real Madrid · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&out=CL
 la-liga | Real Madrid european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Real Madrid · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Real+Madrid
+    team-seasons | Real Madrid · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&out=CL
+    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&season=european-cup-era-1955-1992
+    team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
+    match-finder | Last time Real Madrid won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Real Madrid · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&season=european-cup-era-1955-1992
 la-liga | Real Madrid at home
     team | Real Madrid · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=Real+Madrid
     dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
@@ -1576,9 +1618,16 @@ serie-a | AC Milan semi finals
 serie-a | AC Milan knocked out in the quarter finals
     message: No results for AC Milan in Serie A.
 serie-a | AC Milan champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | AC Milan · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=AC+Milan&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | AC Milan · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan&out=CL
 serie-a | AC Milan european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | AC Milan · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=AC+Milan
+    team-seasons | AC Milan · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan&out=CL
+    dashboard | AC Milan | Team Dashboard (full page) | ContinentalEurope.html?team=AC%20Milan
+    team-seasons | AC Milan · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=AC+Milan&season=european-cup-era-1955-1992
+    team-streaks | AC Milan · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=AC+Milan&type=winning
+    match-finder | Last time AC Milan won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=AC+Milan&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | AC Milan · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=AC+Milan&season=european-cup-era-1955-1992
 serie-a | AC Milan at home
     team | AC Milan · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=serie-a&away=0&t1=AC+Milan
     dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
@@ -1843,9 +1892,16 @@ bundesliga | Bayern semi finals
 bundesliga | Bayern knocked out in the quarter finals
     message: No results for Bayern München in Bundesliga.
 bundesliga | Bayern champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Bayern München · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Bayern+M%C3%BCnchen&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Bayern München · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen&out=CL
 bundesliga | Bayern european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Bayern München · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Bayern+M%C3%BCnchen
+    team-seasons | Bayern München · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen&out=CL
+    dashboard | Bayern München | Team Dashboard (full page) | ContinentalEurope.html?team=Bayern%20M%C3%BCnchen
+    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Bayern+M%C3%BCnchen&season=european-cup-era-1955-1992
+    team-streaks | Bayern München · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Bayern+M%C3%BCnchen&type=winning
+    match-finder | Last time Bayern München won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Bayern+M%C3%BCnchen&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Bayern München · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Bayern+M%C3%BCnchen&season=european-cup-era-1955-1992
 bundesliga | Bayern at home
     team | Bayern München · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=bundesliga&away=0&t1=Bayern+M%C3%BCnchen
     dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
@@ -2110,9 +2166,16 @@ ligue-1 | PSG semi finals
 ligue-1 | PSG knocked out in the quarter finals
     message: No results for Paris Saint-Germain in Ligue 1.
 ligue-1 | PSG champions league titles
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-seasons | Paris Saint-Germain · Titles | Team Seasons · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Paris+Saint-Germain&season=champions-league-era-1992-2026&pos=Champions
+    team-seasons | Paris Saint-Germain · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain&out=CL
 ligue-1 | PSG european cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team | Paris Saint-Germain · European Cup era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992&t1=Paris+Saint-Germain
+    team-seasons | Paris Saint-Germain · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain&out=CL
+    dashboard | Paris Saint-Germain | Team Dashboard (full page) | ContinentalEurope.html?team=Paris%20Saint-Germain
+    team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · European Cup era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Paris+Saint-Germain&season=european-cup-era-1955-1992
+    team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Paris+Saint-Germain&type=winning
+    match-finder | Last time Paris Saint-Germain won | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Paris+Saint-Germain&res=win&season=european-cup-era-1955-1992&cat=recent
+    match-finder | Paris Saint-Germain · Biggest victories | Match Finder · European Cup era | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Paris+Saint-Germain&season=european-cup-era-1955-1992
 ligue-1 | PSG at home
     team | Paris Saint-Germain · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=ligue-1&away=0&t1=Paris+Saint-Germain
     dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
@@ -2906,7 +2969,7 @@ domestic | All English Seasons
 premier-league | All English Seasons
     team-seasons | All teams · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league
 champions-league | All English Seasons
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    team-seasons | All teams · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league
 domestic | All Main Stage
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | All Main Stage
@@ -2989,15 +3052,15 @@ premier-league | biggest wins
 champions-league | biggest wins
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league
 domestic | Champions League
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 premier-league | Champions League
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 champions-league | Champions League
     table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 domestic | champions-league
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 premier-league | champions-league
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 champions-league | champions-league
     table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 domestic | cheap, single-team
@@ -3045,9 +3108,9 @@ premier-league | drew on a Wednesday
 champions-league | drew on a Wednesday
     table | Champions League table · All seasons | League table · Wednesdays | ContinentalEurope.html?view=league-filters&lg=champions-league&day=3
 domestic | European Cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · European Cup era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992
 premier-league | European Cup
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · European Cup era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992
 champions-league | European Cup
     table | Champions League table · European Cup era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992
 domestic | everyone who finished 2nd
@@ -3097,7 +3160,7 @@ domestic | First Division
 premier-league | First Division
     table | Premier League table · First Division era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=english-first-division-era-1888-1992
 champions-league | First Division
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    table | Premier League table · First Division era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=english-first-division-era-1888-1992
 domestic | First Occurrence Only
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | First Occurrence Only
@@ -3145,7 +3208,7 @@ domestic | highest scoring game ever Premier League
 premier-league | highest scoring game ever Premier League
     match-finder | All clubs · Most total goals | Match Finder · Premier League era | DomesticEurope.html?view=match-finder&lg=premier-league&season=premier-league-era-1992-2025&cat=totalGoals
 champions-league | highest scoring game ever Premier League
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    match-finder | All clubs · Most total goals | Match Finder · Premier League era | DomesticEurope.html?view=match-finder&lg=premier-league&season=premier-league-era-1992-2025&cat=totalGoals
 domestic | home - away
     table | Premier League table · All seasons | League table · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0
     table | La Liga table · All seasons | League table · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0
@@ -3379,13 +3442,13 @@ domestic | Premier League
 premier-league | Premier League
     table | Premier League table · Premier League era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025
 champions-league | Premier League
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    table | Premier League table · Premier League era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025
 domestic | premier league champions
     team-seasons | All teams · Titles | Team Seasons · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&season=premier-league-era-1992-2025&pos=1
 premier-league | premier league champions
     team-seasons | All teams · Titles | Team Seasons · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&season=premier-league-era-1992-2025&pos=1
 champions-league | premier league champions
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    team-seasons | All teams · Titles | Team Seasons · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&season=premier-league-era-1992-2025&pos=1
 domestic | quarter final defeats
     table | Premier League table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=premier-league
     table | La Liga table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=la-liga
@@ -3431,9 +3494,9 @@ champions-league | runners up
 domestic | Schalke Bundesliga titles
     team-seasons | FC Schalke 04 · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=FC+Schalke+04&pos=1
 premier-league | Schalke Bundesliga titles
-    message: Bundesliga isn't part of this search - pick it in the dropdown.
+    team-seasons | FC Schalke 04 · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=FC+Schalke+04&pos=1
 champions-league | Schalke Bundesliga titles
-    message: Bundesliga isn't part of this search - pick it in the dropdown.
+    team-seasons | FC Schalke 04 · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=FC+Schalke+04&pos=1
 domestic | Schalke titles
     team-seasons | FC Schalke 04 · Titles | Team Seasons · All seasons · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=FC+Schalke+04&pos=1&hist=1
 premier-league | Schalke titles
@@ -3471,9 +3534,9 @@ champions-league | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
     match-finder | Valencia CF · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Valencia+CF&away=0
     dashboard | Valletta FC | Team Dashboard (full page) | ContinentalEurope.html?team=Valletta%20FC
 domestic | search every league for champions-league
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 premier-league | search every league for champions-league
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 champions-league | search every league for champions-league
     table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 domestic | Select Streak
@@ -3551,11 +3614,11 @@ domestic | the English top flight
 premier-league | the English top flight
     table | Premier League table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=premier-league
 champions-league | the English top flight
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    table | Premier League table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=premier-league
 domestic | the European Cup and Champions League
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 premier-league | the European Cup and Champions League
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 champions-league | the European Cup and Champions League
     table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 domestic | The Last Time When...
@@ -3705,7 +3768,7 @@ domestic | most points in a Premier League season
 premier-league | most points in a Premier League season
     team-records | All clubs · Most points in a season | Team Records · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&season=premier-league-era-1992-2025
 champions-league | most points in a Premier League season
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    team-records | All clubs · Most points in a season | Team Records · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&season=premier-league-era-1992-2025
 domestic | fewest points in a season
     team-records | All clubs · Fewest points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest
     team-records | All clubs · Fewest points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=fewest
@@ -3933,15 +3996,15 @@ champions-league | highest scoring club seasons
 domestic | highest scoring Serie A season
     league-history | Serie A · Highest-scoring seasons | League History · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=league&rank=goals&order=most
 premier-league | highest scoring Serie A season
-    message: Serie A isn't part of this search - pick it in the dropdown.
+    league-history | Serie A · Highest-scoring seasons | League History · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=league&rank=goals&order=most
 champions-league | highest scoring Serie A season
-    message: Serie A isn't part of this search - pick it in the dropdown.
+    league-history | Serie A · Highest-scoring seasons | League History · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=league&rank=goals&order=most
 domestic | lowest scoring premier league seasons
     league-history | Premier League · Lowest-scoring seasons | League History · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=goals&order=fewest&season=premier-league-era-1992-2025
 premier-league | lowest scoring premier league seasons
     league-history | Premier League · Lowest-scoring seasons | League History · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=goals&order=fewest&season=premier-league-era-1992-2025
 champions-league | lowest scoring premier league seasons
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    league-history | Premier League · Lowest-scoring seasons | League History · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=goals&order=fewest&season=premier-league-era-1992-2025
 domestic | highest scoring Aston Villa seasons
     team-records | Aston Villa · Most goals scored in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsFor&order=most&t1=Aston+Villa
 premier-league | highest scoring Aston Villa seasons
@@ -4109,7 +4172,7 @@ domestic | how has the premier league changed
 premier-league | how has the premier league changed
     league-history | Premier League · Every season | League History · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=season&order=most&season=premier-league-era-1992-2025
 champions-league | how has the premier league changed
-    message: Premier League isn't part of this search - pick it in the dropdown.
+    league-history | Premier League · Every season | League History · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=season&order=most&season=premier-league-era-1992-2025
 domestic | goals per game by season
     league-history | Premier League · Every season | League History · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=league&rank=season&order=most&pg=1
     league-history | La Liga · Every season | League History · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=league&rank=season&order=most&pg=1
@@ -4127,9 +4190,9 @@ premier-league | Arsenal goals per game by season
 champions-league | Arsenal goals per game by season
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Arsenal+FC
 domestic | most goals in a champions league campaign
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-records | All clubs · Most goals scored in a campaign | Team Records · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most&season=champions-league-era-1992-2026
 premier-league | most goals in a champions league campaign
-    message: Champions League isn't part of this search - pick it in the dropdown.
+    team-records | All clubs · Most goals scored in a campaign | Team Records · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most&season=champions-league-era-1992-2026
 champions-league | most goals in a champions league campaign
     team-records | All clubs · Most goals scored in a campaign | Team Records · Champions League era | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsFor&order=most&season=champions-league-era-1992-2026
 domestic | most goals in a campaign
