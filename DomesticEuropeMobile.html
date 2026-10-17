@@ -1902,20 +1902,26 @@
             const finalResult = [];
             const overridePositions = new Set(teamsWithOverrides.map(t => t.sharedPosition));
             
+            // A shared group takes as many places as it has clubs: two at
+            // 3rd fill 3rd and 4th, and the next club is 5th
             let nonOverrideIndex = 0;
-            for (let position = 1; position <= tableArray.length; position++) {
+            let position = 1;
+            while (finalResult.length < tableArray.length) {
                 if (overridePositions.has(position)) {
-                    // Fill with override teams at this position
                     const overrideTeamsAtThisPosition = teamsWithOverrides.filter(t => t.sharedPosition === position);
                     finalResult.push(...overrideTeamsAtThisPosition);
+                    position += overrideTeamsAtThisPosition.length;
+                } else if (nonOverrideIndex < teamsWithoutOverrides.length) {
+                    finalResult.push(teamsWithoutOverrides[nonOverrideIndex]);
+                    nonOverrideIndex++;
+                    position++;
                 } else {
-                    // Fill with next non-override team
-                    if (nonOverrideIndex < teamsWithoutOverrides.length) {
-                        finalResult.push(teamsWithoutOverrides[nonOverrideIndex]);
-                        nonOverrideIndex++;
-                    }
+                    break; // an override past the end of the table
                 }
             }
+            // Overrides that never came up (a position past the end, or one
+            // inside an earlier group) still keep their clubs in the table
+            teamsWithOverrides.forEach(t => { if (!finalResult.includes(t)) finalResult.push(t); });
             
             return finalResult;
         }
