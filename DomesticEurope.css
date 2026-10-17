@@ -1164,6 +1164,47 @@ body {
     background: var(--bg-gray-50);
 }
 
+/* Season outcomes: a thin strip beside Pos (champions, Champions League,
+   relegation play-off, relegated), and its key under the table's title */
+.league-table th.outcome-strip,
+.league-table td.outcome-strip {
+    width: 6px;
+    min-width: 6px;
+    padding: 0;
+    cursor: default;
+}
+
+.outcome-key {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #4b5563;
+}
+
+.outcome-key.hidden {
+    display: none;
+}
+
+.outcome-key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.outcome-key-swatch {
+    display: inline-block;
+    width: 6px;
+    height: 0.875rem;
+    border-radius: 1px;
+}
+
+[data-theme="dark"] .outcome-key {
+    color: var(--text-secondary, #d1d5db);
+}
+
 .league-table tr.highlight {
     background: #f0fdf4;
 }

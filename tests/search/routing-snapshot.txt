@@ -58,12 +58,7 @@ domestic | Arsenal finishes
 domestic | Arsenal seasons
     team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
 domestic | Arsenal relegated
-    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
-    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
-    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
-    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
-    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
-    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=R
 domestic | Arsenal longest unbeaten run
     team-streaks | Arsenal FC · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten&status=historic
 domestic | Arsenal longest winning streak
@@ -365,12 +360,7 @@ domestic | Barcelona finishes
 domestic | Barcelona seasons
     team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
 domestic | Barcelona relegated
-    team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
-    dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
-    team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
-    team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
-    match-finder | Last time FC Barcelona won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&cat=recent
-    match-finder | FC Barcelona · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona
+    team-seasons | FC Barcelona · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona&out=R
 domestic | Barcelona longest unbeaten run
     team-streaks | FC Barcelona · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=unbeaten&status=historic
 domestic | Barcelona longest winning streak
@@ -556,12 +546,7 @@ domestic | Juventus finishes
 domestic | Juventus seasons
     team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
 domestic | Juventus relegated
-    team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
-    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
-    team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
-    team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
-    match-finder | Last time Juventus won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
-    match-finder | Juventus · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus
+    team-seasons | Juventus · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&out=R
 domestic | Juventus longest unbeaten run
     team-streaks | Juventus · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=unbeaten&status=historic
 domestic | Juventus longest winning streak
@@ -781,12 +766,7 @@ premier-league | Liverpool finishes
 premier-league | Liverpool seasons
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
 premier-league | Liverpool relegated
-    team | Liverpool FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
-    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
-    team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
-    match-finder | Last time Liverpool FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
-    match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC
+    team-seasons | Liverpool FC · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&out=R
 premier-league | Liverpool longest unbeaten run
     team-streaks | Liverpool FC · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=unbeaten&status=historic
 premier-league | Liverpool longest winning streak
@@ -1020,12 +1000,7 @@ premier-league | Aston Villa finishes
 premier-league | Aston Villa seasons
     team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
 premier-league | Aston Villa relegated
-    team | Aston Villa · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Aston+Villa
-    dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
-    team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
-    team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
-    match-finder | Last time Aston Villa won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&cat=recent
-    match-finder | Aston Villa · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa
+    team-seasons | Aston Villa · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa&out=R
 premier-league | Aston Villa longest unbeaten run
     team-streaks | Aston Villa · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=unbeaten&status=historic
 premier-league | Aston Villa longest winning streak
@@ -1239,12 +1214,7 @@ la-liga | Real Madrid finishes
 la-liga | Real Madrid seasons
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
 la-liga | Real Madrid relegated
-    team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
-    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
-    team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
-    match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
-    match-finder | Real Madrid · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid
+    team-seasons | Real Madrid · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&out=R
 la-liga | Real Madrid longest unbeaten run
     team-streaks | Real Madrid · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=unbeaten&status=historic
 la-liga | Real Madrid longest winning streak
@@ -1508,12 +1478,7 @@ serie-a | AC Milan finishes
 serie-a | AC Milan seasons
     team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
 serie-a | AC Milan relegated
-    team | AC Milan · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=AC+Milan
-    dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
-    team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
-    team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
-    match-finder | Last time AC Milan won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&cat=recent
-    match-finder | AC Milan · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan
+    team-seasons | AC Milan · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan&out=R
 serie-a | AC Milan longest unbeaten run
     team-streaks | AC Milan · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=unbeaten&status=historic
 serie-a | AC Milan longest winning streak
@@ -1780,12 +1745,7 @@ bundesliga | Bayern finishes
 bundesliga | Bayern seasons
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
 bundesliga | Bayern relegated
-    team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
-    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
-    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
-    team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
-    match-finder | Last time Bayern München won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
-    match-finder | Bayern München · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen
+    team-seasons | Bayern München · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen&out=R
 bundesliga | Bayern longest unbeaten run
     team-streaks | Bayern München · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=unbeaten&status=historic
 bundesliga | Bayern longest winning streak
@@ -2052,12 +2012,7 @@ ligue-1 | PSG finishes
 ligue-1 | PSG seasons
     team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
 ligue-1 | PSG relegated
-    team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
-    dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
-    team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
-    team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
-    match-finder | Last time Paris Saint-Germain won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&cat=recent
-    match-finder | Paris Saint-Germain · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain
+    team-seasons | Paris Saint-Germain · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain&out=R
 ligue-1 | PSG longest unbeaten run
     team-streaks | Paris Saint-Germain · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=unbeaten&status=historic
 ligue-1 | PSG longest winning streak
@@ -2324,11 +2279,6 @@ champions-league | Real Madrid seasons
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
 champions-league | Real Madrid relegated
     team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
-    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
-    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
-    team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
-    match-finder | Last time Real Madrid won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
-    match-finder | Real Madrid · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid
 champions-league | Real Madrid longest unbeaten run
     team-streaks | Real Madrid · Unbeaten streaks | Longest in history | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=unbeaten&status=historic
 champions-league | Real Madrid longest winning streak
@@ -2568,11 +2518,6 @@ champions-league | Liverpool seasons
     team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
 champions-league | Liverpool relegated
     team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
-    dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
-    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
-    team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
-    match-finder | Last time Liverpool FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&cat=recent
-    match-finder | Liverpool FC · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC
 champions-league | Liverpool longest unbeaten run
     team-streaks | Liverpool FC · Unbeaten streaks | Longest in history | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=unbeaten&status=historic
 champions-league | Liverpool longest winning streak
@@ -2764,11 +2709,6 @@ champions-league | Celtic seasons
     team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
 champions-league | Celtic relegated
     team | Celtic FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Celtic+FC
-    dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
-    team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
-    team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
-    match-finder | Last time Celtic FC won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&cat=recent
-    match-finder | Celtic FC · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC
 champions-league | Celtic longest unbeaten run
     team-streaks | Celtic FC · Unbeaten streaks | Longest in history | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=unbeaten&status=historic
 champions-league | Celtic longest winning streak

@@ -272,6 +272,23 @@
       "answer": "Since 2000-01, Real Madrid hold the record for the most goals in a 38-game La Liga season: 121 goals in 2011-12.",
       "phone": true,
       "note": "Did you mean the highest-scoring league seasons (every club's goals added up)?"
+    },
+    {
+      "q": "Tottenham relegations",
+      "scope": "premier-league",
+      "answer": "Tottenham Hotspur have been relegated from the English top flight 4 times, first in 1914-15 and most recently in 1976-77.",
+      "note": "Did you mean the Premier League only?"
+    },
+    {
+      "q": "serie a relegation play offs",
+      "scope": "serie-a",
+      "answer": "21 clubs have played a relegation play-off in Serie A, 26 times in all - most recently Spezia Calcio and Hellas Verona in 2022-23."
+    },
+    {
+      "q": "Real Madrid relegated",
+      "scope": "la-liga",
+      "answer": "Real Madrid have never been relegated from La Liga.",
+      "phone": true
     }
   ],
   "shape": [

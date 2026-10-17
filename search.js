@@ -1474,7 +1474,7 @@
     function detectFinish(text) {
         const has = pattern => pattern.test(text);
         const finish = {
-            rank: '', stage: '', better: false,
+            rank: '', stage: '', better: false, outcome: '',
             first: has(/\b(first[ -](· )*(time|titles?|ever|win|final|trophy|scudetto|championship)|for the first time|first[ -]time (champions|winners)|maiden)\b/),
             historic: has(/\b(historic|pre (serie a|bundesliga)|before the (serie a|bundesliga)|old championships?)\b/),
             // About clubs reaching a stage, not the stage's matches
@@ -1508,6 +1508,15 @@
         }
         if (has(/\b(or better|at least|or higher)\b/)) finish.better = true;
         if (Number(finish.rank) > 24) finish.rank = '';
+        // What a league finish led to (season-outcomes.js): a relegation
+        // play-off ("play outs", "test matches") or relegation. The play-off
+        // isn't the Champions League's play-off round, so no stage
+        if (has(/\b(relegation play ?offs?|play ?outs?|relegation deciders?|test matches|barrages?)\b/)) finish.outcome = 'RP';
+        else if (has(/\b(relegat(e|ed|ion|ions)|went down|go down|gone down|demoted|demotions?)\b/)) finish.outcome = 'R';
+        if (finish.outcome && finish.stage !== 'Champions') {
+            finish.stage = '';
+            finish.better = finish.better && !!finish.rank;
+        }
         return finish;
     }
 
@@ -1677,7 +1686,7 @@
         // A table asked for by name wins over the stage words in it
         // ("2004-05 group stage table")
         if (has(/\b(tables?|standings?|classification|rankings?)\b/)) return { view: 'table', location };
-        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semi ?finalists?|semis|quarter ?finals?|quarter ?finalists?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
+        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|relegat(e|ed|ion|ions)|went down|demoted|play ?outs?|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semi ?finalists?|semis|quarter ?finals?|quarter ?finalists?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
             return { view: 'team-seasons', finish: detectFinish(text), location };
         }
         if (has(/\b(vs|v|versus|against|h2h|head to head|head 2 head|meetings?|record)\b/)) return { view: 'h2h', location };
@@ -2181,6 +2190,10 @@
 
     function finishLabel(comp, finish) {
         const pos = comp.continental ? finish.stage : finish.rank;
+        if (finish.outcome && !comp.continental) {
+            const what = { R: 'Relegations', RP: 'Relegation play-offs' }[finish.outcome];
+            return pos ? `${what} from ${pos}${ordinalSuffix(pos)}${finish.better ? ' or better' : ''}` : what;
+        }
         if (!pos) return '';
         if (comp.continental) {
             if (pos === 'Champions') return 'Titles';
@@ -2203,6 +2216,7 @@
             season: parsed.season !== null ? seasonKey(parsed.season) : (era || ''),
             pos,
             better: pos && finish.better && pos !== '1' && pos !== 'Champions' ? '1' : '',
+            out: comp.continental ? '' : (finish.outcome || ''),
             first: !team && pos && finish.first ? '1' : '',
             // Titles count the pre-league champions unless the league itself
             // was named; asking for "historic" always does
@@ -2465,6 +2479,11 @@
                 // Champions League, and a stage ("semi finals") nothing
                 // in a league - skip the competition that can't show it
                 if (comp.continental ? (rank && !stage) : (stage && !rank)) break;
+                // No relegation in the Champions League: the club's record
+                if (comp.continental && intent.finish.outcome) {
+                    if (t1) primary.push(teamRecordResult(comp, t1, parsed));
+                    break;
+                }
                 primary.push(seasonsResult(comp, t1, parsed, intent.finish));
                 break;
             }
@@ -3379,6 +3398,29 @@
             if (better) return { noun: `finished in the top ${pos} of` };
             return { noun: `finished ${pos}${ordinalSuffix(pos)} in` };
         };
+
+        // What the finishes led to (Outcome: relegated, a relegation
+        // play-off...): how often, and the latest
+        const outcome = !continental && !ctx.season ? data.outcome : '';
+        if (outcome) {
+            const did = {
+                C: 'won', CL: 'reached the Champions League from', RP: 'played a relegation play-off in', R: 'been relegated from'
+            }[outcome];
+            const from = pos ? ` (finishing ${pos}${ordinalSuffix(pos)}${better ? ' or better' : ''})` : '';
+            if (ctx.team1) {
+                const team = b(ctx.team1);
+                if (rows.length === 0) return { crestTeam: ctx.team1, html: `${team} have never ${did} ${competition}${from}.` };
+                const span = rows.length > 1 ? `, first in ${earliest.season} and most recently in ${latest.season}` : `, in ${latest.season}`;
+                return { crestTeam: ctx.team1, html: `${team} have ${did} ${competition}${from} ${times(rows.length)}${span}.` };
+            }
+            if (rows.length === 0) return { html: `No club has ${did} ${competition}${from}.` };
+            const clubs = new Set(rows.map(r => r.team)).size;
+            const newest = rows.filter(r => r.season === latest.season).map(r => r.team);
+            return {
+                crestTeam: newest.length === 1 ? newest[0] : undefined,
+                html: `${formatNumber(clubs)} club${clubs === 1 ? ' has' : 's have'} ${did} ${competition}${from}, ${times(rows.length)} in all - most recently ${joinNames(newest.map(b))} in ${latest.season}.`
+            };
+        }
 
         // One team's seasons
         if (ctx.team1) {

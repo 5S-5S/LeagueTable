@@ -3811,3 +3811,36 @@ html:not(.search-mode) .header-actions {
 [data-theme="dark"] .records-row-season {
     color: #9ca3af;
 }
+
+/* Season outcomes: the key under Team History's title (the bar itself is
+   an inset shadow on the Pos cell, drawn inline) */
+.outcome-key {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 0.75rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #4b5563;
+}
+
+.outcome-key.hidden {
+    display: none;
+}
+
+.outcome-key-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.outcome-key-swatch {
+    display: inline-block;
+    width: 6px;
+    height: 0.875rem;
+    border-radius: 1px;
+}
+
+[data-theme="dark"] .outcome-key {
+    color: var(--text-secondary, #d1d5db);
+}

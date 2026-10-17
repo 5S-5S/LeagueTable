@@ -601,6 +601,18 @@
                         </select>
                     </div>
 
+                    <!-- Outcome Filter: what a finish led to (season-outcomes.js) -->
+                    <div id="teamSeasonsOutcomeContainer" class="mb-8 collapsible-control seasons-history-only">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2" for="teamSeasonsOutcomeSelect">Filter by Outcome:</label>
+                        <select id="teamSeasonsOutcomeSelect" class="form-input w-full">
+                            <option value="">All Outcomes</option>
+                            <option value="C">Champions</option>
+                            <option value="CL">Champions League</option>
+                            <option value="RP">Relegation play-off</option>
+                            <option value="R">Relegated</option>
+                        </select>
+                    </div>
+
                     <!-- Position Filter -->
                     <div id="teamSeasonsPositionContainer" class="mb-8 collapsible-control seasons-history-only">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Filter by Position:</label>
@@ -654,6 +666,7 @@
                                 </div>
                                 <h2 class="text-xl font-semibold text-blue-800 mb-1">🏆 Team History</h2>
                                 <p class="text-sm text-blue-600 font-medium" id="teamHistoryTitle"></p>
+                                <div id="teamHistoryOutcomeKey" class="outcome-key hidden"></div>
                             </div>
                             <table>
                                 <thead>
@@ -1109,6 +1122,7 @@
         </div>
     </div>
 
+    <script src="season-outcomes.js"></script>
     <script src="search.js"></script>
     <script>
         // Application state
@@ -1168,6 +1182,7 @@
             teamSeasonsSelectedTeam: '',
             teamSeasonsSelectedSeason: 'all-english-seasons-1888-2025',
             teamSeasonsSelectedPosition: '',
+            teamSeasonsSelectedOutcome: '', // C / CL / RP / R (season-outcomes.js)
             includeBetterResults: false,
             includeHistoricSeasons: false,
             firstOccurrenceOnly: false,
@@ -2771,6 +2786,7 @@
             matchHistoryVisualizations: document.getElementById('matchHistoryVisualizations'),
             teamHistoryTable: document.getElementById('teamHistoryTable'),
             teamHistoryTitle: document.getElementById('teamHistoryTitle'),
+            teamHistoryOutcomeKey: document.getElementById('teamHistoryOutcomeKey'),
             teamHistoryHeader: document.getElementById('teamHistoryHeader'),
             teamHistoryBody: document.getElementById('teamHistoryBody'),
             teamHistoryBackArrow: document.getElementById('teamHistoryBackArrow'),
@@ -2780,6 +2796,8 @@
             teamSeasonsSeasonSelect: document.getElementById('teamSeasonsSeasonSelect'),
             teamSeasonsPositionContainer: document.getElementById('teamSeasonsPositionContainer'),
             teamSeasonsPositionSelect: document.getElementById('teamSeasonsPositionSelect'),
+            teamSeasonsOutcomeContainer: document.getElementById('teamSeasonsOutcomeContainer'),
+            teamSeasonsOutcomeSelect: document.getElementById('teamSeasonsOutcomeSelect'),
             includeBetterResultsContainer: document.getElementById('includeBetterResultsContainer'),
             includeBetterResultsCheckbox: document.getElementById('includeBetterResultsCheckbox'),
             teamSeasonsPositionInfo: document.getElementById('teamSeasonsPositionInfo'),
@@ -4487,6 +4505,7 @@
                 seasons: isSeasons ? {
                     rows: seasonsRows,
                     position: state.teamSeasonsSelectedPosition,
+                    outcome: state.teamSeasonsSelectedOutcome,
                     better: state.includeBetterResults,
                     first: state.firstOccurrenceOnly,
                     // A title that was stripped (Marseille 1992-93, Juventus
@@ -4635,6 +4654,11 @@
             const container = document.getElementById('teamSeasonsPositionContainer');
             const singleSeason = isSingleTeamSeasonSelected();
             if (container) container.classList.toggle('hidden', singleSeason);
+            elements.teamSeasonsOutcomeContainer.classList.toggle('hidden', singleSeason);
+            if (singleSeason && state.teamSeasonsSelectedOutcome) {
+                state.teamSeasonsSelectedOutcome = '';
+                elements.teamSeasonsOutcomeSelect.value = '';
+            }
             if (singleSeason && state.teamSeasonsSelectedPosition) {
                 state.teamSeasonsSelectedPosition = '';
                 elements.teamSeasonsPositionSelect.value = '';
@@ -4695,6 +4719,7 @@
                 state.teamSeasonsSelectedSeason = '';
             }
             state.teamSeasonsSelectedPosition = '';
+            state.teamSeasonsSelectedOutcome = '';
             state.includeBetterResults = false;
             state.includeHistoricSeasons = false;
             state.firstOccurrenceOnly = false;
@@ -4713,6 +4738,7 @@
             elements.teamSeasonsTeamSelect.value = '';
             elements.teamSeasonsSeasonSelect.value = '';
             elements.teamSeasonsPositionSelect.value = '';
+            elements.teamSeasonsOutcomeSelect.value = '';
 
             // Reset Include Better Results checkbox and hide it
             if (elements.includeBetterResultsCheckbox) {
@@ -4794,7 +4820,7 @@
         // Update Historic Seasons toggle visibility
         function updateHistoricSeasonsVisibility() {
             const shouldShow = state.teamSeasonsSelectedTeam ||
-                              (state.teamSeasonsSelectedPosition && !state.teamSeasonsSelectedTeam);
+                              (hasAllTeamsFilter() && !state.teamSeasonsSelectedTeam);
 
             if (shouldShow) {
                 elements.historicSeasonsContainer.classList.remove('hidden');
@@ -4839,7 +4865,7 @@
                         }
                     }, 100);
                 }
-            } else if (state.teamSeasonsSelectedPosition) {
+            } else if (hasAllTeamsFilter()) {
                 showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
             }
         }
@@ -4848,7 +4874,7 @@
         // the all-teams-at-position table (no single team selected), since
         // that's the only view with a Count column.
         function updateFirstOccurrenceOnlyVisibility() {
-            const shouldShow = state.teamSeasonsSelectedPosition && !state.teamSeasonsSelectedTeam;
+            const shouldShow = hasAllTeamsFilter() && !state.teamSeasonsSelectedTeam;
 
             if (shouldShow) {
                 elements.firstOccurrenceOnlyContainer.classList.remove('hidden');
@@ -4879,7 +4905,7 @@
             updateFirstOccurrenceOnlyToggleButton();
 
             // Only relevant when viewing all teams at a position
-            if (state.teamSeasonsSelectedPosition && !state.teamSeasonsSelectedTeam) {
+            if (hasAllTeamsFilter() && !state.teamSeasonsSelectedTeam) {
                 showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
             }
         }
@@ -4976,7 +5002,7 @@
             // If a team is already selected, refresh the team history with the new season filter
             if (state.teamSeasonsSelectedTeam) {
                 showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
-            } else if (state.teamSeasonsSelectedPosition) {
+            } else if (hasAllTeamsFilter()) {
                 // No team selected but a position is - refresh the all-teams-at-position view
                 showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
             } else if (selectedSeason && !isEraSeasonKey(selectedSeason)) {
@@ -5064,9 +5090,41 @@
             }
         }
 
-        // Show all teams that finished at a specific position
+        // A filter that lists every club's seasons: a position, an outcome
+        function hasAllTeamsFilter() {
+            return !!(state.teamSeasonsSelectedPosition || state.teamSeasonsSelectedOutcome);
+        }
+
+        function handleTeamSeasonsOutcomeChange(outcome) {
+            state.teamSeasonsSelectedOutcome = outcome;
+            state.firstOccurrenceOnly = false;
+            updateFirstOccurrenceOnlyToggleButton();
+            updateHistoricSeasonsVisibility();
+            updateFirstOccurrenceOnlyVisibility();
+            if (state.teamSeasonsSelectedTeam || hasAllTeamsFilter() || isSingleTeamSeasonSelected()) {
+                refreshTeamHistoryView();
+            } else {
+                elements.teamHistoryTable.classList.add('hidden');
+                elements.teamSeasonsPositionInfo.textContent = '';
+                pendingTeamSeasonsPositionInfo = '';
+            }
+        }
+
+        // "were relegated 3 times" - the info line's words for an outcome
+        function outcomePhrase(outcome, count) {
+            return {
+                C: 'won the title',
+                CL: 'reached the Champions League',
+                RP: 'played a relegation play-off',
+                R: count === 1 ? 'was relegated' : 'were relegated'
+            }[outcome];
+        }
+
+        // Show all teams that finished at a specific position - or, with an
+        // Outcome, every finish that led to it (position '' for any place)
         function showAllTeamsAtPosition(position, league) {
-            const selectedPos = parseInt(position);
+            const selectedPos = parseInt(position) || 0; // 0: any position (an Outcome on its own)
+            const selectedOutcome = state.teamSeasonsSelectedOutcome;
             const leagueMapping = {
                 'premier-league': 'E0',
                 'la-liga': 'SP1',
@@ -5086,7 +5144,7 @@
             const seasonStandingsBySeasonName = state.seasonStandingsApiCacheKey === divCode ? state.seasonStandingsApiCache : {};
 
             const availableSeasons = getAvailableSeasons(league);
-            const allPositionData = [];
+            let allPositionData = [];
 
             // Filter seasons based on Team Seasons selection (if any)
             let seasonsToProcess = availableSeasons;
@@ -5201,7 +5259,9 @@
                 // Extract all teams at the requested position (handle shared
                 // positions) - or, with Include Better Results, at every
                 // position from 1st down to it ("top 4")
-                const positionsWanted = state.includeBetterResults
+                const positionsWanted = !selectedPos
+                    ? Array.from({ length: overriddenTable.length }, (_, k) => k + 1)
+                    : state.includeBetterResults
                     ? Array.from({ length: selectedPos }, (_, k) => k + 1)
                     : [selectedPos];
                 const teamsThisSeason = new Set();
@@ -5272,10 +5332,15 @@
 
             // Add historic seasons data if enabled
             if (state.includeHistoricSeasons) {
-                const historicPositions = state.includeBetterResults
+                const historicPositions = !selectedPos ? [1] : state.includeBetterResults
                     ? Array.from({ length: selectedPos }, (_, k) => k + 1)
                     : [selectedPos];
                 historicPositions.forEach(pos => allPositionData.push(...getHistoricSeasonsData(null, pos, league)));
+            }
+
+            if (selectedOutcome) {
+                allPositionData = allPositionData.filter(row =>
+                    getSeasonOutcomes(league, row.season, row.position, row.team).includes(selectedOutcome));
             }
 
             // Sort by season (most recent first), then finish ("top 4"
@@ -5311,7 +5376,14 @@
             const orBetter = state.includeBetterResults && selectedPos > 1 ? ' or better' : '';
             const totalCount = allPositionData.length;
             const uniqueTeamCount = Object.keys(teamCounts).length;
-            if (state.firstOccurrenceOnly) {
+            if (selectedOutcome) {
+                const finished = selectedPos ? `finished ${ordinalPosition}${orBetter} and ` : '';
+                const teamText = `${uniqueTeamCount}${state.firstOccurrenceOnly ? ' unique' : ''} ${uniqueTeamCount === 1 ? 'team' : 'teams'}`;
+                const countText = totalCount === 1 ? 'time' : 'times';
+                elements.teamSeasonsPositionInfo.textContent = state.firstOccurrenceOnly
+                    ? `${teamText} ${finished}${outcomePhrase(selectedOutcome, uniqueTeamCount)} (${totalCount} ${countText} total)`
+                    : `${teamText} ${finished}${outcomePhrase(selectedOutcome, uniqueTeamCount)} a total of ${totalCount} ${countText}`;
+            } else if (state.firstOccurrenceOnly) {
                 const teamText = uniqueTeamCount === 1 ? 'team' : 'teams';
                 const countText = totalCount === 1 ? 'time' : 'times';
                 elements.teamSeasonsPositionInfo.textContent = `${uniqueTeamCount} unique ${teamText} finished ${ordinalPosition}${orBetter} (${totalCount} ${countText} total)`;
@@ -5332,6 +5404,50 @@
 
 
         // Render position-only table without recalculating data (for sorting)
+        // Season outcomes (season-outcomes.js): what a finish led to -
+        // champions, the Champions League, a relegation play-off,
+        // relegation. A thin bar on the Pos cell's edge shows the one that
+        // ranks highest in PRIORITY; its tooltip lists them all. (A bar,
+        // not a column: the compact layout sizes columns by position.)
+        const OUTCOME_STYLES = {
+            C: { color: '#eab308', label: 'Champions' },
+            CL: { color: '#2563eb', label: 'Champions League' },
+            RP: { color: '#f97316', label: 'Relegation play-off' },
+            R: { color: '#dc2626', label: 'Relegated' }
+        };
+
+        // The outcome codes for one club's finish, in PRIORITY order. An
+        // entry naming a club (clubs sharing a place) is that club's only
+        function getSeasonOutcomes(league, season, position, team) {
+            const outcomes = window.SeasonOutcomes;
+            const entries = outcomes && outcomes.leagues[league] && outcomes.leagues[league][season];
+            if (!entries) return [];
+            const codes = entries
+                .filter(([pos, , club]) => pos === position && (!club || club === team))
+                .map(([, code]) => code);
+            return outcomes.PRIORITY.filter(code => codes.includes(code));
+        }
+
+        // The bar, as style for a cell: on its left edge, or its right
+        function outcomeBarStyle(codes, side = 'left') {
+            if (!codes.length) return '';
+            return ` box-shadow: inset ${side === 'left' ? 6 : -6}px 0 0 ${OUTCOME_STYLES[codes[0]].color};`;
+        }
+
+        function outcomeBarTitle(codes) {
+            return codes.length ? ` title="${codes.map(code => OUTCOME_STYLES[code].label).join(', ')}"` : '';
+        }
+
+        // The key under the table's title: the outcomes the rows show
+        function updateOutcomeKey(codeLists) {
+            const shown = new Set(codeLists.flat());
+            const codes = window.SeasonOutcomes ? window.SeasonOutcomes.PRIORITY.filter(code => shown.has(code)) : [];
+            elements.teamHistoryOutcomeKey.classList.toggle('hidden', !codes.length);
+            elements.teamHistoryOutcomeKey.innerHTML = codes.map(code => `
+                <span class="outcome-key-item"><span class="outcome-key-swatch" style="background-color: ${OUTCOME_STYLES[code].color};"></span>${OUTCOME_STYLES[code].label}</span>
+            `).join('');
+        }
+
         function renderPositionOnlyTable(allPositionData, selectedPos, league) {
             window.currentSeasonStandingsView = null;
             pendingTeamSeasonsPositionInfo = '';
@@ -5348,13 +5464,19 @@
             const medalStyle = selectedPos === 1 ? 'color: #d97706; font-weight: bold;' : selectedPos === 2 ? 'color: #374151; font-weight: bold;' : selectedPos === 3 ? 'color: #b45309; font-weight: bold;' : 'color: #374151; font-weight: bold;';
             // With Include Better Results: every finish from 1st down ("Top 4")
             const betterRange = state.includeBetterResults && selectedPos > 1;
-            elements.teamHistoryTitle.innerHTML = betterRange
+            // Places are mixed ("top 4", or an Outcome at any place): show each
+            const showPos = betterRange || !selectedPos;
+            const outcome = state.teamSeasonsSelectedOutcome;
+            const outcomeTitle = outcome ? ` - ${OUTCOME_STYLES[outcome].label}` : '';
+            elements.teamHistoryTitle.innerHTML = !selectedPos
+                ? `All teams${outcomeTitle}`
+                : (betterRange
                 ? `All teams (<span style="${medalStyle}">Top ${selectedPos}</span>) - Top ${selectedPos} Finishes`
-                : `All teams (Position <span style="${medalStyle}">${selectedPos}</span>) - ${ordinalPosition} Place Finishes`;
+                : `All teams (Position <span style="${medalStyle}">${selectedPos}</span>) - ${ordinalPosition} Place Finishes`) + outcomeTitle;
             
             elements.teamHistoryTable.classList.remove('single-team-mode');
             elements.teamHistoryTable.classList.add('position-only-mode');
-            elements.teamHistoryTable.classList.toggle('better-range', betterRange);
+            elements.teamHistoryTable.classList.toggle('better-range', showPos);
 
             const thSort = (key, label) =>
                 `<span onclick="handleTeamHistorySort('${key}')" style="cursor:pointer;" title="Sort by ${label}">${label}</span>`;
@@ -5364,7 +5486,7 @@
                 <th class="px-3 py-4 text-left font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('season')" style="text-align: left;">Season</th>
                 <th class="px-2 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('count')" style="text-align: center;">#</th>
                 <th class="px-4 py-4 text-left font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('team')" style="text-align: left;">Team</th>
-                ${betterRange ? '' : `<th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('played')" style="text-align: center;">P</th>`}
+                ${showPos ? '' : `<th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('played')" style="text-align: center;">P</th>`}
                 <th class="px-2 py-4 text-center font-bold text-sm" style="text-align: center; white-space: nowrap;">
                     ${thSort('won', 'W')}-${thSort('drawn', 'D')}-${thSort('lost', 'L')}
                 </th>
@@ -5373,11 +5495,13 @@
                 </th>
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('goalDifference')" style="text-align: center;">GD</th>
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('points')" style="text-align: center;">Pts</th>
-                ${betterRange ? `<th class="px-2 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('position')" style="text-align: center;">Pos</th>` : ''}
+                ${showPos ? `<th class="px-2 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('position')" style="text-align: center;">Pos</th>` : ''}
             `;
 
             // Create table rows
             resetExpandedTeamSeasonsFor(`position::${league}::${selectedPos}`);
+            const outcomesBySeason = new Map(allPositionData.map(season => [season, getSeasonOutcomes(league, season.season, season.position, season.team)]));
+            updateOutcomeKey([...outcomesBySeason.values()]);
             elements.teamHistoryBody.innerHTML = allPositionData.map((season, index) => {
                 // bg-gray-50/bg-white (not bg-gray-100/bg-gray-50) - see the
                 // note on the same fix in updateTableDisplay() above.
@@ -5398,7 +5522,7 @@
                                 <span class="cursor-pointer hover:text-blue-600 team-name-text" onclick="handleTeamClick('${season.team}')">${season.team}</span>
                             </div>
                         </td>
-                        ${betterRange ? '' : `<td class="px-3 py-4 text-center">${season.played}</td>`}
+                        ${showPos ? '' : `<td class="px-3 py-4 text-center">${season.played}</td>`}
                         <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.won}-${season.drawn}-${season.lost}</td>
                         <td class="px-2 py-4 text-center" style="white-space: nowrap;">${season.goalsFor}:${season.goalsAgainst}</td>
                         <td class="px-3 py-4 text-center">
@@ -5406,12 +5530,12 @@
                                 ${season.goalDifference > 0 ? '+' : ''}${season.goalDifference}
                             </span>
                         </td>
-                        <td class="px-3 py-4 text-center">
+                        <td class="px-3 py-4 text-center"${showPos ? '' : outcomeBarTitle(outcomesBySeason.get(season))} style="${showPos ? '' : outcomeBarStyle(outcomesBySeason.get(season), 'right')}">
                             <span class="points-badge">
                                 ${season.points}
                             </span>
                         </td>
-                        ${betterRange ? `<td class="px-2 py-4 text-center font-bold" style="${
+                        ${showPos ? `<td class="px-2 py-4 text-center font-bold"${outcomeBarTitle(outcomesBySeason.get(season))} style="${outcomeBarStyle(outcomesBySeason.get(season))}${
                             season.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
                             season.position === 2 ? 'color: #374151; background-color: #e5e7eb;' :
                             season.position === 3 ? 'color: #b45309; background-color: #fef7ed;' :
@@ -5530,6 +5654,8 @@
                 state.teamSeasonsSelectedTeam = '';
                 state.teamSeasonsSelectedSeason = '';
                 state.teamSeasonsSelectedPosition = '';
+                state.teamSeasonsSelectedOutcome = '';
+                elements.teamSeasonsOutcomeSelect.value = '';
                 state.includeBetterResults = false;
                 state.includeHistoricSeasons = false;
                 state.firstOccurrenceOnly = false;
@@ -5572,6 +5698,8 @@
                 state.teamSeasonsSelectedTeam = '';
                 state.teamSeasonsSelectedSeason = '';
                 state.teamSeasonsSelectedPosition = '';
+                state.teamSeasonsSelectedOutcome = '';
+                elements.teamSeasonsOutcomeSelect.value = '';
                 state.includeBetterResults = false;
                 state.includeHistoricSeasons = false;
                 state.firstOccurrenceOnly = false;
@@ -5926,7 +6054,7 @@
                 if (state.teamSeasonsSelectedTeam) {
                     // Refresh single team view
                     showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
-                } else if (state.teamSeasonsSelectedPosition) {
+                } else if (hasAllTeamsFilter()) {
                     // Refresh position-only view
                     showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
                 }
@@ -6278,6 +6406,10 @@
             
             elements.teamSeasonsPositionSelect.addEventListener('change', (e) => {
                 handleTeamSeasonsPositionChange(e.target.value);
+            });
+
+            elements.teamSeasonsOutcomeSelect.addEventListener('change', (e) => {
+                handleTeamSeasonsOutcomeChange(e.target.value);
             });
 
             elements.includeBetterResultsCheckbox.addEventListener('click', () => {
@@ -8096,7 +8228,7 @@
         function refreshTeamHistoryView() {
             if (state.teamSeasonsSelectedTeam) {
                 showTeamHistory(state.teamSeasonsSelectedTeam, state.teamSeasonsSelectedLeague);
-            } else if (state.teamSeasonsSelectedPosition) {
+            } else if (hasAllTeamsFilter()) {
                 showAllTeamsAtPosition(state.teamSeasonsSelectedPosition, state.teamSeasonsSelectedLeague);
             } else if (state.teamSeasonsSelectedSeason && !isEraSeasonKey(state.teamSeasonsSelectedSeason)) {
                 showSeasonStandings(state.teamSeasonsSelectedSeason, state.teamSeasonsSelectedLeague);
@@ -8735,6 +8867,7 @@
             } else if (view === 'team-seasons') {
                 if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
                 if (state.teamSeasonsSelectedSeason) params.set('season', state.teamSeasonsSelectedSeason);
+                if (state.teamSeasonsSelectedOutcome) params.set('out', state.teamSeasonsSelectedOutcome);
                 if (state.teamSeasonsSelectedPosition) params.set('pos', state.teamSeasonsSelectedPosition);
                 if (state.teamSeasonsSelectedPosition && state.includeBetterResults) params.set('better', '1');
                 if (state.firstOccurrenceOnly) params.set('first', '1');
@@ -8900,6 +9033,11 @@
                 if (season) {
                     elements.teamSeasonsSeasonSelect.value = season;
                     handleTeamSeasonsSeasonChange(season);
+                }
+                const out = params.get('out');
+                if (out && OUTCOME_STYLES[out]) {
+                    elements.teamSeasonsOutcomeSelect.value = out;
+                    handleTeamSeasonsOutcomeChange(out);
                 }
                 if (pos) {
                     elements.teamSeasonsPositionSelect.value = pos;
@@ -11793,6 +11931,8 @@
             `;
 
             resetExpandedTeamSeasonsFor(`season::${league}::${seasonKey}`);
+            const outcomesByTeam = new Map(sortedRows.map(row => [row.team, getSeasonOutcomes(league, seasonKey, row.position, row.team)]));
+            updateOutcomeKey([...outcomesByTeam.values()]);
             elements.teamHistoryBody.innerHTML = sortedRows.map((row, index) => {
                 const rowBackgroundClass = index % 2 === 1 ? 'bg-gray-50' : 'bg-white';
                 const logoUrl = getTeamLogoUrl(row.team, league);
@@ -11801,7 +11941,7 @@
                     strippedChampions.some(([team, div, season, pos]) => team === row.team && div === divCode && season === seasonKey && pos === 1);
                 return `
                     <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
-                        <td class="px-3 py-4 font-bold text-left" ${titleRevoked ? 'title="Title revoked"' : ''} style="${
+                        <td class="px-3 py-4 font-bold text-left" ${titleRevoked ? 'title="Title revoked"' : outcomeBarTitle(outcomesByTeam.get(row.team))} style="${outcomeBarStyle(outcomesByTeam.get(row.team))}${
                             titleRevoked ? 'color: #6b7280;' :
                             row.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
                             row.position === 2 ? 'color: #374151; background-color: #e5e7eb;' :
@@ -11850,8 +11990,19 @@
             // History data processed
             
             // Filter by position if selected
+            const selectedOutcome = state.teamSeasonsSelectedOutcome;
+            if (selectedOutcome) {
+                historyData = historyData.filter(season =>
+                    getSeasonOutcomes(leagueToUse, season.season, season.position, teamName).includes(selectedOutcome));
+            }
             let filteredData = [...historyData];
             let positionInfo = '';
+            if (selectedOutcome && !state.teamSeasonsSelectedPosition) {
+                const newestFirst = [...historyData].sort((a, b) => parseInt(b.season) - parseInt(a.season));
+                positionInfo = newestFirst.length
+                    ? `${teamName} ${outcomePhrase(selectedOutcome, newestFirst.length)} ${newestFirst.length} ${newestFirst.length === 1 ? 'time' : 'times'}. Most recent: ${newestFirst[0].season} Season.`
+                    : `${teamName}: no seasons found (${OUTCOME_STYLES[selectedOutcome].label})`;
+            }
             
             if (state.teamSeasonsSelectedPosition) {
                 const selectedPos = parseInt(state.teamSeasonsSelectedPosition);
@@ -12027,6 +12178,8 @@
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" onclick="handleTeamHistorySort('position')" style="text-align: center;">Pos</th>
             `;
 
+            const outcomesBySeason = new Map(sortedData.map(season => [season, getSeasonOutcomes(leagueToUse, season.season, season.position, teamName)]));
+            updateOutcomeKey([...outcomesBySeason.values()]);
             elements.teamHistoryBody.innerHTML = sortedData.map((season, index) => {
                 // bg-gray-50/bg-white (not bg-gray-100/bg-gray-50) - see the
                 // note on the same fix in updateTableDisplay() above.
@@ -12061,7 +12214,7 @@
                                 ${season.points}
                             </span>
                         </td>
-                        <td class="px-3 py-4 text-center font-bold" ${season.revoked ? 'title="Title revoked" ' : ''}style="${
+                        <td class="px-3 py-4 text-center font-bold" ${season.revoked ? 'title="Title revoked" ' : outcomeBarTitle(outcomesBySeason.get(season)) + ' '}style="${outcomeBarStyle(outcomesBySeason.get(season))}${
                             season.revoked ? 'color: #6b7280;' :
                             season.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :
                             season.position === 2 ? 'color: #374151; background-color: #e5e7eb;' :
