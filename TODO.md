@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-15)
+## Priority (ranked 2026-10-03, updated 2026-10-16)
 
 Most to least important; details are in each item below.
 
@@ -23,12 +23,12 @@ empty search box.
 4. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-5. Match Finder: a country's clubs as the subject (on hold)
-6. API caching (what's left - the outage-preventing parts are done)
-7. Expand favourite team (On this day uses it)
+5. API caching (what's left - the outage-preventing parts are done)
+6. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-8. Typo tolerance in search
+7. Typo tolerance in search
+8. Smarter search suggestions as you type
 9. "City" / "United" alone in search
 10. Recent searches
 11. Road to the final
@@ -49,12 +49,13 @@ empty search box.
 24. Lighter pages (small gain - see the item)
 25. Knockout Stage bracket view (on hold)
 26. Country vs Country
-27. Review upcoming matches
-28. Phone-width checks in npm run check
-29. Team-colour contrast
-30. Sitemap + Google Search Console
-31. Club names that differ from worldfootball.net
-32. Champions League data fixes (found 2026-10-13)
+27. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+28. Review upcoming matches
+29. Phone-width checks in npm run check
+30. Team-colour contrast
+31. Sitemap + Google Search Console
+32. Club names that differ from worldfootball.net
+33. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -296,6 +297,19 @@ empty search box.
 - Maybe: **Typo tolerance in search** — noted 2026-10-03. "arsnl",
   "chelsae" find nothing; fuzzy-match club names ("Did you mean
   Arsenal?").
+
+- Maybe: **Smarter search suggestions as you type** — noted 2026-10-17.
+  Suggestions only use the words already complete: "arsenal ch" (Premier
+  League picked) offers Arsenal's record, dashboard, seasons, streaks and
+  Match Finder - the same as "arsenal" - and nothing about what "ch" is
+  heading towards. Read a half-typed last word as its likely endings
+  (Chelsea, the Champions League, Champions League qualifications,
+  champions/titles) and suggest those: "Arsenal vs Chelsea", "Arsenal in
+  the Champions League", "Arsenal Champions League qualifications",
+  "Arsenal titles". Also rank by what the words so far point to, not a
+  fixed order (record, dashboard, seasons...). Ties in with Typo
+  tolerance (same fuzzy matching) and Analytics' failed searches (which
+  half-typed queries people abandon).
 
 - Maybe: **"/" to search** — noted 2026-10-03. Focus the search bar from
   anywhere on a page.
