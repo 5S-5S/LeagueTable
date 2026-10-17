@@ -4733,11 +4733,6 @@
             const container = document.getElementById('teamSeasonsPositionContainer');
             const singleSeason = isSingleTeamSeasonSelected();
             if (container) container.classList.toggle('hidden', singleSeason);
-            elements.teamSeasonsOutcomeContainer.classList.toggle('hidden', singleSeason);
-            if (singleSeason && state.teamSeasonsSelectedOutcome) {
-                state.teamSeasonsSelectedOutcome = '';
-                elements.teamSeasonsOutcomeSelect.value = '';
-            }
             if (singleSeason && state.teamSeasonsSelectedPosition) {
                 state.teamSeasonsSelectedPosition = '';
                 elements.teamSeasonsPositionSelect.value = '';
@@ -5193,7 +5188,7 @@
         function outcomePhrase(outcome, count) {
             return {
                 C: 'won the title',
-                CL: 'reached the Champions League',
+                CL: 'qualified for the Champions League',
                 RP: 'played a relegation play-off',
                 R: count === 1 ? 'was relegated' : 'were relegated'
             }[outcome];

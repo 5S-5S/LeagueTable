@@ -1511,7 +1511,8 @@
         // What a league finish led to (season-outcomes.js): a relegation
         // play-off ("play outs", "test matches") or relegation. The play-off
         // isn't the Champions League's play-off round, so no stage
-        if (has(/\b(relegation play ?offs?|play ?outs?|relegation deciders?|test matches|barrages?)\b/)) finish.outcome = 'RP';
+        if (has(/\bclqualify\b/)) finish.outcome = 'CL';
+        else if (has(/\b(relegation play ?offs?|play ?outs?|relegation deciders?|test matches|barrages?)\b/)) finish.outcome = 'RP';
         else if (has(/\b(relegat(e|ed|ion|ions)|went down|go down|gone down|demoted|demotions?)\b/)) finish.outcome = 'R';
         if (finish.outcome && finish.stage !== 'Champions') {
             finish.stage = '';
@@ -1686,7 +1687,7 @@
         // A table asked for by name wins over the stage words in it
         // ("2004-05 group stage table")
         if (has(/\b(tables?|standings?|classification|rankings?)\b/)) return { view: 'table', location };
-        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|relegat(e|ed|ion|ions)|went down|demoted|play ?outs?|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semi ?finalists?|semis|quarter ?finals?|quarter ?finalists?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
+        if (has(/\b(seasons|season by season|history|finish|finished|finishes|finishing|positions?|placed|relegat(e|ed|ion|ions)|went down|demoted|play ?outs?|clqualify|titles?|champions|winners|won (the )?(league|title|cup|it|competition)|top (\d{1,2}|two|three|four|five|six|seven|eight|ten)|runners? up|finals?|finalists?|semi ?finals?|semi ?finalists?|semis|quarter ?finals?|quarter ?finalists?|quarters|round of 16|last 16|play ?offs?|group stages?|knocked out|eliminated|how far|\d{1,2}(st|nd|rd|th))\b/)) {
             return { view: 'team-seasons', finish: detectFinish(text), location };
         }
         if (has(/\b(vs|v|versus|against|h2h|head to head|head 2 head|meetings?|record)\b/)) return { view: 'h2h', location };
@@ -1791,6 +1792,16 @@
         text = text.replace(/\bfor the 1st\b/g, 'for the first');
         text = text.replace(/\bthe (?=[a-z ]*derby\b)/, ' ');
         DERBIES.forEach(([pattern, teams]) => { text = text.replace(pattern, ` ${teams.toLowerCase()} `); });
+        // Qualifying for the Champions League is a league finish's outcome,
+        // not the competition ("Arsenal champions league qualifications",
+        // "qualified for the european cup", "champions league places") - a
+        // marker, before the competition names are taken out. The
+        // competition's own rounds stay ("reached the champions league
+        // final", "champions league qualifying")
+        const CL_NAME = '(?:champions league|european cup|ucl|cl)';
+        text = text
+            .replace(new RegExp(`\\b(?:qualif(?:y|ied|ies|ying|ication|ications)|made|make|makes|making|got|get|gets|getting|earned|earn|earns|secured|secure)\\s+(?:it\\s+)?(?:for\\s+|into\\s+|to\\s+|in\\s+)?(?:the\\s+)?${CL_NAME}\\b(?!\\s+(?:matches|games|final|finals|semi|quarter|group|knockout|round|rounds|play|qualifiers|qualifying|campaigns?|titles?))`, 'g'), ' clqualify ')
+            .replace(new RegExp(`\\b${CL_NAME}\\s+(?:qualifications?|places?|spots?|berths?|football)\\b`, 'g'), ' clqualify ');
         const filters = {
             dateFrom: '', dateTo: '', day: '', location: '', lastN: '', points: '', deductions: '',
             stage: '', penalties: false, excludeQualifiers: false, excludeMainStage: false,
@@ -2191,7 +2202,7 @@
     function finishLabel(comp, finish) {
         const pos = comp.continental ? finish.stage : finish.rank;
         if (finish.outcome && !comp.continental) {
-            const what = { R: 'Relegations', RP: 'Relegation play-offs' }[finish.outcome];
+            const what = { R: 'Relegations', RP: 'Relegation play-offs', CL: 'Champions League qualifications' }[finish.outcome];
             return pos ? `${what} from ${pos}${ordinalSuffix(pos)}${finish.better ? ' or better' : ''}` : what;
         }
         if (!pos) return '';
@@ -3401,10 +3412,22 @@
 
         // What the finishes led to (Outcome: relegated, a relegation
         // play-off...): how often, and the latest
-        const outcome = !continental && !ctx.season ? data.outcome : '';
+        const outcome = !continental ? data.outcome : '';
+        // One season: who it was ("... qualified for the Champions League
+        // from the 2019-20 Bundesliga")
+        if (outcome && ctx.season) {
+            const did = { C: 'won', CL: 'qualified for the Champions League from', RP: 'played a relegation play-off in', R: 'were relegated from' }[outcome];
+            const didNot = { C: "didn't win", CL: "didn't qualify for the Champions League from", RP: "didn't play a relegation play-off in", R: "weren't relegated from" }[outcome];
+            const where = `the ${ctx.season} ${shortCompetition}`;
+            if (ctx.team1) {
+                return { crestTeam: ctx.team1, html: `${b(ctx.team1)} ${rows.length ? did : didNot} ${where}.` };
+            }
+            if (rows.length === 0) return { html: `No club ${didNot.replace("weren't", "was")} ${where}.` };
+            return { crestTeam: rows.length === 1 ? rows[0].team : undefined, html: `${joinNames(rows.map(r => b(r.team)))} ${did} ${where}.` };
+        }
         if (outcome) {
             const did = {
-                C: 'won', CL: 'reached the Champions League from', RP: 'played a relegation play-off in', R: 'been relegated from'
+                C: 'won', CL: 'qualified for the European Cup / Champions League from', RP: 'played a relegation play-off in', R: 'been relegated from'
             }[outcome];
             const from = pos ? ` (finishing ${pos}${ordinalSuffix(pos)}${better ? ' or better' : ''})` : '';
             if (ctx.team1) {

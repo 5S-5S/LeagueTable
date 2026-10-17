@@ -289,6 +289,17 @@
       "scope": "la-liga",
       "answer": "Real Madrid have never been relegated from La Liga.",
       "phone": true
+    },
+    {
+      "q": "who qualified for the champions league from the bundesliga in 2019-20",
+      "scope": "bundesliga",
+      "answer": "Bayern München, Borussia Dortmund, RB Leipzig and Bor. Mönchengladbach qualified for the Champions League from the 2019-20 Bundesliga."
+    },
+    {
+      "q": "Tottenham champions league qualifications",
+      "scope": "premier-league",
+      "answer": "Tottenham Hotspur have qualified for the European Cup / Champions League from the English top flight 8 times, first in 1960-61 and most recently in 2024-25.",
+      "phone": true
     }
   ],
   "shape": [
