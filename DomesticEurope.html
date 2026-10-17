@@ -12285,9 +12285,11 @@
                         row.count = '–';
                         return;
                     }
-                    // With Include Better Results the rows are one question
-                    // ("2nd or better"), so they're counted together
-                    const countKey = state.teamSeasonsSelectedPosition && state.includeBetterResults ? 'or-better' : row.position;
+                    // With Include Better Results or an Outcome the rows are
+                    // one question ("2nd or better", "relegated"), so they're
+                    // counted together
+                    const countKey = state.teamSeasonsSelectedOutcome || (state.teamSeasonsSelectedPosition && state.includeBetterResults)
+                        ? 'together' : row.position;
                     finishCounts[countKey] = (finishCounts[countKey] || 0) + 1;
                     row.count = finishCounts[countKey];
                 });
