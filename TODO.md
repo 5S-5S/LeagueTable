@@ -280,6 +280,18 @@ empty search box.
   prominent club of that name. Search-only; the routing check shows which
   questions change.
 
+- Passed over: **Team nicknames in search** — considered 2026-10-18, passed
+  over this time (the plain club names went in instead - see Done). Fan
+  nicknames as TEAM_ALIASES in search.js: gunners (Arsenal), toffees
+  (Everton), red devils (Manchester United), hammers / irons (West Ham),
+  toon / magpies (Newcastle - Notts County are Magpies too), foxes
+  (Leicester), saints (Southampton), canaries / hornets / seagulls /
+  cherries, owls / blades, rams, potters, trotters, tractor boys, terriers,
+  addicks, swans, bluebirds, tigers, royals, lions, bees; rossoneri,
+  bianconeri / old lady, biancocelesti, partenopei; blaugrana, los blancos /
+  merengues, colchoneros. Never: shared ones (reds, blues, eagles, latics,
+  clarets, giallorossi, nerazzurri).
+
 - Maybe: **"/" to search** — noted 2026-10-03. Focus the search bar from
   anywhere on a page.
 
@@ -438,6 +450,26 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Club names in search~~ — done (2026-10-18). Names people actually
+  use, agreed club by club (search.js TEAM_ALIASES): Madrid (Real),
+  Nottingham, Wednesday (Sheffield Wednesday - not after on / a / every:
+  "on a Wednesday" stays the day), munchen (Bayern), sheffield utd, palace,
+  preston, boro, sheff wed; verona / hellas, chievo, vicenza, spal,
+  pescara, messina, siena, mantova, treviso; athletic, la real, seville,
+  coruna, majorca, zaragoza, valladolid, oviedo, murcia, sabadell, jaen,
+  gijon, santander, rayo, recre / huelva, nastic; eintracht, union,
+  duisburg, fortuna / dusseldorf, braunschweig, bielefeld, rostock,
+  dresden, cottbus, aachen, offenbach, mannheim, kiel, furth, munster,
+  uerdingen, lautern / fck (Kaiserslautern, not FC København), rapid
+  (Vienna); auxerre, girondins, angers, caen, sedan, guingamp, dijon,
+  troyes (ESTAC), laval, chateauroux, niort, evian. "Manchester" is
+  neither club now (NOT_SHORT_NAMES), and a shortened name never competes
+  with a club called that ("Dundee" is Dundee FC). Club names with a year
+  ("TSV 1860 München", "1899 Hoffenheim", "Como 1907", "Basel 1893") are no
+  longer read as seasons; "1860" is TSV 1860. Left as they are: nimes, nancy
+  (the older clubs), bristol, samp, man u, orient. Team nicknames passed
+  over (see Items).
 
 - ~~Answer wording: the 2-points note on ranges after 1980-81~~ — done
   (2026-10-18). search.js pointsSystemNote() reads the page as it is now
