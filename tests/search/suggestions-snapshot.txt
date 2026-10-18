@@ -172,7 +172,7 @@ champions-league | real madrid se
 champions-league | bayern co
     h2h | Bayern München vs 1. FC Köln | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen&t2=1.+FC+K%C3%B6ln
     match-finder | Bayern München · Comebacks | Two-legged ties · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Bayern+M%C3%BCnchen&cat=comebacks&mode=tie
-    h2h | Bayern München vs Como 1907 | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen&t2=Como+1907
+    h2h | Bayern München vs Deportivo La Coruña | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen&t2=Deportivo+La+Coru%C3%B1a
     team | Bayern München · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen
     dashboard | Bayern München | Team Dashboard (full page) | ContinentalEurope.html?team=Bayern%20M%C3%BCnchen
     team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Bayern+M%C3%BCnchen

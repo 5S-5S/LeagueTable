@@ -954,6 +954,8 @@
         'athletic bilbao': 'Athletic Club', 'bilbao': 'Athletic Club', 'betis': 'Real Betis',
         'celta vigo': 'Celta de Vigo', 'celta': 'Celta de Vigo', 'deportivo': 'Deportivo La Coruña',
         'depor': 'Deportivo La Coruña', 'sociedad': 'Real Sociedad',
+        'athletic': 'Athletic Club', 'la real': 'Real Sociedad', 'seville': 'Sevilla FC',
+        'coruna': 'Deportivo La Coruña', 'la coruna': 'Deportivo La Coruña', 'majorca': 'RCD Mallorca',
         'juve': 'Juventus', 'inter milan': 'Inter', 'internazionale': 'Inter', 'milan': 'AC Milan',
         'lazio': 'Lazio Roma', 'parma': 'Parma Calcio 1913', 'parma fc': 'Parma Calcio 1913',
         'verona': 'Hellas Verona', 'hellas': 'Hellas Verona', 'chievo': 'Chievo Verona', 'vicenza': 'L.R. Vicenza',
