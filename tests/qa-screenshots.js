@@ -71,6 +71,8 @@ function shots(search) {
         { name: 'seasons-04-league-history', byHand: true, url: `${D}?${q({ view: 'team-seasons', lg: 'la-liga', sub: 'league', rank: 'gap', order: 'fewest' })}`,
             click: '#leagueHistoryBody .league-history-expand',
             from: '#leagueHistoryTable', to: '#leagueHistoryTable', max: 1300 },
+        { name: 'seasons-05-outcomes', url: `${D}?${q({ view: 'team-seasons', lg: 'premier-league', t1: 'Leeds United', from: '1990-91', to: '2004-05' })}`,
+            from: '#teamHistoryTitle', to: '#teamHistoryTable', max: 1100 },
 
         // Match Finder
         { name: 'match-finder-01-biggest-victories', byHand: true, url: `${D}?${q({ view: 'match-finder', lg: 'serie-a', t1: 'AC Milan' })}`,
