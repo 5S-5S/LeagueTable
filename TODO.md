@@ -17,8 +17,8 @@ what the site can do by following an answer rather than facing an
 empty search box.
 
 **Tier 1 - before launch** (keep the site up and know how it's doing)
-1. Analytics, with failed searches
-2. Error reporting
+1. Analytics, with failed searches (built 2026-10-18 - live once the Worker is deployed)
+2. Error reporting (built with 1)
 3. About / sources page (closer to publication, with the crests)
 4. Self-host the club crests (closer to publication)
 
@@ -140,6 +140,23 @@ empty search box.
   Also which half-typed searches people abandon (typed, then left without
   opening a result) - the guide to what the search bar's suggestions
   (suggestFor) and typo tolerance still miss.
+  - Built 2026-10-18 (branch analytics), with Error reporting: log.js
+    (first in every page's <head>) queues page views, searches and
+    JavaScript errors and sends them in one request when the page is
+    hidden; the search bar (mount() in search.js) logs each search as
+    opened / example / no-results / abandoned (3+ letters, left without
+    opening). The Worker's POST /api/log writes them to Workers Analytics
+    Engine (binding LOGS, dataset leaguetable_events - 100k points a day
+    free, kept 3 months, no D1 / KV use). No cookies or IPs; the Worker
+    works out the country and device ("iOS Safari"). Not sent from
+    localhost / 127.0.0.1 (the checks), or with localStorage noLog=1.
+  - Read with `npm run logs [-- days]` in backend/worker (failed searches
+    first). Needs a Cloudflare API token with Account Analytics: Read in
+    ~/.cloudflare-analytics-token - wrangler's login can't read Analytics
+    Engine.
+  - Page views come from the same log, not Cloudflare Web Analytics
+    (that needs a site set up in the dashboard; add it later if the
+    log's numbers aren't enough).
 
 - Later (before launch): **About / sources page** — noted 2026-10-03.
   Where the data comes from, how often it updates, and that club names
@@ -179,6 +196,10 @@ empty search box.
 - Later (before launch): **Error reporting** — noted 2026-10-03. A small
   handler that reports visitors' JavaScript errors (to the Worker or a
   free service), to hear about breakages only some devices hit (iOS).
+  - Built 2026-10-18 with Analytics (see there): uncaught errors and
+    unhandled promise rejections from the site's own files, up to 5
+    different ones per page view, with the file:line, stack and device.
+    A dropped connection's "Failed to fetch" isn't reported.
 
 - Partly done: **API caching for traffic (Cloudflare free plan)** —
   noted 2026-10-03. Free-plan limits per day: 100k Worker requests, 100k

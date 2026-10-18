@@ -4533,6 +4533,45 @@
             }
             const { results, message, correctedTo } = suggestFor(input.value, scopeSelect.value);
             render(results, message, correctedTo);
+            if (pending) {
+                Object.assign(pending, {
+                    text: input.value.trim(), scope: scopeSelect.value, results: results.length,
+                    corrected: correctedTo || '', detail: results.length ? '' : message
+                });
+            }
+        }
+
+        // The visit log (log.js): what was typed and what came of it -
+        // opened (a result), example (the empty bar's guide), no-results
+        // (Enter with nothing to open) or abandoned (left without opening:
+        // typed elsewhere later, or the page hidden). pending is the search
+        // being typed, from the first keystroke; a query the page opened
+        // with (search mode) isn't one until it's edited.
+        let pending = null;
+        function logSearch(outcome, extra = {}) {
+            const log = window.LeagueLog;
+            const event = { ...pending, ...extra, outcome };
+            pending = null;
+            if (!log || !event.text) return;
+            delete event.blurred;
+            log.send({ kind: 'search', ...event });
+        }
+        function logAbandoned() {
+            // 1-2 letters is a search barely started
+            if (pending && pending.text.length >= 3) logSearch('abandoned');
+            pending = null;
+        }
+        if (window.LeagueLog) window.LeagueLog.beforeFlush(logAbandoned);
+        function logOpened(link) {
+            const items = [...resultsEl.querySelectorAll('.search-result')];
+            const title = link.querySelector('.search-result-title');
+            if (link.classList.contains('search-guide-item')) {
+                pending = null;
+                logSearch('example', { text: title ? title.textContent.trim() : '', scope: scopeSelect.value });
+                return;
+            }
+            if (!pending) pending = { text: input.value.trim(), scope: scopeSelect.value, results: items.length };
+            logSearch('opened', { position: items.indexOf(link) + 1, detail: title ? title.textContent.trim() : '' });
         }
 
         function setActive(index) {
@@ -4549,7 +4588,21 @@
             run();
             input.focus();
         });
-        input.addEventListener('input', run);
+        input.addEventListener('input', () => {
+            // typing again after leaving the bar: the last search was abandoned
+            if (pending && pending.blurred) logAbandoned();
+            if (!pending && input.value.trim()) pending = { text: '' };
+            run();
+            if (!input.value.trim()) pending = null;
+        });
+        input.addEventListener('blur', () => {
+            if (pending) pending.blurred = true;
+        });
+        // click and middle click / Cmd-click (a new tab)
+        ['click', 'auxclick'].forEach(type => resultsEl.addEventListener(type, (e) => {
+            const link = e.target.closest('a.search-result');
+            if (link) logOpened(link);
+        }));
         input.addEventListener('focus', () => {
             if (resultsEl.classList.contains('hidden')) run();
         });
@@ -4575,13 +4628,22 @@
             // Empty bar: only an example picked with the arrow keys opens
             if (!input.value.trim()) {
                 const picked = resultsEl.querySelectorAll('.search-result')[activeIndex];
-                if (picked) window.location.href = picked.getAttribute('href');
+                if (picked) {
+                    logOpened(picked);
+                    window.location.href = picked.getAttribute('href');
+                }
                 return;
             }
+            if (!pending) pending = { text: '' };
             run();
             const items = resultsEl.querySelectorAll('.search-result');
             const target = items[activeIndex >= 0 ? activeIndex : 0];
-            if (target) window.location.href = target.getAttribute('href');
+            if (target) {
+                logOpened(target);
+                window.location.href = target.getAttribute('href');
+            } else {
+                logSearch('no-results');
+            }
         });
         document.addEventListener('click', (e) => {
             if (!container.contains(e.target)) resultsEl.classList.add('hidden');

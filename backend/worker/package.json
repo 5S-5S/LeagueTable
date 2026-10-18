@@ -6,7 +6,8 @@
     "deploy": "wrangler deploy",
     "db:create": "wrangler d1 create leaguetable",
     "db:schema": "wrangler d1 execute leaguetable --file=./schema.sql",
-    "db:schema:remote": "wrangler d1 execute leaguetable --remote --file=./schema.sql"
+    "db:schema:remote": "wrangler d1 execute leaguetable --remote --file=./schema.sql",
+    "logs": "node logs.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

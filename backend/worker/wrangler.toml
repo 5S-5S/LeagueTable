@@ -11,6 +11,13 @@ database_id = "7069d435-b2d1-4b49-9510-8be2cf8119d9"
 binding = "CACHE"
 id = "b2fa8b93e59540749923768aaf1fc08d"
 
+# The visit log (POST /api/log): page views, searches and JavaScript
+# errors from log.js. Workers Analytics Engine - free, separate from the
+# D1 / KV limits. Read with logs.mjs.
+[[analytics_engine_datasets]]
+binding = "LOGS"
+dataset = "leaguetable_events"
+
 # Live results (recordFinishedMatches in src/index.js). Every 2 minutes; a
 # run with nothing due is one small D1 read and no API call.
 # Needs the secret: npx wrangler secret put FOOTBALL_DATA_API_KEY

@@ -83,6 +83,17 @@
 //   is also Continental-only, used to determine tournament progression
 //   (e.g. did the team win the Final) without a second per-team request.
 //
+// POST /api/log  body (text/plain JSON): { events: [{ kind, outcome, text, scope?, detail?, corrected?, results?, position?, page, stack? }, ...] }
+//   -> 204, always (logging never shows a visitor an error)
+//   The visit log from log.js: page views, searches (opened / example /
+//   no-results / abandoned) and JavaScript errors. Written to Workers
+//   Analytics Engine (the LOGS binding, dataset leaguetable_events) - its
+//   own free allowance (100k data points a day, kept 3 months), so it
+//   never touches D1 or KV. No IP addresses or cookies: the country and a
+//   device summary ("iOS Safari") are worked out here from the request.
+//   Read with backend/worker/logs.mjs. Not cached, and not counted in the
+//   Caching notes below.
+//
 // Caching: every endpoint above is cached in KV (see
 // withCache()/getKvSetting() below) rather than re-reading D1 on every
 // request - /api/standings and /api/season-standings because they each
@@ -747,6 +758,71 @@ async function handleSnappedStreaks(env) {
     });
 }
 
+// /api/log - see the header comment. Columns (Analytics Engine has no
+// names, only positions; logs.mjs reads them back by these):
+//   index1  kind ('view' | 'search' | 'error')
+//   blob1 kind, blob2 outcome, blob3 text (the query / error message /
+//   referrer host), blob4 scope, blob5 detail (opened result / no-results
+//   message / file:line), blob6 corrected (typo-corrected query), blob7
+//   page, blob8 site (host the page was on), blob9 device, blob10
+//   country, blob11 stack
+//   double1 results shown, double2 position opened (1 = top)
+const LOG_KINDS = new Set(['view', 'search', 'error']);
+const LOG_MAX_EVENTS = 25;
+// Sites the log accepts: the live site, and local testing (kept apart in
+// logs.mjs by blob8)
+const LOG_ORIGINS = /^(https:\/\/5s-5s\.github\.io|http:\/\/(localhost|127\.0\.0\.1)(:\d+)?)$/;
+
+function deviceSummary(ua = '') {
+    const os = /iPhone|iPad|iPod/.test(ua) ? 'iOS'
+        : /Android/.test(ua) ? 'Android'
+        : /Macintosh/.test(ua) ? (/Mobile\//.test(ua) ? 'iPadOS' : 'Mac')
+        : /Windows/.test(ua) ? 'Windows'
+        : /CrOS/.test(ua) ? 'ChromeOS'
+        : /Linux/.test(ua) ? 'Linux' : 'Other';
+    const browser = /bot|crawl|spider|Headless/i.test(ua) ? 'Bot'
+        : /Edg\//.test(ua) ? 'Edge'
+        : /SamsungBrowser/.test(ua) ? 'Samsung'
+        : /Firefox|FxiOS/.test(ua) ? 'Firefox'
+        : /Chrome|CriOS/.test(ua) ? 'Chrome'
+        : /Safari/.test(ua) ? 'Safari' : 'Other';
+    return `${os} ${browser}`;
+}
+
+async function handleLog(request, env) {
+    const done = new Response(null, { status: 204, headers: CORS_HEADERS });
+    const origin = request.headers.get('Origin') || '';
+    if (!env.LOGS || !LOG_ORIGINS.test(origin)) return done;
+    let events;
+    try {
+        const body = await request.text();
+        if (body.length > 64 * 1024) return done;
+        events = JSON.parse(body).events;
+    } catch (err) {
+        return done;
+    }
+    if (!Array.isArray(events)) return done;
+
+    const site = new URL(origin).host;
+    const device = deviceSummary(request.headers.get('User-Agent') || '');
+    const country = (request.cf && request.cf.country) || '';
+    const str = (value, max) => String(value ?? '').slice(0, max);
+    const num = value => (Number.isFinite(Number(value)) ? Number(value) : 0);
+    events.slice(0, LOG_MAX_EVENTS).forEach(event => {
+        if (!event || !LOG_KINDS.has(event.kind)) return;
+        env.LOGS.writeDataPoint({
+            indexes: [event.kind],
+            blobs: [
+                event.kind, str(event.outcome, 20), str(event.text, 300), str(event.scope, 40),
+                str(event.detail, 300), str(event.corrected, 300), str(event.page, 60),
+                site, device, country, str(event.stack, 1000)
+            ],
+            doubles: [num(event.results), num(event.position)],
+        });
+    });
+    return done;
+}
+
 async function handleSeasonMatches(url, env) {
     const div = url.searchParams.get('div');
     if (!div) {
@@ -1109,6 +1185,10 @@ export default {
 
             if (url.pathname === '/api/on-this-day') {
                 return await handleOnThisDay(url, env);
+            }
+
+            if (url.pathname === '/api/log' && request.method === 'POST') {
+                return await handleLog(request, env);
             }
 
             if (url.pathname === '/api/season-standings' && request.method === 'POST') {
