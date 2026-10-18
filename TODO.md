@@ -31,10 +31,10 @@ empty search box.
 8. Recent searches
 9. Road to the final
 10. More competitions (depends on the data)
-11. Trivia mode
-12. Streak-ending social account (closer to launch)
+11. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
+12. Trivia mode
 13. Head-to-head by decade
 14. Side-by-side Team Seasons
 15. League History chart
