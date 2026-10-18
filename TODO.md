@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-16)
+## Priority (ranked 2026-10-03, updated 2026-10-18)
 
 Most to least important; details are in each item below.
 
@@ -27,35 +27,33 @@ empty search box.
 6. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-7. Typo tolerance in search (done 2026-10-18)
-8. Smarter search suggestions as you type (done 2026-10-18)
-9. "City" / "United" alone in search
-10. Recent searches
-11. Road to the final
-12. More competitions (depends on the data)
-13. Trivia mode
-14. Streak-ending social account (closer to launch)
+7. "City" / "United" alone in search
+8. Recent searches
+9. Road to the final
+10. More competitions (depends on the data)
+11. Trivia mode
+12. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-15. Head-to-head by decade
-16. Side-by-side Team Seasons
-17. League History chart
-18. Team Records: bottom / relegated, home / away
-19. A club's title races
-20. Team progression chart (after League History)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. "Won on penalties" in Match Finder
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
-27. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-28. Review upcoming matches
-29. Phone-width checks in npm run check
-30. Team-colour contrast
-31. Sitemap + Google Search Console
-32. Club names that differ from worldfootball.net
-33. Champions League data fixes (found 2026-10-13)
+13. Head-to-head by decade
+14. Side-by-side Team Seasons
+15. League History chart
+16. Team Records: bottom / relegated, home / away
+17. A club's title races
+18. Team progression chart (after League History)
+19. "/" to search
+20. Penalty shootout leaderboard (team and head-to-head answers done)
+21. "Won on penalties" in Match Finder
+22. Lighter pages (small gain - see the item)
+23. Knockout Stage bracket view (on hold)
+24. Country vs Country
+25. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+26. Review upcoming matches
+27. Phone-width checks in npm run check
+28. Team-colour contrast
+29. Sitemap + Google Search Console
+30. Club names that differ from worldfootball.net
+31. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -121,6 +119,9 @@ empty search box.
   results", the best guide to improving the search. Cloudflare Web
   Analytics is free and cookie-free; failed searches could be logged by
   the Worker.
+  Also which half-typed searches people abandon (typed, then left without
+  opening a result) - the guide to what the search bar's suggestions
+  (suggestFor) and typo tolerance still miss.
 
 - Later (before launch): **About / sources page** — noted 2026-10-03.
   Where the data comes from, how often it updates, and that club names
@@ -294,42 +295,6 @@ empty search box.
   prominent club of that name. Search-only; the routing check shows which
   questions change.
 
-- Done: **Typo tolerance in search** — noted 2026-10-03, built 2026-10-18
-  with the suggestions below (search.js correctTypos / suggestFor). In the
-  search bar, a word the search doesn't know is read as the nearest one it
-  does - club name words, search words, competitions, countries: one edit
-  up to five letters, two from six, a swap counts as one, the first letter
-  kept, and vowel-less words ("arsnl"). Used only when it finds an answer
-  the words as typed don't; the dropdown says "Showing results for ...".
-  A list of everyday words (EXTRA_KNOWN_WORDS) is never corrected
-  ("everyone" isn't Everton); none of the ~1,500 routing questions gets
-  corrected. searchFor() itself is unchanged, so a typo'd link (?q=) isn't
-  corrected - the search bar opens the corrected words instead.
-
-- Done: **Smarter search suggestions as you type** — noted 2026-10-17,
-  built 2026-10-18 (search.js suggestFor, checked by
-  tests/search/questions-partial.txt). A half-typed last word is tried as
-  its likely endings - search words (COMPLETION_PHRASES) and the dropdown's
-  clubs, biggest first - each run as a real search, kept only when it
-  answers something new. "arsenal ch" -> Chelsea, Titles, the Champions
-  League, Champions League qualifications, Charlton; after "vs" only clubs.
-  In the Champions League dropdown every club ranks by Champions League
-  matches played (/api/teams?div=C1&counts=1 - Ajax before Auxerre,
-  Benfica first for "be"); without that answer, by name. Still to come:
-  which half-typed searches people abandon (from Analytics' failed
-  searches). The note below is the original idea.
-  Suggestions only use the words already complete: "arsenal ch" (Premier
-  League picked) offers Arsenal's record, dashboard, seasons, streaks and
-  Match Finder - the same as "arsenal" - and nothing about what "ch" is
-  heading towards. Read a half-typed last word as its likely endings
-  (Chelsea, the Champions League, Champions League qualifications,
-  champions/titles) and suggest those: "Arsenal vs Chelsea", "Arsenal in
-  the Champions League", "Arsenal Champions League qualifications",
-  "Arsenal titles". Also rank by what the words so far point to, not a
-  fixed order (record, dashboard, seasons...). Ties in with Typo
-  tolerance (same fuzzy matching) and Analytics' failed searches (which
-  half-typed queries people abandon).
-
 - Maybe: **"/" to search** — noted 2026-10-03. Focus the search bar from
   anywhere on a page.
 
@@ -488,6 +453,54 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Smarter search suggestions as you type~~ — done (2026-10-18), noted
+  2026-10-17. search.js suggestFor(), checked by
+  tests/search/questions-partial.txt (npm run check:search runs it and
+  routing offline). A half-typed last word is tried as its likely endings -
+  search words (COMPLETION_PHRASES) and the dropdown's clubs, biggest
+  first - each run as a real search, kept only when it answers something
+  new. "arsenal ch" -> Chelsea, Titles, the Champions League, Champions
+  League qualifications, Charlton; "arsenal se" moves Season-by-season
+  finishes up; after "vs" only clubs. In the Champions League dropdown
+  clubs rank by Champions League matches played (/api/teams?div=C1&counts=1
+  - Ajax before Auxerre, Benfica first for "be"); without that answer, by
+  name. Enter opens the top suggestion. Still to come: which half-typed
+  searches people abandon (see Analytics, with failed searches).
+
+- ~~Typo tolerance in search~~ — done (2026-10-18), noted 2026-10-03.
+  search.js correctTypos(), used by suggestFor(). In the search bar, a word
+  the search doesn't know is read as the nearest one it does - club name
+  words, search words, competitions, countries: one edit up to five
+  letters, two from six, a swap counts as one, the first letter kept, and
+  vowel-less words ("arsnl"). Used only when it finds an answer the words
+  as typed don't; the dropdown says "Showing results for ...". Everyday
+  words (EXTRA_KNOWN_WORDS) are never corrected ("everyone" isn't
+  Everton); none of the ~1,500 routing questions is. searchFor() itself is
+  unchanged, so a typo'd link (?q=) isn't corrected - the search bar opens
+  the corrected words instead.
+
+- ~~Season outcomes (champions, Champions League, relegation play-off,
+  relegated)~~ — done (2026-10-17/18). season-outcomes.js holds each
+  season's outcomes for all five leagues, hand-reviewed season by season
+  (C / CL / RP / R in PRIORITY order; a club named where places are
+  shared). A thin coloured strip beside Pos, with its key: in Team History
+  (with an Outcome filter - any position, one season or all, Count running
+  through every match: "4th relegation"), in League History's open season
+  tables, and in League Tables for one whole season as it finished (not a
+  custom date range, era, team, venue or weekday filter, or points other
+  than the season's own). Mobile shows it as a bar on the Pos cell.
+  Search: "Tottenham relegations", "serie a relegation play offs", "who
+  qualified for the champions league from the bundesliga in 2019-20",
+  "Arsenal champions league qualifications"; a competition the dropdown
+  leaves out ("Arsenal UCL" with the Premier League picked) is searched
+  anyway instead of "isn't part of this search". Domestic pages.
+
+- ~~Shared ranking overrides and point deductions~~ — done (2026-10-18).
+  standings-adjustments.js holds every ranking override and point
+  deduction (the five leagues and the Champions League) for all four
+  pages, which used to carry their own copies (Domestic desktop and mobile
+  the same 520 lines each). Add a new override or deduction there only.
 
 - ~~Data-freshness alert~~ — done (2026-10-16). scripts/check_freshness.py,
   run daily at 05:00 UTC by .github/workflows/check-freshness.yml (before
