@@ -946,7 +946,9 @@
     const TEAM_ALIASES = {
         'man utd': 'Manchester United', 'man united': 'Manchester United', 'manchester utd': 'Manchester United',
         'man city': 'Manchester City', 'spurs': 'Tottenham Hotspur', 'wolves': 'Wolverhampton Wanderers',
-        'west brom': 'West Bromwich Albion', 'wednesday': 'Sheffield Wednesday', 'sheffield utd': 'Sheffield United', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
+        'west brom': 'West Bromwich Albion', 'wednesday': 'Sheffield Wednesday', 'sheffield utd': 'Sheffield United',
+        'sheff wed': 'Sheffield Wednesday', 'sheffield wed': 'Sheffield Wednesday', 'palace': 'Crystal Palace',
+        'preston': 'Preston North End', 'preston ne': 'Preston North End', 'boro': 'Middlesbrough FC', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
         'brighton': 'Brighton & Hove Albion', 'qpr': 'Queens Park Rangers', 'bournemouth': 'AFC Bournemouth',
         'barca': 'FC Barcelona', 'madrid': 'Real Madrid', 'atletico': 'Atlético Madrid', 'atleti': 'Atlético Madrid',
         'athletic bilbao': 'Athletic Club', 'bilbao': 'Athletic Club', 'betis': 'Real Betis',
