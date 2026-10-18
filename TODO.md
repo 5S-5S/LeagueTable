@@ -66,6 +66,14 @@ empty search box.
   From (the link's from, or the page's current From - ctx.records /
   ctx.leagueHistory carry it) starts after the last 2-point season; same
   for League History's points rankings (gap, topTwo).
+  Plan (2026-10-18, ~30 min): read the page's era and From / To first, as
+  competitionName() does (share its season-of-a-bound helper); keep the
+  note when the range is all 2-point seasons (the 3-points offer still
+  differs). Same pass - the note also reads the link, not the page, for:
+  the stat / ranking (ctx.records.stat, ctx.leagueHistory.rank), the
+  3-points setting (ctx's threePoints), and its own link (rebuilt from the
+  search URL - build it from the page's Copy Link URL instead). Test: "most
+  points in a season since 2000" (no note) in checks/answers.json.
 
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
