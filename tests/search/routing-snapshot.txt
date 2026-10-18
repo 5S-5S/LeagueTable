@@ -3598,15 +3598,15 @@ champions-league | Scoreline:
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 domestic | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
     team | Valencia CF · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=Valencia+CF
-    team | Valenciennes FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=ligue-1&away=0&t1=Valenciennes+FC
+    team | Real Valladolid · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=la-liga&away=0&t1=Real+Valladolid
     dashboard | Valencia CF | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Valencia%20CF
     team-seasons | Valencia CF · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Valencia+CF
     team-streaks | Valencia CF · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Valencia+CF&type=winning&loc=home
     match-finder | Last time Valencia CF won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Valencia+CF&res=win&away=0&cat=recent
     match-finder | Valencia CF · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Valencia+CF&away=0
-    dashboard | Valenciennes FC | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Valenciennes%20FC
-    team-seasons | Valenciennes FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Valenciennes+FC
-    team-streaks | Valenciennes FC · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Valenciennes+FC&type=winning&loc=home
+    dashboard | Real Valladolid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Valladolid
+    team-seasons | Real Valladolid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Valladolid
+    team-streaks | Real Valladolid · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Valladolid&type=winning&loc=home
 premier-league | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
     message: No results for Valencia CF in Premier League.
 champions-league | Scoreline: Home Score: [op] [val] Away Score: [op] [val]
