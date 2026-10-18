@@ -152,7 +152,18 @@ empty search box.
   2026-10-06: browser caching, the cache version kept in memory, falling
   back to D1 when KV fails, past-only answers kept for weeks, and the
   date-range call - estimated to move the first hard failure from a few
-  thousand to ~10k+ visits/day. Still to do:
+  thousand to ~10k+ visits/day. Done 2026-10-18 (after D1's 5M read
+  limit was hit on 17 and 18 Oct): live results bump cache-version after
+  every match, so on match days whole-division answers went cold every
+  couple of hours - the snapped-streaks job alone read ~180k rows a run.
+  Answers reaching into the current season are now cached as two parts
+  (Worker: seasonSplit()) - past seasons up to 30 June (fixed, weeks) and
+  the current season (a few hundred rows a division to re-read) - for
+  season-matches, standings, season-standings, team-history and
+  head-to-head; match lists joined as text (10 ms CPU). sync.mjs's
+  watermark and new-row count read the (div, date) index, not the whole
+  table (~360k rows a day). Checked old vs new answers identical on a
+  synthetic database. Still to do:
   1. Edge cache (Workers Cache API, caches.default - free, unmetered) in
      front of KV, so popular answers use no KV reads / writes. Needs a
      custom domain on Cloudflare: the Cache API does nothing on

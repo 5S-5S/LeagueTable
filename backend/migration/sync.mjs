@@ -82,17 +82,27 @@ function isoDaysBefore(isoDate, days) {
     return d.toISOString().slice(0, 10);
 }
 
-async function getWatermarks() {
-    const { results } = await runD1Query('SELECT div, MAX(date) as max_date FROM matches GROUP BY div');
+// Each division's latest match date. One MAX(date) per division, not
+// MAX(date) ... GROUP BY div: SQLite answers a lone MAX on the (div, date)
+// index by reading one row, where the GROUP BY read the whole table
+// (~180k rows a day against D1's free 5M read limit).
+async function getWatermarks(divs) {
+    const sql = divs.map(() => 'SELECT ? AS div, (SELECT MAX(date) FROM matches WHERE div = ?) AS max_date').join(' UNION ALL ');
+    const { results } = await runD1Query(sql, divs.flatMap(div => [div, div]));
     const watermarks = new Map();
     for (const row of results) {
-        watermarks.set(row.div, row.max_date);
+        if (row.max_date) watermarks.set(row.div, row.max_date);
     }
     return watermarks;
 }
 
-async function getTotalRowCount() {
-    const { results } = await runD1Query('SELECT COUNT(*) as total FROM matches');
+// Matches in the sync's window (each division from its from-date):
+// counted before and after the inserts to find how many were new. Only
+// the window can change, and counting it reads a few hundred index rows
+// where COUNT(*) FROM matches read the whole table.
+async function countInWindow(windows) {
+    const sql = `SELECT ${windows.map(() => '(SELECT COUNT(*) FROM matches WHERE div = ? AND date >= ?)').join(' + ')} AS total`;
+    const { results } = await runD1Query(sql, windows.flatMap(([div, from]) => [div, from]));
     return results[0].total;
 }
 
@@ -108,11 +118,11 @@ function toInsertOrIgnore(batch) {
 async function main() {
     const log = msg => console.log(msg);
 
-    const watermarks = await getWatermarks();
-    log(`Watermarks: ${JSON.stringify(Object.fromEntries(watermarks))}`);
-
     const all = await collectAllMatches({ log });
     log(`Fetched ${all.length} total rows from gists`);
+
+    const watermarks = await getWatermarks([...new Set(all.map(m => m.div))].sort());
+    log(`Watermarks: ${JSON.stringify(Object.fromEntries(watermarks))}`);
 
     // Only rows on/after that div's watermark are even candidates - this
     // is what keeps the daily write volume small. A div with no watermark
@@ -137,8 +147,12 @@ async function main() {
     // D1's INSERT OR IGNORE doesn't reliably report per-batch rows_written
     // over the HTTP API (verified: it can report non-zero even when every
     // row in the batch was an ignored duplicate), so the real "how many
-    // new rows landed" figure comes from a before/after COUNT instead.
-    const countBefore = await getTotalRowCount();
+    // new rows landed" figure comes from a before/after COUNT instead -
+    // of the window the candidates fall in (each division from its
+    // earliest candidate), the only rows the inserts can add
+    const windows = [...new Set(candidates.map(m => m.div))].map(div =>
+        [div, candidates.filter(m => m.div === div).reduce((min, m) => (m.date < min ? m.date : min), '9999-12-31')]);
+    const countBefore = await countInWindow(windows);
 
     // D1 caps bound parameters at 100 per query; 9 columns per row means
     // at most 11 rows per batch (11 * 9 = 99).
@@ -149,9 +163,9 @@ async function main() {
         await runD1Query(sql, params);
     }
 
-    const countAfter = await getTotalRowCount();
+    const countAfter = await countInWindow(windows);
     const newRowCount = countAfter - countBefore;
-    log(`Done. ${newRowCount} genuinely new rows written (out of ${candidates.length} candidates checked). Total rows now: ${countAfter}.`);
+    log(`Done. ${newRowCount} genuinely new rows written (out of ${candidates.length} candidates checked).`);
 
     // Only invalidate the standings/season-standings cache when something
     // actually changed - bumping it on a no-op sync would just force every

@@ -7719,6 +7719,8 @@
                 state.seasonStandingsApiCacheKey = div;
             } catch (err) {
                 console.error('Failed to load season standings from API:', err);
+                // no seasons rather than the last league's (or none at all - null)
+                state.seasonStandingsApiCache = {};
                 state.seasonStandingsApiCacheKey = div; // mark this attempt as done so a failed fetch doesn't retry in a tight loop on the next render
             } finally {
                 state.seasonStandingsApiLoading = false;

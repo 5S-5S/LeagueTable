@@ -253,12 +253,131 @@ function canonicalQueryKey(url) {
         .join('&');
 }
 
+// --- Past seasons and the current one, cached apart ---
+//
+// Live results bump 'cache-version' after every match they record, so on
+// a match day every answer touching the current season goes cold every
+// couple of hours - and the biggest ones (a division's whole history:
+// 51k rows for E0) were re-read from D1 each time. 18 Oct 2026 hit the
+// free plan's 5M rows-read limit that way, mostly /api/season-matches for
+// the snapped-streaks job. So an answer reaching into the current season
+// is cached as two parts: everything up to 30 June (fixed - keyed by
+// history-version and kept for weeks) and the current season from 1 July
+// (keyed by cache-version: a few hundred rows a division to re-read after
+// a bump). Match lists are joined as text, never parsed (the free plan's
+// 10 ms CPU limit); tables are added up (a few dozen rows).
+
+// { pastEnd: '2026-06-30', liveStart: '2026-07-01' } for the current
+// season - null in the first two weeks of July, while the past part isn't
+// fixed yet (answers are then cached whole, as before)
+function seasonSplit() {
+    const now = new Date();
+    const year = now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+    const pastEnd = `${year}-06-30`;
+    return endsBeforeCurrentSeason(pastEnd) ? { pastEnd, liveStart: `${year}-07-01` } : null;
+}
+
+// The split for a request bounded by dateFrom / dateTo - null when it's
+// fixed already, lies wholly in the current season (small anyway), or
+// there's no split yet
+function splitFor(dateFrom, dateTo) {
+    if (endsBeforeCurrentSeason(dateTo)) return null;
+    const split = seasonSplit();
+    if (!split || (dateFrom && dateFrom > split.pastEnd)) return null;
+    return split;
+}
+
+// withCache() for an answer kept as JSON text, returned unparsed
+async function withCacheText(env, keyParts, computeText, { fixed = false } = {}) {
+    let key = null;
+    try {
+        const version = fixed
+            ? `h${await getKvSetting(env, 'history-version')}`
+            : `v${await getKvSetting(env, 'cache-version')}`;
+        key = await kvSafeKey(`${version}:${keyParts.join(':')}`);
+        const cached = await env.CACHE.get(key);
+        if (cached !== null) return cached;
+    } catch (err) {
+        console.error('Cache read failed - answering from D1:', err);
+        key = null;
+    }
+
+    const text = await computeText();
+    if (key) {
+        try {
+            await env.CACHE.put(key, text, { expirationTtl: fixed ? FIXED_CACHE_TTL_SECONDS : CACHE_TTL_SECONDS });
+        } catch (err) {
+            console.error('Failed to write cache entry:', err);
+        }
+    }
+    return text;
+}
+
+// '[a,b]' and '[c]' -> '[a,b,c]': JSON arrays joined as text
+function joinJsonArrays(...arrays) {
+    return `[${arrays.map(text => text.slice(1, -1)).filter(Boolean).join(',')}]`;
+}
+
+// JSON text of object with field set to an array given as JSON text
+// ({ team, div } + matches) - the array is never parsed
+function jsonWithArrayText(object, field, arrayText) {
+    return JSON.stringify({ ...object, [field]: '__ARRAY__' }).replace('"__ARRAY__"', () => arrayText);
+}
+
+// jsonResponse() for a body that's already JSON text
+function textResponse(text, status = 200, { fixed = false } = {}) {
+    const maxAge = fixed ? BROWSER_MAX_AGE_FIXED_SECONDS : BROWSER_MAX_AGE_SECONDS;
+    return new Response(text, {
+        status,
+        headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': status === 200 ? `public, max-age=${maxAge}` : 'no-store',
+            ...CORS_HEADERS,
+        },
+    });
+}
+
+// The current season's matches in one division from `from` (to `to`, if
+// given), oldest first - optionally one team's, or one team's against
+// opponents. Through idx_matches_unique's (div, date) prefix, so it reads
+// only the season's rows; the team indexes have no date, and a seek on
+// them would read the team's whole history.
+async function queryCurrentSeasonMatches(env, div, from, { to = '', team = '', opponents = [] } = {}) {
+    let sql = `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
+         FROM matches INDEXED BY idx_matches_unique WHERE div = ? AND date >= ?`;
+    const params = [div, from];
+    if (to) { sql += ' AND date <= ?'; params.push(to); }
+    if (team && opponents.length) {
+        const list = opponents.map(() => '?').join(', ');
+        sql += ` AND ((home_team = ? AND away_team IN (${list})) OR (away_team = ? AND home_team IN (${list})))`;
+        params.push(team, ...opponents, team, ...opponents);
+    } else if (team) {
+        sql += ' AND (home_team = ? OR away_team = ?)';
+        params.push(team, team);
+    }
+    sql += ' ORDER BY date ASC';
+    const { results } = await env.DB.prepare(sql).bind(...params).all();
+    return results.map(rowToMatch);
+}
+
 async function handleTeamHistory(url, env) {
     const div = url.searchParams.get('div');
     const team = url.searchParams.get('team');
 
     if (!div || !team) {
         return jsonResponse({ error: 'div and team query params are required' }, 400);
+    }
+
+    const split = seasonSplit();
+    if (split) {
+        const key = canonicalQueryKey(url);
+        const [past, live] = await Promise.all([
+            withCacheText(env, ['team-history-past', split.pastEnd, key],
+                async () => JSON.stringify(await queryTeamMatches(env, div, team, split.pastEnd)), { fixed: true }),
+            withCacheText(env, ['team-history-live', split.liveStart, key],
+                async () => JSON.stringify(await queryCurrentSeasonMatches(env, div, split.liveStart, { team }))),
+        ]);
+        return textResponse(jsonWithArrayText({ team, div }, 'matches', joinJsonArrays(past, live)));
     }
 
     const body = await withCache(env, ['team-history', canonicalQueryKey(url)], async () => {
@@ -298,14 +417,16 @@ function rowToMatch(row) {
 // JS instead of a SQL UNION matters too - UNION's merge/sort step reread
 // both sides again, ~2x the cost (8,812 rows) of just concatenating and
 // sorting two already-small arrays here.
-async function queryTeamMatches(env, div, team) {
+// to: only matches up to that date (the past part - seasonSplit())
+async function queryTeamMatches(env, div, team, to = '') {
     const sql = side => `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
          FROM matches INDEXED BY idx_matches_${side}_team_div
-         WHERE div = ?1 AND ${side}_team = ?2`;
+         WHERE div = ?1 AND ${side}_team = ?2${to ? ' AND date <= ?3' : ''}`;
+    const params = to ? [div, team, to] : [div, team];
 
     const [homeResult, awayResult] = await Promise.all([
-        env.DB.prepare(sql('home')).bind(div, team).all(),
-        env.DB.prepare(sql('away')).bind(div, team).all(),
+        env.DB.prepare(sql('home')).bind(...params).all(),
+        env.DB.prepare(sql('away')).bind(...params).all(),
     ]);
 
     return [...homeResult.results, ...awayResult.results]
@@ -317,15 +438,16 @@ async function queryTeamMatches(env, div, team) {
 // home_team IN (...) opponent filter - applied after the composite-index
 // seek already narrows to team1's matches in this division, so it stays
 // cheap (filtering a few thousand already-fetched rows, not scanning).
-async function queryHeadToHeadMatches(env, div, team1, opponents) {
+async function queryHeadToHeadMatches(env, div, team1, opponents, to = '') {
     const placeholders = opponents.map(() => '?').join(', ');
     const sql = side => `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info
          FROM matches INDEXED BY idx_matches_${side}_team_div
-         WHERE div = ? AND ${side}_team = ? AND ${side === 'home' ? 'away' : 'home'}_team IN (${placeholders})`;
+         WHERE div = ? AND ${side}_team = ? AND ${side === 'home' ? 'away' : 'home'}_team IN (${placeholders})${to ? ' AND date <= ?' : ''}`;
+    const params = [div, team1, ...opponents, ...(to ? [to] : [])];
 
     const [homeResult, awayResult] = await Promise.all([
-        env.DB.prepare(sql('home')).bind(div, team1, ...opponents).all(),
-        env.DB.prepare(sql('away')).bind(div, team1, ...opponents).all(),
+        env.DB.prepare(sql('home')).bind(...params).all(),
+        env.DB.prepare(sql('away')).bind(...params).all(),
     ]);
 
     return [...homeResult.results, ...awayResult.results]
@@ -345,6 +467,18 @@ async function handleHeadToHead(url, env) {
     const opponents = team2Param.split(',').map(t => t.trim()).filter(Boolean);
     if (opponents.length === 0) {
         return jsonResponse({ error: 'team2 must contain at least one team name' }, 400);
+    }
+
+    const split = seasonSplit();
+    if (split) {
+        const key = canonicalQueryKey(url);
+        const [past, live] = await Promise.all([
+            withCacheText(env, ['head-to-head-past', split.pastEnd, key],
+                async () => JSON.stringify(await queryHeadToHeadMatches(env, div, team1, opponents, split.pastEnd)), { fixed: true }),
+            withCacheText(env, ['head-to-head-live', split.liveStart, key],
+                async () => JSON.stringify(await queryCurrentSeasonMatches(env, div, split.liveStart, { team: team1, opponents }))),
+        ]);
+        return textResponse(jsonWithArrayText({ team1, team2: opponents, div }, 'matches', joinJsonArrays(past, live)));
     }
 
     const body = await withCache(env, ['head-to-head', canonicalQueryKey(url)], async () => {
@@ -591,12 +725,11 @@ async function handleStandings(url, env) {
     const excludeMainStage = parseBoolParam(url, 'excludeMainStage', false);
     const competitionStage = url.searchParams.get('competitionStage') || '';
 
-    const fixed = endsBeforeCurrentSeason(dateTo);
-    const body = await withCache(env, ['standings', canonicalQueryKey(url)], async () => {
-        let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier FROM matches WHERE div = ?1`;
+    const compute = async (from, to, current = false) => {
+        let sql = `SELECT div, date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier FROM matches${current ? ' INDEXED BY idx_matches_unique' : ''} WHERE div = ?1`;
         const params = [div];
-        if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
-        if (dateTo) { params.push(dateTo); sql += ` AND date <= ?${params.length}`; }
+        if (from) { params.push(from); sql += ` AND date >= ?${params.length}`; }
+        if (to) { params.push(to); sql += ` AND date <= ?${params.length}`; }
         if (dayOfWeek !== null) { params.push(dayOfWeek); sql += ` AND CAST(strftime('%w', date) AS INTEGER) = ?${params.length}`; }
 
         const { results } = await env.DB.prepare(sql).bind(...params).all();
@@ -614,9 +747,47 @@ async function handleStandings(url, env) {
         const { matchDateRange, standings } = aggregateStandings(matches, { threePointSystem, homeFilter, awayFilter });
 
         return { div, matchCount: matches.length, matchDateRange, standings };
-    }, { fixed });
+    };
+
+    // Past seasons and the current one apart, then added up
+    const split = splitFor(dateFrom, dateTo);
+    if (split) {
+        const key = canonicalQueryKey(url);
+        const [past, live] = await Promise.all([
+            withCache(env, ['standings-past', split.pastEnd, key], () => compute(dateFrom, split.pastEnd), { fixed: true }),
+            withCache(env, ['standings-live', split.liveStart, key], () => compute(split.liveStart, dateTo, true)),
+        ]);
+        return jsonResponse(mergeStandings(div, past, live));
+    }
+
+    const fixed = endsBeforeCurrentSeason(dateTo);
+    const body = await withCache(env, ['standings', canonicalQueryKey(url)], () => compute(dateFrom, dateTo), { fixed });
 
     return jsonResponse(body, 200, { fixed });
+}
+
+// Two /api/standings answers for back-to-back date ranges, as one: each
+// club's numbers added up (points are per match, so the sums are exact),
+// clubs in order of first appearance - the pages sort the table themselves
+function mergeStandings(div, earlier, later) {
+    const table = new Map();
+    for (const part of [earlier, later]) {
+        for (const row of part.standings) {
+            const sum = table.get(row.team);
+            if (!sum) {
+                table.set(row.team, { ...row });
+                continue;
+            }
+            for (const field of ['played', 'won', 'drawn', 'lost', 'goalsFor', 'goalsAgainst', 'points']) sum[field] += row[field];
+        }
+    }
+    const ranges = [earlier.matchDateRange, later.matchDateRange].filter(Boolean);
+    return {
+        div,
+        matchCount: earlier.matchCount + later.matchCount,
+        matchDateRange: ranges.length ? { start: ranges[0].start, end: ranges[ranges.length - 1].end } : null,
+        standings: [...table.values()],
+    };
 }
 
 async function handleDateRange(url, env) {
@@ -831,6 +1002,27 @@ async function handleSeasonMatches(url, env) {
 
     const dateFrom = url.searchParams.get('dateFrom');
     const dateTo = url.searchParams.get('dateTo');
+
+    // A division's whole history (Team Streaks with no team, the
+    // snapped-streaks job): past seasons and the current one apart
+    const split = splitFor(dateFrom, dateTo);
+    if (split) {
+        const [past, live] = await Promise.all([
+            withCacheText(env, ['season-matches-past', split.pastEnd, div, dateFrom || ''], async () => {
+                let sql = `SELECT date, home_team, away_team, home_goals, away_goals, competition_phase, is_qualifier, additional_info FROM matches WHERE div = ?1`;
+                const params = [div];
+                if (dateFrom) { params.push(dateFrom); sql += ` AND date >= ?${params.length}`; }
+                params.push(split.pastEnd);
+                sql += ` AND date <= ?${params.length} ORDER BY date ASC`;
+                const { results } = await env.DB.prepare(sql).bind(...params).all();
+                return JSON.stringify(results.map(rowToMatch));
+            }, { fixed: true }),
+            withCacheText(env, ['season-matches-live', split.liveStart, div, dateTo || ''],
+                async () => JSON.stringify(await queryCurrentSeasonMatches(env, div, split.liveStart, { to: dateTo || '' }))),
+        ]);
+        return textResponse(jsonWithArrayText({ div }, 'matches', joinJsonArrays(past, live)));
+    }
+
     const fixed = endsBeforeCurrentSeason(dateTo);
 
     const body = await withCache(env, ['season-matches', canonicalQueryKey(url)], async () => {
@@ -939,12 +1131,8 @@ async function handleSeasonStandings(request, env) {
     const qualifierDates = seasons.some(s => s.qualifiersStart || s.qualifiersEnd) ? 'qdates' : 'plain';
     // 'totals': entries from before each season carried its league-wide
     // totals (goals, home wins, draws, away wins) aren't reused
-    const responseBody = await withCache(env, ['season-standings', div, !!excludeQualifiers, !!excludeMainStage, qualifierDates, 'totals'], async () => {
-        const { results } = await env.DB.prepare(
-            `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
-             FROM matches WHERE div = ?1 ORDER BY date ASC`
-        ).bind(div).all();
-
+    // Each season's standings and totals from date-ordered match rows
+    const seasonResultsFor = (results, seasonList) => {
         let matches = results.map(row => ({
             div, date: row.date, homeTeam: row.home_team, awayTeam: row.away_team,
             homeGoals: row.home_goals, awayGoals: row.away_goals, isQualifier: !!row.is_qualifier,
@@ -954,7 +1142,7 @@ async function handleSeasonStandings(request, env) {
         if (excludeQualifiers) matches = matches.filter(m => !m.isQualifier);
         if (excludeMainStage) matches = matches.filter(m => m.isQualifier);
 
-        const buckets = bucketMatchesBySeason(matches, seasons);
+        const buckets = bucketMatchesBySeason(matches, seasonList);
 
         // Continental's Team Seasons view needs each team's chronologically
         // last match of the season (its competitionPhase, score, and
@@ -998,7 +1186,45 @@ async function handleSeasonStandings(request, env) {
             return { season, matchCount: seasonMatches.length, goals, homeWins, draws, awayWins, standings: standingsWithLastMatch };
         });
 
-        return { div, seasons: seasonResults };
+        return seasonResults;
+    };
+    const keyFlags = [div, !!excludeQualifiers, !!excludeMainStage, qualifierDates, 'totals'];
+
+    // Past seasons (every date by 30 June) and the current one apart: the
+    // past part is fixed, so a results bump re-reads only the current
+    // season. Past seasons come before current ones in start order, so the
+    // two lists join in the same order as one.
+    const split = seasonSplit();
+    const isPast = s => split && s.end <= split.pastEnd && (!s.qualifiersEnd || s.qualifiersEnd <= split.pastEnd);
+    const pastSeasons = seasons.filter(isPast);
+    const liveSeasons = seasons.filter(s => !isPast(s));
+    if (split && pastSeasons.length && liveSeasons.length) {
+        const liveFrom = liveSeasons.map(s => s.qualifiersStart && s.qualifiersStart < s.start ? s.qualifiersStart : s.start).sort()[0];
+        const [past, live] = await Promise.all([
+            withCacheText(env, ['season-standings-past', split.pastEnd, ...keyFlags], async () => {
+                const { results } = await env.DB.prepare(
+                    `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
+                     FROM matches WHERE div = ?1 AND date <= ?2 ORDER BY date ASC`
+                ).bind(div, split.pastEnd).all();
+                return JSON.stringify(seasonResultsFor(results, pastSeasons));
+            }, { fixed: true }),
+            withCacheText(env, ['season-standings-live', liveFrom, ...keyFlags], async () => {
+                const { results } = await env.DB.prepare(
+                    `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
+                     FROM matches INDEXED BY idx_matches_unique WHERE div = ?1 AND date >= ?2 ORDER BY date ASC`
+                ).bind(div, liveFrom).all();
+                return JSON.stringify(seasonResultsFor(results, liveSeasons));
+            }),
+        ]);
+        return textResponse(jsonWithArrayText({ div }, 'seasons', joinJsonArrays(past, live)));
+    }
+
+    const responseBody = await withCache(env, ['season-standings', ...keyFlags], async () => {
+        const { results } = await env.DB.prepare(
+            `SELECT date, home_team, away_team, home_goals, away_goals, is_qualifier, competition_phase, additional_info
+             FROM matches WHERE div = ?1 ORDER BY date ASC`
+        ).bind(div).all();
+        return { div, seasons: seasonResultsFor(results, seasons) };
     });
 
     return jsonResponse(responseBody);
