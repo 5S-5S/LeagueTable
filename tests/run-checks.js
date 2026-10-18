@@ -2,13 +2,17 @@
 //
 //   cd tests && npm run check          # everything (~5 minutes)
 //   npm run check:quick                # desktop pages only, no phone runs
+//   npm run check:search               # routing and suggestions only:
+//                                      # offline, no pages, no API reads
 //   npm run check:update               # accept the current routing and
 //                                      # exact answers as the new expected
 //                                      # ones (review the diff before committing)
 //
 // 1. Routing: every question in the search question set
 //    (search/questions.js, ~1,500) through search.js, compared with
-//    search/routing-snapshot.txt - any change is listed.
+//    search/routing-snapshot.txt - any change is listed. And the search
+//    bar's suggestions for half-typed searches (search/questions-partial.txt)
+//    against search/suggestions-snapshot.txt.
 // 2. Pages: the four sport pages (desktop, and phone width for the Mobile
 //    pages) in headless Chrome - every tab and Seasons sub-tab clicked, no
 //    script error, Team Records and League History draw rows; and League
@@ -37,9 +41,12 @@ const { loadSearch, buildQuestions, describeResults } = require('./search/questi
 const ROOT = path.join(__dirname, '..');
 const ARGS = new Set(process.argv.slice(2));
 const QUICK = ARGS.has('--quick');
+const SEARCH_ONLY = ARGS.has('--search');
 const UPDATE = ARGS.has('--update');
 const CHROME = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const ROUTING_SNAPSHOT = path.join(__dirname, 'search', 'routing-snapshot.txt');
+const PARTIAL_QUESTIONS = path.join(__dirname, 'search', 'questions-partial.txt');
+const SUGGESTIONS_SNAPSHOT = path.join(__dirname, 'search', 'suggestions-snapshot.txt');
 const ANSWERS = path.join(__dirname, 'checks', 'answers.json');
 const PARALLEL = 5;
 const ANSWER_TIMEOUT_MS = 25000;
@@ -54,15 +61,27 @@ const search = loadSearch(fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8'))
 
 function checkRouting() {
     const questions = buildQuestions(search);
-    const now = questions.map(([q, scope]) => `${scope} | ${q}\n${describeResults(search.searchFor(q, scope)).replace(/^/gm, '    ')}`).join('\n') + '\n';
-    if (UPDATE || !fs.existsSync(ROUTING_SNAPSHOT)) {
-        fs.writeFileSync(ROUTING_SNAPSHOT, now);
-        console.log(`Routing: ${questions.length} questions, snapshot ${UPDATE ? 'updated' : 'written'}`);
+    compareSnapshot('Routing', ROUTING_SNAPSHOT, questions, 'questions', (q, scope) => search.searchFor(q, scope));
+}
+
+// The search bar's suggestions as the last word is typed
+function checkSuggestions() {
+    const questions = fs.readFileSync(PARTIAL_QUESTIONS, 'utf8').split('\n')
+        .map(line => line.trim()).filter(line => line && !line.startsWith('#'))
+        .map(line => { const [scope, q] = line.split(' | '); return [q, scope]; });
+    compareSnapshot('Suggestions', SUGGESTIONS_SNAPSHOT, questions, 'half-typed searches', (q, scope) => search.suggestFor(q, scope));
+}
+
+function compareSnapshot(section, file, questions, noun, run) {
+    const now = questions.map(([q, scope]) => `${scope} | ${q}\n${describeResults(run(q, scope)).replace(/^/gm, '    ')}`).join('\n') + '\n';
+    if (UPDATE || !fs.existsSync(file)) {
+        fs.writeFileSync(file, now);
+        console.log(`${section}: ${questions.length} ${noun}, snapshot ${UPDATE ? 'updated' : 'written'}`);
         return;
     }
-    const was = fs.readFileSync(ROUTING_SNAPSHOT, 'utf8');
+    const was = fs.readFileSync(file, 'utf8');
     if (was === now) {
-        console.log(`Routing: ${questions.length} questions, as the snapshot`);
+        console.log(`${section}: ${questions.length} ${noun}, as the snapshot`);
         return;
     }
     // Compare question by question (blocks start at a line with no indent)
@@ -72,10 +91,10 @@ function checkRouting() {
     for (const [key, block] of after) {
         if (before.get(key) === block) continue;
         changed++;
-        fail('routing', `${key}\n      was: ${(before.get(key) || '(new question)').split('\n').slice(1, 2).join('').trim()}\n      now: ${block.split('\n').slice(1, 2).join('').trim()}`);
+        fail(section.toLowerCase(), `${key}\n      was: ${(before.get(key) || '(new question)').split('\n').slice(1, 2).join('').trim()}\n      now: ${block.split('\n').slice(1, 2).join('').trim()}`);
     }
-    for (const key of before.keys()) if (!after.has(key)) { changed++; fail('routing', `${key}: no longer in the question set`); }
-    console.log(`Routing: ${questions.length} questions, ${changed} differ from the snapshot (npm run check:update to accept)`);
+    for (const key of before.keys()) if (!after.has(key)) { changed++; fail(section.toLowerCase(), `${key}: no longer in the question set`); }
+    console.log(`${section}: ${questions.length} ${noun}, ${changed} differ from the snapshot (npm run check:update to accept)`);
 }
 
 // --- A static server for the pages ---
@@ -391,6 +410,8 @@ async function checkAnswers(browser, base) {
 (async () => {
     const started = Date.now();
     checkRouting();
+    checkSuggestions();
+    if (SEARCH_ONLY) return report(started);
     const server = await startServer();
     const base = `http://127.0.0.1:${server.address().port}`;
     const browser = await puppeteer.launch({ executablePath: CHROME, headless: true, args: ['--no-first-run'] });
@@ -401,6 +422,13 @@ async function checkAnswers(browser, base) {
         await browser.close();
         server.close();
     }
+    report(started);
+})().catch(err => {
+    console.error(err);
+    process.exit(1);
+});
+
+function report(started) {
     const took = Math.round((Date.now() - started) / 1000);
     if (failures.length) {
         console.log(`\n${failures.length} problem(s):\n`);
@@ -409,7 +437,4 @@ async function checkAnswers(browser, base) {
         process.exit(1);
     }
     console.log(`\nAll checks passed (${took}s)`);
-})().catch(err => {
-    console.error(err);
-    process.exit(1);
-});
+}

@@ -28,7 +28,7 @@ empty search box.
 
 **Tier 3 - worthwhile features**
 7. Typo tolerance in search
-8. Smarter search suggestions as you type
+8. Smarter search suggestions as you type (done; Champions League-only clubs' order left)
 9. "City" / "United" alone in search
 10. Recent searches
 11. Road to the final
@@ -298,7 +298,17 @@ empty search box.
   "chelsae" find nothing; fuzzy-match club names ("Did you mean
   Arsenal?").
 
-- Maybe: **Smarter search suggestions as you type** — noted 2026-10-17.
+- Mostly done: **Smarter search suggestions as you type** — noted 2026-10-17,
+  built 2026-10-18 (search.js suggestFor, checked by
+  tests/search/questions-partial.txt). A half-typed last word is tried as
+  its likely endings - search words (COMPLETION_PHRASES) and the dropdown's
+  clubs, biggest first - each run as a real search, kept only when it
+  answers something new. "arsenal ch" -> Chelsea, Titles, the Champions
+  League, Champions League qualifications, Charlton; after "vs" only clubs.
+  Left: clubs only in the Champions League (Ajax, Benfica, Porto...) are
+  ranked by name, not size - nothing in search.js says how big they are
+  (their Champions League match counts would). The note below is the
+  original idea.
   Suggestions only use the words already complete: "arsenal ch" (Premier
   League picked) offers Arsenal's record, dashboard, seasons, streaks and
   Match Finder - the same as "arsenal" - and nothing about what "ch" is

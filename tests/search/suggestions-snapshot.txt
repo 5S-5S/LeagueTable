@@ -1,0 +1,188 @@
+premier-league | arsenal ch
+    h2h | Arsenal FC vs Chelsea FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC&t2=Chelsea+FC
+    team-seasons | Arsenal FC · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&pos=1
+    team | Arsenal FC · Champions League era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=CL
+    h2h | Arsenal FC vs Charlton Athletic | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC&t2=Charlton+Athletic
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+premier-league | arsenal champ
+    team-seasons | Arsenal FC · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&pos=1
+    team | Arsenal FC · Champions League era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=CL
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+premier-league | arsenal champions
+    team-seasons | Arsenal FC · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&pos=1
+    team | Arsenal FC · Champions League era | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=CL
+premier-league | arsenal rel
+    team-seasons | Arsenal FC · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=R
+    team-seasons | Arsenal FC · Relegation play-offs | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=RP
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+premier-league | arsenal tit
+    team-seasons | Arsenal FC · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&pos=1
+premier-league | arsenal se
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+premier-league | arsenal st
+    h2h | Arsenal FC vs Stoke City | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC&t2=Stoke+City
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+premier-league | arsenal lon
+    team-streaks | Arsenal FC · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten&status=historic
+    team-streaks | Arsenal FC · Winning streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning&status=historic
+    team-streaks | Arsenal FC · Losing streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=losing&status=historic
+    team-streaks | Arsenal FC · Winless streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winless&status=historic
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+premier-league | arsenal bi
+    h2h | Arsenal FC vs Birmingham City | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC&t2=Birmingham+City
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+    match-finder | Arsenal FC · Biggest defeats | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&cat=defeats
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+premier-league | arsenal vs chelsea
+    h2h | Arsenal FC vs Chelsea FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC&t2=Chelsea+FC
+premier-league | arsenal home
+    team | Arsenal FC · All seasons | Record and match history · Home games | DomesticEurope.html?view=league-filters&lg=premier-league&away=0&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks · Home games | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning&loc=home
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&away=0&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Home games | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&away=0
+premier-league | manchester united vs li
+    h2h | Manchester United vs Liverpool FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Manchester+United&t2=Liverpool+FC
+    team | Manchester United · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Manchester+United
+premier-league | last time liverpool beat ev
+    match-finder | Last time Liverpool FC beat Everton FC | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&t2=Everton+FC&res=win&cat=recent
+    match-finder | Last time Liverpool FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&cat=recent
+premier-league | premier league ch
+    team | Chelsea FC · Premier League era | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025&t1=Chelsea+FC
+    team-seasons | All teams · Titles | Team Seasons · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&season=premier-league-era-1992-2025&pos=1
+    team-seasons | All teams · Champions League qualifications | Team Seasons · Premier League era | DomesticEurope.html?view=team-seasons&lg=premier-league&season=premier-league-era-1992-2025&out=CL
+    team | Charlton Athletic · Premier League era | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025&t1=Charlton+Athletic
+    table | Premier League table · Premier League era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025
+domestic | barcelona vs re
+    h2h | FC Barcelona vs Real Madrid | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona&t2=Real+Madrid
+    h2h | FC Barcelona vs Real Sociedad | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona&t2=Real+Sociedad
+    h2h | FC Barcelona vs Real Betis | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona&t2=Real+Betis
+    h2h | FC Barcelona vs Real Zaragoza | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona&t2=Real+Zaragoza
+    team | FC Barcelona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona
+domestic | juventus re
+    team-seasons | Juventus · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&out=R
+    team-seasons | Juventus · Relegation play-offs | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&out=RP
+    team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
+    dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
+    team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
+    team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
+    match-finder | Last time Juventus won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&cat=recent
+    match-finder | Juventus · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus
+domestic | juventus vs mi
+    h2h | Juventus vs AC Milan | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus&t2=AC+Milan
+    team | Juventus · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Juventus
+domestic | serie a ch
+    team-seasons | All teams · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&pos=1
+    team-seasons | All teams · Champions League qualifications | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&out=CL
+    team | Chievo Verona · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Chievo+Verona
+    table | Serie A table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=serie-a
+domestic | bayern lon
+    team-streaks | Bayern München · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=unbeaten&status=historic
+    team-streaks | Bayern München · Winning streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning&status=historic
+    team-streaks | Bayern München · Losing streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=losing&status=historic
+    team-streaks | Bayern München · Winless streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winless&status=historic
+    team | Bayern München · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen
+    dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
+    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
+    team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
+    match-finder | Last time Bayern München won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
+    match-finder | Bayern München · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen
+domestic | psg vs ma
+    h2h | Paris Saint-Germain vs Olympique Marseille | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain&t2=Olympique+Marseille
+    team | Paris Saint-Germain · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=Paris+Saint-Germain
+la-liga | real madrid vs at
+    h2h | Real Madrid vs Atlético Madrid | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid&t2=Atl%C3%A9tico+Madrid
+    h2h | Real Madrid vs Athletic Club | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid&t2=Athletic+Club
+    h2h | Real Madrid vs Atlético Tetuán | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid&t2=Atl%C3%A9tico+Tetu%C3%A1n
+    team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
+serie-a | inter vs ju
+    h2h | Inter vs Juventus | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Inter&t2=Juventus
+    team | Inter · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Inter
+bundesliga | dortmund vs sc
+    h2h | Borussia Dortmund vs FC Schalke 04 | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Borussia+Dortmund&t2=FC+Schalke+04
+    h2h | Borussia Dortmund vs SC Freiburg | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Borussia+Dortmund&t2=SC+Freiburg
+    h2h | Borussia Dortmund vs SC Paderborn 07 | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Borussia+Dortmund&t2=SC+Paderborn+07
+    team | Borussia Dortmund · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Borussia+Dortmund
+ligue-1 | lyon tit
+    team-seasons | Olympique Lyonnais · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Olympique+Lyonnais&pos=1
+champions-league | liverpool vs ba
+    h2h | Liverpool FC vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=Bayern+M%C3%BCnchen
+    h2h | Liverpool FC vs FC Barcelona | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=FC+Barcelona
+    h2h | Liverpool FC vs Bayer Leverkusen | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=Bayer+Leverkusen
+    h2h | Liverpool FC vs Bangor City | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=Bangor+City
+    h2h | Liverpool FC vs Baník Ostrava | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=Ban%C3%ADk+Ostrava
+    team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
+champions-league | real madrid fi
+    h2h | Real Madrid vs ACF Fiorentina | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid&t2=ACF+Fiorentina
+    team-seasons | Real Madrid · Titles | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&pos=Champions
+    team-seasons | Real Madrid · Reached the final | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&pos=Final&better=1
+    team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
+    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
+    team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
+    match-finder | Last time Real Madrid won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
+    match-finder | Real Madrid · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid
+champions-league | real madrid se
+    h2h | Real Madrid vs Sevilla FC | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid&t2=Sevilla+FC
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
+    team-seasons | Real Madrid · Reached the semi-finals | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&pos=Semi-Finals&better=1
+    h2h | Real Madrid vs Servette FC | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid&t2=Servette+FC
+    team | Real Madrid · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid
+    dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
+    team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
+    match-finder | Last time Real Madrid won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&cat=recent
+    match-finder | Real Madrid · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid
+champions-league | bayern co
+    h2h | Bayern München vs 1. FC Köln | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen&t2=1.+FC+K%C3%B6ln
+    match-finder | Bayern München · Comebacks | Two-legged ties · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Bayern+M%C3%BCnchen&cat=comebacks&mode=tie
+    h2h | Bayern München vs Como 1907 | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen&t2=Como+1907
+    team | Bayern München · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen
+    dashboard | Bayern München | Team Dashboard (full page) | ContinentalEurope.html?team=Bayern%20M%C3%BCnchen
+    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Bayern+M%C3%BCnchen
+    team-streaks | Bayern München · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Bayern+M%C3%BCnchen&type=winning
+    match-finder | Last time Bayern München won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Bayern+M%C3%BCnchen&res=win&cat=recent
+    match-finder | Bayern München · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Bayern+M%C3%BCnchen
+champions-league | liverpool vs aj
+    h2h | Liverpool FC vs AJ Auxerre | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=AJ+Auxerre
+    h2h | Liverpool FC vs AFC Ajax | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC&t2=AFC+Ajax
+    team | Liverpool FC · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Liverpool+FC
+champions-league | ajax tit
+    team-seasons | AFC Ajax · Titles | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=AFC+Ajax&pos=Champions
+    h2h | AFC Ajax vs OFK Titograd | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=AFC+Ajax&t2=OFK+Titograd

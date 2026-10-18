@@ -7,7 +7,11 @@ cd tests
 npm install          # once (puppeteer-core - uses the installed Google Chrome)
 npm run check        # everything, ~3 minutes
 npm run check:quick  # desktop pages only, ~2 minutes
+npm run check:search # search routing and suggestions only - offline, a second
 ```
+
+`check:search` reads nothing from the API: use it for search-only changes,
+and on days when D1's free-plan read limit (5M rows a day) is tight.
 
 It prints `All checks passed`, or each problem and `FAILED` (exit code 1).
 
@@ -16,7 +20,10 @@ It prints `All checks passed`, or each problem and `FAILED` (exit code 1).
 1. **Search routing** - ~1,500 questions (`search/questions.js`: each
    dropdown's examples, `search/templates.txt` per dropdown, phrasings from
    past commits, season-record questions) through `search.js`, compared
-   with `search/routing-snapshot.txt`.
+   with `search/routing-snapshot.txt`. And the search bar's suggestions
+   as the last word is typed (`search/questions-partial.txt`: "arsenal ch"
+   -> Chelsea, Titles, the Champions League...), compared with
+   `search/suggestions-snapshot.txt`.
 2. **Pages** - the four sport pages in headless Chrome (desktop, and the
    Mobile pages at phone width): every tab and Seasons sub-tab clicked, no
    script error, Team Records and League History draw rows. Plus the home,
@@ -36,7 +43,7 @@ connection.
 A new search route, a reworded answer, a record broken at a season's end:
 
 ```
-npm run check:update   # rewrites routing-snapshot.txt and the exact answers
+npm run check:update   # rewrites the routing and suggestions snapshots and the exact answers
 git diff tests/        # read it - every change should be one you meant
 ```
 

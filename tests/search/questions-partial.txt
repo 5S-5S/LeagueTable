@@ -1,0 +1,32 @@
+# Half-typed searches (the last word still being typed), for the search
+# bar's suggestions - search.js suggestFor(). Each line: dropdown | text.
+premier-league | arsenal ch
+premier-league | arsenal champ
+premier-league | arsenal champions
+premier-league | arsenal rel
+premier-league | arsenal tit
+premier-league | arsenal se
+premier-league | arsenal st
+premier-league | arsenal lon
+premier-league | arsenal bi
+premier-league | arsenal vs chelsea
+premier-league | arsenal home
+premier-league | manchester united vs li
+premier-league | last time liverpool beat ev
+premier-league | premier league ch
+domestic | barcelona vs re
+domestic | juventus re
+domestic | juventus vs mi
+domestic | serie a ch
+domestic | bayern lon
+domestic | psg vs ma
+la-liga | real madrid vs at
+serie-a | inter vs ju
+bundesliga | dortmund vs sc
+ligue-1 | lyon tit
+champions-league | liverpool vs ba
+champions-league | real madrid fi
+champions-league | real madrid se
+champions-league | bayern co
+champions-league | liverpool vs aj
+champions-league | ajax tit

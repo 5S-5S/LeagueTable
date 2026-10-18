@@ -4101,6 +4101,121 @@
         return (SEARCH_EXAMPLES[scope] || SEARCH_EXAMPLES.domestic).flatMap(([, items]) => items);
     }
 
+    // --- Completing the last word (as you type) ---
+
+    // What a half-typed last word may be heading towards, after a team or
+    // a league ("arsenal ch" -> the Champions League, champions...). Each
+    // is tried as a real search, so one the dropdown can't answer, or that
+    // answers the same as the words before it, is never offered.
+    const COMPLETION_PHRASES = [
+        'vs', 'titles', 'champions', 'champions league', 'champions league qualifications',
+        'european cup', 'relegations', 'relegation play offs', 'seasons', 'top 4 finishes',
+        'longest unbeaten run', 'longest winning streak', 'longest losing streak', 'longest winless run',
+        'unbeaten run', 'winning streak', 'streaks', 'biggest wins', 'biggest defeats',
+        'biggest aggregate wins', 'highest scoring draws', 'highest scoring games', 'last time',
+        'clean sheets', 'at home', 'away', 'since 2010', 'last 10 meetings', 'table', 'home table',
+        'first title', 'last title', 'finals', 'semi finals', 'knockouts', 'comebacks', 'on penalties',
+        'most points in a season', 'most goals in a season', 'closest title races'
+    ];
+    const MAX_COMPLETIONS = 5;
+    const MAX_COMPLETION_TRIES = 14;
+
+    // Teams the dropdown choice covers, for completing a club's name
+    function teamInScope(name, scopeKey) {
+        const team = SEARCH_TEAMS.get(name);
+        if (!team) return false;
+        if (scopeKey === 'champions-league') return team.continental;
+        if (!scopeKey || scopeKey === 'domestic') return !!team.league;
+        return team.league === scopeKey;
+    }
+
+    // How prominent a club is: TEAM_DIRECTORY lists each league's clubs
+    // biggest first, so its place in its own league (Bayern and Real
+    // Madrid both 0). Clubs only in the Champions League come after, in
+    // name order - there's nothing here to rank them by.
+    const TEAM_PROMINENCE = new Map();
+    (() => {
+        const perLeague = {};
+        TEAM_DIRECTORY.forEach(({ name, league }) => {
+            perLeague[league] = (perLeague[league] || 0) + 1;
+            TEAM_PROMINENCE.set(name, perLeague[league] - 1);
+        });
+    })();
+    const teamProminence = name => TEAM_PROMINENCE.has(name) ? TEAM_PROMINENCE.get(name) : 1000;
+
+    // The clubs a fragment starts (from three letters, any word of the
+    // name - "dunaferr se" isn't "se"), biggest first, each as its
+    // shortest way of writing
+    function teamCompletions(fragment, scopeKey) {
+        const best = new Map();
+        teamNameIndex.forEach(([phrase, name]) => {
+            if (!teamInScope(name, scopeKey)) return;
+            if (!phrase.startsWith(fragment) && !(fragment.length >= 3 && phrase.includes(' ' + fragment))) return;
+            const known = best.get(name);
+            if (!known || phrase.length < known.length) best.set(name, phrase);
+        });
+        return [...best.entries()]
+            .sort((a, b) => teamProminence(a[0]) - teamProminence(b[0]) || a[0].localeCompare(b[0]))
+            .map(([name, phrase]) => ({ name, phrase }));
+    }
+
+    // The words before end on an opponent still to come ("arsenal vs re"):
+    // only a club can follow
+    const OPPONENT_NEXT = /\b(vs|v|versus|against|beat|beaten by|lost to|h2h|and)$/;
+
+    // searchFor(), plus what the last word may be heading towards: those
+    // answers come first while the word is half typed (the as-typed ones
+    // follow), and after it once the word already means something
+    function suggestFor(query, scopeKey) {
+        const typed = searchFor(query, scopeKey);
+        // A space after the last word: it's finished
+        const match = query.match(/^(.*\S)\s+(\S+)$/);
+        if (!match) return typed;
+        const base = match[1];
+        const fragment = normalizeSearchText(match[2]);
+        if (fragment.length < 2) return typed;
+
+        const before = searchFor(base, scopeKey).results;
+        if (before.length === 0) return typed;
+        const sameAnswer = (a, b) => a && b && a.href === b.href && a.title === b.title;
+
+        const opponentNext = OPPONENT_NEXT.test(normalizeSearchText(base));
+        const phrases = opponentNext ? [] : COMPLETION_PHRASES.filter(phrase => phrase.startsWith(fragment) && phrase !== fragment);
+        const teams = teamCompletions(fragment, scopeKey).slice(0, opponentNext ? MAX_COMPLETIONS : 2);
+        // A league club first ("arsenal chel"), then the search words, then
+        // the rest ("ajax tit": titles before OFK Titograd)
+        const lead = teams.length && teamProminence(teams[0].name) < 1000 ? 1 : 0;
+        const teamPhrases = teams.map(team => team.phrase);
+        const candidates = [...teamPhrases.slice(0, lead), ...phrases, ...teamPhrases.slice(lead)].slice(0, MAX_COMPLETION_TRIES);
+
+        // An answer the as-typed list already has moves up rather than
+        // showing twice ("arsenal se" -> the season-by-season finishes)
+        const answerKey = result => result.href + '|' + result.title;
+        // The last word is a whole word that already changed the answer
+        // ("arsenal champions", not "ajax tit" read as Titograd): its own
+        // answers stay first, and aren't offered again
+        const wholeWord = SEARCH_KEYWORDS.has(fragment) || teamPhraseIndex.has(fragment) || COMPLETION_PHRASES.includes(fragment);
+        const wordMeansSomething = wholeWord && typed.results.length > 0 && !sameAnswer(typed.results[0], before[0]);
+        const kept = wordMeansSomething ? typed.results.slice(0, 3) : [];
+        const seen = new Set(kept.map(answerKey));
+        const completions = [];
+        for (const completion of candidates) {
+            if (completions.length >= MAX_COMPLETIONS) break;
+            const text = `${base} ${completion}`;
+            const top = searchFor(text, scopeKey).results[0];
+            if (!top || sameAnswer(top, before[0])) continue;
+            const key = answerKey(top);
+            if (seen.has(key)) continue;
+            seen.add(key);
+            completions.push({ ...top, query: text });
+        }
+        if (completions.length === 0) return typed;
+
+        const rest = typed.results.filter(result => !seen.has(answerKey(result)));
+        const results = [...kept, ...completions, ...rest];
+        return { results: results.slice(0, MAX_SEARCH_RESULTS), message: '' };
+    }
+
     // --- Search bar ---
 
     // Result kinds whose page has a search mode: the page opens with its
@@ -4180,7 +4295,7 @@
                         ? `<img src="${crest}" class="search-result-crest" alt="" loading="lazy">`
                         : `<span class="search-result-icon" aria-hidden="true">${result.icon || '⚽'}</span>`;
                     return `
-                        <a class="search-result" role="option" href="${escapeSearchHtml(resultHref(result, input.value.trim(), scopeSelect.value))}">
+                        <a class="search-result" role="option" href="${escapeSearchHtml(resultHref(result, result.query || input.value.trim(), scopeSelect.value))}">
                             ${icon}
                             <span class="search-result-text">
                                 <span class="search-result-title">${escapeSearchHtml(result.title)}</span>
@@ -4224,7 +4339,7 @@
                 else render([], '');
                 return;
             }
-            const { results, message } = searchFor(input.value, scopeSelect.value);
+            const { results, message } = suggestFor(input.value, scopeSelect.value);
             render(results, message);
         }
 
@@ -4293,5 +4408,5 @@
         };
     }
 
-    window.LeagueSearch = { mount, searchFor, renderAnswer, examples, reportHref, bindReportLinks };
+    window.LeagueSearch = { mount, searchFor, suggestFor, renderAnswer, examples, reportHref, bindReportLinks };
 })();

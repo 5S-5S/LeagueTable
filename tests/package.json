@@ -5,6 +5,7 @@
   "scripts": {
     "check": "node run-checks.js",
     "check:quick": "node run-checks.js --quick",
+    "check:search": "node run-checks.js --search",
     "check:update": "node run-checks.js --update",
     "qa-screenshots": "node qa-screenshots.js"
   },
