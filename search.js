@@ -940,12 +940,15 @@
     const CLUB_NAME_OPTIONAL_ENDINGS = new Set([
         'city', 'united', 'town', 'county', 'rovers', 'wanderers', 'athletic', 'albion', 'hotspur'
     ]);
+    // Shortened names nobody uses for either club ("Manchester" is
+    // neither United nor City) - still offered while typing the full name
+    const NOT_SHORT_NAMES = new Set(['manchester']);
     const TEAM_ALIASES = {
         'man utd': 'Manchester United', 'man united': 'Manchester United', 'manchester utd': 'Manchester United',
         'man city': 'Manchester City', 'spurs': 'Tottenham Hotspur', 'wolves': 'Wolverhampton Wanderers',
         'west brom': 'West Bromwich Albion', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
         'brighton': 'Brighton & Hove Albion', 'qpr': 'Queens Park Rangers', 'bournemouth': 'AFC Bournemouth',
-        'barca': 'FC Barcelona', 'atletico': 'Atlético Madrid', 'atleti': 'Atlético Madrid',
+        'barca': 'FC Barcelona', 'madrid': 'Real Madrid', 'atletico': 'Atlético Madrid', 'atleti': 'Atlético Madrid',
         'athletic bilbao': 'Athletic Club', 'bilbao': 'Athletic Club', 'betis': 'Real Betis',
         'celta vigo': 'Celta de Vigo', 'celta': 'Celta de Vigo', 'deportivo': 'Deportivo La Coruña',
         'depor': 'Deportivo La Coruña', 'sociedad': 'Real Sociedad',
@@ -1078,6 +1081,7 @@
             teamPhraseIndex.get(phrase).add(name);
             teamNameIndex.push([phrase, name]);
         };
+        const shortened = [];
         SEARCH_TEAMS.forEach(team => {
             const full = normalizeSearchText(team.name);
             add(full, team.name);
@@ -1085,8 +1089,15 @@
             if (words.length === 0) return;
             add(words.join(' '), team.name);
             if (words.length > 1 && CLUB_NAME_OPTIONAL_ENDINGS.has(words[words.length - 1])) {
-                add(words.slice(0, -1).join(' '), team.name);
+                shortened.push([words.slice(0, -1).join(' '), team.name]);
             }
+        });
+        // Leicester for Leicester City - but never over a club that's
+        // called that ("Dundee" is Dundee FC, not Dundee United too)
+        shortened.forEach(([phrase, name]) => {
+            if (NOT_SHORT_NAMES.has(phrase)) return;
+            if (teamPhraseIndex.has(phrase) && ![...teamPhraseIndex.get(phrase)].some(other => shortened.some(([p, n]) => p === phrase && n === other))) return;
+            add(phrase, name);
         });
         // An alias always means its one team, even over a shared short name
         Object.entries(TEAM_ALIASES).forEach(([alias, name]) => {

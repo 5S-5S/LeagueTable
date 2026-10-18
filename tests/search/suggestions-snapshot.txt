@@ -219,9 +219,9 @@ premier-league | tottnham
 domestic | real madird
     corrected to: real madrid
     team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
-    team | Atlético Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Atl%C3%A9tico+Madrid
     dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
     team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
+    team | Atlético Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Atl%C3%A9tico+Madrid
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid

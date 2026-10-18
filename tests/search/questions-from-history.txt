@@ -50,6 +50,7 @@ load league data
 loose index scan
 lost 5-0
 lost in the final
+madrid vs barcelona
 maiden
 main stage only
 Match Finder

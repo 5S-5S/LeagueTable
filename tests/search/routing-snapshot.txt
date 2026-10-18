@@ -3360,6 +3360,12 @@ premier-league | lost in the final
     team-seasons | All teams · 2nd place finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&pos=2
 champions-league | lost in the final
     team-seasons | All teams · Lost in the final | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&pos=Final
+domestic | madrid vs barcelona
+    h2h | Real Madrid vs FC Barcelona | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid&t2=FC+Barcelona
+premier-league | madrid vs barcelona
+    message: No results for Real Madrid and FC Barcelona in Premier League together.
+champions-league | madrid vs barcelona
+    h2h | Real Madrid vs FC Barcelona | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid&t2=FC+Barcelona
 domestic | maiden
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | maiden
