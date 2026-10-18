@@ -945,6 +945,9 @@
     const NOT_SHORT_NAMES = new Set(['manchester']);
     const TEAM_ALIASES = {
         'man utd': 'Manchester United', 'man united': 'Manchester United', 'manchester utd': 'Manchester United',
+        // "City" / "United" alone are the Manchester clubs ("man utd vs city",
+        // "city vs united") - a full name still wins ("hull city")
+        'city': 'Manchester City', 'united': 'Manchester United',
         'man city': 'Manchester City', 'spurs': 'Tottenham Hotspur', 'wolves': 'Wolverhampton Wanderers',
         'west brom': 'West Bromwich Albion', 'wednesday': 'Sheffield Wednesday', 'sheffield utd': 'Sheffield United',
         'sheff wed': 'Sheffield Wednesday', 'sheffield wed': 'Sheffield Wednesday', 'palace': 'Crystal Palace',

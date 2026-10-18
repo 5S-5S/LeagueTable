@@ -18,6 +18,7 @@ boro vs leeds
 Champions League
 champions-league
 cheap, single-team
+city vs united
 como 1907
 days ago
 Days Since Last Match Results
@@ -53,6 +54,7 @@ Last Data Update
 last time ...
 last time arsenal won away
 league::teamName
+leeds vs united
 level with Manchester United
 load league data
 loose index scan
@@ -117,6 +119,7 @@ Viking FK
 wednesday vs leeds
 were beaten by
 when did arsenal last win the league
+when did man utd last lose to city
 where was Arsenal on 1/1/2023
 which teams finished Nth
 won a final

@@ -25,33 +25,32 @@ empty search box.
 4. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-5. "City" / "United" alone in search
-6. Recent searches
-7. Road to the final
-8. More competitions (depends on the data)
-9. Streak-ending social account (closer to launch)
+5. Recent searches
+6. Road to the final
+7. More competitions (depends on the data)
+8. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-10. Trivia mode
-11. Head-to-head by decade
-12. Side-by-side Team Seasons
-13. League History chart
-14. Team Records: bottom / relegated, home / away
-15. A club's title races
-16. Team progression chart (after League History)
-17. "/" to search
-18. Penalty shootout leaderboard (team and head-to-head answers done)
-19. "Won on penalties" in Match Finder
-20. Lighter pages (small gain - see the item)
-21. Knockout Stage bracket view (on hold)
-22. Country vs Country
-23. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-24. Review upcoming matches
-25. Phone-width checks in npm run check
-26. Team-colour contrast
-27. Sitemap + Google Search Console
-28. Club names that differ from worldfootball.net
-29. Champions League data fixes (found 2026-10-13)
+9. Trivia mode
+10. Head-to-head by decade
+11. Side-by-side Team Seasons
+12. League History chart
+13. Team Records: bottom / relegated, home / away
+14. A club's title races
+15. Team progression chart (after League History)
+16. "/" to search
+17. Penalty shootout leaderboard (team and head-to-head answers done)
+18. "Won on penalties" in Match Finder
+19. Lighter pages (small gain - see the item)
+20. Knockout Stage bracket view (on hold)
+21. Country vs Country
+22. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+23. Review upcoming matches
+24. Phone-width checks in npm run check
+25. Team-colour contrast
+26. Sitemap + Google Search Console
+27. Club names that differ from worldfootball.net
+28. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -273,13 +272,6 @@ empty search box.
   Continental (shared code like search downloaded once) - small gain
   for a big refactor of four large pages.
 
-- Maybe: **"City" / "United" alone in search** — split from Match Finder
-  upgrades 2026-10-07. "When did Man Utd last lose to City" reads City as
-  Hull City. A bare "City" or "United" should mean the club's local rival
-  (Manchester City for Manchester United and vice versa), or else the most
-  prominent club of that name. Search-only; the routing check shows which
-  questions change.
-
 - Passed over: **Team nicknames in search** — considered 2026-10-18, passed
   over this time (the plain club names went in instead - see Done). Fan
   nicknames as TEAM_ALIASES in search.js: gunners (Arsenal), toffees
@@ -450,6 +442,14 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~"City" / "United" alone in search~~ — done (2026-10-18), split from
+  Match Finder upgrades 2026-10-07. "When did Man Utd last lose to City"
+  read City as Hull City (the first "... City" by name). Now TEAM_ALIASES:
+  "city" is Manchester City and "united" Manchester United wherever they
+  appear ("city vs united" is the derby, "leeds vs united" Leeds v Man
+  Utd); a full name still wins ("hull city", "leeds united vs city").
+  Simpler than the local-rival rule first planned, with the same answers.
 
 - ~~Club names in search~~ — done (2026-10-18). Names people actually
   use, agreed club by club (search.js TEAM_ALIASES): Madrid (Real),
