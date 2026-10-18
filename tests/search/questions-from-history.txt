@@ -11,8 +11,10 @@ arsenal on a wednesday
 Arsenal penalty shootouts
 arsenal seasons
 attempted
+auxerre vs psg
 Away goals
 biggest wins
+boro vs leeds
 Champions League
 champions-league
 cheap, single-team
@@ -22,9 +24,11 @@ Days Since Last Match Results
 decided by away goals
 didn't lose
 drew on a Wednesday
+eintracht vs bayern
 European Cup
 everyone who finished 2nd
 exactly the semi finals
+fck vs bayern
 Filter by Progression
 finalists
 finals
@@ -41,6 +45,7 @@ in the 90s
 including historic
 January 2010
 knocked out in ...
+la real vs athletic
 last 5
 Last 5
 last 5 meetings
@@ -66,10 +71,14 @@ not yet merged to main
 nottingham vs arsenal
 once, in 2015-16
 Opponent
+oviedo vs gijon
+palace vs arsenal
 parma fc
+pescara vs roma
 Premier League
 premier league champions
 quarter final defeats
+rapid vs bayern
 reached the final
 Reload Data
 results on Boxing Day 1963
@@ -83,6 +92,8 @@ Select Streak
 semi final exits
 semi finals
 set default date range for this competition
+seville vs betis
+sheff wed vs sheff utd
 sheffield utd vs leeds
 since 01/01/1991
 since the last sync
@@ -99,6 +110,7 @@ titles
 to filter with
 too many SQL variables
 tsv 1860 munchen vs bayern
+verona vs chievo
 victories by away goals
 Viking FC
 Viking FK

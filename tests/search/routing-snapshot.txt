@@ -3068,6 +3068,12 @@ premier-league | attempted
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | attempted
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | auxerre vs psg
+    h2h | AJ Auxerre vs Paris Saint-Germain | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=ligue-1&t1=AJ+Auxerre&t2=Paris+Saint-Germain
+premier-league | auxerre vs psg
+    message: No results for AJ Auxerre and Paris Saint-Germain in Premier League together.
+champions-league | auxerre vs psg
+    h2h | AJ Auxerre vs Paris Saint-Germain | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=AJ+Auxerre&t2=Paris+Saint-Germain
 domestic | Away goals
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga
@@ -3088,6 +3094,12 @@ premier-league | biggest wins
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league
 champions-league | biggest wins
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league
+domestic | boro vs leeds
+    h2h | Middlesbrough FC vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Middlesbrough+FC&t2=Leeds+United
+premier-league | boro vs leeds
+    h2h | Middlesbrough FC vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Middlesbrough+FC&t2=Leeds+United
+champions-league | boro vs leeds
+    message: No results for Middlesbrough FC and Leeds United in Champions League together.
 domestic | Champions League
     table | Champions League table · Champions League era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=champions-league-era-1992-2026
 premier-league | Champions League
@@ -3160,6 +3172,12 @@ premier-league | drew on a Wednesday
     table | Premier League table · All seasons | League table · Wednesdays | DomesticEurope.html?view=league-filters&lg=premier-league&day=3
 champions-league | drew on a Wednesday
     table | Champions League table · All seasons | League table · Wednesdays | ContinentalEurope.html?view=league-filters&lg=champions-league&day=3
+domestic | eintracht vs bayern
+    h2h | Eintracht Frankfurt vs Bayern München | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Eintracht+Frankfurt&t2=Bayern+M%C3%BCnchen
+premier-league | eintracht vs bayern
+    message: No results for Eintracht Frankfurt and Bayern München in Premier League together.
+champions-league | eintracht vs bayern
+    h2h | Eintracht Frankfurt vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Eintracht+Frankfurt&t2=Bayern+M%C3%BCnchen
 domestic | European Cup
     table | Champions League table · European Cup era | League table | ContinentalEurope.html?view=league-filters&lg=champions-league&season=european-cup-era-1955-1992
 premier-league | European Cup
@@ -3186,6 +3204,12 @@ premier-league | exactly the semi finals
     table | Premier League table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=premier-league
 champions-league | exactly the semi finals
     table | Champions League table · All seasons | League table · Semi-finals | ContinentalEurope.html?view=league-filters&lg=champions-league&stage=Semi-Finals
+domestic | fck vs bayern
+    h2h | 1. FC Kaiserslautern vs Bayern München | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=1.+FC+Kaiserslautern&t2=Bayern+M%C3%BCnchen
+premier-league | fck vs bayern
+    message: No results for 1. FC Kaiserslautern and Bayern München in Premier League together.
+champions-league | fck vs bayern
+    h2h | 1. FC Kaiserslautern vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=1.+FC+Kaiserslautern&t2=Bayern+M%C3%BCnchen
 domestic | Filter by Progression
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | Filter by Progression
@@ -3318,6 +3342,12 @@ premier-league | knocked out in ...
     team-seasons | All teams · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league
 champions-league | knocked out in ...
     team-seasons | All teams · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league
+domestic | la real vs athletic
+    h2h | Real Sociedad vs Athletic Club | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Sociedad&t2=Athletic+Club
+premier-league | la real vs athletic
+    message: No results for Real Sociedad and Athletic Club in Premier League together.
+champions-league | la real vs athletic
+    h2h | Real Sociedad vs Athletic Club | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Sociedad&t2=Athletic+Club
 domestic | last 5
     message: 
 premier-league | last 5
@@ -3508,6 +3538,18 @@ premier-league | Opponent
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | Opponent
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | oviedo vs gijon
+    h2h | Real Oviedo vs Sporting Gijón | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Oviedo&t2=Sporting+Gij%C3%B3n
+premier-league | oviedo vs gijon
+    message: No results for Real Oviedo and Sporting Gijón in Premier League together.
+champions-league | oviedo vs gijon
+    message: No results for Real Oviedo and Sporting Gijón in Champions League together.
+domestic | palace vs arsenal
+    h2h | Crystal Palace vs Arsenal FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Crystal+Palace&t2=Arsenal+FC
+premier-league | palace vs arsenal
+    h2h | Crystal Palace vs Arsenal FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Crystal+Palace&t2=Arsenal+FC
+champions-league | palace vs arsenal
+    message: No results for Crystal Palace and Arsenal FC in Champions League together.
 domestic | parma fc
     team | Parma Calcio 1913 · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Parma+Calcio+1913
     dashboard | Parma Calcio 1913 | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Parma%20Calcio%201913
@@ -3524,6 +3566,12 @@ champions-league | parma fc
     team-streaks | Parma Calcio 1913 · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Parma+Calcio+1913&type=winning
     match-finder | Last time Parma Calcio 1913 won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Parma+Calcio+1913&res=win&cat=recent
     match-finder | Parma Calcio 1913 · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Parma+Calcio+1913
+domestic | pescara vs roma
+    h2h | Delfino Pescara vs AS Roma | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Delfino+Pescara&t2=AS+Roma
+premier-league | pescara vs roma
+    message: No results for Delfino Pescara and AS Roma in Premier League together.
+champions-league | pescara vs roma
+    message: No results for Delfino Pescara and AS Roma in Champions League together.
 domestic | Premier League
     table | Premier League table · Premier League era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025
 premier-league | Premier League
@@ -3546,6 +3594,12 @@ premier-league | quarter final defeats
     table | Premier League table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=premier-league
 champions-league | quarter final defeats
     table | Champions League table · All seasons | League table · Quarter-finals | ContinentalEurope.html?view=league-filters&lg=champions-league&stage=Quarter-Finals
+domestic | rapid vs bayern
+    h2h | Rapid Vienna vs Bayern München | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Rapid+Vienna&t2=Bayern+M%C3%BCnchen
+premier-league | rapid vs bayern
+    message: No results for Rapid Vienna and Bayern München in Premier League together.
+champions-league | rapid vs bayern
+    h2h | Rapid Vienna vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Rapid+Vienna&t2=Bayern+M%C3%BCnchen
 domestic | reached the final
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | reached the final
@@ -3658,6 +3712,20 @@ premier-league | set default date range for this competition
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | set default date range for this competition
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | seville vs betis
+    h2h | Sevilla FC vs Real Betis | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Sevilla+FC&t2=Real+Betis
+premier-league | seville vs betis
+    message: No results for Sevilla FC and Real Betis in Premier League together.
+champions-league | seville vs betis
+    h2h | Sevilla FC vs Real Betis | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Sevilla+FC&t2=Real+Betis
+domestic | sheff wed vs sheff utd
+    h2h | Sheffield Wednesday vs Sheffield United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+Wednesday&t2=Sheffield+United
+    h2h | Sheffield Wednesday vs Manchester United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+Wednesday&t2=Manchester+United
+premier-league | sheff wed vs sheff utd
+    h2h | Sheffield Wednesday vs Sheffield United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+Wednesday&t2=Sheffield+United
+    h2h | Sheffield Wednesday vs Manchester United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+Wednesday&t2=Manchester+United
+champions-league | sheff wed vs sheff utd
+    message: No results for Sheffield Wednesday and Sheffield United in Champions League together.
 domestic | sheffield utd vs leeds
     h2h | Sheffield United vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+United&t2=Leeds+United
 premier-league | sheffield utd vs leeds
@@ -3770,6 +3838,12 @@ premier-league | tsv 1860 munchen vs bayern
     message: No results for TSV 1860 München and Bayern München in Premier League together.
 champions-league | tsv 1860 munchen vs bayern
     h2h | TSV 1860 München vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=TSV+1860+M%C3%BCnchen&t2=Bayern+M%C3%BCnchen
+domestic | verona vs chievo
+    h2h | Hellas Verona vs Chievo Verona | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Hellas+Verona&t2=Chievo+Verona
+premier-league | verona vs chievo
+    message: No results for Hellas Verona and Chievo Verona in Premier League together.
+champions-league | verona vs chievo
+    h2h | Hellas Verona vs Chievo Verona | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Hellas+Verona&t2=Chievo+Verona
 domestic | victories by away goals
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga
