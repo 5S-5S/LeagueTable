@@ -1019,6 +1019,7 @@
                 <!-- Main Table Container (shows above match history when single team selected) -->
                 <div id="tableContainer" class="hidden">
                     <div class="league-table">
+                        <div id="tableOutcomeKey" class="outcome-key league-table-outcome-key hidden"></div>
                         <table>
                             <thead>
                                 <tr id="tableHeader">
@@ -2265,6 +2266,7 @@
             teamHistoryTable: document.getElementById('teamHistoryTable'),
             teamHistoryTitle: document.getElementById('teamHistoryTitle'),
             teamHistoryOutcomeKey: document.getElementById('teamHistoryOutcomeKey'),
+            tableOutcomeKey: document.getElementById('tableOutcomeKey'),
             teamHistoryHeader: document.getElementById('teamHistoryHeader'),
             teamHistoryBody: document.getElementById('teamHistoryBody'),
             teamHistoryBackArrow: document.getElementById('teamHistoryBackArrow'),
@@ -4938,14 +4940,36 @@
             return `<td class="outcome-strip" style="background-color: ${OUTCOME_STYLES[codes[0]].color};" title="${label}"><span class="sr-only">${label}</span></td>`;
         }
 
-        // The key under the table's title: the outcomes the rows show
-        function updateOutcomeKey(codeLists) {
+        // A key of the outcomes the rows show (empty when they show none)
+        function outcomeKeyItems(codeLists) {
             const shown = new Set(codeLists.flat());
             const codes = window.SeasonOutcomes ? window.SeasonOutcomes.PRIORITY.filter(code => shown.has(code)) : [];
-            elements.teamHistoryOutcomeKey.classList.toggle('hidden', !codes.length);
-            elements.teamHistoryOutcomeKey.innerHTML = codes.map(code => `
+            return codes.map(code => `
                 <span class="outcome-key-item"><span class="outcome-key-swatch" style="background-color: ${OUTCOME_STYLES[code].color};"></span>${OUTCOME_STYLES[code].label}</span>
             `).join('');
+        }
+
+        function setOutcomeKey(element, codeLists) {
+            const items = outcomeKeyItems(codeLists);
+            element.classList.toggle('hidden', !items);
+            element.innerHTML = items;
+        }
+
+        // The key under Team History's title
+        function updateOutcomeKey(codeLists) {
+            setOutcomeKey(elements.teamHistoryOutcomeKey, codeLists);
+        }
+
+        // League Tables shows outcomes only for one whole season as it
+        // finished: no custom dates, era, team, venue or weekday filter,
+        // and the season's own points and deductions
+        function leagueTableShowsOutcomes() {
+            const season = state.selectedSeason;
+            if (!season || isEraSeasonKey(season)) return false;
+            if (state.selectedTeam1 || !state.homeFilter || !state.awayFilter || state.selectedDayOfWeek !== '') return false;
+            if (state.threePointSystem || !state.pointDeductionsEnabled) return false;
+            const range = getSeasonDateRange(season);
+            return !!range && range.start === state.dateFrom && range.end === state.dateTo;
         }
 
         function renderPositionOnlyTable(allPositionData, selectedPos, league) {
@@ -9012,7 +9036,14 @@
                 { key: 'points', label: 'Pts' }
             ];
             
-            elements.tableHeader.innerHTML = headers.map(header => `
+            // One whole season: what each finish led to, beside Pos
+            const showOutcomes = leagueTableShowsOutcomes();
+            const outcomes = showOutcomes
+                ? tableResult.tableData.map(team => getSeasonOutcomes(state.selectedLeague, state.selectedSeason, team.sharedPosition || team.originalPosition, team.team))
+                : [];
+            setOutcomeKey(elements.tableOutcomeKey, outcomes);
+
+            elements.tableHeader.innerHTML = (showOutcomes ? '<th class="outcome-strip" aria-label="Outcome"></th>' : '') + headers.map(header => `
                 <th class="px-3 py-4 text-center font-bold text-sm cursor-pointer hover:bg-gray-600" 
                     onclick="handleSort('${header.key}')" 
                     style="text-align: ${header.key === 'team' ? 'left' : 'center'}">
@@ -9064,6 +9095,7 @@
                     
                     return `
                         <tr class="border-b hover:bg-gray-50 ${rowBackgroundClass}">
+                            ${showOutcomes ? renderOutcomeStrip(outcomes[index]) : ''}
                             <td class="px-3 py-4 text-center font-bold text-gray-600">${team.sharedPosition || team.originalPosition}</td>
                             <td class="px-4 py-4 font-semibold ${isHighlighted ? 'text-black' : 'text-gray-900'}">
                                 <div class="flex items-center cursor-pointer hover:bg-gray-100 rounded p-2 -m-2 team-clickable" data-team="${team.team}" title="Click to view ${team.team} history">
@@ -11004,12 +11036,17 @@
         // season's final standings
         function leagueHistorySeasonTable(row, league) {
             if (!row.table || !row.table.length) return '<p class="season-matches-status">No table for this season.</p>';
+            const season = row.season;
+            const outcomes = row.table.map(club => getSeasonOutcomes(league, season, club.position, club.team));
+            const key = outcomeKeyItems(outcomes);
             return `
                 <div class="league-table season-matches" data-own-colors>
+                    ${key ? `<div class="outcome-key league-history-outcome-key">${key}</div>` : ''}
                     <table>
-                        <thead><tr><th class="text-center">Pos</th><th class="text-center">Team</th><th class="text-center">P</th><th class="text-center">W</th><th class="text-center">D</th><th class="text-center">L</th><th class="text-center">GF</th><th class="text-center">GA</th><th class="text-center">GD</th><th class="text-center">Pts</th></tr></thead>
+                        <thead><tr><th class="outcome-strip" aria-label="Outcome"></th><th class="text-center">Pos</th><th class="text-center">Team</th><th class="text-center">P</th><th class="text-center">W</th><th class="text-center">D</th><th class="text-center">L</th><th class="text-center">GF</th><th class="text-center">GA</th><th class="text-center">GD</th><th class="text-center">Pts</th></tr></thead>
                         <tbody>
-                            ${row.table.map(row => `<tr>
+                            ${row.table.map((row, index) => `<tr>
+                            ${renderOutcomeStrip(outcomes[index])}
                             <td class="text-center font-bold" style="${
                                 row.revoked ? 'color: #6b7280;' :
                                 row.position === 1 ? 'color: #d97706; background-color: #fef3c7;' :

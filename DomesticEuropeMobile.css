@@ -3841,6 +3841,12 @@ html:not(.search-mode) .header-actions {
     border-radius: 1px;
 }
 
+.league-table-outcome-key,
+.league-history-outcome-key {
+    margin: 0;
+    padding: 0.5rem 0.75rem;
+}
+
 [data-theme="dark"] .outcome-key {
     color: var(--text-secondary, #d1d5db);
 }

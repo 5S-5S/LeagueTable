@@ -1201,6 +1201,12 @@ body {
     border-radius: 1px;
 }
 
+.league-table-outcome-key,
+.league-history-outcome-key {
+    margin: 0;
+    padding: 0.5rem 1rem;
+}
+
 [data-theme="dark"] .outcome-key {
     color: var(--text-secondary, #d1d5db);
 }
@@ -1270,6 +1276,12 @@ body {
 
 .league-table.season-matches td {
     padding: 0.625rem 0.75rem;
+}
+
+.league-table.season-matches th.outcome-strip,
+.league-table.season-matches td.outcome-strip {
+    width: 6px;
+    padding: 0;
 }
 
 [data-theme="dark"] .league-table.season-matches {
