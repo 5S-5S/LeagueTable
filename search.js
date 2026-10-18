@@ -956,6 +956,8 @@
         'depor': 'Deportivo La Coruña', 'sociedad': 'Real Sociedad',
         'juve': 'Juventus', 'inter milan': 'Inter', 'internazionale': 'Inter', 'milan': 'AC Milan',
         'lazio': 'Lazio Roma', 'parma': 'Parma Calcio 1913', 'parma fc': 'Parma Calcio 1913',
+        'verona': 'Hellas Verona', 'hellas': 'Hellas Verona', 'chievo': 'Chievo Verona', 'vicenza': 'L.R. Vicenza',
+        'spal': 'SPAL 2013 Ferrara',
         'bayern': 'Bayern München', 'bayern munich': 'Bayern München', 'munich': 'Bayern München', 'munchen': 'Bayern München',
         'dortmund': 'Borussia Dortmund', 'bvb': 'Borussia Dortmund', 'gladbach': 'Bor. Mönchengladbach',
         'monchengladbach': 'Bor. Mönchengladbach', 'moenchengladbach': 'Bor. Mönchengladbach',
