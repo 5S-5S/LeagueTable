@@ -9,7 +9,7 @@
 //    drift; L/GA/played are lower bounds since more matches land via the
 //    daily sync over time. Pts is checked against the RAW total
 //    (won*3+drawn) plus the known Arsenal FC 1990-91 E0 deduction
-//    (pointDeductions in DomesticEurope.html: -2), since this endpoint
+//    (pointDeductions in standings-adjustments.js: -2), since this endpoint
 //    deliberately returns undeducted points - deductions stay
 //    client-side (see backend/README.md's Data integrity section).
 // 2. Structural invariants that must hold for ANY filter combination:

@@ -71,7 +71,7 @@
 //   division's entire match history into the given season date ranges in
 //   a single query/pass, returning each season's full (all-teams,
 //   raw/undeducted) standings. The client applies point deductions and
-//   ranking overrides itself (unchanged, hardcoded, never duplicated
+//   ranking overrides itself (standings-adjustments.js, never duplicated
 //   here) to find the requested team's final position per season - this
 //   endpoint only supplies the compact per-team-per-season aggregates.
 //   excludeQualifiers/excludeMainStage are Continental-only. lastMatch

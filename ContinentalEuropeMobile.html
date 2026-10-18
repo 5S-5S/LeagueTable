@@ -1378,6 +1378,7 @@
         </div>
     </div>
 
+    <script src="standings-adjustments.js"></script>
     <script src="search.js"></script>
     <script>
         // Application state
@@ -1633,31 +1634,7 @@
 
         // Ranking overrides for historic seasons
         function getRankingOverrides() {
-            return [
-                // Italy
-                ["Pro Vercelli", "I1", "1930-31", 10, 1],
-
-                // Germany
-                ["1. FC Köln", "D1", "1968-69", 13],
-
-                // Spain
-                ["Girona FC", "SP1", "2024-25", 16],
-                ["Sevilla FC", "SP1", "2025-26", 13],
-                ["CD Alavés", "SP1", "2025-26", 14],
-                ["Elche CF", "SP1", "2025-26", 15],
-                ["Levante UD", "SP1", "2025-26", 16],
-                ["CA Osasuna", "SP1", "2025-26", 17],
-                ["RCD Mallorca", "SP1", "2025-26", 18],
-
-                // England
-                ["Liverpool FC", "E0", "1974-75", 2],
-
-                // France
-                // Add ranking overrides here as needed
-                ["FC Metz", "F1", "2023-24", 16]
-
-
-            ];
+            return window.StandingsAdjustments.rankingOverrides;
         }
 
         // Apply ranking overrides for historic seasons
@@ -3382,13 +3359,7 @@
         }
 
         // Point deductions data
-        const pointDeductions = [
-            // Champions League point deductions
-            { team: 'AC Milan', points: 2, startDate: '1994-07-01', endDate: '1995-06-30', league: 'C1' },
-            
-            // Other leagues (kept for reference)
-            { team: 'Málaga CF', points: 3, startDate: '1979-07-01', endDate: '1980-06-30', league: 'SP1' }
-        ];
+        const pointDeductions = window.StandingsAdjustments.pointDeductions;
 
         // Season mappings
         const seasons = {
