@@ -1104,11 +1104,14 @@
     // competition since the list above was taken). Fetched once per
     // page; onUpdate re-runs a search that's showing.
     let continentalTeamsRequest = null;
+    const continentalMatchCounts = new Map();
     function loadContinentalTeams(onUpdate) {
         if (!continentalTeamsRequest) {
-            continentalTeamsRequest = fetch(`${LEAGUE_TABLE_API_BASE}/api/teams?div=C1`)
+            continentalTeamsRequest = fetch(`${LEAGUE_TABLE_API_BASE}/api/teams?div=C1&counts=1`)
                 .then(res => res.ok ? res.json() : { teams: [] })
                 .then(data => {
+                    // Matches played, to rank the clubs only this list knows
+                    Object.entries(data.counts || {}).forEach(([name, n]) => continentalMatchCounts.set(name, n));
                     let added = false;
                     (data.teams || []).forEach(name => {
                         const team = SEARCH_TEAMS.get(name);
@@ -4101,6 +4104,137 @@
         return (SEARCH_EXAMPLES[scope] || SEARCH_EXAMPLES.domestic).flatMap(([, items]) => items);
     }
 
+    // --- Typo tolerance ---
+
+    // Every word the search knows: its own words, the words of each
+    // club's names and aliases, competitions, countries and the example
+    // questions. A typed word outside it is read as the nearest one
+    // ("chelsae" -> chelsea, "arsnl" -> arsenal, "tittles" -> titles).
+    // Rebuilt when the Champions League's clubs arrive.
+    const EXTRA_KNOWN_WORDS = (
+        'christmas boxing day new year easter january february march april may june july august september ' +
+        'october november december decade decades aggregate extra penalty shootout shootouts comeback comebacks ' +
+        'derby derbies qualifier qualifiers qualifying qualification qualifications qualified relegated ' +
+        'relegation relegations demoted play offs playoff playoffs playout playouts test barrage barrages ' +
+        'historic top flight division premier first second champion championship championships trophy trophies ' +
+        'league leagues cup european europe english clubs exits exit exited lead leading leader leaders ' +
+        'points per game average ' +
+        // Everyday words, never corrected into a club or a search word
+        // ("everyone" isn't Everton, "filter" isn't Inter)
+        'everyone everybody anyone anybody someone something nothing everything where there here this that ' +
+        'these those them then than when while which whose whom what why with within without about above ' +
+        'below again against because been being both each either else enough even ever every first ' +
+        'following found further having into itself last least like little made make makes making many ' +
+        'might mine more most must name named near need needs never next none often once only other ' +
+        'others otherwise over same seem seems several shall since some such sure take taken takes taking ' +
+        'their theirs themselves thing things think those though thought through together towards under ' +
+        'until upon used using very want wanted wants were whether will wish would your yours ' +
+        'search searches searched searching filter filters filtered filtering hide hidden show shown ' +
+        'showing reload data main merged merge decided decide decides deciding finder finders started ' +
+        'start starts starting ended ending ends finalist finalists scorer scorers runner goal ' +
+        'happened happen happens across ahead behind beside besides during except inside outside past ' +
+        'per plus versus within opponent opponents rival rivals rivalry fixture date dates day days week ' +
+        'weeks month months total totals count counts number numbers ranked rank level levels'
+    ).split(' ');
+    let knownWords = null;
+    let knownWordsFor = -1;
+
+    function searchWordList() {
+        if (knownWords && knownWordsFor === teamNameIndex.length) return knownWords;
+        const words = new Set([...SEARCH_KEYWORDS, ...EXTRA_KNOWN_WORDS]);
+        const addText = text => normalizeSearchText(text).split(/[^a-z0-9]+/).forEach(word => {
+            if (word.length >= 3 && !/\d/.test(word)) words.add(word);
+        });
+        teamNameIndex.forEach(([phrase]) => addText(phrase));
+        Object.keys(TEAM_ALIASES).forEach(addText);
+        SEARCH_COMPETITIONS.forEach(comp => { addText(comp.name); (comp.aliases || []).forEach(addText); });
+        Object.keys(COUNTRY_DEMONYMS).forEach(addText);
+        COUNTRY_NAMES.forEach(addText);
+        COMPLETION_PHRASES.forEach(addText);
+        Object.values(SEARCH_EXAMPLES).forEach(groups => groups.forEach(([, items]) => items.forEach(addText)));
+        Object.values(SEARCH_MODIFIERS).forEach(tips => tips.forEach(addText));
+        knownWords = [...words];
+        knownWordsFor = teamNameIndex.length;
+        return knownWords;
+    }
+
+    // Edits from one word to the other (a swap of two letters is one),
+    // or Infinity once past max
+    function editDistance(a, b, max) {
+        if (Math.abs(a.length - b.length) > max) return Infinity;
+        let prev2 = null;
+        let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+        for (let i = 1; i <= a.length; i++) {
+            const row = [i];
+            let best = i;
+            for (let j = 1; j <= b.length; j++) {
+                const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                let d = Math.min(prev[j] + 1, row[j - 1] + 1, prev[j - 1] + cost);
+                if (prev2 && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d = Math.min(d, prev2[j - 2] + 1);
+                row.push(d);
+                best = Math.min(best, d);
+            }
+            if (best > max) return Infinity;
+            prev2 = prev;
+            prev = row;
+        }
+        return prev[b.length] <= max ? prev[b.length] : Infinity;
+    }
+
+    // The letters of word, in order, within known ("arsnl" in arsenal):
+    // a word typed without its vowels
+    function isAbbreviationOf(word, known) {
+        if (word[0] !== known[0] || known.length > word.length * 1.8) return false;
+        let k = 0;
+        for (const ch of known) if (ch === word[k]) k++;
+        return k === word.length;
+    }
+
+    // The known word a typo most likely meant, or null. Four letters or
+    // more; one edit up to five letters, two from six. Typos keep the
+    // first letter (or swap the first two)
+    function correctWord(word, known) {
+        if (word.length < 4 || /\d/.test(word)) return null;
+        const max = word.length <= 5 ? 1 : 2;
+        let best = null;
+        let bestDistance = Infinity;
+        for (const candidate of known) {
+            if (candidate[0] !== word[0] && !(candidate[0] === word[1] && candidate[1] === word[0])) continue;
+            const d = editDistance(word, candidate, Math.min(max, bestDistance));
+            // Ties: the first letter kept, then the shorter word
+            if (d < bestDistance || (d === bestDistance && best && candidate[0] === word[0] && (best[0] !== word[0] || candidate.length < best.length))) {
+                best = candidate;
+                bestDistance = d;
+            }
+        }
+        if (best) return best;
+        const abbreviated = known.filter(candidate => isAbbreviationOf(word, candidate));
+        return abbreviated.length === 1 ? abbreviated[0] : null;
+    }
+
+    // The query with each unknown word read as the word it most likely
+    // meant - except a last word still being typed (the start of a known
+    // word: completing it is suggestFor's job). Returns the corrected
+    // text, or null when nothing changed.
+    function correctTypos(query) {
+        const known = searchWordList();
+        const knownSet = new Set(known);
+        const parts = query.split(/(\s+)/);
+        const lastIndex = parts.length - 1 - (/\s$/.test(query) ? 1 : 0);
+        let changed = false;
+        const out = parts.map((part, index) => {
+            if (!part.trim()) return part;
+            const word = normalizeSearchText(part).replace(/[^a-z0-9'-]/g, '');
+            if (!word || knownSet.has(word) || /[\d'-]/.test(word)) return part;
+            if (index === lastIndex && !/\s$/.test(query) && known.some(candidate => candidate.startsWith(word))) return part;
+            const fixed = correctWord(word, known);
+            if (!fixed || fixed === word) return part;
+            changed = true;
+            return fixed;
+        });
+        return changed ? out.join('') : null;
+    }
+
     // --- Completing the last word (as you type) ---
 
     // What a half-typed last word may be heading towards, after a team or
@@ -4131,8 +4265,9 @@
 
     // How prominent a club is: TEAM_DIRECTORY lists each league's clubs
     // biggest first, so its place in its own league (Bayern and Real
-    // Madrid both 0). Clubs only in the Champions League come after, in
-    // name order - there's nothing here to rank them by.
+    // Madrid both 0). Clubs only in the Champions League come after, most
+    // Champions League matches first (Ajax before Rabat Ajax) once
+    // /api/teams has answered, else in name order.
     const TEAM_PROMINENCE = new Map();
     (() => {
         const perLeague = {};
@@ -4141,7 +4276,19 @@
             TEAM_PROMINENCE.set(name, perLeague[league] - 1);
         });
     })();
-    const teamProminence = name => TEAM_PROMINENCE.has(name) ? TEAM_PROMINENCE.get(name) : 1000;
+    const teamProminence = name => TEAM_PROMINENCE.has(name) ? TEAM_PROMINENCE.get(name)
+        : 1000 + Math.max(0, 1000 - (continentalMatchCounts.get(name) || 0));
+    // In the Champions League dropdown, Champions League matches rank
+    // every club (Ajax before Auxerre), once they've arrived
+    const LEAD_CL_MATCHES = 40;
+    function teamRank(name, scopeKey) {
+        if (scopeKey === 'champions-league' && continentalMatchCounts.size > 0) {
+            const n = continentalMatchCounts.get(name) || 0;
+            return { rank: -n, lead: n >= LEAD_CL_MATCHES };
+        }
+        const rank = teamProminence(name);
+        return { rank, lead: rank < 1000 };
+    }
 
     // The clubs a fragment starts (from three letters, any word of the
     // name - "dunaferr se" isn't "se"), biggest first, each as its
@@ -4155,18 +4302,36 @@
             if (!known || phrase.length < known.length) best.set(name, phrase);
         });
         return [...best.entries()]
-            .sort((a, b) => teamProminence(a[0]) - teamProminence(b[0]) || a[0].localeCompare(b[0]))
-            .map(([name, phrase]) => ({ name, phrase }));
+            .map(([name, phrase]) => ({ name, phrase, ...teamRank(name, scopeKey) }))
+            .sort((a, b) => a.rank - b.rank || a.name.localeCompare(b.name));
     }
 
     // The words before end on an opponent still to come ("arsenal vs re"):
     // only a club can follow
     const OPPONENT_NEXT = /\b(vs|v|versus|against|beat|beaten by|lost to|h2h|and)$/;
 
+    // The search bar's results: searchFor() with typos read as the words
+    // they most likely meant ({ correctedTo } says so), and the last word
+    // completed while it's half typed
+    function suggestFor(query, scopeKey) {
+        // A correction is used only when it finds an answer the words as
+        // typed don't ("top scorers" stays as it is)
+        const corrected = correctTypos(query);
+        if (corrected) {
+            const fixed = completeLastWord(corrected, scopeKey);
+            const asTyped = searchFor(query, scopeKey).results[0];
+            const changesAnswer = !asTyped || !fixed.results[0] || asTyped.href !== fixed.results[0].href || asTyped.title !== fixed.results[0].title;
+            if (fixed.results.length > 0 && changesAnswer) {
+                return { ...fixed, results: fixed.results.map(result => ({ query: corrected.trim(), ...result })), correctedTo: corrected.trim() };
+            }
+        }
+        return completeLastWord(query, scopeKey);
+    }
+
     // searchFor(), plus what the last word may be heading towards: those
     // answers come first while the word is half typed (the as-typed ones
     // follow), and after it once the word already means something
-    function suggestFor(query, scopeKey) {
+    function completeLastWord(query, scopeKey) {
         const typed = searchFor(query, scopeKey);
         // A space after the last word: it's finished
         const match = query.match(/^(.*\S)\s+(\S+)$/);
@@ -4184,7 +4349,7 @@
         const teams = teamCompletions(fragment, scopeKey).slice(0, opponentNext ? MAX_COMPLETIONS : 2);
         // A league club first ("arsenal chel"), then the search words, then
         // the rest ("ajax tit": titles before OFK Titograd)
-        const lead = teams.length && teamProminence(teams[0].name) < 1000 ? 1 : 0;
+        const lead = teams.length && teams[0].lead ? 1 : 0;
         const teamPhrases = teams.map(team => team.phrase);
         const candidates = [...teamPhrases.slice(0, lead), ...phrases, ...teamPhrases.slice(lead)].slice(0, MAX_COMPLETION_TRIES);
 
@@ -4279,7 +4444,7 @@
         if (options.query) input.value = options.query;
         if (options.autofocus) input.focus();
 
-        function render(results, message) {
+        function render(results, message, correctedTo = '') {
             activeIndex = -1;
             if (results.length === 0 && !message) {
                 resultsEl.classList.add('hidden');
@@ -4289,7 +4454,10 @@
             if (results.length === 0) {
                 resultsEl.innerHTML = `<div class="search-empty">${escapeSearchHtml(message)}</div>`;
             } else {
-                resultsEl.innerHTML = results.map(result => {
+                const correction = correctedTo
+                    ? `<div class="search-correction">Showing results for <strong>${escapeSearchHtml(correctedTo)}</strong></div>`
+                    : '';
+                resultsEl.innerHTML = correction + results.map(result => {
                     const crest = result.crestTeam ? crestUrl(result.crestTeam) : '';
                     const icon = crest
                         ? `<img src="${crest}" class="search-result-crest" alt="" loading="lazy">`
@@ -4339,8 +4507,8 @@
                 else render([], '');
                 return;
             }
-            const { results, message } = suggestFor(input.value, scopeSelect.value);
-            render(results, message);
+            const { results, message, correctedTo } = suggestFor(input.value, scopeSelect.value);
+            render(results, message, correctedTo);
         }
 
         function setActive(index) {

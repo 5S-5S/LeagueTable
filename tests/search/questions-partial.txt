@@ -1,5 +1,6 @@
-# Half-typed searches (the last word still being typed), for the search
-# bar's suggestions - search.js suggestFor(). Each line: dropdown | text.
+# Half-typed and misspelled searches, for the search bar's suggestions -
+# search.js suggestFor(). Each line: dropdown | text. (Offline, so the
+# Champions League clubs rank without their match counts.)
 premier-league | arsenal ch
 premier-league | arsenal champ
 premier-league | arsenal champions
@@ -30,3 +31,20 @@ champions-league | real madrid se
 champions-league | bayern co
 champions-league | liverpool vs aj
 champions-league | ajax tit
+# Typos
+premier-league | arsnl
+premier-league | chelsae
+premier-league | arsenal vs chelsae
+premier-league | liverpol titles
+premier-league | tottnham
+domestic | real madird
+domestic | barcelone vs real madrid
+domestic | juventus tittles
+domestic | dortmudn
+domestic | arsenal relegatoins
+domestic | bayern longest unbeatn run
+domestic | man utd vs liverpoool
+champions-league | real madird vs bayern
+# Not typos - left as typed
+domestic | Serie A top scorers
+domestic | everyone who finished 2nd

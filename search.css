@@ -145,6 +145,18 @@
     white-space: nowrap;
 }
 
+/* "Showing results for ..." when a typo was read as another word */
+.search-correction {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.85rem;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.search-correction strong {
+    color: #111827;
+}
+
 .search-empty {
     padding: 1rem 1.25rem;
     color: #6b7280;
@@ -299,6 +311,14 @@
     background: #333333;
 }
 
+[data-theme="dark"] .search-correction {
+    border-bottom-color: #444;
+}
+
+[data-theme="dark"] .search-correction strong {
+    color: #f3f4f6;
+}
+
 [data-theme="dark"] .search-guide-tip {
     background: #222222;
     color: #e5e7eb;
@@ -307,6 +327,7 @@
 [data-theme="dark"] .search-result-detail,
 [data-theme="dark"] .search-result-comp,
 [data-theme="dark"] .search-empty,
+[data-theme="dark"] .search-correction,
 [data-theme="dark"] .search-answer-note {
     color: #ccc;
 }

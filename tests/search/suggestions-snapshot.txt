@@ -186,3 +186,77 @@ champions-league | liverpool vs aj
 champions-league | ajax tit
     team-seasons | AFC Ajax · Titles | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=AFC+Ajax&pos=Champions
     h2h | AFC Ajax vs OFK Titograd | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=AFC+Ajax&t2=OFK+Titograd
+premier-league | arsnl
+    corrected to: arsenal
+    team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC
+premier-league | chelsae
+    corrected to: chelsea
+    team | Chelsea FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Chelsea+FC
+    dashboard | Chelsea FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Chelsea%20FC
+    team-seasons | Chelsea FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Chelsea+FC
+    team-streaks | Chelsea FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Chelsea+FC&type=winning
+    match-finder | Last time Chelsea FC won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Chelsea+FC&res=win&cat=recent
+    match-finder | Chelsea FC · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Chelsea+FC
+premier-league | arsenal vs chelsae
+    corrected to: arsenal vs chelsea
+    h2h | Arsenal FC vs Chelsea FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC&t2=Chelsea+FC
+premier-league | liverpol titles
+    corrected to: liverpool titles
+    team-seasons | Liverpool FC · Titles | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&pos=1
+premier-league | tottnham
+    corrected to: tottenham
+    team | Tottenham Hotspur · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Tottenham+Hotspur
+    dashboard | Tottenham Hotspur | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Tottenham%20Hotspur
+    team-seasons | Tottenham Hotspur · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Tottenham+Hotspur
+    team-streaks | Tottenham Hotspur · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Tottenham+Hotspur&type=winning
+    match-finder | Last time Tottenham Hotspur won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Tottenham+Hotspur&res=win&cat=recent
+    match-finder | Tottenham Hotspur · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Tottenham+Hotspur
+domestic | real madird
+    corrected to: real madrid
+    team | Real Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Real+Madrid
+    team | Atlético Madrid · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&t1=Atl%C3%A9tico+Madrid
+    dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
+    team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
+    match-finder | Last time Real Madrid won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&cat=recent
+    match-finder | Real Madrid · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid
+domestic | barcelone vs real madrid
+    corrected to: barcelona vs real madrid
+    h2h | FC Barcelona vs Real Madrid | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona&t2=Real+Madrid
+    h2h | FC Barcelona vs Atlético Madrid | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=la-liga&t1=FC+Barcelona&t2=Atl%C3%A9tico+Madrid
+domestic | juventus tittles
+    corrected to: juventus titles
+    team-seasons | Juventus · Titles | Team Seasons · All seasons · With historic seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&pos=1&hist=1
+domestic | dortmudn
+    corrected to: dortmund
+    team | Borussia Dortmund · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Borussia+Dortmund
+    dashboard | Borussia Dortmund | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Borussia%20Dortmund
+    team-seasons | Borussia Dortmund · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Borussia+Dortmund
+    team-streaks | Borussia Dortmund · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Borussia+Dortmund&type=winning
+    match-finder | Last time Borussia Dortmund won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Borussia+Dortmund&res=win&cat=recent
+    match-finder | Borussia Dortmund · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Borussia+Dortmund
+domestic | arsenal relegatoins
+    corrected to: arsenal relegations
+    team-seasons | Arsenal FC · Relegations | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&out=R
+domestic | bayern longest unbeatn run
+    corrected to: bayern longest unbeaten run
+    team-streaks | Bayern München · Unbeaten streaks | Longest in history | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=unbeaten&status=historic
+domestic | man utd vs liverpoool
+    corrected to: man utd vs liverpool
+    h2h | Manchester United vs Liverpool FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Manchester+United&t2=Liverpool+FC
+champions-league | real madird vs bayern
+    corrected to: real madrid vs bayern
+    h2h | Real Madrid vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Real+Madrid&t2=Bayern+M%C3%BCnchen
+domestic | Serie A top scorers
+    table | Serie A table · All seasons | League table | DomesticEurope.html?view=league-filters&lg=serie-a
+domestic | everyone who finished 2nd
+    team-seasons | All teams · 2nd place finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&pos=2
+    team-seasons | All teams · 2nd place finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&pos=2
+    team-seasons | All teams · 2nd place finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&pos=2
+    team-seasons | All teams · 2nd place finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&pos=2
+    team-seasons | All teams · 2nd place finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&pos=2

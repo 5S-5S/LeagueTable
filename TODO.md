@@ -27,8 +27,8 @@ empty search box.
 6. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-7. Typo tolerance in search
-8. Smarter search suggestions as you type (done; Champions League-only clubs' order left)
+7. Typo tolerance in search (done 2026-10-18)
+8. Smarter search suggestions as you type (done 2026-10-18)
 9. "City" / "United" alone in search
 10. Recent searches
 11. Road to the final
@@ -294,21 +294,30 @@ empty search box.
   prominent club of that name. Search-only; the routing check shows which
   questions change.
 
-- Maybe: **Typo tolerance in search** — noted 2026-10-03. "arsnl",
-  "chelsae" find nothing; fuzzy-match club names ("Did you mean
-  Arsenal?").
+- Done: **Typo tolerance in search** — noted 2026-10-03, built 2026-10-18
+  with the suggestions below (search.js correctTypos / suggestFor). In the
+  search bar, a word the search doesn't know is read as the nearest one it
+  does - club name words, search words, competitions, countries: one edit
+  up to five letters, two from six, a swap counts as one, the first letter
+  kept, and vowel-less words ("arsnl"). Used only when it finds an answer
+  the words as typed don't; the dropdown says "Showing results for ...".
+  A list of everyday words (EXTRA_KNOWN_WORDS) is never corrected
+  ("everyone" isn't Everton); none of the ~1,500 routing questions gets
+  corrected. searchFor() itself is unchanged, so a typo'd link (?q=) isn't
+  corrected - the search bar opens the corrected words instead.
 
-- Mostly done: **Smarter search suggestions as you type** — noted 2026-10-17,
+- Done: **Smarter search suggestions as you type** — noted 2026-10-17,
   built 2026-10-18 (search.js suggestFor, checked by
   tests/search/questions-partial.txt). A half-typed last word is tried as
   its likely endings - search words (COMPLETION_PHRASES) and the dropdown's
   clubs, biggest first - each run as a real search, kept only when it
   answers something new. "arsenal ch" -> Chelsea, Titles, the Champions
   League, Champions League qualifications, Charlton; after "vs" only clubs.
-  Left: clubs only in the Champions League (Ajax, Benfica, Porto...) are
-  ranked by name, not size - nothing in search.js says how big they are
-  (their Champions League match counts would). The note below is the
-  original idea.
+  In the Champions League dropdown every club ranks by Champions League
+  matches played (/api/teams?div=C1&counts=1 - Ajax before Auxerre,
+  Benfica first for "be"); without that answer, by name. Still to come:
+  which half-typed searches people abandon (from Analytics' failed
+  searches). The note below is the original idea.
   Suggestions only use the words already complete: "arsenal ch" (Premier
   League picked) offers Arsenal's record, dashboard, seasons, streaks and
   Match Finder - the same as "arsenal" - and nothing about what "ch" is

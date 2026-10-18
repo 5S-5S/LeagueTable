@@ -61,19 +61,23 @@ const search = loadSearch(fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8'))
 
 function checkRouting() {
     const questions = buildQuestions(search);
-    compareSnapshot('Routing', ROUTING_SNAPSHOT, questions, 'questions', (q, scope) => search.searchFor(q, scope));
+    compareSnapshot('Routing', ROUTING_SNAPSHOT, questions, 'questions', (q, scope) => describeResults(search.searchFor(q, scope)));
 }
 
-// The search bar's suggestions as the last word is typed
+// The search bar's suggestions: the last word completed as it's typed,
+// typos corrected
 function checkSuggestions() {
     const questions = fs.readFileSync(PARTIAL_QUESTIONS, 'utf8').split('\n')
         .map(line => line.trim()).filter(line => line && !line.startsWith('#'))
         .map(line => { const [scope, q] = line.split(' | '); return [q, scope]; });
-    compareSnapshot('Suggestions', SUGGESTIONS_SNAPSHOT, questions, 'half-typed searches', (q, scope) => search.suggestFor(q, scope));
+    compareSnapshot('Suggestions', SUGGESTIONS_SNAPSHOT, questions, 'half-typed and misspelled searches', (q, scope) => {
+        const got = search.suggestFor(q, scope);
+        return (got.correctedTo ? `corrected to: ${got.correctedTo}\n` : '') + describeResults(got);
+    });
 }
 
 function compareSnapshot(section, file, questions, noun, run) {
-    const now = questions.map(([q, scope]) => `${scope} | ${q}\n${describeResults(run(q, scope)).replace(/^/gm, '    ')}`).join('\n') + '\n';
+    const now = questions.map(([q, scope]) => `${scope} | ${q}\n${run(q, scope).replace(/^/gm, '    ')}`).join('\n') + '\n';
     if (UPDATE || !fs.existsSync(file)) {
         fs.writeFileSync(file, now);
         console.log(`${section}: ${questions.length} ${noun}, snapshot ${UPDATE ? 'updated' : 'written'}`);

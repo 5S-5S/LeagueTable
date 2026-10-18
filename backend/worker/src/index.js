@@ -10,9 +10,12 @@
 //   client-side (unchanged) and just sends the resolved names here.
 //   -> { team1, team2: [...], div, matches: [...] }
 //
-// GET /api/teams?div=C1
-//   -> { div, teams: [name, ...] }
+// GET /api/teams?div=C1[&counts=1]
+//   -> { div, teams: [name, ...] } (with counts=1, also counts:
+//   { name: matches played in the division })
 //   Every distinct team name that's played in this division, sorted.
+//   The counts rank clubs the search bar only knows from this list
+//   (Ajax, Benfica...) when it completes a half-typed name.
 //   Exists specifically for Continental, where (unlike Domestic) the
 //   frontend's hardcoded color/logo table can't stand in for "teams that
 //   played in this competition" - see getLeagueTeams() in
@@ -347,9 +350,11 @@ async function handleTeams(url, env) {
         return jsonResponse({ error: 'div query param is required' }, 400);
     }
 
+    const withCounts = url.searchParams.get('counts') === '1';
     const body = await withCache(env, ['teams', canonicalQueryKey(url)], async () => {
-        const teams = await queryDistinctTeams(env, div);
-        return { div, teams };
+        if (!withCounts) return { div, teams: await queryDistinctTeams(env, div) };
+        const counts = await queryTeamMatchCounts(env, div);
+        return { div, teams: Object.keys(counts).sort(), counts };
     });
 
     return jsonResponse(body);
@@ -391,6 +396,24 @@ async function queryDistinctTeams(env, div) {
     ]);
 
     return [...teams].sort();
+}
+
+// Matches each team has played in one division: { team: count }. Each
+// side is a GROUP BY over the (div, team) index, so it reads the
+// division's index entries once (C1: ~14k each side) and no table rows -
+// cached like every /api/teams answer, so once per sync at most.
+async function queryTeamMatchCounts(env, div) {
+    const sql = column => `SELECT ${column} AS team, COUNT(*) AS n FROM matches INDEXED BY idx_matches_div_${column}
+         WHERE div = ?1 GROUP BY ${column}`;
+    const [homeResult, awayResult] = await Promise.all([
+        env.DB.prepare(sql('home_team')).bind(div).all(),
+        env.DB.prepare(sql('away_team')).bind(div).all(),
+    ]);
+    const counts = {};
+    [...homeResult.results, ...awayResult.results].forEach(row => {
+        counts[row.team] = (counts[row.team] || 0) + row.n;
+    });
+    return counts;
 }
 
 // Historical point-system rule: 3 points for a win unless threePointSystem
