@@ -245,8 +245,7 @@
     {
       "q": "most points in a season since 1992",
       "scope": "premier-league",
-      "answer": "Since 1992-93, Manchester City hold the record for the most points in a Premier League season: 100 points in 2017-18.",
-      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+      "answer": "Since 1992-93, Manchester City hold the record for the most points in a Premier League season: 100 points in 2017-18."
     },
     {
       "q": "highest scoring seasons in the 90s",
@@ -257,8 +256,7 @@
     {
       "q": "fewest points in a 38 game season between 2015 and 2021",
       "scope": "ligue-1",
-      "answer": "From 2015-16 to 2021-22, ESTAC Troyes hold the record for the fewest points in a 38-game Ligue 1 season: 18 points in 2015-16.",
-      "note": "Points are as awarded: 2 for a win until 1993-94. Count every win as 3 points?"
+      "answer": "From 2015-16 to 2021-22, ESTAC Troyes hold the record for the fewest points in a 38-game Ligue 1 season: 18 points in 2015-16."
     },
     {
       "q": "most goals in a campaign between 2000 and 2009",
@@ -317,6 +315,17 @@
       "scope": "premier-league",
       "answer": "From 1980-81 to 1990-91, Everton FC (1984-85) and Liverpool FC (1987-88) share the record for the most points in a First Division season: 90 points.",
       "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+    },
+    {
+      "q": "most points in a season between 2000 and 2020",
+      "scope": "premier-league",
+      "answer": "From 2000-01 to 2020-21, Manchester City hold the record for the most points in a Premier League season: 100 points in 2017-18."
+    },
+    {
+      "q": "biggest title winning margin between 1995 and 2015",
+      "scope": "premier-league",
+      "answer": "From 1995-96 to 2015-16, the biggest Premier League title-winning margin is 18 points: Manchester United over Arsenal FC in 1999-00.",
+      "note": "Did you mean the closest title races or the best title races by points?"
     },
     {
       "q": "German champions before 1963",

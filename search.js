@@ -2745,6 +2745,30 @@
         themeWatcher.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
+    // The season a range bound falls in, by its start year: a season key
+    // ("1992-93") or a date (January 1993 is in 1992-93); null for none
+    function seasonStart(bound) {
+        if (/^\d{4}-\d{2}$/.test(bound || '')) return Number(bound.slice(0, 4));
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(bound || '')) return null;
+        return Number(bound.slice(5, 7)) >= 7 ? Number(bound.slice(0, 4)) : Number(bound.slice(0, 4)) - 1;
+    }
+
+    // The span an answer covers: the page's era and From / To as they are
+    // now (Team Records, League History, Team Seasons pass them in), else
+    // the link's. { era, from, to } - from / to as start years (null for
+    // open), in order
+    function answerRange(ctx, params) {
+        const now = [ctx.records, ctx.leagueHistory, ctx.seasons].find(view => view && view.from !== undefined);
+        let from = seasonStart(now ? now.from : params.get('from'));
+        let to = seasonStart(now ? now.to : params.get('to'));
+        if (from !== null && to !== null && from > to) [from, to] = [to, from];
+        return { era: now ? now.era : params.get('season'), from, to };
+    }
+
+    // The page's Copy Link (bindReportLinks() is handed it): the note's
+    // links start from the page as it is now, not the search's link
+    let pageLink = null;
+
     // The last season each competition gave 2 points for a win (as the
     // Worker's winPointsFor() - Ligue 1's 1988-89 exception aside), and
     // the eras that start after it
@@ -2757,19 +2781,39 @@
         'champions-league-era-1992-2026': 1992
     };
 
-    // Points as awarded mix 2 and 3 for a win across the seasons ranked -
+    // Points as awarded gave 2 for a win in some of the seasons ranked -
     // say so, with the other way as a link ('' when every season in range
-    // gave 3, or the question isn't about points)
+    // gave 3, or the question isn't about points). Reads the page as it is
+    // now (stat, ranking, 3 points, era, From / To), else the link.
     function pointsSystemNote(ctx, params) {
-        const aboutPoints = (ctx.view === 'team-records' && params.get('stat') === 'points') ||
-            (ctx.view === 'league-history' && ['gap', 'topTwo'].includes(params.get('rank')));
+        const records = ctx.records || {};
+        const history = ctx.leagueHistory || {};
+        const stat = records.stat !== undefined ? records.stat : params.get('stat');
+        const rank = history.rank !== undefined ? history.rank : params.get('rank');
+        const aboutPoints = (ctx.view === 'team-records' && stat === 'points') ||
+            (ctx.view === 'league-history' && ['gap', 'topTwo'].includes(rank));
         const lastTwo = LAST_TWO_POINT_SEASON[ctx.league];
         if (!aboutPoints || lastTwo === undefined) return '';
-        const eraStart = ERA_START_YEARS[params.get('season')];
+        // every season in range after the last 2-point one
+        const range = answerRange(ctx, params);
+        const eraStart = ERA_START_YEARS[range.era];
         if (eraStart !== undefined && eraStart > lastTwo) return '';
+        if (range.from !== null && range.from > lastTwo) return '';
+        if (ctx.season && Number(ctx.season.slice(0, 4)) > lastTwo) return '';
         const lastSeason = `${lastTwo}-${String((lastTwo + 1) % 100).padStart(2, '0')}`;
-        const threePoints = params.get('p3') === '1';
-        const flipped = new URLSearchParams(params);
+        const pageThree = ctx.view === 'team-records' ? records.threePoints : history.threePoints;
+        const threePoints = pageThree !== undefined ? !!pageThree : params.get('p3') === '1';
+        // the page's Copy Link with 3 points the other way, still a search
+        // answer (search, q, scope from the search's link)
+        let flipped = new URLSearchParams(params);
+        try {
+            if (pageLink) {
+                flipped = new URL(pageLink(), window.location.href).searchParams;
+                ['search', 'q', 'scope'].forEach(key => {
+                    if (params.get(key) !== null) flipped.set(key, params.get(key));
+                });
+            }
+        } catch (err) { /* the search's link, as before */ }
         if (threePoints) flipped.delete('p3'); else flipped.set('p3', '1');
         const href = `${window.location.pathname.split('/').pop()}?${flipped.toString()}`;
         return threePoints
@@ -2952,6 +2996,7 @@
     // link is used, from the page's own Copy Link (pageUrl() - the current
     // tab and filters), so it is never stale
     function bindReportLinks(pageUrl) {
+        pageLink = pageUrl;
         const fill = event => {
             const link = event.target.closest && event.target.closest('a.report-link[data-tab-report]');
             if (link) link.href = reportHref({ page: pageUrl() });
@@ -2998,22 +3043,10 @@
         if (!era) return ctx.competition;
         const [firstYear, oldName, newName, bothNames] = era;
         if (recentOnly) return newName;
-        // The page's era and From / To as they are now (Team Records,
-        // League History, Team Seasons), else the link's
-        const now = [ctx.records, ctx.leagueHistory, ctx.seasons].find(view => view && view.from !== undefined);
-        const eraKey = now ? now.era : params.get('season');
+        // The page's era and From / To as they are now, else the link's
+        const { era: eraKey, from, to } = answerRange(ctx, params);
         if (ERA_NAMES[eraKey]) return ERA_NAMES[eraKey];
         if (ctx.season) return Number(ctx.season.slice(0, 4)) >= firstYear ? newName : oldName;
-        // The season a bound falls in, by its start year: a season key
-        // ("1992-93") or a date (January 1993 is in 1992-93)
-        const seasonStart = bound => {
-            if (/^\d{4}-\d{2}$/.test(bound || '')) return Number(bound.slice(0, 4));
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(bound || '')) return null;
-            return Number(bound.slice(5, 7)) >= 7 ? Number(bound.slice(0, 4)) : Number(bound.slice(0, 4)) - 1;
-        };
-        let from = seasonStart(now ? now.from : params.get('from'));
-        let to = seasonStart(now ? now.to : params.get('to'));
-        if (from !== null && to !== null && from > to) [from, to] = [to, from];
         if (from !== null && from >= firstYear) return newName;
         if (to !== null && to < firstYear) return oldName;
         return bothNames;

@@ -21,57 +21,39 @@ empty search box.
 2. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-3. Answer wording: the 2-points note on ranges after 1980-81
-4. API caching (what's left - the outage-preventing parts are done)
-5. Expand favourite team (On this day uses it)
+3. API caching (what's left - the outage-preventing parts are done)
+4. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-6. "City" / "United" alone in search
-7. Recent searches
-8. Road to the final
-9. More competitions (depends on the data)
-10. Streak-ending social account (closer to launch)
+5. "City" / "United" alone in search
+6. Recent searches
+7. Road to the final
+8. More competitions (depends on the data)
+9. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-11. Trivia mode
-12. Head-to-head by decade
-13. Side-by-side Team Seasons
-14. League History chart
-15. Team Records: bottom / relegated, home / away
-16. A club's title races
-17. Team progression chart (after League History)
-18. "/" to search
-19. Penalty shootout leaderboard (team and head-to-head answers done)
-20. "Won on penalties" in Match Finder
-21. Lighter pages (small gain - see the item)
-22. Knockout Stage bracket view (on hold)
-23. Country vs Country
-24. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-25. Review upcoming matches
-26. Phone-width checks in npm run check
-27. Team-colour contrast
-28. Sitemap + Google Search Console
-29. Club names that differ from worldfootball.net
-30. Champions League data fixes (found 2026-10-13)
+10. Trivia mode
+11. Head-to-head by decade
+12. Side-by-side Team Seasons
+13. League History chart
+14. Team Records: bottom / relegated, home / away
+15. A club's title races
+16. Team progression chart (after League History)
+17. "/" to search
+18. Penalty shootout leaderboard (team and head-to-head answers done)
+19. "Won on penalties" in Match Finder
+20. Lighter pages (small gain - see the item)
+21. Knockout Stage bracket view (on hold)
+22. Country vs Country
+23. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+24. Review upcoming matches
+25. Phone-width checks in npm run check
+26. Team-colour contrast
+27. Sitemap + Google Search Console
+28. Club names that differ from worldfootball.net
+29. Champions League data fixes (found 2026-10-13)
 
 ## Items
-
-- Next: **Answer wording: the 2-points note on ranges after 1980-81** —
-  noted 2026-10-18. search.js pointsSystemNote() checks only the era
-  (season=...), not From / To: "most points in a season since 2000" still
-  says "Points are as awarded: 2 for a win until 1980-81. Count every win
-  as 3 points?" though every season in range gave 3. Skip the note when
-  From (the link's from, or the page's current From - ctx.records /
-  ctx.leagueHistory carry it) starts after the last 2-point season; same
-  for League History's points rankings (gap, topTwo).
-  Plan (2026-10-18, ~30 min): read the page's era and From / To first, as
-  competitionName() does (share its season-of-a-bound helper); keep the
-  note when the range is all 2-point seasons (the 3-points offer still
-  differs). Same pass - the note also reads the link, not the page, for:
-  the stat / ranking (ctx.records.stat, ctx.leagueHistory.rank), the
-  3-points setting (ctx's threePoints), and its own link (rebuilt from the
-  search URL - build it from the page's Copy Link URL instead). Test: "most
-  points in a season since 2000" (no note) in checks/answers.json.
 
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
@@ -456,6 +438,18 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Answer wording: the 2-points note on ranges after 1980-81~~ — done
+  (2026-10-18). search.js pointsSystemNote() reads the page as it is now
+  (answerRange(), shared with competitionName(): era, From / To; the
+  stat / ranking and 3 points from ctx.records / ctx.leagueHistory), else
+  the link. No note when every season in range gave 3 for a win ("most
+  points in a season since 2000"); kept when any gave 2. Its link is the
+  page's Copy Link (bindReportLinks() hands it over) with 3 points flipped,
+  still a search answer (search, q, scope kept). Two exact answers had
+  recorded the wrong note (since 1992; Ligue 1 2015-2021); two added.
+  Left as it was: didYouMean()'s links still come from the search's link,
+  so they drop a From / To changed on the page.
 
 - ~~Analytics, with failed searches~~ — done (2026-10-18), noted
   2026-10-03. Know what people ask - especially questions that get "No
