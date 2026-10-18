@@ -16,45 +16,43 @@ filters set, so people learn
 what the site can do by following an answer rather than facing an
 empty search box.
 
-**Tier 1 - before launch** (keep the site up and know how it's doing)
-1. Analytics, with failed searches (built 2026-10-18 - live once the Worker is deployed)
-2. Error reporting (built with 1)
-3. About / sources page (closer to publication, with the crests)
-4. Self-host the club crests (closer to publication)
+**Tier 1 - before launch** (keep the site up and know how it's doing - analytics and error reporting done 2026-10-18)
+1. About / sources page (closer to publication, with the crests)
+2. Self-host the club crests (closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-5. Answer wording: the 2-points note on ranges after 1980-81
-6. API caching (what's left - the outage-preventing parts are done)
-7. Expand favourite team (On this day uses it)
+3. Answer wording: the 2-points note on ranges after 1980-81
+4. API caching (what's left - the outage-preventing parts are done)
+5. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-8. "City" / "United" alone in search
-9. Recent searches
-10. Road to the final
-11. More competitions (depends on the data)
-12. Streak-ending social account (closer to launch)
+6. "City" / "United" alone in search
+7. Recent searches
+8. Road to the final
+9. More competitions (depends on the data)
+10. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-13. Trivia mode
-14. Head-to-head by decade
-15. Side-by-side Team Seasons
-16. League History chart
-17. Team Records: bottom / relegated, home / away
-18. A club's title races
-19. Team progression chart (after League History)
-20. "/" to search
-21. Penalty shootout leaderboard (team and head-to-head answers done)
-22. "Won on penalties" in Match Finder
-23. Lighter pages (small gain - see the item)
-24. Knockout Stage bracket view (on hold)
-25. Country vs Country
-26. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-27. Review upcoming matches
-28. Phone-width checks in npm run check
-29. Team-colour contrast
-30. Sitemap + Google Search Console
-31. Club names that differ from worldfootball.net
-32. Champions League data fixes (found 2026-10-13)
+11. Trivia mode
+12. Head-to-head by decade
+13. Side-by-side Team Seasons
+14. League History chart
+15. Team Records: bottom / relegated, home / away
+16. A club's title races
+17. Team progression chart (after League History)
+18. "/" to search
+19. Penalty shootout leaderboard (team and head-to-head answers done)
+20. "Won on penalties" in Match Finder
+21. Lighter pages (small gain - see the item)
+22. Knockout Stage bracket view (on hold)
+23. Country vs Country
+24. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+25. Review upcoming matches
+26. Phone-width checks in npm run check
+27. Team-colour contrast
+28. Sitemap + Google Search Console
+29. Club names that differ from worldfootball.net
+30. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -132,32 +130,6 @@ empty search box.
     uses s.hs-data.com's bandwidth without permission. Pair with the
     About page's disclaimer (see About / sources page).
 
-- Later (before launch): **Analytics, with failed searches** — noted
-  2026-10-03. Know what people ask - especially questions that get "No
-  results", the best guide to improving the search. Cloudflare Web
-  Analytics is free and cookie-free; failed searches could be logged by
-  the Worker.
-  Also which half-typed searches people abandon (typed, then left without
-  opening a result) - the guide to what the search bar's suggestions
-  (suggestFor) and typo tolerance still miss.
-  - Built 2026-10-18 (branch analytics), with Error reporting: log.js
-    (first in every page's <head>) queues page views, searches and
-    JavaScript errors and sends them in one request when the page is
-    hidden; the search bar (mount() in search.js) logs each search as
-    opened / example / no-results / abandoned (3+ letters, left without
-    opening). The Worker's POST /api/log writes them to Workers Analytics
-    Engine (binding LOGS, dataset leaguetable_events - 100k points a day
-    free, kept 3 months, no D1 / KV use). No cookies or IPs; the Worker
-    works out the country and device ("iOS Safari"). Not sent from
-    localhost / 127.0.0.1 (the checks), or with localStorage noLog=1.
-  - Read with `npm run logs [-- days]` in backend/worker (failed searches
-    first). Needs a Cloudflare API token with Account Analytics: Read in
-    ~/.cloudflare-analytics-token - wrangler's login can't read Analytics
-    Engine.
-  - Page views come from the same log, not Cloudflare Web Analytics
-    (that needs a site set up in the dashboard; add it later if the
-    log's numbers aren't enough).
-
 - Later (before launch): **About / sources page** — noted 2026-10-03.
   Where the data comes from, how often it updates, and that club names
   and crests belong to their owners. A privacy note too if analytics
@@ -192,14 +164,6 @@ empty search box.
     with a line inviting rights holders to ask for removal via the
     contact page. If the site ever makes money (ads, paid features), get
     proper legal advice first.
-
-- Later (before launch): **Error reporting** — noted 2026-10-03. A small
-  handler that reports visitors' JavaScript errors (to the Worker or a
-  free service), to hear about breakages only some devices hit (iOS).
-  - Built 2026-10-18 with Analytics (see there): uncaught errors and
-    unhandled promise rejections from the site's own files, up to 5
-    different ones per page view, with the file:line, stack and device.
-    A dropped connection's "Failed to fetch" isn't reported.
 
 - Partly done: **API caching for traffic (Cloudflare free plan)** —
   noted 2026-10-03. Free-plan limits per day: 100k Worker requests, 100k
@@ -492,6 +456,40 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Analytics, with failed searches~~ — done (2026-10-18), noted
+  2026-10-03. Know what people ask - especially questions that get "No
+  results", the best guide to improving the search. Cloudflare Web
+  Analytics is free and cookie-free; failed searches could be logged by
+  the Worker.
+  Also which half-typed searches people abandon (typed, then left without
+  opening a result) - the guide to what the search bar's suggestions
+  (suggestFor) and typo tolerance still miss.
+  - Live 2026-10-18 (Worker deployed, pages pushed), with Error reporting: log.js
+    (first in every page's <head>) queues page views, searches and
+    JavaScript errors and sends them in one request when the page is
+    hidden; the search bar (mount() in search.js) logs each search as
+    opened / example / no-results / abandoned (3+ letters, left without
+    opening). The Worker's POST /api/log writes them to Workers Analytics
+    Engine (binding LOGS, dataset leaguetable_events - 100k points a day
+    free, kept 3 months, no D1 / KV use). No cookies or IPs; the Worker
+    works out the country and device ("iOS Safari"). Not sent from
+    localhost / 127.0.0.1 (the checks), or with localStorage noLog=1.
+  - Read with `npm run logs [-- days]` in backend/worker (failed searches
+    first). Needs a Cloudflare API token with Account Analytics: Read in
+    ~/.cloudflare-analytics-token - wrangler's login can't read Analytics
+    Engine.
+  - Page views come from the same log, not Cloudflare Web Analytics
+    (that needs a site set up in the dashboard; add it later if the
+    log's numbers aren't enough).
+
+- ~~Error reporting~~ — done (2026-10-18), noted 2026-10-03. A small
+  handler that reports visitors' JavaScript errors (to the Worker or a
+  free service), to hear about breakages only some devices hit (iOS).
+  - Built 2026-10-18 with Analytics (see there): uncaught errors and
+    unhandled promise rejections from the site's own files, up to 5
+    different ones per page view, with the file:line, stack and device.
+    A dropped connection's "Failed to fetch" isn't reported.
 
 - ~~Answer wording: "the Premier League" for ranges into the First
   Division~~ — done (2026-10-18). search.js competitionName() names the
