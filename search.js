@@ -946,7 +946,7 @@
     const TEAM_ALIASES = {
         'man utd': 'Manchester United', 'man united': 'Manchester United', 'manchester utd': 'Manchester United',
         'man city': 'Manchester City', 'spurs': 'Tottenham Hotspur', 'wolves': 'Wolverhampton Wanderers',
-        'west brom': 'West Bromwich Albion', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
+        'west brom': 'West Bromwich Albion', 'wednesday': 'Sheffield Wednesday', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
         'brighton': 'Brighton & Hove Albion', 'qpr': 'Queens Park Rangers', 'bournemouth': 'AFC Bournemouth',
         'barca': 'FC Barcelona', 'madrid': 'Real Madrid', 'atletico': 'Atlético Madrid', 'atleti': 'Atlético Madrid',
         'athletic bilbao': 'Athletic Club', 'bilbao': 'Athletic Club', 'betis': 'Real Betis',
@@ -1393,6 +1393,7 @@
     ];
 
     const WEEKDAYS = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const WEEKDAY_LEADS = new Set(['on', 'a', 'every', 'each', 'this', 'last', 'next']);
 
     // Champions League stages, in the words people use. Keys are the
     // canonical stage; the page values differ by filter (see STAGE_VALUES)
@@ -1862,6 +1863,11 @@
 
         const words = normalizeSearchText(text).split(' ').filter(Boolean);
         const used = words.map(() => false);
+        // A weekday after "on" / "a" / "every" is the day, never a club
+        // ("on a Wednesday" isn't Sheffield Wednesday) - held back from the
+        // team lookup, then left for the day filter
+        const dayWords = words.map((word, i) => i > 0 && WEEKDAYS.includes(word) && WEEKDAY_LEADS.has(words[i - 1]) ? i : -1).filter(i => i >= 0);
+        dayWords.forEach(i => { used[i] = true; });
         let mentions = findTeamMentions(words, used);
         const opponentGroup = findOpponentGroup(words, used);
 
@@ -1895,6 +1901,7 @@
 
         // Taken-out words become a marker, so the words either side of a
         // team are never read as one phrase ("last · time")
+        dayWords.forEach(i => { used[i] = false; });
         const rest = words.map((word, i) => used[i] ? '·' : word).join(' ');
         const intent = detectIntent(rest, scoreline);
         Object.assign(filters, detectTableFilters(rest));
