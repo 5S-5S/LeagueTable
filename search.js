@@ -946,7 +946,7 @@
     const TEAM_ALIASES = {
         'man utd': 'Manchester United', 'man united': 'Manchester United', 'manchester utd': 'Manchester United',
         'man city': 'Manchester City', 'spurs': 'Tottenham Hotspur', 'wolves': 'Wolverhampton Wanderers',
-        'west brom': 'West Bromwich Albion', 'wednesday': 'Sheffield Wednesday', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
+        'west brom': 'West Bromwich Albion', 'wednesday': 'Sheffield Wednesday', 'sheffield utd': 'Sheffield United', 'forest': 'Nottingham Forest', 'nottingham': 'Nottingham Forest', 'villa': 'Aston Villa',
         'brighton': 'Brighton & Hove Albion', 'qpr': 'Queens Park Rangers', 'bournemouth': 'AFC Bournemouth',
         'barca': 'FC Barcelona', 'madrid': 'Real Madrid', 'atletico': 'Atlético Madrid', 'atleti': 'Atlético Madrid',
         'athletic bilbao': 'Athletic Club', 'bilbao': 'Athletic Club', 'betis': 'Real Betis',
@@ -954,7 +954,7 @@
         'depor': 'Deportivo La Coruña', 'sociedad': 'Real Sociedad',
         'juve': 'Juventus', 'inter milan': 'Inter', 'internazionale': 'Inter', 'milan': 'AC Milan',
         'lazio': 'Lazio Roma', 'parma': 'Parma Calcio 1913',
-        'bayern': 'Bayern München', 'bayern munich': 'Bayern München', 'munich': 'Bayern München',
+        'bayern': 'Bayern München', 'bayern munich': 'Bayern München', 'munich': 'Bayern München', 'munchen': 'Bayern München',
         'dortmund': 'Borussia Dortmund', 'bvb': 'Borussia Dortmund', 'gladbach': 'Bor. Mönchengladbach',
         'monchengladbach': 'Bor. Mönchengladbach', 'moenchengladbach': 'Bor. Mönchengladbach',
         'borussia monchengladbach': 'Bor. Mönchengladbach', 'leverkusen': 'Bayer Leverkusen',
