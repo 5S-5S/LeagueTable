@@ -3421,6 +3421,12 @@ premier-league | not yet merged to main
     message: No results for 1. FSV Mainz 05 in Premier League.
 champions-league | not yet merged to main
     message: No results for 1. FSV Mainz 05 in Champions League.
+domestic | nottingham vs arsenal
+    h2h | Nottingham Forest vs Arsenal FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Nottingham+Forest&t2=Arsenal+FC
+premier-league | nottingham vs arsenal
+    h2h | Nottingham Forest vs Arsenal FC | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Nottingham+Forest&t2=Arsenal+FC
+champions-league | nottingham vs arsenal
+    h2h | Nottingham Forest vs Arsenal FC | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Nottingham+Forest&t2=Arsenal+FC
 domestic | once, in 2015-16
     team-seasons | Premier League table · 2015-16 | Final standings | DomesticEurope.html?view=team-seasons&lg=premier-league&season=2015-16
     team-seasons | La Liga table · 2015-16 | Final standings | DomesticEurope.html?view=team-seasons&lg=la-liga&season=2015-16
