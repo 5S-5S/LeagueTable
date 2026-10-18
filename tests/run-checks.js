@@ -95,7 +95,12 @@ function compareSnapshot(section, file, questions, noun, run) {
     for (const [key, block] of after) {
         if (before.get(key) === block) continue;
         changed++;
-        fail(section.toLowerCase(), `${key}\n      was: ${(before.get(key) || '(new question)').split('\n').slice(1, 2).join('').trim()}\n      now: ${block.split('\n').slice(1, 2).join('').trim()}`);
+        // The first line that differs (often a later result, not the top one)
+        const wasLines = (before.get(key) || '').split('\n'), nowLines = block.split('\n');
+        let line = 1;
+        while (line < Math.max(wasLines.length, nowLines.length) - 1 && wasLines[line] === nowLines[line]) line++;
+        const at = line > 1 ? ` (result ${line})` : '';
+        fail(section.toLowerCase(), `${key}${at}\n      was: ${before.has(key) ? (wasLines[line] || '(nothing)').trim() : '(new question)'}\n      now: ${(nowLines[line] || '(nothing)').trim()}`);
     }
     for (const key of before.keys()) if (!after.has(key)) { changed++; fail(section.toLowerCase(), `${key}: no longer in the question set`); }
     console.log(`${section}: ${questions.length} ${noun}, ${changed} differ from the snapshot (npm run check:update to accept)`);

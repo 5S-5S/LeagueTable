@@ -223,14 +223,14 @@ domestic | Arsenal away
 domestic | Arsenal in the 90s
     team | Arsenal FC · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=1999-12-31&t1=Arsenal+FC
     dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
-    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&from=1990-91&to=1999-00
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&from=1990-01-01&to=1999-12-31
 domestic | Arsenal between 1990 and 2000
     team | Arsenal FC · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=2000-12-31&t1=Arsenal+FC
     dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
-    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&from=1990-91&to=2000-01
     team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
     match-finder | Last time Arsenal FC won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Arsenal FC · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&from=1990-01-01&to=2000-12-31
@@ -462,14 +462,14 @@ domestic | Barcelona away
 domestic | Barcelona in the 90s
     team | FC Barcelona · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=1999-12-31&t1=FC+Barcelona
     dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
-    team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
+    team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona&from=1990-91&to=1999-00
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&from=1990-01-01&to=1999-12-31
 domestic | Barcelona between 1990 and 2000
     team | FC Barcelona · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=2000-12-31&t1=FC+Barcelona
     dashboard | FC Barcelona | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=FC%20Barcelona
-    team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona
+    team-seasons | FC Barcelona · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=FC+Barcelona&from=1990-91&to=2000-01
     team-streaks | FC Barcelona · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=FC+Barcelona&type=winning
     match-finder | Last time FC Barcelona won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | FC Barcelona · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=FC+Barcelona&from=1990-01-01&to=2000-12-31
@@ -655,14 +655,14 @@ domestic | Juventus away
 domestic | Juventus in the 90s
     team | Juventus · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=1999-12-31&t1=Juventus
     dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
-    team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
+    team-seasons | Juventus · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&from=1990-91&to=1999-00
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&from=1990-01-01&to=1999-12-31
 domestic | Juventus between 1990 and 2000
     team | Juventus · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=2000-12-31&t1=Juventus
     dashboard | Juventus | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Juventus
-    team-seasons | Juventus · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus
+    team-seasons | Juventus · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&from=1990-91&to=2000-01
     team-streaks | Juventus · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Juventus&type=winning
     match-finder | Last time Juventus won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Juventus · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Juventus&from=1990-01-01&to=2000-12-31
@@ -912,14 +912,14 @@ premier-league | Liverpool away
 premier-league | Liverpool in the 90s
     team | Liverpool FC · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=1999-12-31&t1=Liverpool+FC
     dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
-    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
+    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&from=1990-91&to=1999-00
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&from=1990-01-01&to=1999-12-31
 premier-league | Liverpool between 1990 and 2000
     team | Liverpool FC · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=2000-12-31&t1=Liverpool+FC
     dashboard | Liverpool FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Liverpool%20FC
-    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC
+    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&from=1990-91&to=2000-01
     team-streaks | Liverpool FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Liverpool+FC&from=1990-01-01&to=2000-12-31
@@ -1123,14 +1123,14 @@ premier-league | Aston Villa away
 premier-league | Aston Villa in the 90s
     team | Aston Villa · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=1999-12-31&t1=Aston+Villa
     dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
-    team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
+    team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa&from=1990-91&to=1999-00
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&from=1990-01-01&to=1999-12-31
 premier-league | Aston Villa between 1990 and 2000
     team | Aston Villa · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&from=1990-01-01&to=2000-12-31&t1=Aston+Villa
     dashboard | Aston Villa | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Aston%20Villa
-    team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa
+    team-seasons | Aston Villa · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Aston+Villa&from=1990-91&to=2000-01
     team-streaks | Aston Villa · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Aston+Villa&type=winning
     match-finder | Last time Aston Villa won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Aston Villa · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Aston+Villa&from=1990-01-01&to=2000-12-31
@@ -1374,14 +1374,14 @@ la-liga | Real Madrid away
 la-liga | Real Madrid in the 90s
     team | Real Madrid · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=1999-12-31&t1=Real+Madrid
     dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
-    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&from=1990-91&to=1999-00
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&from=1990-01-01&to=1999-12-31
 la-liga | Real Madrid between 1990 and 2000
     team | Real Madrid · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=la-liga&from=1990-01-01&to=2000-12-31&t1=Real+Madrid
     dashboard | Real Madrid | Team Dashboard (full page) | DomesticEurope.html?league=la-liga&team=Real%20Madrid
-    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&from=1990-91&to=2000-01
     team-streaks | Real Madrid · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=la-liga&t1=Real+Madrid&from=1990-01-01&to=2000-12-31
@@ -1645,14 +1645,14 @@ serie-a | AC Milan away
 serie-a | AC Milan in the 90s
     team | AC Milan · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=1999-12-31&t1=AC+Milan
     dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
-    team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
+    team-seasons | AC Milan · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan&from=1990-91&to=1999-00
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&from=1990-01-01&to=1999-12-31
 serie-a | AC Milan between 1990 and 2000
     team | AC Milan · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&from=1990-01-01&to=2000-12-31&t1=AC+Milan
     dashboard | AC Milan | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=AC%20Milan
-    team-seasons | AC Milan · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan
+    team-seasons | AC Milan · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=AC+Milan&from=1990-91&to=2000-01
     team-streaks | AC Milan · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=AC+Milan&type=winning
     match-finder | Last time AC Milan won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | AC Milan · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=serie-a&t1=AC+Milan&from=1990-01-01&to=2000-12-31
@@ -1919,14 +1919,14 @@ bundesliga | Bayern away
 bundesliga | Bayern in the 90s
     team | Bayern München · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&from=1990-01-01&to=1999-12-31&t1=Bayern+M%C3%BCnchen
     dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
-    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
+    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen&from=1990-91&to=1999-00
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&from=1990-01-01&to=1999-12-31
 bundesliga | Bayern between 1990 and 2000
     team | Bayern München · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&from=1990-01-01&to=2000-12-31&t1=Bayern+M%C3%BCnchen
     dashboard | Bayern München | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=Bayern%20M%C3%BCnchen
-    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen
+    team-seasons | Bayern München · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=Bayern+M%C3%BCnchen&from=1990-91&to=2000-01
     team-streaks | Bayern München · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=Bayern+M%C3%BCnchen&type=winning
     match-finder | Last time Bayern München won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Bayern München · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=Bayern+M%C3%BCnchen&from=1990-01-01&to=2000-12-31
@@ -2193,14 +2193,14 @@ ligue-1 | PSG away
 ligue-1 | PSG in the 90s
     team | Paris Saint-Germain · In the 1990s | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&from=1990-01-01&to=1999-12-31&t1=Paris+Saint-Germain
     dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
-    team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
+    team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain&from=1990-91&to=1999-00
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · In the 1990s | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&from=1990-01-01&to=1999-12-31
 ligue-1 | PSG between 1990 and 2000
     team | Paris Saint-Germain · Between 1990 and 2000 | Record and match history | DomesticEurope.html?view=league-filters&lg=ligue-1&from=1990-01-01&to=2000-12-31&t1=Paris+Saint-Germain
     dashboard | Paris Saint-Germain | Team Dashboard (full page) | DomesticEurope.html?league=ligue-1&team=Paris%20Saint-Germain
-    team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain
+    team-seasons | Paris Saint-Germain · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=ligue-1&t1=Paris+Saint-Germain&from=1990-91&to=2000-01
     team-streaks | Paris Saint-Germain · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=ligue-1&t1=Paris+Saint-Germain&type=winning
     match-finder | Last time Paris Saint-Germain won | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Paris Saint-Germain · Biggest victories | Match Finder · Between 1990 and 2000 | DomesticEurope.html?view=match-finder&lg=ligue-1&t1=Paris+Saint-Germain&from=1990-01-01&to=2000-12-31
@@ -2464,14 +2464,14 @@ champions-league | Real Madrid away
 champions-league | Real Madrid in the 90s
     team | Real Madrid · In the 1990s | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=1999-12-31&t1=Real+Madrid
     dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
-    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&from=1990-91&to=1999-00
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&from=1990-01-01&to=1999-12-31
 champions-league | Real Madrid between 1990 and 2000
     team | Real Madrid · Between 1990 and 2000 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=2000-12-31&t1=Real+Madrid
     dashboard | Real Madrid | Team Dashboard (full page) | ContinentalEurope.html?team=Real%20Madrid
-    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid
+    team-seasons | Real Madrid · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&from=1990-91&to=2000-01
     team-streaks | Real Madrid · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Real+Madrid&type=winning
     match-finder | Last time Real Madrid won | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Real Madrid · Biggest victories | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Real+Madrid&from=1990-01-01&to=2000-12-31
@@ -2673,14 +2673,14 @@ champions-league | Liverpool away
 champions-league | Liverpool in the 90s
     team | Liverpool FC · In the 1990s | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=1999-12-31&t1=Liverpool+FC
     dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
-    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
+    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&from=1990-91&to=1999-00
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&from=1990-01-01&to=1999-12-31
 champions-league | Liverpool between 1990 and 2000
     team | Liverpool FC · Between 1990 and 2000 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=2000-12-31&t1=Liverpool+FC
     dashboard | Liverpool FC | Team Dashboard (full page) | ContinentalEurope.html?team=Liverpool%20FC
-    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC
+    team-seasons | Liverpool FC · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Liverpool+FC&from=1990-91&to=2000-01
     team-streaks | Liverpool FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Liverpool+FC&type=winning
     match-finder | Last time Liverpool FC won | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Liverpool FC · Biggest victories | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Liverpool+FC&from=1990-01-01&to=2000-12-31
@@ -2864,14 +2864,14 @@ champions-league | Celtic away
 champions-league | Celtic in the 90s
     team | Celtic FC · In the 1990s | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=1999-12-31&t1=Celtic+FC
     dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
-    team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
+    team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · 1990-91 to 1999-00 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC&from=1990-91&to=1999-00
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&from=1990-01-01&to=1999-12-31&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · In the 1990s | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&from=1990-01-01&to=1999-12-31
 champions-league | Celtic between 1990 and 2000
     team | Celtic FC · Between 1990 and 2000 | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&from=1990-01-01&to=2000-12-31&t1=Celtic+FC
     dashboard | Celtic FC | Team Dashboard (full page) | ContinentalEurope.html?team=Celtic%20FC
-    team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC
+    team-seasons | Celtic FC · Season-by-season finishes | Team Seasons · 1990-91 to 2000-01 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Celtic+FC&from=1990-91&to=2000-01
     team-streaks | Celtic FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Celtic+FC&type=winning
     match-finder | Last time Celtic FC won | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&res=win&from=1990-01-01&to=2000-12-31&cat=recent
     match-finder | Celtic FC · Biggest victories | Match Finder · Between 1990 and 2000 | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&from=1990-01-01&to=2000-12-31
@@ -4477,3 +4477,64 @@ premier-league | Arsenal unbeaten in the last 38 games this season
     team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=unbeaten
 champions-league | Arsenal unbeaten in the last 38 games this season
     team-streaks | Arsenal FC · Unbeaten streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Arsenal+FC&type=unbeaten
+domestic | most top 4 finishes since 1996 premier league
+    team-seasons | All teams · Top 4 finishes | Team Seasons · 1996-97 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&from=1996-97&pos=4&better=1
+premier-league | most top 4 finishes since 1996 premier league
+    team-seasons | All teams · Top 4 finishes | Team Seasons · 1996-97 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&from=1996-97&pos=4&better=1
+champions-league | most top 4 finishes since 1996 premier league
+    team-seasons | All teams · Top 4 finishes | Team Seasons · 1996-97 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&from=1996-97&pos=4&better=1
+domestic | most top 4 finishes in the premier league since 1996
+    team-seasons | All teams · Top 4 finishes | Team Seasons · 1996-97 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&from=1996-97&pos=4&better=1
+premier-league | most top 4 finishes in the premier league since 1996
+    team-seasons | All teams · Top 4 finishes | Team Seasons · 1996-97 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&from=1996-97&pos=4&better=1
+champions-league | most top 4 finishes in the premier league since 1996
+    team-seasons | All teams · Top 4 finishes | Team Seasons · 1996-97 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&from=1996-97&pos=4&better=1
+domestic | Arsenal titles since 2000
+    team-seasons | Arsenal FC · Titles | Team Seasons · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&from=2000-01&pos=1
+premier-league | Arsenal titles since 2000
+    team-seasons | Arsenal FC · Titles | Team Seasons · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC&from=2000-01&pos=1
+champions-league | Arsenal titles since 2000
+    team-seasons | Arsenal FC · Titles | Team Seasons · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Arsenal+FC&from=2000-01&pos=Champions
+domestic | Juventus titles between 1990 and 2000
+    team-seasons | Juventus · Titles | Team Seasons · 1990-91 to 2000-01 | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Juventus&from=1990-91&to=2000-01&pos=1
+premier-league | Juventus titles between 1990 and 2000
+    message: No results for Juventus in Premier League.
+champions-league | Juventus titles between 1990 and 2000
+    team-seasons | Juventus · Titles | Team Seasons · 1990-91 to 2000-01 | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Juventus&from=1990-91&to=2000-01&pos=Champions
+domestic | Liverpool top 4 finishes in the 80s
+    team-seasons | Liverpool FC · Top 4 finishes | Team Seasons · 1980-81 to 1989-90 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&from=1980-81&to=1989-90&pos=4&better=1
+premier-league | Liverpool top 4 finishes in the 80s
+    team-seasons | Liverpool FC · Top 4 finishes | Team Seasons · 1980-81 to 1989-90 | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Liverpool+FC&from=1980-81&to=1989-90&pos=4&better=1
+champions-league | Liverpool top 4 finishes in the 80s
+    message: No results for Liverpool FC in Champions League.
+domestic | German champions before 1963
+    team-seasons | All teams · Titles | Team Seasons · Up to 1962-63 · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&to=1962-63&pos=1&hist=1
+premier-league | German champions before 1963
+    team-seasons | All teams · Titles | Team Seasons · Up to 1962-63 · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&to=1962-63&pos=1&hist=1
+champions-league | German champions before 1963
+    team-seasons | All teams · Titles | Team Seasons · Up to 1962-63 · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&to=1962-63&pos=1&hist=1
+domestic | German champions since 1950
+    team-seasons | All teams · Titles | Team Seasons · 1950-51 onwards · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&from=1950-51&pos=1&hist=1
+premier-league | German champions since 1950
+    team-seasons | All teams · Titles | Team Seasons · 1950-51 onwards · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&from=1950-51&pos=1&hist=1
+champions-league | German champions since 1950
+    team-seasons | All teams · Titles | Team Seasons · 1950-51 onwards · With historic seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&from=1950-51&pos=1&hist=1
+domestic | relegations since 2010 serie a
+    team-seasons | All teams · Relegations | Team Seasons · 2010-11 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&from=2010-11&out=R
+premier-league | relegations since 2010 serie a
+    team-seasons | All teams · Relegations | Team Seasons · 2010-11 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&from=2010-11&out=R
+champions-league | relegations since 2010 serie a
+    team-seasons | All teams · Relegations | Team Seasons · 2010-11 onwards | DomesticEurope.html?view=team-seasons&lg=serie-a&from=2010-11&out=R
+domestic | Real Madrid champions league titles since 2000
+    team-seasons | Real Madrid · Titles | Team Seasons · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&from=2000-01&pos=Champions
+    team-seasons | Real Madrid · Champions League qualifications | Team Seasons · 2000-01 onwards | DomesticEurope.html?view=team-seasons&lg=la-liga&t1=Real+Madrid&from=2000-01&out=CL
+premier-league | Real Madrid champions league titles since 2000
+    team-seasons | Real Madrid · Titles | Team Seasons · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&from=2000-01&pos=Champions
+champions-league | Real Madrid champions league titles since 2000
+    team-seasons | Real Madrid · Titles | Team Seasons · 2000-01 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Real+Madrid&from=2000-01&pos=Champions
+domestic | teams that reached the champions league semi finals since 2010
+    team-seasons | All teams · Reached the semi-finals | Team Seasons · 2010-11 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&from=2010-11&pos=Semi-Finals&better=1
+premier-league | teams that reached the champions league semi finals since 2010
+    team-seasons | All teams · Reached the semi-finals | Team Seasons · 2010-11 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&from=2010-11&pos=Semi-Finals&better=1
+champions-league | teams that reached the champions league semi finals since 2010
+    team-seasons | All teams · Reached the semi-finals | Team Seasons · 2010-11 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&from=2010-11&pos=Semi-Finals&better=1

@@ -2025,6 +2025,10 @@
     // written-out date, so a day is always spelled out ("since January 1,
     // 1991", not "since 1991"), in the visitor's own date style.
     function describeDates(from, to, exact) {
+        // Only dates - Team Seasons' / Team Records' from / to are seasons
+        const isDate = date => /^\d{4}-\d{2}-\d{2}$/.test(date);
+        if (!isDate(from)) from = '';
+        if (!isDate(to)) to = '';
         const yearStart = date => !exact && /^\d{4}-01-01$/.test(date);
         const seasonStart = date => !exact && /^\d{4}-07-01$/.test(date);
         const yearEnd = date => !exact && /^\d{4}-12-31$/.test(date);
@@ -2224,10 +2228,13 @@
     function seasonsResult(comp, team, parsed, finish) {
         const pos = comp.continental ? finish.stage : finish.rank;
         const era = parsed.eras[comp.key];
+        // "since 1996": From / To, as Team Records (not with one season)
+        const range = parsed.season === null ? recordSeasons(parsed) : { from: '', to: '' };
         const params = {
             league: comp.continental ? comp.key : '',
             t1: team,
             season: parsed.season !== null ? seasonKey(parsed.season) : (era || ''),
+            ...range,
             pos,
             better: pos && finish.better && pos !== '1' && pos !== 'Champions' ? '1' : '',
             out: comp.continental ? '' : (finish.outcome || ''),
@@ -2236,14 +2243,16 @@
             // was named; asking for "historic" always does
             hist: !comp.continental && (finish.historic ||
                 (HISTORIC_TITLE_LEAGUES[comp.key] && pos === '1' && !finish.better &&
-                    parsed.season === null && !parsed.leaguesNamed.includes(comp.key))) ? '1' : ''
+                    parsed.season === null && !parsed.leaguesNamed.includes(comp.key) &&
+                    // not when From is already in the league's own seasons
+                    !(range.from && parseInt(range.from) >= parseInt(comp.seasons)))) ? '1' : ''
         };
         return {
             kind: 'team-seasons', icon: '📈', comp,
             title: `${team || 'All teams'} · ${finishLabel(comp, finish) || 'Season-by-season finishes'}`,
             detail: joinDetail([
                 'Team Seasons',
-                parsed.season !== null ? seasonKey(parsed.season) : (era ? `${capitalize(ERA_NAMES[era].replace(/^the /, ''))} era` : 'All seasons'),
+                parsed.season !== null ? seasonKey(parsed.season) : recordSeasonsDetail(parsed, { ...comp, continental: true }),
                 params.first ? 'First time only' : '',
                 params.hist ? 'With historic seasons' : ''
             ]),
@@ -3656,8 +3665,11 @@
 
     // Team Records' and League History's From / To (season keys) at the
     // start of the answer: "Since 2000-01, ", "From 1990-91 to 1999-00, "
-    function recordRangePrefix(params) {
-        let from = params.get('from') || '', to = params.get('to') || '';
+    // range: the page's From / To now ({ from, to }), which a link's
+    // params only give as they were when the search was made
+    function recordRangePrefix(params, range) {
+        const now = range && range.from !== undefined;
+        let from = (now ? range.from : params.get('from')) || '', to = (now ? range.to : params.get('to')) || '';
         // Only season keys - other views' from / to are dates
         if (!/^\d{4}-\d{2}$/.test(from)) from = '';
         if (!/^\d{4}-\d{2}$/.test(to)) to = '';
@@ -3862,10 +3874,10 @@
 
         if (ctx.view === 'match-finder') return describeMatchFinder(ctx, params, { b, location, span, penalties });
         if (ctx.view === 'team-streaks') return describeStreaks(ctx, params, { b, competition });
-        if (ctx.view === 'team-records') return withRecordRange(describeTeamRecords(ctx, params, { b, competition }), recordRangePrefix(params));
+        if (ctx.view === 'team-records') return withRecordRange(describeTeamRecords(ctx, params, { b, competition }), recordRangePrefix(params, ctx.records));
         if (ctx.view === 'league-history') {
             const games = params.get('games');
-            const prefix = recordRangePrefix(params);
+            const prefix = recordRangePrefix(params, ctx.leagueHistory);
             // "In 38-game seasons since 2000-01, the ..."
             const lead = games ? `In ${games}-game seasons${prefix ? ` ${prefix[0].toLowerCase()}${prefix.slice(1)}` : ', '}` : prefix;
             return withRecordRange(describeLeagueHistory(ctx, params, { b, competition }), lead);
@@ -3911,7 +3923,7 @@
                 link.searchParams.set('q', query);
                 answer.note = `Search <a href="${escapeSearchHtml(link.pathname + link.search)}">“${escapeSearchHtml(query)}”</a> to include ${eraNote.other} too.`;
             }
-            return answer;
+            return withRecordRange(answer, recordRangePrefix(params, ctx.seasons));
         }
 
         if (ctx.view === 'team') {

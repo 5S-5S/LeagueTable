@@ -768,6 +768,21 @@
                         <select id="teamSeasonsSeasonSelect" class="form-input w-full">
                             <option value="">Select Season</option>
                         </select>
+                        <!-- From / To: seasons narrowed within the era (not with one season) -->
+                        <div id="teamSeasonsRangeRow" class="season-range-controls mt-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="teamSeasonsFromSelect">From:</label>
+                                <select id="teamSeasonsFromSelect" class="form-input w-full">
+                                    <option value="">Earliest</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2" for="teamSeasonsToSelect">To:</label>
+                                <select id="teamSeasonsToSelect" class="form-input w-full">
+                                    <option value="">Latest</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Progression Filter -->
@@ -1528,6 +1543,8 @@
             teamSeasonsSelectedTeam: '',
             teamSeasonsSelectedSeason: '',
             teamSeasonsSelectedPosition: '',
+            teamSeasonsFrom: '',
+            teamSeasonsTo: '',
             includeBetterResults: false,
             firstOccurrenceOnly: false,
             controlsCollapsed: false,
@@ -2941,6 +2958,8 @@
                 if (state.teamSeasonsSelectedLeague) params.set('league', state.teamSeasonsSelectedLeague);
                 if (state.teamSeasonsSelectedTeam) params.set('t1', state.teamSeasonsSelectedTeam);
                 if (state.teamSeasonsSelectedSeason) params.set('season', state.teamSeasonsSelectedSeason);
+                if (state.teamSeasonsFrom) params.set('from', state.teamSeasonsFrom);
+                if (state.teamSeasonsTo) params.set('to', state.teamSeasonsTo);
                 if (state.teamSeasonsSelectedPosition) params.set('pos', state.teamSeasonsSelectedPosition);
                 if (state.teamSeasonsSelectedPosition && state.includeBetterResults) params.set('better', '1');
                 if (state.firstOccurrenceOnly) params.set('first', '1');
@@ -3155,6 +3174,9 @@
                 const t1 = params.get('t1');
                 const season = params.get('season');
                 const pos = params.get('pos');
+                state.teamSeasonsFrom = params.get('from') || '';
+                state.teamSeasonsTo = params.get('to') || '';
+                fillTeamSeasonsRange(getAvailableSeasons(state.teamSeasonsSelectedLeague).filter(s => !isEraSeasonKey(s)));
                 if (t1) teamSeasonsCombobox.selectOption(t1, t1);
                 if (season) {
                     elements.teamSeasonsSeasonSelect.value = season;
@@ -3572,6 +3594,9 @@
             teamSeasonsTeamSelect: document.getElementById('teamSeasonsTeamSelect'),
             teamSeasonsSeasonContainer: document.getElementById('teamSeasonsSeasonContainer'),
             teamSeasonsSeasonSelect: document.getElementById('teamSeasonsSeasonSelect'),
+            teamSeasonsRangeRow: document.getElementById('teamSeasonsRangeRow'),
+            teamSeasonsFromSelect: document.getElementById('teamSeasonsFromSelect'),
+            teamSeasonsToSelect: document.getElementById('teamSeasonsToSelect'),
             teamSeasonsPositionContainer: document.getElementById('teamSeasonsPositionContainer'),
             teamSeasonsPositionSelect: document.getElementById('teamSeasonsPositionSelect'),
             includeBetterResultsContainer: document.getElementById('includeBetterResultsContainer'),
@@ -5203,12 +5228,14 @@
                 // Team Records' ranked rows and what they're ranked by
                 records: isRecords ? {
                     rows: from.records, stat: state.recordsStat, order: state.recordsOrder,
+                    from: state.recordsFrom, to: state.recordsTo,
                     perGame: state.recordsPerGame, threePoints: state.recordsThreePoints,
                     position: state.recordsPosition, better: state.recordsBetter, team: state.recordsTeam, continental: true
                 } : null,
                 // League History's ranked rows (season order has no answer)
                 leagueHistory: isLeagueHistory ? {
                     rows: from.league, rank: state.leagueHistoryRank, order: state.leagueHistoryOrder,
+                    from: state.leagueHistoryFrom, to: state.leagueHistoryTo,
                     perGame: state.leagueHistoryPerGame, threePoints: !!state.leagueHistoryThreePoints
                 } : null,
                 // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
@@ -5219,6 +5246,7 @@
                 seasons: isSeasons ? {
                     rows: seasonsRows,
                     position: state.teamSeasonsSelectedPosition,
+                    from: state.teamSeasonsFrom, to: state.teamSeasonsTo,
                     better: state.includeBetterResults,
                     first: state.firstOccurrenceOnly,
                     // A title that was stripped (Marseille 1992-93, Juventus
@@ -5355,6 +5383,13 @@
             const container = document.getElementById('teamSeasonsPositionContainer');
             const singleSeason = isSingleTeamSeasonSelected();
             if (container) container.classList.toggle('hidden', singleSeason);
+            elements.teamSeasonsRangeRow.classList.toggle('hidden', singleSeason);
+            if (singleSeason && (state.teamSeasonsFrom || state.teamSeasonsTo)) {
+                state.teamSeasonsFrom = '';
+                state.teamSeasonsTo = '';
+                elements.teamSeasonsFromSelect.value = '';
+                elements.teamSeasonsToSelect.value = '';
+            }
             if (singleSeason && state.teamSeasonsSelectedPosition) {
                 state.teamSeasonsSelectedPosition = '';
                 elements.teamSeasonsPositionSelect.value = '';
@@ -5363,6 +5398,20 @@
                 if (typeof updateHistoricSeasonsVisibility === 'function') updateHistoricSeasonsVisibility();
                 if (typeof updateFirstOccurrenceOnlyVisibility === 'function') updateFirstOccurrenceOnlyVisibility();
             }
+        }
+
+        // From / To: the competition's seasons, plus one asked for that it
+        // lacks (from a link). Season keys sort as strings.
+        function fillTeamSeasonsRange(leagueSeasons) {
+            [['From', 'Earliest'], ['To', 'Latest']].forEach(([end, any]) => {
+                const key = `teamSeasons${end}`;
+                if (state[key] && !/^\d{4}-\d{2}$/.test(state[key])) state[key] = '';
+                const seasons = state[key] && !leagueSeasons.includes(state[key])
+                    ? [...leagueSeasons, state[key]].sort().reverse() : leagueSeasons;
+                elements[`${key}Select`].innerHTML = `<option value="">${any}</option>` +
+                    seasons.map(season => `<option value="${season}">${season}</option>`).join('');
+                elements[`${key}Select`].value = state[key];
+            });
         }
 
         function updateTeamSeasonsSeasonSelect() {
@@ -5389,6 +5438,7 @@
 
             elements.teamSeasonsSeasonSelect.innerHTML = seasonOptions;
             elements.teamSeasonsSeasonSelect.value = state.teamSeasonsSelectedSeason;
+            fillTeamSeasonsRange(individualSeasons);
             updateTeamSeasonsPositionVisibility();
         }
 
@@ -5398,6 +5448,8 @@
             state.teamSeasonsSelectedTeam = '';
             state.teamSeasonsSelectedSeason = '';
             state.teamSeasonsSelectedPosition = '';
+            state.teamSeasonsFrom = '';
+            state.teamSeasonsTo = '';
             state.includeBetterResults = false;
             state.firstOccurrenceOnly = false;
 
@@ -5653,7 +5705,7 @@
             const seasonStandingsBySeasonName = state.seasonStandingsApiCache[`${divCode}::false::false`] || {};
 
             const availableSeasons = getAvailableSeasons(league);
-            const allProgressionData = [];
+            let allProgressionData = [];
 
             // Filter seasons based on Team Seasons selection (if any)
             let seasonsToProcess = availableSeasons;
@@ -5762,6 +5814,9 @@
                     });
             });
             
+            // From / To (so Count runs within them)
+            allProgressionData = allProgressionData.filter(row => inSeasonRange(row.season, state.teamSeasonsFrom, state.teamSeasonsTo));
+
             // Sort by season (most recent first), then by team name
             allProgressionData.sort((a, b) => {
                 const yearA = parseInt(a.season.split('-')[0]);
@@ -5847,7 +5902,8 @@
 
             // Update title for progression-only view
             const progressionStyle = progression === 'Champions' ? 'color: #d97706; font-weight: bold;' : 'color: #374151; font-weight: bold;';
-            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})`;
+            const range = seasonRangeLabel(state.teamSeasonsFrom, state.teamSeasonsTo);
+            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})${range ? ` (${range})` : ''}`;
 
             // Store data globally for sorting
             window.currentTeamHistoryData = [...allProgressionData];
@@ -5947,7 +6003,8 @@
 
             // Update title for progression-only view
             const progressionStyle = progression === 'Champions' ? 'color: #d97706; font-weight: bold;' : 'color: #374151; font-weight: bold;';
-            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})`;
+            const range = seasonRangeLabel(state.teamSeasonsFrom, state.teamSeasonsTo);
+            elements.teamHistoryTitle.innerHTML = `All teams (Progression: <span style="${progressionStyle}">${progression}</span>${state.includeBetterResults && progression !== 'Champions' ? ' or better' : ''})${range ? ` (${range})` : ''}`;
 
             // Store data globally for sorting
             window.currentTeamHistoryData = [...allProgressionData];
@@ -6810,6 +6867,12 @@
             
             elements.teamSeasonsSeasonSelect.addEventListener('change', (e) => {
                 handleTeamSeasonsSeasonChange(e.target.value);
+            });
+            [['teamSeasonsFromSelect', 'teamSeasonsFrom'], ['teamSeasonsToSelect', 'teamSeasonsTo']].forEach(([el, key]) => {
+                elements[el].addEventListener('change', (e) => {
+                    state[key] = e.target.value;
+                    refreshTeamHistoryView();
+                });
             });
             
             elements.teamSeasonsPositionSelect.addEventListener('change', (e) => {
@@ -13294,6 +13357,11 @@
 
                 // Show back arrow when navigating from League Tables
                 elements.teamHistoryBackArrow.classList.remove('hidden');
+                // Every season of the team: no From / To left from before
+                state.teamSeasonsFrom = '';
+                state.teamSeasonsTo = '';
+                elements.teamSeasonsFromSelect.value = '';
+                elements.teamSeasonsToSelect.value = '';
             }
 
             state.teamSeasonsSelectedTeam = teamName;
@@ -13513,6 +13581,13 @@
                 });
             });
             
+            // From / To (Team Seasons' own; not from League Tables' team links)
+            if (sourceLeague) {
+                const inRange = teamHistoryData.filter(row => inSeasonRange(row.season, state.teamSeasonsFrom, state.teamSeasonsTo));
+                teamHistoryData.length = 0;
+                teamHistoryData.push(...inRange);
+            }
+
             // Sort by season (most recent first)
             teamHistoryData.sort((a, b) => {
                 // Extract year from season string (e.g., "2023-24" -> 2023)
@@ -14674,7 +14749,8 @@
             window.currentTeamHistoryName = teamName;
             resetExpandedTeamSeasonsFor(`team::${leagueToUse}::${teamName}`);
             
-            elements.teamHistoryTitle.textContent = `${teamName} - Season History`;
+            const range = seasonRangeLabel(state.teamSeasonsFrom, state.teamSeasonsTo);
+            elements.teamHistoryTitle.textContent = `${teamName} - Season History${range ? ` (${range})` : ''}`;
             
             // Apply sorting if active
             // Count: the nth time the team reached this stage, oldest

@@ -3757,6 +3757,13 @@ html:not(.search-mode) .header-actions {
     text-decoration: line-through;
 }
 
+/* Team History: From / To under Season */
+.season-range-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
 /* Team Records: Stat / Order / Position / Seasons, two to a row */
 .records-controls {
     display: grid;
