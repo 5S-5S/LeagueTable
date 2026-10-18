@@ -19,9 +19,9 @@ empty search box.
 **Tier 1 - before launch** (keep the site up and know how it's doing - analytics and error reporting done 2026-10-18)
 1. About / sources page (closer to publication, with the crests)
 2. Self-host the club crests (closer to publication)
+3. API caching (what's left - the outage-preventing parts are done; closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-3. API caching (what's left - the outage-preventing parts are done)
 4. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
