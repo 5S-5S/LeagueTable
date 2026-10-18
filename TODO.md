@@ -76,8 +76,9 @@ empty search box.
   or a range started on the page from 1980-81, can still say "a Premier
   League season". Name it from the current range (ctx's from / to, as
   recordRangePrefix does): all before 1992-93 -> the First Division, all
-  from 1992-93 -> the Premier League, across -> both names. Same for Ligue 1
-  / Division 1 (2002-03) and the European Cup / Champions League (1992-93).
+  from 1992-93 -> the Premier League, across -> both names. Same for the
+  European Cup / Champions League (1992-93). Not Ligue 1 / Division 1
+  (decided 2026-10-18: a more superficial rename).
 
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
