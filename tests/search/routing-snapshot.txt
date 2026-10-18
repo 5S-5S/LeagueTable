@@ -2938,6 +2938,22 @@ champions-league | Celtic fewest goals conceded
     team-records | Celtic FC · Fewest goals conceded in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsAgainst&order=fewest&t1=Celtic+FC
 champions-league | Celtic biggest home win
     match-finder | Celtic FC · Biggest victories | Match Finder · All seasons · Home games | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Celtic+FC&away=0
+domestic | 1899 hoffenheim
+    team | 1899 Hoffenheim · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=1899+Hoffenheim
+    dashboard | 1899 Hoffenheim | Team Dashboard (full page) | DomesticEurope.html?league=bundesliga&team=1899%20Hoffenheim
+    team-seasons | 1899 Hoffenheim · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&t1=1899+Hoffenheim
+    team-streaks | 1899 Hoffenheim · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=bundesliga&t1=1899+Hoffenheim&type=winning
+    match-finder | Last time 1899 Hoffenheim won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=1899+Hoffenheim&res=win&cat=recent
+    match-finder | 1899 Hoffenheim · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=bundesliga&t1=1899+Hoffenheim
+premier-league | 1899 hoffenheim
+    message: No results for 1899 Hoffenheim in Premier League.
+champions-league | 1899 hoffenheim
+    team | 1899 Hoffenheim · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=1899+Hoffenheim
+    dashboard | 1899 Hoffenheim | Team Dashboard (full page) | ContinentalEurope.html?team=1899%20Hoffenheim
+    team-seasons | 1899 Hoffenheim · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=1899+Hoffenheim
+    team-streaks | 1899 Hoffenheim · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=1899+Hoffenheim&type=winning
+    match-finder | Last time 1899 Hoffenheim won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=1899+Hoffenheim&res=win&cat=recent
+    match-finder | 1899 Hoffenheim · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=1899+Hoffenheim
 domestic | a unbeaten streak
     team-streaks | All teams · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&type=unbeaten
     team-streaks | All teams · Unbeaten streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=la-liga&type=unbeaten
@@ -2998,6 +3014,27 @@ premier-league | an away run
     team-streaks | All teams · Winning streaks | Active streaks · Away games | DomesticEurope.html?view=team-streaks&lg=premier-league&type=winning&loc=away
 champions-league | an away run
     team-streaks | All teams · Winning streaks | Active streaks · Away games | ContinentalEurope.html?view=team-streaks&lg=champions-league&type=winning&loc=away
+domestic | arsenal on a wednesday
+    team | Arsenal FC · All seasons | Record and match history · Wednesdays | DomesticEurope.html?view=league-filters&lg=premier-league&day=3&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons · Wednesdays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&day=3&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Wednesdays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&day=3
+premier-league | arsenal on a wednesday
+    team | Arsenal FC · All seasons | Record and match history · Wednesdays | DomesticEurope.html?view=league-filters&lg=premier-league&day=3&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=premier-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons · Wednesdays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&res=win&day=3&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Wednesdays | DomesticEurope.html?view=match-finder&lg=premier-league&t1=Arsenal+FC&day=3
+champions-league | arsenal on a wednesday
+    team | Arsenal FC · All seasons | Record and match history · Wednesdays | ContinentalEurope.html?view=league-filters&lg=champions-league&day=3&t1=Arsenal+FC
+    dashboard | Arsenal FC | Team Dashboard (full page) | ContinentalEurope.html?team=Arsenal%20FC
+    team-seasons | Arsenal FC · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Arsenal+FC
+    team-streaks | Arsenal FC · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Arsenal+FC&type=winning
+    match-finder | Last time Arsenal FC won | Match Finder · All seasons · Wednesdays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Arsenal+FC&res=win&day=3&cat=recent
+    match-finder | Arsenal FC · Biggest victories | Match Finder · All seasons · Wednesdays | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Arsenal+FC&day=3
 domestic | Arsenal penalty shootouts
     team | Arsenal FC · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Arsenal+FC
     dashboard | Arsenal FC | Team Dashboard (full page) | DomesticEurope.html?league=premier-league&team=Arsenal%20FC
@@ -3069,6 +3106,22 @@ premier-league | cheap, single-team
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | cheap, single-team
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | como 1907
+    team | Como 1907 · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Como+1907
+    dashboard | Como 1907 | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Como%201907
+    team-seasons | Como 1907 · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Como+1907
+    team-streaks | Como 1907 · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Como+1907&type=winning
+    match-finder | Last time Como 1907 won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Como+1907&res=win&cat=recent
+    match-finder | Como 1907 · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Como+1907
+premier-league | como 1907
+    message: No results for Como 1907 in Premier League.
+champions-league | como 1907
+    team | Como 1907 · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Como+1907
+    dashboard | Como 1907 | Team Dashboard (full page) | ContinentalEurope.html?team=Como%201907
+    team-seasons | Como 1907 · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Como+1907
+    team-streaks | Como 1907 · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Como+1907&type=winning
+    match-finder | Last time Como 1907 won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Como+1907&res=win&cat=recent
+    match-finder | Como 1907 · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Como+1907
 domestic | days ago
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | days ago
@@ -3394,6 +3447,12 @@ premier-league | Most recent N
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | Most recent N
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | munchen vs dortmund
+    h2h | Bayern München vs Borussia Dortmund | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=Bayern+M%C3%BCnchen&t2=Borussia+Dortmund
+premier-league | munchen vs dortmund
+    message: No results for Bayern München and Borussia Dortmund in Premier League together.
+champions-league | munchen vs dortmund
+    h2h | Bayern München vs Borussia Dortmund | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Bayern+M%C3%BCnchen&t2=Borussia+Dortmund
 domestic | Next steps
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | Next steps
@@ -3449,6 +3508,22 @@ premier-league | Opponent
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | Opponent
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | parma fc
+    team | Parma Calcio 1913 · All seasons | Record and match history | DomesticEurope.html?view=league-filters&lg=serie-a&t1=Parma+Calcio+1913
+    dashboard | Parma Calcio 1913 | Team Dashboard (full page) | DomesticEurope.html?league=serie-a&team=Parma%20Calcio%201913
+    team-seasons | Parma Calcio 1913 · Season-by-season finishes | Team Seasons · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&t1=Parma+Calcio+1913
+    team-streaks | Parma Calcio 1913 · Winning streaks | Active streaks | DomesticEurope.html?view=team-streaks&lg=serie-a&t1=Parma+Calcio+1913&type=winning
+    match-finder | Last time Parma Calcio 1913 won | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Parma+Calcio+1913&res=win&cat=recent
+    match-finder | Parma Calcio 1913 · Biggest victories | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=serie-a&t1=Parma+Calcio+1913
+premier-league | parma fc
+    message: No results for Parma Calcio 1913 in Premier League.
+champions-league | parma fc
+    team | Parma Calcio 1913 · All seasons | Record and match history | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=Parma+Calcio+1913
+    dashboard | Parma Calcio 1913 | Team Dashboard (full page) | ContinentalEurope.html?team=Parma%20Calcio%201913
+    team-seasons | Parma Calcio 1913 · Season-by-season finishes | Team Seasons · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&t1=Parma+Calcio+1913
+    team-streaks | Parma Calcio 1913 · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Parma+Calcio+1913&type=winning
+    match-finder | Last time Parma Calcio 1913 won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Parma+Calcio+1913&res=win&cat=recent
+    match-finder | Parma Calcio 1913 · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Parma+Calcio+1913
 domestic | Premier League
     table | Premier League table · Premier League era | League table | DomesticEurope.html?view=league-filters&lg=premier-league&season=premier-league-era-1992-2025
 premier-league | Premier League
@@ -3583,6 +3658,12 @@ premier-league | set default date range for this competition
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | set default date range for this competition
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | sheffield utd vs leeds
+    h2h | Sheffield United vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+United&t2=Leeds+United
+premier-league | sheffield utd vs leeds
+    h2h | Sheffield United vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+United&t2=Leeds+United
+champions-league | sheffield utd vs leeds
+    message: No results for Sheffield United and Leeds United in Champions League together.
 domestic | since 01/01/1991
     table | Premier League table · Since January 1, 1991 | League table | DomesticEurope.html?view=league-filters&lg=premier-league&from=1991-01-01
     table | La Liga table · Since January 1, 1991 | League table | DomesticEurope.html?view=league-filters&lg=la-liga&from=1991-01-01
@@ -3683,6 +3764,12 @@ premier-league | too many SQL variables
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 champions-league | too many SQL variables
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
+domestic | tsv 1860 munchen vs bayern
+    h2h | TSV 1860 München vs Bayern München | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=bundesliga&t1=TSV+1860+M%C3%BCnchen&t2=Bayern+M%C3%BCnchen
+premier-league | tsv 1860 munchen vs bayern
+    message: No results for TSV 1860 München and Bayern München in Premier League together.
+champions-league | tsv 1860 munchen vs bayern
+    h2h | TSV 1860 München vs Bayern München | Head to head · All seasons | ContinentalEurope.html?view=league-filters&lg=champions-league&t1=TSV+1860+M%C3%BCnchen&t2=Bayern+M%C3%BCnchen
 domestic | victories by away goals
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=premier-league
     match-finder | All clubs · Biggest wins | Match Finder · All seasons | DomesticEurope.html?view=match-finder&lg=la-liga
@@ -3715,6 +3802,12 @@ champions-league | Viking FK
     team-streaks | Viking FK · Winning streaks | Active streaks | ContinentalEurope.html?view=team-streaks&lg=champions-league&t1=Viking+FK&type=winning
     match-finder | Last time Viking FK won | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Viking+FK&res=win&cat=recent
     match-finder | Viking FK · Biggest victories | Match Finder · All seasons | ContinentalEurope.html?view=match-finder&lg=champions-league&t1=Viking+FK
+domestic | wednesday vs leeds
+    h2h | Sheffield Wednesday vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+Wednesday&t2=Leeds+United
+premier-league | wednesday vs leeds
+    h2h | Sheffield Wednesday vs Leeds United | Head to head · All seasons | DomesticEurope.html?view=league-filters&lg=premier-league&t1=Sheffield+Wednesday&t2=Leeds+United
+champions-league | wednesday vs leeds
+    message: No results for Sheffield Wednesday and Leeds United in Champions League together.
 domestic | were beaten by
     message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.
 premier-league | were beaten by

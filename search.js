@@ -953,7 +953,7 @@
         'celta vigo': 'Celta de Vigo', 'celta': 'Celta de Vigo', 'deportivo': 'Deportivo La Coruña',
         'depor': 'Deportivo La Coruña', 'sociedad': 'Real Sociedad',
         'juve': 'Juventus', 'inter milan': 'Inter', 'internazionale': 'Inter', 'milan': 'AC Milan',
-        'lazio': 'Lazio Roma', 'parma': 'Parma Calcio 1913',
+        'lazio': 'Lazio Roma', 'parma': 'Parma Calcio 1913', 'parma fc': 'Parma Calcio 1913',
         'bayern': 'Bayern München', 'bayern munich': 'Bayern München', 'munich': 'Bayern München', 'munchen': 'Bayern München',
         'dortmund': 'Borussia Dortmund', 'bvb': 'Borussia Dortmund', 'gladbach': 'Bor. Mönchengladbach',
         'monchengladbach': 'Bor. Mönchengladbach', 'moenchengladbach': 'Bor. Mönchengladbach',
@@ -1071,6 +1071,21 @@
     // (more than one when a shortened name is shared, e.g. "Manchester")
     let teamPhraseIndex = null;
     let teamNameIndex = null; // [normalized full name, alias or short name, team name] for typed-ahead matching
+    // Club names with a year in them ("TSV 1860 München", "1899
+    // Hoffenheim", "Como 1907"): [pattern, marker] - parseSearchQuery()
+    // swaps the name for its marker ("tsv y1860 munchen") before it looks
+    // for seasons, so the year isn't read as one; the team index knows the
+    // markers. Longest names first.
+    let yearClubPatterns = [];
+    // Ways of saying a year club that aren't in its name
+    const YEAR_CLUB_ALIASES = { '1860': 'TSV 1860 München', '1860 munich': 'TSV 1860 München' };
+    const ACCENTED = { a: 'aàáâãäå', e: 'eèéêë', i: 'iìíîï', o: 'oòóôõöø', u: 'uùúûü', c: 'cç', n: 'nñ' };
+    // A normalized phrase as a pattern for the raw query: any accents, any
+    // spacing or punctuation between words ("1. FC", "München")
+    function rawPhrasePattern(phrase) {
+        const word = w => w.split('').map(ch => ACCENTED[ch] ? `[${ACCENTED[ch]}]` : ch).join('').replace(/ss/g, '(?:ss|ß)');
+        return new RegExp(`(?<![a-z0-9\u00c0-\u024f])${phrase.split(' ').map(word).join('[^a-z0-9\u00c0-\u024f]+')}(?![a-z0-9\u00c0-\u024f])`, 'g');
+    }
 
     function buildTeamIndexes() {
         teamPhraseIndex = new Map();
@@ -1099,6 +1114,35 @@
             if (teamPhraseIndex.has(phrase) && ![...teamPhraseIndex.get(phrase)].some(other => shortened.some(([p, n]) => p === phrase && n === other))) return;
             add(phrase, name);
         });
+        // Year clubs: the full name, without the filler words, and the year
+        // with the word either side ("tsv 1860", "1860 munchen", "como 1907")
+        const yearPhrases = new Map();
+        const addYearPhrase = (phrase, name) => {
+            if (!/\b\d{4}\b/.test(phrase) || yearPhrases.has(phrase)) return;
+            const marker = phrase.replace(/\b(\d{4})\b/g, 'y$1');
+            yearPhrases.set(phrase, marker);
+            add(marker, name);
+            teamNameIndex.push([phrase, name]);
+        };
+        SEARCH_TEAMS.forEach(team => {
+            const full = normalizeSearchText(team.name).split(' ');
+            if (!full.some(word => /^\d{4}$/.test(word))) return;
+            const core = full.filter(word => !CLUB_NAME_FILLER_WORDS.has(word));
+            [full, core].forEach(words => {
+                addYearPhrase(words.join(' '), team.name);
+                words.forEach((word, i) => {
+                    if (!/^\d{4}$/.test(word)) return;
+                    if (i > 0) addYearPhrase(`${words[i - 1]} ${word}`, team.name);
+                    if (i < words.length - 1) addYearPhrase(`${word} ${words[i + 1]}`, team.name);
+                });
+            });
+        });
+        Object.entries(YEAR_CLUB_ALIASES).forEach(([alias, name]) => {
+            if (SEARCH_TEAMS.has(name)) addYearPhrase(alias, name);
+        });
+        yearClubPatterns = [...yearPhrases.entries()]
+            .sort((a, b) => b[0].length - a[0].length)
+            .map(([phrase, marker]) => [rawPhrasePattern(phrase), marker]);
         // An alias always means its one team, even over a shared short name
         Object.entries(TEAM_ALIASES).forEach(([alias, name]) => {
             if (!SEARCH_TEAMS.has(name)) return;
@@ -1807,6 +1851,8 @@
         text = text.replace(/\bfor the 1st\b/g, 'for the first');
         text = text.replace(/\bthe (?=[a-z ]*derby\b)/, ' ');
         DERBIES.forEach(([pattern, teams]) => { text = text.replace(pattern, ` ${teams.toLowerCase()} `); });
+        // A club's year isn't a season ("TSV 1860 München", "Como 1907")
+        yearClubPatterns.forEach(([pattern, marker]) => { text = text.replace(pattern, ` ${marker} `); });
         // Qualifying for the Champions League is a league finish's outcome,
         // not the competition ("Arsenal champions league qualifications",
         // "qualified for the european cup", "champions league places") - a

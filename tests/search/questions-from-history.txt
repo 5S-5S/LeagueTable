@@ -1,3 +1,4 @@
+1899 hoffenheim
 a unbeaten streak
 Add to any question
 aggregate
@@ -6,6 +7,7 @@ All Main Stage
 All Teams
 all-time
 an away run
+arsenal on a wednesday
 Arsenal penalty shootouts
 arsenal seasons
 attempted
@@ -14,6 +16,7 @@ biggest wins
 Champions League
 champions-league
 cheap, single-team
+como 1907
 days ago
 Days Since Last Match Results
 decided by away goals
@@ -55,6 +58,7 @@ maiden
 main stage only
 Match Finder
 Most recent N
+munchen vs dortmund
 Next steps
 No seasons found
 No Team
@@ -62,6 +66,7 @@ not yet merged to main
 nottingham vs arsenal
 once, in 2015-16
 Opponent
+parma fc
 Premier League
 premier league champions
 quarter final defeats
@@ -78,6 +83,7 @@ Select Streak
 semi final exits
 semi finals
 set default date range for this competition
+sheffield utd vs leeds
 since 01/01/1991
 since the last sync
 Start -> End
@@ -92,9 +98,11 @@ Title revoked
 titles
 to filter with
 too many SQL variables
+tsv 1860 munchen vs bayern
 victories by away goals
 Viking FC
 Viking FK
+wednesday vs leeds
 were beaten by
 when did arsenal last win the league
 where was Arsenal on 1/1/2023
