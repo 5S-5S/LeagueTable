@@ -301,6 +301,32 @@
       "answer": "Tottenham Hotspur have qualified for the European Cup / Champions League from the English top flight 8 times, first in 1960-61 and most recently in 2024-25.",
       "phone": true,
       "note": "Did you mean the Premier League only?"
+    },
+    {
+      "q": "Liverpool top 4 finishes in the 80s",
+      "scope": "premier-league",
+      "answer": "From 1980-81 to 1989-90, Liverpool FC have finished in the top 4 of the First Division 9 times, first in 1981-82 and most recently in 1989-90."
+    },
+    {
+      "q": "most top 4 finishes premier league between 1996 and 2015",
+      "scope": "premier-league",
+      "answer": "From 1996-97 to 2015-16, Arsenal FC have finished in the top 4 of the Premier League the most (20 times), one of 10 clubs to do it."
+    },
+    {
+      "q": "most points in a season between 1980 and 1990",
+      "scope": "premier-league",
+      "answer": "From 1980-81 to 1990-91, Everton FC (1984-85) and Liverpool FC (1987-88) share the record for the most points in a First Division season: 90 points.",
+      "note": "Points are as awarded: 2 for a win until 1980-81. Count every win as 3 points?"
+    },
+    {
+      "q": "German champions before 1963",
+      "scope": "domestic",
+      "answer": "Up to 1962-63, 1. FC Nürnberg have won the German championship the most (8 times), one of 24 clubs to do it. The most recent was 1. FC Köln in 1962."
+    },
+    {
+      "q": "most champions league titles between 1960 and 1999",
+      "scope": "champions-league",
+      "answer": "From 1960-61 to 1999-00, AC Milan have won the European Cup and Champions League the most (5 times), one of 21 clubs to do it. The most recent was Real Madrid in 1999-00."
     }
   ],
   "shape": [

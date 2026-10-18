@@ -4021,14 +4021,14 @@
                 // Team Records' ranked rows and what they're ranked by
                 records: isRecords ? {
                     rows: from.records, stat: state.recordsStat, order: state.recordsOrder,
-                    from: state.recordsFrom, to: state.recordsTo,
+                    from: state.recordsFrom, to: state.recordsTo, era: state.recordsEra,
                     perGame: state.recordsPerGame, threePoints: state.recordsThreePoints,
                     position: state.recordsPosition, better: state.recordsBetter, team: state.recordsTeam, continental: false
                 } : null,
                 // League History's ranked rows (season order has no answer)
                 leagueHistory: isLeagueHistory ? {
                     rows: from.league, rank: state.leagueHistoryRank, order: state.leagueHistoryOrder,
-                    from: state.leagueHistoryFrom, to: state.leagueHistoryTo,
+                    from: state.leagueHistoryFrom, to: state.leagueHistoryTo, era: state.leagueHistoryEra,
                     perGame: state.leagueHistoryPerGame, threePoints: !!state.leagueHistoryThreePoints
                 } : null,
                 // A team's pre-Serie A / pre-Bundesliga titles (Domestic only)
@@ -4040,6 +4040,7 @@
                     rows: seasonsRows,
                     position: state.teamSeasonsSelectedPosition,
                     from: state.teamSeasonsFrom, to: state.teamSeasonsTo,
+                    era: isEraSeasonKey(state.teamSeasonsSelectedSeason || '') ? state.teamSeasonsSelectedSeason : '',
                     outcome: state.teamSeasonsSelectedOutcome,
                     better: state.includeBetterResults,
                     first: state.firstOccurrenceOnly,

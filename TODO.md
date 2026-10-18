@@ -24,38 +24,37 @@ empty search box.
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
 5. Answer wording: the 2-points note on ranges after 1980-81
-6. Answer wording: "the Premier League" for ranges into the First Division
-7. API caching (what's left - the outage-preventing parts are done)
-8. Expand favourite team (On this day uses it)
+6. API caching (what's left - the outage-preventing parts are done)
+7. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-9. "City" / "United" alone in search
-10. Recent searches
-11. Road to the final
-12. More competitions (depends on the data)
-13. Streak-ending social account (closer to launch)
+8. "City" / "United" alone in search
+9. Recent searches
+10. Road to the final
+11. More competitions (depends on the data)
+12. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-14. Trivia mode
-15. Head-to-head by decade
-16. Side-by-side Team Seasons
-17. League History chart
-18. Team Records: bottom / relegated, home / away
-19. A club's title races
-20. Team progression chart (after League History)
-21. "/" to search
-22. Penalty shootout leaderboard (team and head-to-head answers done)
-23. "Won on penalties" in Match Finder
-24. Lighter pages (small gain - see the item)
-25. Knockout Stage bracket view (on hold)
-26. Country vs Country
-27. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-28. Review upcoming matches
-29. Phone-width checks in npm run check
-30. Team-colour contrast
-31. Sitemap + Google Search Console
-32. Club names that differ from worldfootball.net
-33. Champions League data fixes (found 2026-10-13)
+13. Trivia mode
+14. Head-to-head by decade
+15. Side-by-side Team Seasons
+16. League History chart
+17. Team Records: bottom / relegated, home / away
+18. A club's title races
+19. Team progression chart (after League History)
+20. "/" to search
+21. Penalty shootout leaderboard (team and head-to-head answers done)
+22. "Won on penalties" in Match Finder
+23. Lighter pages (small gain - see the item)
+24. Knockout Stage bracket view (on hold)
+25. Country vs Country
+26. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+27. Review upcoming matches
+28. Phone-width checks in npm run check
+29. Team-colour contrast
+30. Sitemap + Google Search Console
+31. Club names that differ from worldfootball.net
+32. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -67,18 +66,6 @@ empty search box.
   From (the link's from, or the page's current From - ctx.records /
   ctx.leagueHistory carry it) starts after the last 2-point season; same
   for League History's points rankings (gap, topTwo).
-
-- Next: **Answer wording: "the Premier League" for ranges into the First
-  Division** — noted 2026-10-18. search.js competitionName() names the span
-  from the link's from / to only, and compares them as dates. Team Records
-  / League History / Team Seasons from / to are seasons, and the page's
-  From / To can change after the search: "Up to 1980-81" with To changed,
-  or a range started on the page from 1980-81, can still say "a Premier
-  League season". Name it from the current range (ctx's from / to, as
-  recordRangePrefix does): all before 1992-93 -> the First Division, all
-  from 1992-93 -> the Premier League, across -> both names. Same for the
-  European Cup / Champions League (1992-93). Not Ligue 1 / Division 1
-  (decided 2026-10-18: a more superficial rename).
 
 - On hold: **Knockout Stage bracket view (Continental)** — built on the
   `knockout-bracket-view` branch, not merged to main yet: more work
@@ -476,6 +463,17 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Answer wording: "the Premier League" for ranges into the First
+  Division~~ — done (2026-10-18). search.js competitionName() names the
+  competition from the page's era and From / To as they are now (the
+  pages pass them in the answer's records / leagueHistory / seasons), else
+  the link's; season keys and dates both read as the season they fall in.
+  All before 1992-93: the First Division / the European Cup; all from
+  1992-93: the Premier League / the Champions League; across: the English
+  top flight / the European Cup and Champions League. Not Ligue 1 /
+  Division 1 (a more superficial rename). Five ranged questions in
+  checks/answers.json.
 
 - ~~From / To in Team History (Team Seasons)~~ — done (2026-10-18). "most
   top 4 finishes since 1996 premier league" dropped its "since" (and fell

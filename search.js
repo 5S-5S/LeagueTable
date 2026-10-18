@@ -2998,12 +2998,24 @@
         if (!era) return ctx.competition;
         const [firstYear, oldName, newName, bothNames] = era;
         if (recentOnly) return newName;
-        if (ERA_NAMES[params.get('season')]) return ERA_NAMES[params.get('season')];
+        // The page's era and From / To as they are now (Team Records,
+        // League History, Team Seasons), else the link's
+        const now = [ctx.records, ctx.leagueHistory, ctx.seasons].find(view => view && view.from !== undefined);
+        const eraKey = now ? now.era : params.get('season');
+        if (ERA_NAMES[eraKey]) return ERA_NAMES[eraKey];
         if (ctx.season) return Number(ctx.season.slice(0, 4)) >= firstYear ? newName : oldName;
-        const from = params.get('from');
-        const to = params.get('to');
-        if (from && from >= `${firstYear}-07-01`) return newName;
-        if (to && to < `${firstYear}-07-01`) return oldName;
+        // The season a bound falls in, by its start year: a season key
+        // ("1992-93") or a date (January 1993 is in 1992-93)
+        const seasonStart = bound => {
+            if (/^\d{4}-\d{2}$/.test(bound || '')) return Number(bound.slice(0, 4));
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(bound || '')) return null;
+            return Number(bound.slice(5, 7)) >= 7 ? Number(bound.slice(0, 4)) : Number(bound.slice(0, 4)) - 1;
+        };
+        let from = seasonStart(now ? now.from : params.get('from'));
+        let to = seasonStart(now ? now.to : params.get('to'));
+        if (from !== null && to !== null && from > to) [from, to] = [to, from];
+        if (from !== null && from >= firstYear) return newName;
+        if (to !== null && to < firstYear) return oldName;
         return bothNames;
     }
 
