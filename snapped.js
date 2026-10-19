@@ -40,6 +40,35 @@
     };
     const COMPETITION_ORDER = ['E0', 'SP1', 'I1', 'D1', 'F1', 'C1'];
 
+    // Champions League stages (a streak's `stage` - snapped-lib.mjs STAGES):
+    // its matches in words, the competition label in the pills, and the
+    // Team Streaks tab's Competition Stage option
+    const STAGES = {
+        group: { word: 'Group Stage', matches: 'Group Stage matches', in: 'the Group Stage', filter: 'League/Group Stage' },
+        knockout: { word: 'Knock-Out', matches: 'Knock-Out matches', in: 'the Knock-Out stage', filter: 'Knock-Out Stage' },
+        final: { word: 'Final', matches: 'Finals', in: 'Finals', filter: 'Final' },
+        semi: { word: 'Semi-Finals', matches: 'Semi-Finals matches', in: 'Semi-Finals', filter: 'Semi-Finals' },
+        quarter: { word: 'Quarter-Finals', matches: 'Quarter-Finals matches', in: 'Quarter-Finals', filter: 'Quarter-Finals' },
+        r16: { word: 'Round of 16', matches: 'Round of 16 matches', in: 'the Round of 16', filter: 'Round Of 16' }
+    };
+    const stageOf = s => (s.stage && STAGES[s.stage]) || null;
+
+    // A match in a stage - the same rule as snapped-lib.mjs's inStage()
+    // (qualifying rounds are in none)
+    const KNOCKOUT_PHASES = ['round of 16', 'quarter-finals', 'semi-finals', 'final', 'play-offs', '1. round', '2. round'];
+    function inStage(competitionPhase, stage) {
+        if (!competitionPhase || competitionPhase.startsWith('Qualification')) return false;
+        const phase = competitionPhase.toLowerCase();
+        return {
+            group: () => /league phase|group|preliminary|intermediate/.test(phase),
+            knockout: () => KNOCKOUT_PHASES.includes(phase),
+            final: () => phase === 'final',
+            semi: () => phase === 'semi-finals',
+            quarter: () => phase === 'quarter-finals',
+            r16: () => phase === 'round of 16'
+        }[stage]();
+    }
+
     // The words the search reads as each streak type ("Sevilla FC longest
     // winless runs vs FC Barcelona")
     const SEARCH_TYPE_WORDS = {
@@ -103,7 +132,7 @@
     const isLive = s => Boolean(s.fixture);
     const judgedOn = s => isLive(s) ? s.fixture.utcDate.slice(0, 10) : s.end;
 
-    const keyOf = s => [s.kind, s.div, s.team, s.opp || '', s.type, s.loc, isLive(s) ? `f${s.fixture.matchId}` : s.end].join('|');
+    const keyOf = s => [s.kind, s.div, s.stage || '', s.team, s.opp || '', s.type, s.loc, isLive(s) ? `f${s.fixture.matchId}` : s.end].join('|');
 
     function teamStyle(team, div, highlight = '') {
         const color = getTeamColor(team, COMPETITIONS[div].slug);
@@ -121,33 +150,38 @@
 
     // What happened, in words: the run that ended, said from the side of
     // the club it belonged to
+    // A stage's run says which ("in the Group Stage", "Finals")
     function headline(s) {
         const T = teamName(s.team, s.div);
         const n = s.count;
+        const stage = stageOf(s);
+        const IN = stage ? ` in ${stage.in}` : '';
         if (s.kind === 'club') {
             const adj = { all: '', home: 'home ', away: 'away ' }[s.loc];
             const where = { all: '', home: ' at home', away: ' away from home' }[s.loc];
+            const matches = stage ? stage.matches : 'matches';
             return {
-                'winning': `${T}'s ${n}-match ${adj}winning run is over`,
-                'unbeaten': `${T}'s ${n}-match ${adj}unbeaten run is over`,
-                'draw': `${T}'s run of ${n} ${adj}draws is over`,
-                'winless': `${T} won${where} for the first time in ${n} matches`,
-                'losing': `${T} avoided defeat${where} for the first time in ${n} matches`,
-                'clean-sheet': `${T}'s run of ${n} ${adj}clean sheets is over`,
-                'goals-conceded': `${T} kept a clean sheet${where} for the first time in ${n} matches`,
-                'scoring': `${T} failed to score${where} for the first time in ${n} matches`,
-                'no-score': `${T} scored${where} for the first time in ${n} matches`
+                'winning': `${T}'s ${n}-match ${adj}winning run${IN} is over`,
+                'unbeaten': `${T}'s ${n}-match ${adj}unbeaten run${IN} is over`,
+                'draw': `${T}'s run of ${n} ${adj}draws${IN} is over`,
+                'winless': `${T} won${where} for the first time in ${n} ${matches}`,
+                'losing': `${T} avoided defeat${where} for the first time in ${n} ${matches}`,
+                'clean-sheet': `${T}'s run of ${n} ${adj}clean sheets${IN} is over`,
+                'goals-conceded': `${T} kept a clean sheet${where} for the first time in ${n} ${matches}`,
+                'scoring': `${T} failed to score${where} for the first time in ${n} ${matches}`,
+                'no-score': `${T} scored${where} for the first time in ${n} ${matches}`
             }[s.type];
         }
         const O = teamName(s.opp, s.div);
-        const games = { all: 'meetings', home: 'home games against them', away: 'visits' }[s.loc];
-        const vs = { all: `against ${O}`, home: `at home to ${O}`, away: `away at ${O}` }[s.loc];
+        const word = stage ? `${stage.word} ` : '';
+        const games = { all: `${word}meetings`, home: `home ${word}games against them`, away: `${word}visits` }[s.loc];
+        const vs = { all: `against ${O}`, home: `at home to ${O}`, away: `away at ${O}` }[s.loc] + IN;
         return {
             'winning': `${T}'s ${n}-game winning run ${vs} is over`,
             'unbeaten': `${T}'s ${n}-game unbeaten run ${vs} is over`,
             'draw': `${T}'s run of ${n} draws ${vs} is over`,
             'winless': s.loc === 'away'
-                ? `${T} won at ${O} for the first time in ${n} visits`
+                ? `${T} won at ${O} for the first time in ${n} ${word}visits`
                 : `${T} beat ${O}${s.loc === 'home' ? ' at home' : ''} for the first time in ${n} ${games}`,
             'losing': `${T} avoided defeat ${vs} for the first time in ${n} ${games}`,
             'clean-sheet': `${T}'s run of ${n} clean sheets ${vs} is over`,
@@ -162,9 +196,13 @@
     function liveHeadline(s) {
         const T = teamName(s.team, s.div);
         const n = s.count;
+        // "their last 39 home Group Stage matches", "last 9 Finals"
+        const stage = stageOf(s);
+        const matches = stage ? stage.matches : 'matches';
+        const word = stage ? `${stage.word} ` : '';
         const games = s.kind === 'club'
-            ? { all: 'matches', home: 'home matches', away: 'away matches' }[s.loc]
-            : { all: `meetings with ${teamName(s.opp, s.div)}`, home: `home games against ${teamName(s.opp, s.div)}`, away: `visits to ${teamName(s.opp, s.div)}` }[s.loc];
+            ? { all: matches, home: `home ${matches}`, away: `away ${matches}` }[s.loc]
+            : { all: `${word}meetings with ${teamName(s.opp, s.div)}`, home: `home ${word}games against ${teamName(s.opp, s.div)}`, away: `${word}visits to ${teamName(s.opp, s.div)}` }[s.loc];
         const last = `their last ${n} ${games}`;
         return {
             'winning': `${T} have won ${last}`,
@@ -184,7 +222,7 @@
     // the club record (one more sets a new one)
     // league: the competition's name in the label - On this day passes
     // the one it had then (the First Division)
-    function pills(s, league = COMPETITIONS[s.div].name) {
+    function pills(s, league = COMPETITIONS[s.div].name + (stageOf(s) ? ` ${stageOf(s).word}` : '')) {
         const top = Math.max(0.1, Math.ceil((1 - s.pct) * 1000) / 10);
         const rare = `<span class="ss-pill rare" title="Longer than ${(s.pct * 100).toFixed(1)}% of ${escapeHtml(league)} runs of this kind since 1995">Top ${top}% in ${escapeHtml(league)}</span>`;
         if (s.kind === 'h2h') return `${rare}<span class="ss-pill h2h">Head-to-head</span>`;
@@ -236,6 +274,7 @@
             const data = await fetchJson(url);
             const inRun = (data.matches || [])
                 .filter(m => s.loc === 'all' || (s.loc === 'home') === (m.homeTeam === s.team))
+                .filter(m => !s.stage || inStage(m.competitionPhase, s.stage))
                 .filter(m => m.date >= s.start && m.date <= (s.end || s.last))
                 .sort((a, b) => a.date.localeCompare(b.date));
             if (isLive(s)) {
@@ -317,7 +356,8 @@
     // visitor would type, in this competition's dropdown. Falls back to
     // Team Streaks' Historic list if the search doesn't take it.
     function searchQuestion(s) {
-        return `${s.team} longest ${s.loc === 'all' ? '' : `${s.loc} `}${SEARCH_TYPE_WORDS[s.type]} runs${s.opp ? ` vs ${s.opp}` : ''}`;
+        const stage = stageOf(s);
+        return `${s.team} longest ${s.loc === 'all' ? '' : `${s.loc} `}${SEARCH_TYPE_WORDS[s.type]} runs${s.opp ? ` vs ${s.opp}` : ''}${stage ? ` in ${stage.in}` : ''}`;
     }
 
     function streaksHref(s) {
@@ -327,8 +367,11 @@
         params.set('status', 'historic');
         if (s.loc !== 'all') params.set('loc', s.loc);
         params.set('type', s.type);
+        // A stage's run: the tab with its Competition Stage set (the search
+        // doesn't take stages for streaks)
+        if (stageOf(s)) params.set('stage', stageOf(s).filter);
         const tab = `${comp.page}?${params}`;
-        if (!window.LeagueSearch) return tab;
+        if (!window.LeagueSearch || stageOf(s)) return tab;
         const question = searchQuestion(s);
         const result = (LeagueSearch.searchFor(question, comp.slug).results || [])[0];
         if (!result || result.kind !== 'team-streaks') return tab;
@@ -634,8 +677,9 @@
         load();
     }
 
-    // headline / pills / streaksHref / searchQuestion: one snapped streak
-    // in words, why it's listed, and its Team Streaks link - On this day
+    // headline / pills / streaksHref / searchQuestion / stageWord: one
+    // snapped streak in words, why it's listed, its Team Streaks link, and
+    // its Champions League stage ("Group Stage") if it has one - On this day
     // (onthisday.js) shows the streaks a past match ended the same way
-    window.SnappedStreaks = { mount, headline, pills, streaksHref, searchQuestion };
+    window.SnappedStreaks = { mount, headline, pills, streaksHref, searchQuestion, stageWord: s => (stageOf(s) ? stageOf(s).word : '') };
 })();

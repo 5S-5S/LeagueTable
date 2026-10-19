@@ -244,7 +244,7 @@
         const streakLines = window.SnappedStreaks && SnappedStreaks.headline ? ended.map(s => `
                         <div class="otd-streak">
                             <div class="otd-streak-text">${SnappedStreaks.headline(s)}</div>
-                            <div class="ss-meta">${SnappedStreaks.pills(s, competitionName({ div: s.div, date: s.end }))}</div>
+                            <div class="ss-meta">${SnappedStreaks.pills(s, competitionName({ div: s.div, date: s.end }) + (s.stage ? ` ${SnappedStreaks.stageWord(s)}` : ''))}</div>
                         </div>`).join('') : '';
         return `
             <div class="ss-item${open ? ' open' : ''}" data-key="${escapeHtml(key)}">

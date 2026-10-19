@@ -118,12 +118,12 @@ async function main() {
     for (const s of streaks) byDiv[s.div] = (byDiv[s.div] || 0) + 1;
     console.log(`By competition: ${JSON.stringify(byDiv)}`);
     for (const s of streaks.slice(0, 5)) {
-        console.log(`  ${s.end} ${s.div} ${s.team}${s.opp ? ` v ${s.opp}` : ''} ${s.type}/${s.loc} ${s.count}`);
+        console.log(`  ${s.end} ${s.div}${s.stage ? `:${s.stage}` : ''} ${s.team}${s.opp ? ` v ${s.opp}` : ''} ${s.type}/${s.loc} ${s.count}`);
     }
 
     console.log(`${onTheLine.length} streaks on the line`);
     for (const s of onTheLine.slice(0, 5)) {
-        console.log(`  ${s.fixture.utcDate} ${s.div} ${s.team}${s.opp ? ` v ${s.opp}` : ''} ${s.type}/${s.loc} ${s.count} (${s.source})`);
+        console.log(`  ${s.fixture.utcDate} ${s.div}${s.stage ? `:${s.stage}` : ''} ${s.team}${s.opp ? ` v ${s.opp}` : ''} ${s.type}/${s.loc} ${s.count} (${s.source})`);
     }
 
     const body = JSON.stringify({ generatedAt: new Date().toISOString(), from, to, streaks, onTheLine });

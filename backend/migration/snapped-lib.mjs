@@ -46,6 +46,18 @@
 // are common, and "conceded in 14 in a row" is less of a reason to watch:
 // only a club record or the league's top 0.5%, never "rare for the club"
 // or near-record (picked on 2026-10-12; they were two thirds of the list).
+//
+// Champions League stages (STAGES, added 2026-10-19): the same runs again
+// within one stage - the group / league stage, the knock-out stage, and
+// each single knockout round (Final, Semi-Finals, Quarter-Finals, Round of
+// 16) - the Team Streaks tab's Competition Stage options. Each stage is
+// judged against the runs in that stage only, and listed with a `stage`
+// key; one entry per club per match still, across all of them. Qualifiers
+// get none. A single round is a few games a season, so its club runs have
+// their own bar: 4+ games and the club's longest of its kind in that round
+// for 10+ years ("Real Madrid have won their last 9 Finals"); no
+// head-to-head runs there. Runs in a stage span seasons by nature, so they
+// carry no gap notes.
 
 export const STREAK_TYPES = {
     'winning': (result) => result === 'win',
@@ -73,6 +85,24 @@ export const BIG_CLUBS = new Set([
     'Bayern München', 'Borussia Dortmund', 'FC Schalke 04', '1. FC Köln', 'Eintracht Frankfurt', 'Hamburger SV', 'VfB Stuttgart', 'Bor. Mönchengladbach',
     'Olympique Marseille', 'AS Monaco', 'Olympique Lyonnais', 'Lille OSC', 'Paris Saint-Germain',
 ]);
+
+// Champions League stages - the page's matchesStageCategory()
+// (ContinentalEurope.html) for these options; qualifying rounds never fit
+export const STAGES = {
+    group: { single: false, fits: phase => /league phase|group|preliminary|intermediate/.test(phase) },
+    knockout: { single: false, fits: phase => ['round of 16', 'quarter-finals', 'semi-finals', 'final', 'play-offs', '1. round', '2. round'].includes(phase) },
+    // At a neutral ground: no home or away runs
+    final: { single: true, neutral: true, fits: phase => phase === 'final' },
+    semi: { single: true, fits: phase => phase === 'semi-finals' },
+    quarter: { single: true, fits: phase => phase === 'quarter-finals' },
+    r16: { single: true, fits: phase => phase === 'round of 16' },
+};
+const STAGE_DIVS = new Set(['C1']);
+
+function inStage(competitionPhase, stage) {
+    if (!competitionPhase || competitionPhase.startsWith('Qualification')) return false;
+    return STAGES[stage].fits(competitionPhase.toLowerCase());
+}
 
 const ERA_START = '1995-08-01';
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -129,6 +159,11 @@ function atLocation(list, team, loc) {
 // kind, div, opp, type, count, pct and (club) longestSince, ownRuns,
 // ownPct; end is the date it's judged on.
 function sourceOf(c, end) {
+    if (c.stage && STAGES[c.stage].single) {
+        if (c.kind !== 'club') return null;
+        const yearsSince = c.longestSince ? (new Date(end) - new Date(c.longestSince)) / YEAR_MS : Infinity;
+        return c.count >= 4 && yearsSince >= 10 ? 'league' : null;
+    }
     if (c.kind === 'club') {
         const yearsSince = c.longestSince ? (new Date(end) - new Date(c.longestSince)) / YEAR_MS : Infinity;
         if (c.pct >= 0.995 || (yearsSince >= 10 && c.pct >= 0.95 && c.count >= 6)) return 'league';
@@ -151,12 +186,14 @@ function clubHistory(past, count, end) {
     return { longestSince, ownRuns: own.length, ownPct: own.length ? countBelow(own, count) / own.length : 0 };
 }
 
-// One per club per match, one per head-to-head meeting: the league-wide
-// bars first, then the rarest, then the longest. matchKey names the match
-// (the date that snapped it, or the fixture on the line).
+// One per club per match, one per head-to-head meeting: a single
+// knockout round's run first (a few a year, and the most telling - "won
+// their last 9 Finals"), then the league-wide bars, then the rarest, then
+// the longest. matchKey names the match (the date that snapped it, or the
+// fixture on the line).
 function bestPerMatch(picked, matchKey) {
     const best = new Map();
-    const rank = s => (s.source === 'league' ? 1 : 0);
+    const rank = s => (s.stage && STAGES[s.stage].single ? 2 : s.source === 'league' ? 1 : 0);
     for (const s of picked) {
         const key = s.kind === 'club'
             ? `club|${s.div}|${s.team}|${matchKey(s)}`
@@ -170,6 +207,7 @@ function bestPerMatch(picked, matchKey) {
 // Breaks of more than a summer (or two, head-to-head home/away) between
 // a run's matches
 function gapsIn(s, matches) {
+    if (s.stage) return [];
     const dates = matches.map(m => m.date);
     const limit = s.kind === 'club' ? GAP_DAYS.club : s.loc === 'all' ? GAP_DAYS.h2hAll : GAP_DAYS.h2hVenue;
     const gaps = [];
@@ -204,101 +242,108 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
     };
 
     for (const [div, unsorted] of Object.entries(matchesByDiv)) {
-        const matches = [...unsorted].sort((a, b) => a.date.localeCompare(b.date));
-        const byTeam = new Map();
-        const byPair = new Map();
-        for (const m of matches) {
-            for (const [team, opp] of [[m.homeTeam, m.awayTeam], [m.awayTeam, m.homeTeam]]) {
-                if (!byTeam.has(team)) byTeam.set(team, []);
-                byTeam.get(team).push(m);
-                const pairKey = `${team}\u0000${opp}`;
-                if (!byPair.has(pairKey)) byPair.set(pairKey, []);
-                byPair.get(pairKey).push(m);
+        const sorted = [...unsorted].sort((a, b) => a.date.localeCompare(b.date));
+        // The whole competition, then (the Champions League) each stage
+        const scopes = [['', sorted], ...(STAGE_DIVS.has(div) ? Object.keys(STAGES).map(stage => [stage, sorted.filter(m => inStage(m.competitionPhase, stage))]) : [])];
+        for (const [stage, matches] of scopes) {
+            const g = stage ? `${div}:${stage}` : div; // the group key's competition part
+            const byTeam = new Map();
+            const byPair = new Map();
+            for (const m of matches) {
+                for (const [team, opp] of [[m.homeTeam, m.awayTeam], [m.awayTeam, m.homeTeam]]) {
+                    if (!byTeam.has(team)) byTeam.set(team, []);
+                    byTeam.get(team).push(m);
+                    const pairKey = `${team}\u0000${opp}`;
+                    if (!byPair.has(pairKey)) byPair.set(pairKey, []);
+                    byPair.get(pairKey).push(m);
+                }
             }
-        }
 
-        // This competition's fixtures not yet in the results (a result is
-        // dated by local kickoff, so up to a day off the UTC date), soonest
-        // first
-        const played = new Set(matches.map(m => `${m.date}|${m.homeTeam}|${m.awayTeam}`));
-        const dayAround = (iso, days) => {
-            const d = new Date(`${iso}T12:00:00Z`);
-            d.setUTCDate(d.getUTCDate() + days);
-            return d.toISOString().slice(0, 10);
-        };
-        const upcoming = fixtures
-            .filter(f => f.div === div)
-            .filter(f => ![-1, 0, 1].some(days => played.has(`${dayAround(f.utcDate.slice(0, 10), days)}|${f.homeTeam}|${f.awayTeam}`)))
-            .sort((a, b) => a.utcDate.localeCompare(b.utcDate));
-        // The next fixture that could end a run: the club's next one at
-        // that location (against that opponent, head-to-head)
-        const nextFixture = (team, opp, loc) => upcoming.find(f => {
-            if (f.homeTeam !== team && f.awayTeam !== team) return false;
-            if (opp && f.homeTeam !== opp && f.awayTeam !== opp) return false;
-            return loc === 'all' || (loc === 'home') === (f.homeTeam === team);
-        });
+            // This competition's fixtures not yet in the results (a result is
+            // dated by local kickoff, so up to a day off the UTC date), soonest
+            // first
+            const played = new Set(matches.map(m => `${m.date}|${m.homeTeam}|${m.awayTeam}`));
+            const dayAround = (iso, days) => {
+                const d = new Date(`${iso}T12:00:00Z`);
+                d.setUTCDate(d.getUTCDate() + days);
+                return d.toISOString().slice(0, 10);
+            };
+            const upcoming = fixtures
+                .filter(f => f.div === div && (!stage || inStage(f.competitionPhase, stage)))
+                .filter(f => ![-1, 0, 1].some(days => played.has(`${dayAround(f.utcDate.slice(0, 10), days)}|${f.homeTeam}|${f.awayTeam}`)))
+                .sort((a, b) => a.utcDate.localeCompare(b.utcDate));
+            // The next fixture that could end a run: the club's next one at
+            // that location (against that opponent, head-to-head)
+            const nextFixture = (team, opp, loc) => upcoming.find(f => {
+                if (f.homeTeam !== team && f.awayTeam !== team) return false;
+                if (opp && f.homeTeam !== opp && f.awayTeam !== opp) return false;
+                return loc === 'all' || (loc === 'home') === (f.homeTeam === team);
+            });
 
-        // Club runs: also the club's own history of each kind, for "longest
-        // since" and "unusual for the club"
-        for (const [team, teamMatches] of byTeam) {
-            for (const loc of LOCATIONS) {
-                const list = atLocation(teamMatches, team, loc);
-                const history = {}; // type -> [{ end, count }] in order
-                forEachRun(list, team, (type, first, count, endIndex) => {
-                    const end = list[endIndex].date;
-                    const start = list[first].date;
-                    addToGroup(`club|${div}|${type}|${loc}`, count, end);
-                    noteBest(`${div}|${team}|${loc}|${type}`, count, start, end);
-                    const past = history[type] || (history[type] = []);
-                    if (end >= from && end <= to) {
-                        candidates.push({
-                            kind: 'club', div, team, opp: null, loc, type, count, start, end,
-                            ...clubHistory(past, count, end),
-                            list, first, endIndex,
+            // Club runs: also the club's own history of each kind, for "longest
+            // since" and "unusual for the club"
+            for (const [team, teamMatches] of byTeam) {
+                for (const loc of stage && STAGES[stage].neutral ? ['all'] : LOCATIONS) {
+                    const list = atLocation(teamMatches, team, loc);
+                    const history = {}; // type -> [{ end, count }] in order
+                    forEachRun(list, team, (type, first, count, endIndex) => {
+                        const end = list[endIndex].date;
+                        const start = list[first].date;
+                        addToGroup(`club|${g}|${type}|${loc}`, count, end);
+                        noteBest(`${g}|${team}|${loc}|${type}`, count, start, end);
+                        const past = history[type] || (history[type] = []);
+                        if (end >= from && end <= to) {
+                            candidates.push({
+                                kind: 'club', div, stage, team, opp: null, loc, type, count, start, end,
+                                ...clubHistory(past, count, end),
+                                list, first, endIndex,
+                            });
+                        }
+                        past.push({ end, count });
+                    }, (type, first, count) => {
+                        noteBest(`${g}|${team}|${loc}|${type}`, count, list[first].date, null);
+                        const fixture = nextFixture(team, null, loc);
+                        if (!fixture) return;
+                        const past = history[type] || [];
+                        const on = fixture.utcDate.slice(0, 10);
+                        const record = past.length ? Math.max(...past.map(r => r.count)) : null;
+                        open.push({
+                            kind: 'club', div, stage, team, opp: null, loc, type, count, start: list[first].date, on,
+                            ...clubHistory(past, count, on), record,
+                            // Level with the club record: one more is a new one
+                            next: record === count ? clubHistory(past, count + 1, on) : null,
+                            list, first, fixture,
                         });
-                    }
-                    past.push({ end, count });
-                }, (type, first, count) => {
-                    noteBest(`${div}|${team}|${loc}|${type}`, count, list[first].date, null);
-                    const fixture = nextFixture(team, null, loc);
-                    if (!fixture) return;
-                    const past = history[type] || [];
-                    const on = fixture.utcDate.slice(0, 10);
-                    const record = past.length ? Math.max(...past.map(r => r.count)) : null;
-                    open.push({
-                        kind: 'club', div, team, opp: null, loc, type, count, start: list[first].date, on,
-                        ...clubHistory(past, count, on), record,
-                        // Level with the club record: one more is a new one
-                        next: record === count ? clubHistory(past, count + 1, on) : null,
-                        list, first, fixture,
                     });
-                });
+                }
             }
-        }
 
-        // Head-to-head runs: one club's games against one opponent
-        for (const [pairKey, pairMatches] of byPair) {
-            const [team, opp] = pairKey.split('\u0000');
-            for (const loc of LOCATIONS) {
-                const list = atLocation(pairMatches, team, loc);
-                forEachRun(list, team, (type, first, count, endIndex) => {
-                    const end = list[endIndex].date;
-                    addToGroup(`h2h|${div}|${type}|${loc}`, count, end);
-                    if (end >= from && end <= to) {
-                        candidates.push({ kind: 'h2h', div, team, opp, loc, type, count, start: list[first].date, end, list, first, endIndex });
-                    }
-                }, (type, first, count) => {
-                    const fixture = nextFixture(team, opp, loc);
-                    if (!fixture) return;
-                    open.push({ kind: 'h2h', div, team, opp, loc, type, count, start: list[first].date, on: fixture.utcDate.slice(0, 10), list, first, fixture });
-                });
+            // Head-to-head runs: one club's games against one opponent (none
+            // within a single round)
+            if (stage && STAGES[stage].single) continue;
+            for (const [pairKey, pairMatches] of byPair) {
+                const [team, opp] = pairKey.split('\u0000');
+                for (const loc of LOCATIONS) {
+                    const list = atLocation(pairMatches, team, loc);
+                    forEachRun(list, team, (type, first, count, endIndex) => {
+                        const end = list[endIndex].date;
+                        addToGroup(`h2h|${g}|${type}|${loc}`, count, end);
+                        if (end >= from && end <= to) {
+                            candidates.push({ kind: 'h2h', div, stage, team, opp, loc, type, count, start: list[first].date, end, list, first, endIndex });
+                        }
+                    }, (type, first, count) => {
+                        const fixture = nextFixture(team, opp, loc);
+                        if (!fixture) return;
+                        open.push({ kind: 'h2h', div, stage, team, opp, loc, type, count, start: list[first].date, on: fixture.utcDate.slice(0, 10), list, first, fixture });
+                    });
+                }
             }
         }
     }
 
     for (const arr of groups.values()) arr.sort((x, y) => x - y);
     const pctOf = (c, count) => {
-        const group = groups.get(`${c.kind}|${c.div}|${c.type}|${c.loc}`) || [];
+        const group = groups.get(`${c.kind}|${c.stage ? `${c.div}:${c.stage}` : c.div}|${c.type}|${c.loc}`) || [];
         return group.length ? countBelow(group, count) / group.length : 0;
     };
 
@@ -308,6 +353,16 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
         const source = sourceOf(c, c.end);
         if (source) picked.push({ ...c, source });
     }
+
+    // In a single round, a run that is also a winning (losing) run of the
+    // same matches says so: "won their last 9 Finals", not "unbeaten in"
+    const sameRun = s => `${s.kind}|${s.div}|${s.stage}|${s.team}|${s.opp}|${s.loc}|${s.start}|${s.count}`;
+    const subsumed = list => {
+        const strong = new Set(list.filter(s => s.stage && STAGES[s.stage].single && (s.type === 'winning' || s.type === 'losing'))
+            .map(s => `${s.type}|${sameRun(s)}`));
+        return list.filter(s => !(s.stage && STAGES[s.stage].single
+            && ((s.type === 'unbeaten' && strong.has(`winning|${sameRun(s)}`)) || (s.type === 'winless' && strong.has(`losing|${sameRun(s)}`)))));
+    };
 
     const pickedOpen = [];
     for (const c of open) {
@@ -322,14 +377,14 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
         if (source) pickedOpen.push({ ...c, source });
     }
 
-    const snapped = bestPerMatch(picked, s => s.end)
+    const snapped = bestPerMatch(subsumed(picked), s => s.end)
         .sort((a, b) => b.end.localeCompare(a.end) || b.pct - a.pct)
         .map(s => {
             const ended = s.list[s.endIndex];
             // A record then, beaten since
-            const best = s.kind === 'club' && !s.longestSince ? clubBest.get(`${s.div}|${s.team}|${s.loc}|${s.type}`) : null;
+            const best = s.kind === 'club' && !s.longestSince ? clubBest.get(`${s.stage ? `${s.div}:${s.stage}` : s.div}|${s.team}|${s.loc}|${s.type}`) : null;
             return {
-                kind: s.kind, div: s.div, team: s.team, opp: s.opp, loc: s.loc, type: s.type,
+                kind: s.kind, div: s.div, ...(s.stage ? { stage: s.stage } : {}), team: s.team, opp: s.opp, loc: s.loc, type: s.type,
                 count: s.count, start: s.start, end: s.end,
                 endedBy: {
                     date: ended.date, homeTeam: ended.homeTeam, awayTeam: ended.awayTeam,
@@ -343,12 +398,12 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
             };
         });
 
-    const onTheLine = bestPerMatch(pickedOpen, s => s.fixture.matchId)
+    const onTheLine = bestPerMatch(subsumed(pickedOpen), s => s.fixture.matchId)
         .sort((a, b) => a.fixture.utcDate.localeCompare(b.fixture.utcDate) || b.pct - a.pct)
         .map(s => {
             const f = s.fixture;
             return {
-                kind: s.kind, div: s.div, team: s.team, opp: s.opp, loc: s.loc, type: s.type,
+                kind: s.kind, div: s.div, ...(s.stage ? { stage: s.stage } : {}), team: s.team, opp: s.opp, loc: s.loc, type: s.type,
                 count: s.count, start: s.start, last: s.list[s.list.length - 1].date,
                 fixture: {
                     matchId: f.matchId, utcDate: f.utcDate, homeTeam: f.homeTeam, awayTeam: f.awayTeam,

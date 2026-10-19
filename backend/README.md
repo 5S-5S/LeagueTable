@@ -243,6 +243,11 @@ Actions job does it: `.github/workflows/snapped-streaks.yml` runs
 API, applies `findSnappedStreaks()` (`migration/snapped-lib.mjs` - the
 significance bars are documented there) and writes the list (~100 KB) to
 KV as `snapped-streaks`. `/api/snapped-streaks` serves it unchanged.
+Since 2026-10-19 Champions League runs are also worked out within each
+stage (group / league stage, knock-out stage, and the Final,
+Semi-Finals, Quarter-Finals and Round of 16 on their own), each judged
+against its own stage; entries carry a `stage` key, and the card words
+and links them by it.
 
 The job runs after every daily sync and, optionally, after the Worker
 records live results: `recordFinishedMatches()` sends a
