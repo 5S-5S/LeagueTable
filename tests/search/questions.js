@@ -12,11 +12,11 @@ const vm = require('vm');
 
 // search.js in a plain Node context (no page): searchFor() only needs its
 // own tables, so nothing is fetched
-function loadSearch(source) {
+function loadSearch(source, storage = { getItem() { return null; }, setItem() {}, removeItem() {} }) {
     const ctx = { console, setTimeout, clearTimeout, Promise, URLSearchParams, URL, Date, Math, JSON, Intl, Map, Set, RegExp, Number, String, Array, Object };
     ctx.window = ctx;
     ctx.document = { addEventListener() {}, querySelector() { return null; } };
-    ctx.localStorage = { getItem() { return null; }, setItem() {} };
+    ctx.localStorage = storage;
     ctx.fetch = () => Promise.reject(new Error('offline'));
     vm.createContext(ctx);
     vm.runInContext(source, ctx);

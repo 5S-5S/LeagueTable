@@ -4547,6 +4547,34 @@
         return team && team.crestId ? `https://s.hs-data.com/gfx/emblem/common/80x80/${team.crestId}.png` : '';
     }
 
+    // Recent searches: the last answers opened from any search bar, kept
+    // in this browser only, newest first. The same answer opened again
+    // (even typed differently) moves to the top.
+    const RECENT_KEY = 'recentSearches';
+    const RECENT_MAX = 5;
+
+    function readRecent() {
+        let list = [];
+        try { list = JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch (err) { /* storage blocked or garbled */ }
+        if (!Array.isArray(list)) return [];
+        // Only our own pages' links, from a competition we still have
+        return list.filter(item => item && typeof item.title === 'string' && typeof item.href === 'string'
+            && /^[A-Za-z]+\.html(\?|$)/.test(item.href)
+            && SEARCH_COMPETITIONS.some(comp => comp.key === item.comp)).slice(0, RECENT_MAX);
+    }
+
+    function addRecent({ title, detail = '', comp, href }) {
+        if (!title || !href) return readRecent();
+        const same = item => item.title === title && item.detail === detail && item.comp === comp;
+        const list = [{ title, detail, comp, href }, ...readRecent().filter(item => !same(item))].slice(0, RECENT_MAX);
+        try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (err) { /* storage blocked */ }
+        return list;
+    }
+
+    function clearRecent() {
+        try { localStorage.removeItem(RECENT_KEY); } catch (err) { /* storage blocked */ }
+    }
+
     const SCOPE_OPTIONS_HTML = `
         <optgroup label="Domestic Football">
             <option value="domestic">Top 5 Leagues</option>
@@ -4611,7 +4639,7 @@
                         ? `<img src="${crest}" class="search-result-crest" alt="" loading="lazy">`
                         : `<span class="search-result-icon" aria-hidden="true">${result.icon || '⚽'}</span>`;
                     return `
-                        <a class="search-result" role="option" href="${escapeSearchHtml(resultHref(result, result.query || input.value.trim(), scopeSelect.value))}">
+                        <a class="search-result" role="option" data-comp="${result.comp.key}" href="${escapeSearchHtml(resultHref(result, result.query || input.value.trim(), scopeSelect.value))}">
                             ${icon}
                             <span class="search-result-text">
                                 <span class="search-result-title">${escapeSearchHtml(result.title)}</span>
@@ -4625,18 +4653,30 @@
         }
 
         // The empty bar's guide: this dropdown choice's example questions,
-        // grouped, each opening its answer, then words to add to any question
+        // grouped, each opening its answer, then words to add to any question.
+        // Above them, the recent searches from every competition.
         function renderGuide() {
             const scope = scopeSelect.value;
             const groups = SEARCH_EXAMPLES[scope] || SEARCH_EXAMPLES.domestic;
+            const recent = readRecent();
             activeIndex = -1;
-            resultsEl.innerHTML = groups.map(([label, items]) => `
+            const recentHtml = recent.length === 0 ? '' : `
+                <div class="search-guide-group search-recent-group"><span class="search-guide-icon">🕘</span>Recent<button type="button" class="search-recent-clear">Clear</button></div>
+                ${recent.map(item => `
+                    <a class="search-result search-guide-item search-recent-item" role="option" data-comp="${item.comp}" href="${escapeSearchHtml(item.href)}">
+                        <span class="search-result-text">
+                            <span class="search-result-title">${escapeSearchHtml(item.title)}</span>
+                            ${item.detail ? `<span class="search-result-detail">${escapeSearchHtml(item.detail)}</span>` : ''}
+                        </span>
+                        <span class="search-result-comp">${SEARCH_COMPETITIONS.find(comp => comp.key === item.comp).badge}</span>
+                    </a>`).join('')}`;
+            resultsEl.innerHTML = recentHtml + groups.map(([label, items]) => `
                 <div class="search-guide-group"><span class="search-guide-icon">${GUIDE_ICONS[label] || ''}</span>${escapeSearchHtml(label)}</div>
                 ${items.map(text => {
                     const top = searchFor(text, scope).results[0];
                     if (!top) return '';
                     return `
-                        <a class="search-result search-guide-item" role="option" href="${escapeSearchHtml(resultHref(top, text, scope))}">
+                        <a class="search-result search-guide-item" role="option" data-comp="${top.comp.key}" href="${escapeSearchHtml(resultHref(top, text, scope))}">
                             <span class="search-result-title">${escapeSearchHtml(text)}</span>
                             <span class="search-result-comp">${top.comp.badge}</span>
                         </a>`;
@@ -4686,9 +4726,22 @@
             pending = null;
         }
         if (window.LeagueLog) window.LeagueLog.beforeFlush(logAbandoned);
+        // ...and the answer kept as a recent search (not the guide's examples)
         function logOpened(link) {
             const items = [...resultsEl.querySelectorAll('.search-result')];
             const title = link.querySelector('.search-result-title');
+            const detail = link.querySelector('.search-result-detail');
+            if (!link.classList.contains('search-guide-item') || link.classList.contains('search-recent-item')) {
+                addRecent({
+                    title: title ? title.textContent.trim() : '', detail: detail ? detail.textContent.trim() : '',
+                    comp: link.dataset.comp, href: link.getAttribute('href')
+                });
+            }
+            if (link.classList.contains('search-recent-item')) {
+                pending = null;
+                logSearch('recent', { text: title ? title.textContent.trim() : '', scope: scopeSelect.value, position: items.indexOf(link) + 1 });
+                return;
+            }
             if (link.classList.contains('search-guide-item')) {
                 pending = null;
                 logSearch('example', { text: title ? title.textContent.trim() : '', scope: scopeSelect.value });
@@ -4721,6 +4774,15 @@
         });
         input.addEventListener('blur', () => {
             if (pending) pending.blurred = true;
+        });
+        resultsEl.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-recent-clear')) return;
+            // the button is gone after the redraw: keep the page's
+            // click-outside handler from closing the guide
+            e.stopPropagation();
+            clearRecent();
+            renderGuide();
+            input.focus();
         });
         // click and middle click / Cmd-click (a new tab)
         ['click', 'auxclick'].forEach(type => resultsEl.addEventListener(type, (e) => {
@@ -4786,5 +4848,5 @@
         };
     }
 
-    window.LeagueSearch = { mount, searchFor, suggestFor, renderAnswer, examples, reportHref, bindReportLinks };
+    window.LeagueSearch = { mount, searchFor, suggestFor, renderAnswer, examples, reportHref, bindReportLinks, readRecent, addRecent, clearRecent };
 })();
