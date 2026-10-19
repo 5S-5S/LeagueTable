@@ -338,23 +338,35 @@ empty search box.
   on 2026-10-06 (low priority).
 
 - Maybe: **Expand favourite team** — the visitor's team is kept since
-  2026-10-15 (favourite-team.js: window.FavouriteTeam - get / set / clear
-  / onChange / allTeams / resolve, in localStorage). Moved to Tier 2 on
-  2026-10-09: it lets the home page lead with the visitor's club.
-  Home page done 2026-10-19:
-  - ~~One place to pick it~~ - the top bar's chip (favourite-picker.js),
-    next to the dark mode toggle; On this day keeps its own box too.
-  - ~~Upcoming matches~~ - every day the favourite plays has a starred
-    tab, and on that day its match leads the row (not pinned on other
-    days - decided 2026-10-19).
-  - ~~The streaks card~~ - a third "⭐ <team>" view: its runs on the line,
-    then those it snapped. Picking a team switches this card and On this
-    day to it; removing it switches them back.
+  2026-10-15 (favourite-team.js: window.FavouriteTeam - list / get / has /
+  add / remove / set / clear / onChange / allTeams / resolve, in
+  localStorage). Moved to Tier 2 on 2026-10-09: it lets the home page
+  lead with the visitor's club. Home page done 2026-10-19:
+  - ~~Several teams~~ - any number, in the order added (a friend's
+    suggestion; unlimited to see how it goes). A team stored before
+    (a plain name) reads as a list of one.
+  - ~~One place to pick them~~ - the top bar's chip (favourite-picker.js),
+    next to the dark mode toggle: the first team and "+2"; its panel
+    lists the teams with × each, an "Add another team" box (only clubs
+    not picked yet) and Remove all. On this day's own box is gone - its
+    "⭐ Pick your team" opens the chip's panel, as the streaks card's.
+  - ~~Upcoming matches~~ - every day one of the teams plays has a
+    starred tab, and on that day their matches lead the row (not pinned
+    on other days - decided 2026-10-19).
+  - ~~The streaks card~~ - a third "⭐ <team>" / "⭐ Your teams" view:
+    each team's runs on the line, then those it snapped. With several
+    teams, a heading per team (crest, name, count) that folds its runs
+    away - chevron on the right, remembered on this device
+    (collapsedTeams). A run between two of them comes under the first.
+  - ~~On this day~~ - the teams' matches on the day merged, newest first,
+    each told from its team's side. Picking a team switches this card
+    and the streaks card to the team view; removing the last switches
+    them back.
   Still to do:
-  - The search: a one-click shortcut to the favourite's dashboard, and
-    questions about "my team".
-  - The sport pages: Team 1 / Team History / Team Streaks opening on it
-    (only where the club is in that competition) - and the chip there too.
+  - The search: a one-click shortcut to each favourite's dashboard, and
+    questions about "my team" (the first team, with several).
+  - The sport pages: Team 1 / Team History / Team Streaks opening on the
+    first team that's in that competition - and the chip there too.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter
