@@ -218,9 +218,9 @@ empty search box.
     - Checked on the user's iPhone 2026-10-19: fine. How often the 📅
       button is used doesn't matter - it stays as a convenience, so
       nobody has to go back to the home page to see upcoming matches.
-    - Page weight: the sport pages now load upcoming.js, team-registry.js,
-      combobox.js and the favourites scripts (~130 KB before gzip) even
-      with the strip hidden - fine for now, but see Lighter pages.
+    - Page weight: the added scripts are ~140 KB raw, ~41 KB gzipped and
+      cached after the first visit, against 680-870 KB for the pages
+      themselves - negligible, nothing to do.
     - Back from the match view (restores the Copy Link state) checked by
       the user 2026-10-19: works as intended.
 
