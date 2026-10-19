@@ -1069,7 +1069,8 @@
 
     // --- The sport pages' row ---------------------------------------------
 
-    // One row of cards, no day tabs or chips: the next STRIP_DAYS of
+    // One row of cards in a card of its own above the page, no day tabs or
+    // chips: the next STRIP_DAYS of
     // matches in the league the page has picked (several for the search's
     // "Top 5 Leagues"), the favourites' first. Each card links to the
     // match's view on the home page. The league comes from the page:
@@ -1089,16 +1090,11 @@
         return button ? [button.dataset.league] : fallback;
     }
 
-    // Under the header, or above the search bar in search mode (where the
-    // header is hidden)
+    // Its own card, just above the page's main card (as the home page's
+    // sections are)
     function placeRow(row) {
-        const searchMode = document.documentElement.classList.contains('search-mode');
-        const anchor = searchMode ? document.getElementById('searchModeBar') : document.querySelector('.main-card > .header');
-        if (!anchor) return;
-        if (searchMode ? anchor.previousElementSibling !== row.el : anchor.nextElementSibling !== row.el) {
-            if (searchMode) anchor.before(row.el);
-            else anchor.after(row.el);
-        }
+        const card = document.querySelector('.league-table-container > .main-card');
+        if (card && card.previousElementSibling !== row.el) card.before(row.el);
     }
 
     function renderRow(row) {
@@ -1118,7 +1114,7 @@
         if (!soon.length) {
             // An international break, or the season's end
             const name = divs.length === 1 ? `${COMPETITIONS[divs[0]].name} ` : '';
-            el.innerHTML = `<p class="um-row-status">${escapeHtml(fixtures.length
+            el.innerHTML = `<h2 class="um-strip-title">Upcoming matches</h2><p class="um-row-status">${escapeHtml(fixtures.length
                 ? `No ${name}matches until ${longDay(new Date(fixtures[0].utcDate))}.`
                 : `No upcoming ${name}matches right now.`)}</p>`;
             return;
@@ -1127,7 +1123,7 @@
         const ordered = [...soon.filter(f => favs.has(f)), ...soon.filter(f => !favs.has(f))];
         [...new Set(soon.map(f => f.div))].forEach(loadSeasonData);
         const scrollLeft = el.querySelector('.um-row')?.scrollLeft || 0;
-        el.innerHTML = `<div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
+        el.innerHTML = `<h2 class="um-strip-title">Upcoming matches</h2><div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
             fav: favs.has(f), href: `index.html?match=${f.matchId}&back=1`, withDay: true
         })).join('')}</div>`;
         const list = el.querySelector('.um-row');
@@ -1138,8 +1134,7 @@
         rows.forEach(renderRow);
     }
 
-    // el: the row's element (moved under the header / above the search bar
-    // as the page switches mode). fallback: the leagues when the page
+    // el: the row's element (moved to just above the main card). fallback: the leagues when the page
     // shows none (the Continental pages: ['champions-league']). pageQuery:
     // the page's tab and filters as a URL (its Copy Link) - written into
     // this history entry as a card opens, so the match view's Back reloads

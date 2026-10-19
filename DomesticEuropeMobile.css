@@ -3400,7 +3400,7 @@ html.search-mode .header-actions {
 
 /* Search mode before any question (?search=none, from the Search
    button): the bar only - no answer, no results */
-html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header):not(.um-sport-row) {
+html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header) {
     display: none !important;
 }
 
@@ -3408,14 +3408,15 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
     padding-bottom: 1.75rem;
 }
 
-/* The upcoming matches row (upcoming.js mountRow) moves above the bar in
-   search mode: it takes the bar's room for the fixed buttons */
-html.search-mode .um-sport-row {
-    padding: 4.25rem 1rem 0;
+/* The upcoming matches card (upcoming.js mountRow) is first on the page:
+   room above its heading for the fixed menu and ▼ buttons, and the search
+   bar under it no longer needs any */
+.league-table-container > .um-sport-row {
+    padding-top: 4.25rem;
 }
 
-html.search-mode .um-sport-row:not([hidden]) + .search-mode-bar {
-    padding-top: 0.75rem;
+html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {
+    padding-top: 1.5rem;
 }
 
 html.search-mode #teamDashboardHeader,

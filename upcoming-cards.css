@@ -154,12 +154,24 @@ a.um-card {
 }
 
 .um-sport-row {
-    padding: 1rem 2rem 0;
+    max-width: 72rem;
+    margin: 0 auto 1.75rem;
+    padding: 1.25rem 2rem 1rem;
+    border-radius: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     text-align: left;
 }
 
 .um-sport-row[hidden] {
     display: none;
+}
+
+.um-sport-row .um-strip-title {
+    margin: 0 0 0.6rem;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1f2937;
 }
 
 .um-sport-row .um-row {
@@ -178,10 +190,14 @@ a.um-card {
     }
 
     .um-sport-row {
-        padding: 0.75rem 1rem 0;
+        margin-bottom: 1.25rem;
+        padding: 1rem;
+        border-radius: 1rem;
     }
 }
 
+[data-theme="dark"] .um-sport-row { background: #333333; }
+[data-theme="dark"] .um-sport-row .um-strip-title { color: #f3f4f6; }
 [data-theme="dark"] .um-card-top,
 [data-theme="dark"] .um-row-status { color: #9ca3af; }
 [data-theme="dark"] .um-kickoff { color: #d1d5db; }

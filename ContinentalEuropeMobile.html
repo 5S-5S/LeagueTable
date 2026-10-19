@@ -127,6 +127,10 @@
     </div>
 
     <div class="league-table-container">
+        <!-- Upcoming matches in the league picked on the page (upcoming.js
+             mountRow), a card of its own above the page -->
+        <div id="upcomingRow" class="um-sport-row" hidden></div>
+
         <div class="main-card">
             <!-- Search mode: the search bar and a one-line answer, in place
                  of the header and controls -->
@@ -152,11 +156,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Upcoming matches in the league picked on the page (upcoming.js
-                 mountRow) - here under the header, above the search bar in
-                 search mode -->
-            <div id="upcomingRow" class="um-sport-row" hidden></div>
 
             <!-- Team Dashboard Snapshot (shown only when Team 1 is locked via URL) -->
             <div id="teamDashboardHeader" class="team-dashboard-header hidden"></div>
