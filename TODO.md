@@ -20,17 +20,17 @@ empty search box.
 1. About / sources page (closer to publication, with the crests)
 2. Self-host the club crests (closer to publication)
 3. API caching (what's left - the outage-preventing parts are done; closer to publication)
+4. Streak-ending social account (the last item before launch)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
 (none right now - favourite teams closed 2026-10-19)
 
 **Tier 3 - worthwhile features**
-4. Team Overview (the Team Dashboard rework - team-overview branch)
-5. Road to the final
-6. More competitions (depends on the data)
-7. Streak-ending social account (closer to launch)
+5. Team Overview (the Team Dashboard rework - team-overview branch)
+6. Road to the final
 
 **Tier 4 - nice to have**
+7. More competitions (depends on the data)
 8. Trivia mode
 9. Head-to-head by decade
 10. Side-by-side Team Seasons
@@ -238,8 +238,8 @@ empty search box.
   read it at the domain root. Answers are built in the browser, so
   they mostly won't be indexed; the pages themselves can be.
 
-- Later: **Streak-ending social account** — noted 2026-10-09, closer to
-  launch, after the snapped-streaks card. An X (and Bluesky) account
+- Later: **Streak-ending social account** — noted 2026-10-09, the last item
+  before launch (moved up 2026-10-19), after the snapped-streaks card. An X (and Bluesky) account
   that posts when a notable streak ends, within about an hour of full
   time - a way to reach people who aren't on the site. Builds on:
   - Live results - done 2026-10-09: a Worker cron records finished
