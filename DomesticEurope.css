@@ -1662,6 +1662,26 @@ body {
     transition: all 0.3s ease;
 }
 
+/* The menu and Hide/Show Controls buttons (fixed, top corners): their
+   colours here rather than inline, so dark mode can change them */
+.hamburger-btn,
+.collapse-controls-btn {
+    background: var(--bg-white);
+    border: 1px solid #ccc;
+    color: #374151;
+}
+
+[data-theme="dark"] .hamburger-btn,
+[data-theme="dark"] .collapse-controls-btn {
+    background: #333333;
+    border-color: #555555;
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .hamburger-line {
+    background: #e5e7eb;
+}
+
 .hamburger-btn.active {
     opacity: 0;
     visibility: hidden;

@@ -481,6 +481,10 @@ body {
     color: white;
 }
 
+[data-theme="dark"] .hamburger-line {
+    background: #e5e7eb;
+}
+
 [data-theme="dark"] .hamburger-btn {
     background: var(--bg-white);
 }
