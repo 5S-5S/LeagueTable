@@ -458,6 +458,24 @@ empty search box.
 
 ## Done
 
+- ~~Champions League stage streaks~~ — done (2026-10-19), asked for
+  2026-10-19. Snapped and on-the-line streaks within a stage: the group /
+  league stage, the knock-out stage, and each single round (Final,
+  Semi-Finals, Quarter-Finals, Round of 16) - the Team Streaks tab's
+  Competition Stage options. Nothing for qualifiers. Each stage is judged
+  against its own runs (snapped-lib.mjs STAGES); one entry per club per
+  match across all of them, a single round's run first. Single rounds
+  have a looser bar (4+ games, the club's longest of its kind in that
+  round for 10+ years; club runs only) - with the usual bars only one
+  finals streak since 1990 would have qualified. Finals are at a neutral
+  ground, so all matches only. Worded as asked: "their last 39 home Group
+  Stage matches", "last 9 Knock-Out matches", "last 9 Finals"; pills say
+  "Champions League Group Stage"; an entry lists only that stage's
+  matches and links to Team Streaks with the stage set. The replay of
+  2023-26 gave 12-21 new entries a season (2-3 more in a Champions League
+  week); live on 2026-10-19: 11 of 46 on the line, 29 of 309 snapped.
+  On this day shows past stage streaks the same way.
+
 - ~~Q&A gaps~~ — done (2026-10-19). An audit of qa.html against the
   features added since its last update. Fixed: when results appear
   (within minutes; maintenance can delay one to after midnight UTC), new
