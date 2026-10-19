@@ -12529,7 +12529,7 @@
     <script>
         // The next week's matches in the league picked on the page, and the
         // favourite teams' chip next to Search (their matches lead the row)
-        UpcomingMatches.mountRow(document.getElementById('upcomingRow'), { fallback: ['premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'] });
+        UpcomingMatches.mountRow(document.getElementById('upcomingRow'), { fallback: ['premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'], pageQuery: buildShareableFilterUrl });
         FavouritePicker.mount(document.querySelector('.header-actions'), document.querySelector('.header-actions .dark-mode-toggle'));
     </script>
 </body>

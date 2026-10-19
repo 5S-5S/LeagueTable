@@ -970,15 +970,11 @@
         window.scrollTo(0, 0);
     }
 
-    // Opened from a sport page's row (a link from this site, in this tab)
+    // Opened from a sport page's row in this tab: its links carry back=1
+    // (not the referrer, which a page opened from a file doesn't send). A
+    // shared copy of the link opens in a tab with nothing to go back to.
     function cameFromSportPage() {
-        if (history.length < 2 || !document.referrer) return false;
-        try {
-            const from = new URL(document.referrer);
-            return from.origin === window.location.origin && from.pathname !== window.location.pathname;
-        } catch (err) {
-            return false;
-        }
+        return new URLSearchParams(window.location.search).get('back') === '1' && history.length > 1;
     }
 
     function closeMatch() {
@@ -1132,7 +1128,7 @@
         [...new Set(soon.map(f => f.div))].forEach(loadSeasonData);
         const scrollLeft = el.querySelector('.um-row')?.scrollLeft || 0;
         el.innerHTML = `<div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
-            fav: favs.has(f), href: `index.html?match=${f.matchId}`, withDay: true
+            fav: favs.has(f), href: `index.html?match=${f.matchId}&back=1`, withDay: true
         })).join('')}</div>`;
         const list = el.querySelector('.um-row');
         if (list) list.scrollLeft = scrollLeft;
@@ -1144,11 +1140,26 @@
 
     // el: the row's element (moved under the header / above the search bar
     // as the page switches mode). fallback: the leagues when the page
-    // shows none (the Continental pages: ['champions-league']).
-    function mountRow(el, { fallback = [] } = {}) {
+    // shows none (the Continental pages: ['champions-league']). pageQuery:
+    // the page's tab and filters as a URL (its Copy Link) - written into
+    // this history entry as a card opens, so the match view's Back reloads
+    // the page as it was even when the browser didn't keep it (search mode
+    // has its question in the URL already).
+    function mountRow(el, { fallback = [], pageQuery = null } = {}) {
         const row = { el, divs: [] };
         rows.push(row);
         el.hidden = true;
+        ['click', 'auxclick'].forEach(type => el.addEventListener(type, event => {
+            if (!pageQuery || !event.target.closest('a.um-card')) return;
+            if (document.documentElement.classList.contains('search-mode')) return;
+            try {
+                const url = pageQuery();
+                const query = url.slice(url.indexOf('?'));
+                if (query.startsWith('?')) history.replaceState(history.state, '', query);
+            } catch (err) {
+                console.error('Keeping the page state failed:', err);
+            }
+        }));
         let queued = false;
         const update = () => {
             queued = false;
