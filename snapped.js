@@ -225,7 +225,11 @@
     function pills(s, league = COMPETITIONS[s.div].name + (stageOf(s) ? ` ${stageOf(s).word}` : '')) {
         const top = Math.max(0.1, Math.ceil((1 - s.pct) * 1000) / 10);
         const rare = `<span class="ss-pill rare" title="Longer than ${(s.pct * 100).toFixed(1)}% of ${escapeHtml(league)} runs of this kind since 1995">Top ${top}% in ${escapeHtml(league)}</span>`;
-        if (s.kind === 'h2h') return `${rare}<span class="ss-pill h2h">Head-to-head</span>`;
+        // The longest of its kind by anyone, all time (snapped-lib.mjs) -
+        // in place of the club record it also is
+        const competition = competitionPill(s, league);
+        if (s.kind === 'h2h') return `${competition || rare}<span class="ss-pill h2h">Head-to-head</span>`;
+        if (competition) return competition;
         const nextRecord = isLive(s) && s.record === s.count
             ? `<span class="ss-pill record" title="Level with ${escapeHtml(s.team)}'s longest run of this kind in ${escapeHtml(league)} (${s.record})">One more: club record</span>`
             : '';
@@ -243,6 +247,22 @@
             return `<span class="ss-pill since" title="In the top 2% of ${escapeHtml(s.team)}'s own runs of this kind over the last 20 years">Rare for ${escapeHtml(s.team)}</span>${nextRecord}`;
         }
         return rare + nextRecord;
+    }
+
+    function competitionPill(s, league) {
+        const kind = s.kind === 'h2h' ? 'head-to-head run' : 'run';
+        if (s.competitionRecord === 'record') {
+            return `<span class="ss-pill competition" title="The longest ${kind} of this kind in ${escapeHtml(league)} history">Competition record</span>`;
+        }
+        if (s.competitionRecord === 'level') {
+            return `<span class="ss-pill competition" title="Level with the longest ${kind} of this kind in ${escapeHtml(league)} history (${s.count})">One more: competition record</span>`;
+        }
+        if (s.competitionRecord === true) {
+            return s.competitionRecordNow
+                ? `<span class="ss-pill competition" title="The longest ${kind} of this kind in ${escapeHtml(league)} history when it ended; the longest now is ${s.competitionRecordNow}">Competition record then · now ${s.competitionRecordNow}</span>`
+                : `<span class="ss-pill competition" title="The longest ${kind} of this kind in ${escapeHtml(league)} history">Competition record</span>`;
+        }
+        return '';
     }
 
     // Runs that carry on across years out of the competition (or years
