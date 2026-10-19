@@ -3408,14 +3408,9 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
     padding-bottom: 1.75rem;
 }
 
-/* The upcoming matches card (upcoming.js mountRow) is first on the page,
-   with no room of its own for the fixed buttons (menu, ▼, and in search
-   mode Filters / the chip / the toggle) - the page starts below them
-   instead, and the search bar under it needs none */
-.league-table-container:has(> .um-sport-row:not([hidden])) {
-    padding-top: 4.5rem !important; /* over the phone width's 0.15rem !important */
-}
-
+/* The upcoming matches strip (upcoming.js mountRow) is first on the page
+   when shown (it keeps clear of the fixed buttons itself), so the search
+   bar under it needs no room for them */
 html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {
     padding-top: 1.5rem;
 }
@@ -3597,8 +3592,8 @@ html.search-mode body[data-theme="dark"] .search-mode-switch {
 }
 
 /* Phone width: the title needs the row, so the favourite teams' chip
-   (crest or star only) and the toggle share a line, with the Search button
-   under them */
+   (crest or star only) and the toggle share a line, with the Matches (📅
+   only) and Search buttons under them */
 html:not(.search-mode) .header-actions {
     display: grid;
     grid-template-columns: auto auto;
@@ -3607,16 +3602,23 @@ html:not(.search-mode) .header-actions {
     align-self: flex-end; /* low in the header, clear of the pinned ▼ button */
 }
 
-html:not(.search-mode) .header-actions .search-mode-switch {
+html:not(.search-mode) .header-actions #searchModeSwitch {
     grid-row: 2;
-    grid-column: 1 / -1;
+    grid-column: 2;
 }
 
-html:not(.search-mode) .header-actions :is(.fav-chip-name, .fav-chip-arrow) {
+html:not(.search-mode) .header-actions .um-row-toggle {
+    grid-row: 2;
+    grid-column: 1;
+}
+
+/* Both modes: the chip and the Matches button as icons, so search mode's
+   pinned buttons fit beside the menu button */
+.header-actions :is(.fav-chip-name, .fav-chip-arrow, .um-row-toggle-text) {
     display: none;
 }
 
-html:not(.search-mode) .header-actions .fav-chip {
+.header-actions .fav-chip {
     padding: 0 0.6rem;
 }
 

@@ -1078,6 +1078,7 @@
     // button, else `fallback` (the Continental pages: the Champions League).
     const DIV_BY_SLUG = Object.fromEntries(Object.entries(COMPETITIONS).map(([div, comp]) => [comp.slug, div]));
     const DOMESTIC_SLUGS = ['premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'];
+    const ROW_SHOWN_KEY = 'upcomingRowShown';
     const rows = [];
 
     function pageLeagues(fallback) {
@@ -1097,10 +1098,14 @@
         if (card && card.previousElementSibling !== row.el) card.before(row.el);
     }
 
+    // Hidden until the visitor turns it on (the Matches button); then the
+    // fixtures load
     function renderRow(row) {
         const { el, divs } = row;
-        if (!state.loaded || !divs.length) {
+        if (row.shown) ensureFixtures();
+        if (!row.shown || !state.loaded || !divs.length) {
             el.hidden = true;
+            clearFixedButtons(row);
             return;
         }
         const now = Date.now();
@@ -1128,6 +1133,29 @@
         })).join('')}</div>`;
         const list = el.querySelector('.um-row');
         if (list) list.scrollLeft = scrollLeft;
+        clearFixedButtons(row);
+    }
+
+    // The strip starts at the top of the page, as the main card does, and
+    // moves down only as far as a fixed button (menu, ▼, search mode's
+    // Filters / chip / toggle) that would sit on it - on a wide screen they
+    // are beside the page's column, on a phone they are over it. Measured
+    // at the top of the page, where the buttons and the strip meet.
+    const FIXED_BUTTONS = '#hamburgerBtn, #collapseControlsBtn, .header-actions';
+    function clearFixedButtons(row) {
+        const el = row.el;
+        el.style.marginTop = '';
+        if (el.hidden) return;
+        const strip = el.getBoundingClientRect();
+        const top = strip.top + window.scrollY;
+        let need = 0;
+        document.querySelectorAll(FIXED_BUTTONS).forEach(button => {
+            if (getComputedStyle(button).position !== 'fixed') return;
+            const b = button.getBoundingClientRect();
+            if (!b.width || b.left >= strip.right || b.right <= strip.left) return;
+            need = Math.max(need, b.bottom + 8 - top);
+        });
+        if (need > 0) el.style.marginTop = `${Math.ceil(need)}px`;
     }
 
     function renderRows() {
@@ -1139,11 +1167,38 @@
     // the page's tab and filters as a URL (its Copy Link) - written into
     // this history entry as a card opens, so the match view's Back reloads
     // the page as it was even when the browser didn't keep it (search mode
-    // has its question in the URL already).
-    function mountRow(el, { fallback = [], pageQuery = null } = {}) {
-        const row = { el, divs: [] };
+    // has its question in the URL already). toggleIn / toggleBefore: where
+    // the Matches button goes (the header's actions, before the toggle).
+    function mountRow(el, { fallback = [], pageQuery = null, toggleIn = null, toggleBefore = null } = {}) {
+        const row = { el, divs: [], shown: false };
+        try { row.shown = localStorage.getItem(ROW_SHOWN_KEY) === '1'; } catch (err) { /* storage blocked */ }
         rows.push(row);
         el.hidden = true;
+
+        // The Matches button (in the page's header, by Search): shows or
+        // hides the strip, remembered on this device
+        let toggle = null;
+        const syncToggle = () => {
+            if (!toggle) return;
+            toggle.setAttribute('aria-pressed', String(row.shown));
+            toggle.title = row.shown ? 'Hide upcoming matches' : 'Show upcoming matches';
+        };
+        if (toggleIn) {
+            toggle = document.createElement('button');
+            toggle.type = 'button';
+            toggle.className = 'search-mode-switch um-row-toggle';
+            toggle.innerHTML = '<span aria-hidden="true">📅</span><span class="um-row-toggle-text"> Matches</span>';
+            toggle.setAttribute('aria-label', 'Upcoming matches');
+            toggleIn.insertBefore(toggle, toggleBefore);
+            toggle.addEventListener('click', () => {
+                row.shown = !row.shown;
+                try { localStorage.setItem(ROW_SHOWN_KEY, row.shown ? '1' : '0'); } catch (err) { /* storage blocked */ }
+                syncToggle();
+                renderRow(row);
+            });
+            syncToggle();
+        }
+
         ['click', 'auxclick'].forEach(type => el.addEventListener(type, event => {
             if (!pageQuery || !event.target.closest('a.um-card')) return;
             if (document.documentElement.classList.contains('search-mode')) return;
@@ -1160,7 +1215,10 @@
             queued = false;
             placeRow(row);
             const divs = pageLeagues(fallback).map(slug => DIV_BY_SLUG[slug]).filter(Boolean);
-            if (divs.join() === row.divs.join()) return;
+            if (divs.join() === row.divs.join()) {
+                clearFixedButtons(row); // a mode switch moves the buttons
+                return;
+            }
             row.divs = divs;
             renderRow(row);
         };
@@ -1176,8 +1234,8 @@
         // Team text colors depend on the theme; the favourites lead the row
         new MutationObserver(() => renderRow(row)).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
         if (window.FavouriteTeam) FavouriteTeam.onChange(() => renderRow(row));
+        window.addEventListener('resize', () => clearFixedButtons(row));
         update();
-        ensureFixtures();
     }
 
     window.UpcomingMatches = { mount, mountRow, openMatch };

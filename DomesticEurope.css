@@ -1997,14 +1997,9 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
     padding-bottom: 1.75rem;
 }
 
-/* The upcoming matches card (upcoming.js mountRow) is first on the page,
-   with no room of its own for the fixed buttons (menu, ▼, and in search
-   mode Filters / the chip / the toggle) - the page starts below them
-   instead, and the search bar under it needs none */
-.league-table-container:has(> .um-sport-row:not([hidden])) {
-    padding-top: 3.75rem;
-}
-
+/* The upcoming matches strip (upcoming.js mountRow) is first on the page
+   when shown (it keeps clear of the fixed buttons itself), so the search
+   bar under it needs no room for them */
 html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {
     padding-top: 1.75rem;
 }

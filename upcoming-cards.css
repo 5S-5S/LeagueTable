@@ -148,6 +148,26 @@
 .um-form-dot.D { background: #9ca3af; }
 .um-form-dot.L { background: #dc2626; }
 
+/* The sport pages' Matches button (mountRow), styled as their Search
+   button: pressed while the strip shows */
+.um-row-toggle[aria-pressed="true"] {
+    background: white;
+    border-color: white;
+    color: #047857;
+}
+
+/* Search mode pins the header's buttons top-right: 📅 only there, so
+   they stay beside the strip on a wide screen */
+html.search-mode .um-row-toggle-text {
+    display: none;
+}
+
+html.search-mode .um-row-toggle[aria-pressed="true"] {
+    background: #059669;
+    border-color: #059669;
+    color: white;
+}
+
 /* The sport pages' row (mountRow): cards are links there */
 a.um-card {
     text-decoration: none;

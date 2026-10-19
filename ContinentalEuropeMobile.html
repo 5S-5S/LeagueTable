@@ -15454,9 +15454,11 @@
     <script src="favourite-picker.js"></script>
     <script src="upcoming.js"></script>
     <script>
-        // The next week's matches in the league picked on the page, and the
-        // favourite teams' chip next to Search (their matches lead the row)
-        UpcomingMatches.mountRow(document.getElementById('upcomingRow'), { fallback: ['champions-league'], pageQuery: buildShareableFilterUrl });
+        // The next week's matches in the league picked on the page (hidden
+        // until the Matches button turns them on), and the favourite teams'
+        // chip next to Search (their matches lead the row)
+        UpcomingMatches.mountRow(document.getElementById('upcomingRow'), { fallback: ['champions-league'], pageQuery: buildShareableFilterUrl,
+            toggleIn: document.querySelector('.header-actions'), toggleBefore: document.querySelector('.header-actions .dark-mode-toggle') });
         FavouritePicker.mount(document.querySelector('.header-actions'), document.querySelector('.header-actions .dark-mode-toggle'));
     </script>
 </body>
