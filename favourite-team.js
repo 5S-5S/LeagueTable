@@ -1,33 +1,45 @@
-// The visitor's favourite team: one club, kept in this browser
-// (localStorage) so the home page can lead with it - On this day
-// (onthisday.js) first; other cards and pages can read it the same way.
+// The visitor's favourite teams: any number of clubs, in the order they
+// were added, kept in this browser (localStorage) so the home page can
+// lead with them; other cards and pages can read them the same way.
 // Club names are the site's own (team-registry.js), which are the same in
 // every competition, so one name finds a club's domestic and Champions
 // League matches alike.
 //
-// Exposes window.FavouriteTeam = { get(), set(team), clear(), onChange(fn),
-// allTeams(), resolve(text) }. Needs team-registry.js.
+// Exposes window.FavouriteTeam = { list(), get(), has(team), add(team),
+// remove(team), set(team), clear(), onChange(fn), allTeams(), resolve(text) }.
+// get() is the first team, set(team) makes it the only one; onChange's
+// listeners get the new list. Needs team-registry.js.
 (function () {
     'use strict';
 
+    // A JSON list; one team picked before there could be several was
+    // stored as its plain name, and still reads as a list of one
     const STORAGE_KEY = 'favouriteTeam';
     const listeners = new Set();
     let teams = null;
 
     // Storage can be missing or refuse (a private window, blocked site
-    // data) - then the favourite lasts until the page closes
-    let memory = '';
+    // data) - then the favourites last until the page closes
+    let memory = [];
     function read() {
+        let raw;
         try {
-            return localStorage.getItem(STORAGE_KEY) || '';
+            raw = localStorage.getItem(STORAGE_KEY);
         } catch (err) {
             return memory;
         }
-    }
-    function write(team) {
-        memory = team;
+        if (!raw) return [];
         try {
-            if (team) localStorage.setItem(STORAGE_KEY, team);
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed.filter(team => typeof team === 'string') : [];
+        } catch (err) {
+            return [raw];
+        }
+    }
+    function write(list) {
+        memory = list;
+        try {
+            if (list.length) localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
             else localStorage.removeItem(STORAGE_KEY);
         } catch (err) {
             // kept in memory above
@@ -61,22 +73,28 @@
         return contains.length === 1 ? contains[0] : '';
     }
 
-    function get() {
-        const team = read();
-        return team && allTeams().includes(team) ? team : '';
+    // Only clubs the registry still knows, each once
+    function list() {
+        const known = allTeams();
+        return [...new Set(read())].filter(team => known.includes(team));
     }
 
-    function set(team) {
-        const value = team && allTeams().includes(team) ? team : '';
-        if (value === get()) return;
-        write(value);
-        listeners.forEach(fn => fn(value));
+    function save(next) {
+        if (next.join('\n') === list().join('\n')) return;
+        write(next);
+        listeners.forEach(fn => fn(next.slice()));
     }
+
+    const isTeam = team => Boolean(team) && allTeams().includes(team);
 
     window.FavouriteTeam = {
-        get,
-        set,
-        clear: () => set(''),
+        list,
+        get: () => list()[0] || '',
+        has: team => list().includes(team),
+        add: team => { if (isTeam(team) && !list().includes(team)) save([...list(), team]); },
+        remove: team => save(list().filter(t => t !== team)),
+        set: team => save(isTeam(team) ? [team] : []),
+        clear: () => save([]),
         onChange: fn => listeners.add(fn),
         allTeams,
         resolve

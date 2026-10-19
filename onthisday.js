@@ -9,9 +9,9 @@
 //   club doesn't fill it. Only facts are labelled (the stage, a shootout,
 //   the streak a match ended); nothing that depends on how strong a club
 //   was then.
-// - Your team: every match the visitor's favourite team (favourite-team.js)
-//   played on this day, newest first, picked with the sport pages' team
-//   search box (combobox.js).
+// - Your team(s): every match the visitor's favourite teams
+//   (favourite-team.js, picked with the top bar's chip) played on this
+//   day, all together, newest first.
 // A match that ended a notable streak says so, as the snapped streaks card
 // words it (snapped.js), with a link to the run in Team Streaks. Each match
 // opens into links to the tools that answer it: the full head-to-head,
@@ -20,7 +20,8 @@
 //
 // The matches and streaks come from /api/on-this-day (the visitor's own
 // date; the streaks from the snapped-streaks job). Needs team-registry.js,
-// combobox.js, favourite-team.js, snapped.js, and search.js for the links.
+// favourite-team.js, favourite-picker.js, snapped.js, and search.js for the
+// links.
 (function () {
     'use strict';
 
@@ -173,10 +174,12 @@
         return [...picked, ...rest].slice(0, NOTABLE_MAX);
     }
 
-    function teamList(team) {
+    // Each match told from the side of the first of the teams in it (the
+    // order they were added)
+    function teamList(teams) {
         return state.matches
-            .filter(m => m.homeTeam === team || m.awayTeam === team)
-            .map(m => ({ m, ...notability(m) }));
+            .filter(m => teams.includes(m.homeTeam) || teams.includes(m.awayTeam))
+            .map(m => ({ m, ...notability(m), team: teams.find(team => team === m.homeTeam || team === m.awayTeam) }));
     }
 
     // --- One match ----------------------------------------------------------
@@ -277,11 +280,13 @@
             return;
         }
         els.section.hidden = false;
-        const team = FavouriteTeam.get();
+        const teams = FavouriteTeam.list();
+        const team = teams[0] || '';
+        const several = teams.length > 1;
         const teamView = state.view === 'team';
         const day = dayAndMonth(state.md);
 
-        const views = [['notable', 'Notable'], ['team', team ? `⭐ ${team}` : '⭐ Your team']];
+        const views = [['notable', 'Notable'], ['team', several ? '⭐ Your teams' : team ? `⭐ ${team}` : '⭐ Your team']];
         els.head.innerHTML = `
             <div class="ss-title-row">
                 <h2 class="ss-title">On this day · ${escapeHtml(day)}</h2>
@@ -290,23 +295,21 @@
                 </div>
             </div>
             <p class="ss-sub">${teamView
-                ? (team ? `Every match ${escapeHtml(team)} played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
+                ? (several ? `Every match your teams played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
+                    : team ? `Every match ${escapeHtml(team)} played on ${escapeHtml(day)}. Click one for its head-to-head and that day's matches.`
                     : `Pick your team to see every match it played on ${escapeHtml(day)}. It's remembered on this device.`)
                 : `Finals, big wins, high scores and the notable streaks that ended on ${escapeHtml(day)} in years gone by. Click one for its head-to-head and that day's matches.`}</p>`;
 
-        els.teamRow.hidden = !teamView;
-        els.remove.hidden = !team;
-        if (teamCombobox && teamCombobox.currentValue !== team) teamCombobox.setValue(team, team);
-
+        // No team yet: the top bar chip's panel
         if (teamView && !team) {
-            els.body.innerHTML = '';
+            els.body.innerHTML = '<div class="ss-pick"><button type="button" class="btn btn-secondary" data-fav-open>⭐ Pick your team</button></div>';
             return;
         }
         if (!state.matches) {
             els.body.innerHTML = '<p class="ss-loading">Loading the matches...</p>';
             return;
         }
-        const all = teamView ? teamList(team) : notableList();
+        const all = teamView ? teamList(teams) : notableList();
         const shown = all.slice(0, state.shown);
         const more = all.length - shown.length;
         const count = teamView
@@ -314,10 +317,10 @@
             : `The ${shown.length === 1 ? 'standout match' : `${shown.length} standout matches`} of the ${state.matches.length.toLocaleString()} played on ${day}`;
         els.body.innerHTML = all.length
             ? `<p class="ss-count">${escapeHtml(count)}</p>
-               <div class="ss-list">${shown.map(x => entryHtml(x, teamView ? team : '')).join('')}</div>
+               <div class="ss-list">${shown.map(x => entryHtml(x, teamView ? x.team : '')).join('')}</div>
                ${more > 0 ? `<div class="otd-more"><button type="button" class="btn btn-secondary" data-more>Show ${Math.min(more, teamView ? TEAM_PAGE : NOTABLE_PAGE)} more</button></div>` : ''}`
             : `<p class="ss-empty">${teamView
-                ? `${escapeHtml(team)} haven't played on ${escapeHtml(day)} in these competitions. Switch to Notable for the day's standout matches.`
+                ? `${several ? 'Your teams' : escapeHtml(team)} haven't played on ${escapeHtml(day)} in these competitions. Switch to Notable for the day's standout matches.`
                 : `Nothing stands out among the matches played on ${escapeHtml(day)}.`}</p>`;
     }
 
@@ -332,8 +335,6 @@
         state.shown = view === 'team' ? TEAM_PAGE : NOTABLE_PAGE;
         state.open.clear();
         render();
-        // No team yet: straight into the search box
-        if (view === 'team' && !FavouriteTeam.get()) els.input.focus();
     }
 
     function handleClick(event) {
@@ -342,9 +343,9 @@
             if (state.view !== viewButton.dataset.view) setView(viewButton.dataset.view);
             return;
         }
-        if (event.target.closest('[data-remove]')) {
-            FavouriteTeam.clear();
-            setView('notable');
+        // No team yet: the top bar's chip opens its panel
+        if (event.target.closest('[data-fav-open]')) {
+            if (window.FavouritePicker) FavouritePicker.open();
             return;
         }
         if (event.target.closest('[data-more]')) {
@@ -387,55 +388,30 @@
         render();
     }
 
-    let teamCombobox = null;
-
     // section: the card's element (a .search-card, so it hides with the
     // search card while a match is open)
     function mount(section) {
         section.hidden = true;
         section.innerHTML = `
             <div class="ss-head" data-head></div>
-            <div class="otd-team-row" data-team-row hidden>
-                <label class="otd-team-label" for="otdTeamInput">⭐ Your team</label>
-                <div class="otd-team-picker">
-                    <div class="combobox-container" id="otdTeamContainer">
-                        <input type="text" id="otdTeamInput" class="combobox-input" placeholder="Search for a team" autocomplete="off">
-                        <span class="combobox-arrow">▼</span>
-                        <div class="combobox-dropdown" id="otdTeamDropdown"></div>
-                    </div>
-                    <button type="button" class="otd-remove" data-remove hidden>Remove</button>
-                </div>
-            </div>
             <div data-body></div>`;
         els = {
             section,
             head: section.querySelector('[data-head]'),
-            teamRow: section.querySelector('[data-team-row]'),
-            input: section.querySelector('#otdTeamInput'),
-            remove: section.querySelector('[data-remove]'),
             body: section.querySelector('[data-body]')
         };
-        teamCombobox = new Combobox('otdTeamContainer', 'otdTeamInput', 'otdTeamDropdown', 'Search for a team', value => {
-            if (!value) return;
-            FavouriteTeam.set(value);
-            state.shown = TEAM_PAGE;
-            state.open.clear();
-            render();
-        }, { logoLeague: 'champions-league', allowEmpty: false });
-        teamCombobox.setOptions(FavouriteTeam.allTeams().map(team => ({ value: team, text: team })));
-
-        // Opens on the favourite's matches when there is one
-        state.view = FavouriteTeam.get() ? 'team' : 'notable';
+        // Opens on the favourites' matches when there are any
+        state.view = FavouriteTeam.list().length ? 'team' : 'notable';
         state.shown = state.view === 'team' ? TEAM_PAGE : NOTABLE_PAGE;
         section.addEventListener('click', handleClick);
         section.addEventListener('keydown', handleKey);
         // Team text colors depend on the theme
         new MutationObserver(render).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
-        // A pick (here or in the top bar's chip) shows its matches;
-        // removing it goes back to the day's notable ones
-        FavouriteTeam.onChange(team => {
-            state.view = team ? 'team' : 'notable';
-            state.shown = team ? TEAM_PAGE : NOTABLE_PAGE;
+        // A pick (the top bar's chip) shows the teams' matches; removing
+        // the last one goes back to the day's notable ones
+        FavouriteTeam.onChange(teams => {
+            state.view = teams.length ? 'team' : 'notable';
+            state.shown = teams.length ? TEAM_PAGE : NOTABLE_PAGE;
             state.open.clear();
             render();
         });

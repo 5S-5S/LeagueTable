@@ -46,6 +46,15 @@
     color: #1f2937;
 }
 
+.fav-chip-more {
+    flex-shrink: 0;
+    padding: 0.05rem 0.4rem;
+    border-radius: 0.6rem;
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.75rem;
+}
+
 .fav-chip-arrow {
     color: #6b7280;
     font-size: 0.75rem;
@@ -77,6 +86,62 @@
         width: auto;
         max-width: none;
     }
+}
+
+/* The teams picked so far, each with its remove button */
+.fav-teams {
+    margin: 0 0 0.75rem;
+    padding: 0;
+    list-style: none;
+    max-height: 14rem;
+    overflow-y: auto;
+}
+
+.fav-teams[hidden] {
+    display: none;
+}
+
+.fav-team {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.fav-team img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.fav-team-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fav-team-remove {
+    width: 1.6rem;
+    height: 1.6rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #6b7280;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.fav-team-remove:hover {
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .fav-panel-label {
@@ -131,3 +196,7 @@
 [data-theme="dark"] .fav-panel-note { color: #9ca3af; }
 [data-theme="dark"] .fav-remove { border-color: #6b7280; color: #d1d5db; }
 [data-theme="dark"] .fav-remove:hover { background: #3f3f46; }
+[data-theme="dark"] .fav-chip-more { background: #78350f; color: #fde68a; }
+[data-theme="dark"] .fav-team { color: #f3f4f6; border-color: #3f3f46; }
+[data-theme="dark"] .fav-team-remove { color: #9ca3af; }
+[data-theme="dark"] .fav-team-remove:hover { background: #7f1d1d; color: #fecaca; }
