@@ -25,32 +25,31 @@ empty search box.
 4. Expand favourite team (home page done; search and sport pages left)
 
 **Tier 3 - worthwhile features**
-5. Recent searches
-6. Road to the final
-7. More competitions (depends on the data)
-8. Streak-ending social account (closer to launch)
+5. Road to the final
+6. More competitions (depends on the data)
+7. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-9. Trivia mode
-10. Head-to-head by decade
-11. Side-by-side Team Seasons
-12. League History chart
-13. Team Records: bottom / relegated, home / away
-14. A club's title races
-15. Team progression chart (after League History)
-16. "/" to search
-17. Penalty shootout leaderboard (team and head-to-head answers done)
-18. "Won on penalties" in Match Finder
-19. Lighter pages (small gain - see the item)
-20. Knockout Stage bracket view (on hold)
-21. Country vs Country
-22. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-23. Review upcoming matches
-24. Phone-width checks in npm run check
-25. Team-colour contrast
-26. Sitemap + Google Search Console
-27. Club names that differ from worldfootball.net
-28. Champions League data fixes (found 2026-10-13)
+8. Trivia mode
+9. Head-to-head by decade
+10. Side-by-side Team Seasons
+11. League History chart
+12. Team Records: bottom / relegated, home / away
+13. A club's title races
+14. Team progression chart (after League History)
+15. "/" to search
+16. Penalty shootout leaderboard (team and head-to-head answers done)
+17. "Won on penalties" in Match Finder
+18. Lighter pages (small gain - see the item)
+19. Knockout Stage bracket view (on hold)
+20. Country vs Country
+21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+22. Review upcoming matches
+23. Phone-width checks in npm run check
+24. Team-colour contrast
+25. Sitemap + Google Search Console
+26. Club names that differ from worldfootball.net
+27. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -257,10 +256,6 @@ empty search box.
   club's season as its whole path: group results, then each knockout tie
   on aggregate ("Liverpool 2018-19 run"). The tie code already pairs
   legs.
-
-- Maybe: **Recent searches** — noted 2026-10-03. A visitor's last few
-  questions, kept in their browser (localStorage), at the top of the
-  empty search bar's suggestions. Pairs with the pinned-team idea.
 
 - Maybe: **Head-to-head by decade** — noted 2026-10-03. A rivalry's
   record split by decade ("Arsenal v Spurs: 1990s W12 D6 L2, ...") to
@@ -469,6 +464,16 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Recent searches~~ — done (2026-10-19), noted 2026-10-03. The last 5
+  answers opened from any search bar (home page and the four sport
+  pages), in a "🕘 Recent" group at the top of the empty bar's guide with
+  a Clear link. Kept in this browser only (localStorage recentSearches),
+  newest first, from every competition with its badge; each shows the
+  answer's title and detail, not what was typed, and the same answer
+  opened again moves to the top. The guide's examples aren't saved;
+  opening a recent one logs outcome "recent". The Q&A privacy answer
+  says so; checkRecent() in check:search covers it.
 
 - ~~Champions League stage streaks and competition records~~ — done (2026-10-19), asked for
   2026-10-19. Snapped and on-the-line streaks within a stage: the group /
