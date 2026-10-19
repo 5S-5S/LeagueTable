@@ -397,9 +397,8 @@
         return team ? fixtures.find(f => f.homeTeam === team || f.awayTeam === team) || null : null;
     }
 
-    // fav: the favourite's next match, starred and first in the row;
-    // pinned: from another day than the one on show, so it says which
-    function cardHtml(fixture, { fav = false, pinned = false } = {}) {
+    // fav: the favourite's next match, starred and first in its day's row
+    function cardHtml(fixture, { fav = false } = {}) {
         const comp = COMPETITIONS[fixture.div];
         // Crest, the name with its league position underneath, form dots
         const teamLine = team => `
@@ -412,10 +411,10 @@
             </span>
             ${formDots(fixture, team)}`;
         return `
-            <button type="button" class="um-card${fav ? ' um-card-fav' : ''}" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fav ? 'Your team: ' : ''}${fixture.homeTeam} vs ${fixture.awayTeam}, ${pinned ? `${dayLabel(new Date(fixture.utcDate))} ` : ''}${kickoffTime(fixture)}`)}">
+            <button type="button" class="um-card${fav ? ' um-card-fav' : ''}" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fav ? 'Your team: ' : ''}${fixture.homeTeam} vs ${fixture.awayTeam}, ${kickoffTime(fixture)}`)}">
                 <span class="um-card-top">
                     <span class="um-card-comp">${fav ? '<span class="um-fav-star" aria-hidden="true">⭐</span>' : ''}${comp.flag} ${escapeHtml(comp.name)}</span>
-                    <span class="um-kickoff">${escapeHtml(pinned ? `${dayLabel(new Date(fixture.utcDate))} · ${kickoffTime(fixture)}` : kickoffTime(fixture))}</span>
+                    <span class="um-kickoff">${escapeHtml(kickoffTime(fixture))}</span>
                 </span>
                 <span class="um-card-teams">
                     ${teamLine(fixture.homeTeam)}
@@ -435,15 +434,13 @@
         if (!days.some(d => d.key === state.day)) state.day = days.length ? days[0].key : null;
         const day = days.find(d => d.key === state.day);
 
-        // The favourite's next match leads the row: moved to the front on
-        // its own day (whose tab is starred), and pinned before the first
-        // tab's matches - what the strip opens on - when it's another day
+        // The favourite's next match: its day's tab is starred, and on that
+        // day it leads the row - only there, not on days it isn't playing
         const fav = favouriteFixture(fixtures);
-        const favPinned = fav && day === days[0] && !day.fixtures.includes(fav);
         const rowFixtures = day ? (fav && day.fixtures.includes(fav) ? [fav, ...day.fixtures.filter(f => f !== fav)] : day.fixtures) : [];
 
         // Positions and form for the competitions on show
-        [...new Set([...rowFixtures, ...(favPinned ? [fav] : [])].map(f => f.div))].forEach(loadSeasonData);
+        if (day) [...new Set(day.fixtures.map(f => f.div))].forEach(loadSeasonData);
 
         const chips = [['all', 'All'], ...COMPETITION_ORDER.map(div => [div, `${COMPETITIONS[div].flag} ${COMPETITIONS[div].name}`])];
         const status = !day
@@ -465,7 +462,7 @@
                 `<button type="button" role="tab" class="um-day-tab${d.key === state.day ? ' active' : ''}" aria-selected="${d.key === state.day}" data-day="${d.key}">${escapeHtml(waiting ? longDay(d.date) : dayLabel(d.date))}${fav && d.fixtures.includes(fav) ? ' <span class="um-fav-star" aria-label="your team plays">⭐</span>' : ''}</button>`
             ).join('')}</div>` : ''}
             <p class="um-status">${escapeHtml(status)}</p>
-            ${day ? `<div class="um-row">${favPinned ? cardHtml(fav, { fav: true, pinned: true }) : ''}${rowFixtures.map(f => cardHtml(f, { fav: f === fav })).join('')}</div>` : ''}`;
+            ${day ? `<div class="um-row">${rowFixtures.map(f => cardHtml(f, { fav: f === fav })).join('')}</div>` : ''}`;
         const row = els.strip.querySelector('.um-row');
         if (row) row.scrollLeft = scrollLeft;
     }
