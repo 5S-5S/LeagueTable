@@ -458,7 +458,7 @@ empty search box.
 
 ## Done
 
-- ~~Champions League stage streaks~~ — done (2026-10-19), asked for
+- ~~Champions League stage streaks and competition records~~ — done (2026-10-19), asked for
   2026-10-19. Snapped and on-the-line streaks within a stage: the group /
   league stage, the knock-out stage, and each single round (Final,
   Semi-Finals, Quarter-Finals, Round of 16) - the Team Streaks tab's
@@ -475,6 +475,17 @@ empty search box.
   2023-26 gave 12-21 new entries a season (2-3 more in a Champions League
   week); live on 2026-10-19: 11 of 46 on the line, 29 of 309 snapped.
   On this day shows past stage streaks the same way.
+  Also 2026-10-19: a **Competition record** pill - the longest run of its
+  kind by anyone in the competition (or stage), all time, in place of
+  Club record (noticed with Bayern's 39 home Group Stage games unbeaten,
+  ahead of Barcelona's 33). Snapped: a record when it ended ("then · now
+  N" if beaten since); on the line: already the longest, or level ("One
+  more"). Labels only - the lists don't change. Fixed the same night: a
+  snapped run must also beat the runs still going when it ended (Real
+  Madrid v Bayern's 9 unbeaten showed "record then · now 11", but Bayern
+  v Benfica's 11, going since 1976, was already ahead). Live: 1 on the
+  line, 4 snapped in the last year (Leverkusen's 37 away unbeaten, PSG
+  conceding in 17 straight quarter-finals, ...).
 
 - ~~Q&A gaps~~ — done (2026-10-19). An audit of qa.html against the
   features added since its last update. Fixed: when results appear
