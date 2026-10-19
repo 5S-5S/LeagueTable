@@ -85,11 +85,30 @@
         filterDiv: 'all',
         page: 1,
         open: new Set(),        // keys of expanded entries
-        matches: new Map()      // key -> { status: 'loading' | 'ready' | 'error', ended, run }
+        matches: new Map(),     // key -> { status: 'loading' | 'ready' | 'error', ended, run }
+        collapsed: readCollapsed() // favourite teams whose runs are folded away
     };
     let els = null;
 
     // --- Helpers ----------------------------------------------------------
+
+    // The team view's folded teams, remembered in this browser (or until
+    // the page closes, where storage refuses)
+    function readCollapsed() {
+        try {
+            const list = JSON.parse(localStorage.getItem('collapsedTeams') || '[]');
+            return new Set(Array.isArray(list) ? list : []);
+        } catch (err) {
+            return new Set();
+        }
+    }
+    function writeCollapsed() {
+        try {
+            localStorage.setItem('collapsedTeams', JSON.stringify([...state.collapsed]));
+        } catch (err) {
+            // kept in state
+        }
+    }
 
     const jsonCache = new Map();
     function fetchJson(url) {
@@ -536,14 +555,23 @@
         const present = new Set(all.map(s => s.div));
         const chips = [['all', 'All'], ...COMPETITION_ORDER.filter(div => present.has(div)).map(div => [div, `${COMPETITIONS[div].flag} ${COMPETITIONS[div].name}`])];
         const filtered = all.filter(s => state.filterDiv === 'all' || s.div === state.filterDiv);
-        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        // Several teams: a folded team keeps only its heading, so the pages
+        // hold the runs still shown
+        const perTeam = new Map(teams.map(t => [t, filtered.filter(s => ownerOf(s, teams) === t)]));
+        const rows = teamView && several
+            ? teams.flatMap(t => {
+                const mine = perTeam.get(t);
+                return mine.length && state.collapsed.has(t) ? [{ collapsedTeam: t, div: mine[0].div }] : mine;
+            })
+            : filtered;
+        const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
         state.page = Math.min(Math.max(1, state.page), totalPages);
         const pageStart = (state.page - 1) * PAGE_SIZE;
-        const pageStreaks = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+        const pageStreaks = rows.slice(pageStart, pageStart + PAGE_SIZE);
         const recentFrom = isoDaysAgo(RECENT_DAYS);
 
         const where = state.filterDiv === 'all' ? '' : ` in ${COMPETITIONS[state.filterDiv].name}`;
-        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${teamView ? 'on the line or snapped' : onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
+        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${teamView ? 'on the line or snapped' : onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 && rows === filtered ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
         // Previous / Page X of Y / Next, as Team Streaks' historic list
         const controls = totalPages > 1 ? `
             <div class="flex items-center justify-center gap-4 py-4">
@@ -555,12 +583,24 @@
         const views = [['line', 'On the line'], ['snapped', 'Snapped'], ['team', several ? '⭐ Your teams' : team ? `⭐ ${team}` : '⭐ Your team']];
         // The team view: with several teams a heading for each, and within
         // a team a heading before its on the line and its snapped entries
+        // A team's heading folds its runs away (the chevron on the right),
+        // with how many there are
+        const teamHeadingHtml = (team, div) => {
+            const folded = state.collapsed.has(team);
+            const n = perTeam.get(team).length;
+            return `<h3 class="ss-group ss-group-team${folded ? ' folded' : ''}">
+                <button type="button" class="ss-team-toggle" data-fold="${escapeHtml(team)}" aria-expanded="${!folded}">
+                    ${crest(team, div)}<span class="ss-team-name">${escapeHtml(team)}</span>
+                    <span class="ss-team-count">${n} streak${n === 1 ? '' : 's'}</span>
+                    <span class="ss-chevron" aria-hidden="true">▶</span>
+                </button></h3>`;
+        };
+        const ownerOfRow = s => s.collapsedTeam || ownerOf(s, teams);
         const teamGroups = list => list.map((s, i) => {
+            if (s.collapsedTeam) return teamHeadingHtml(s.collapsedTeam, s.div);
             const owner = ownerOf(s, teams);
-            const newTeam = i === 0 || ownerOf(list[i - 1], teams) !== owner;
-            const teamHeading = several && newTeam
-                ? `<h3 class="ss-group ss-group-team">${crest(owner, s.div)}${escapeHtml(owner)}</h3>`
-                : '';
+            const newTeam = i === 0 || ownerOfRow(list[i - 1]) !== owner;
+            const teamHeading = several && newTeam ? teamHeadingHtml(owner, s.div) : '';
             const heading = (newTeam || isLive(list[i - 1]) !== isLive(s))
                 ? `<h3 class="ss-group">${isLive(s) ? 'On the line in the next 7 days' : 'Snapped in the last year'}</h3>`
                 : '';
@@ -633,6 +673,18 @@
         // No favourite yet: the top bar's chip opens its panel
         if (event.target.closest('[data-fav-open]')) {
             if (window.FavouritePicker) FavouritePicker.open();
+            return;
+        }
+        // A team's heading: fold or unfold its runs
+        const fold = event.target.closest('[data-fold]');
+        if (fold) {
+            const team = fold.dataset.fold;
+            if (state.collapsed.has(team)) state.collapsed.delete(team);
+            else state.collapsed.add(team);
+            writeCollapsed();
+            render();
+            const again = [...els.section.querySelectorAll('[data-fold]')].find(b => b.dataset.fold === team);
+            if (again) again.focus();
             return;
         }
         // The fixture's match view, in place (upcoming.js) - a plain link
