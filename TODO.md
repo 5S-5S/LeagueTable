@@ -22,7 +22,7 @@ empty search box.
 3. API caching (what's left - the outage-preventing parts are done; closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-4. Expand favourite team (On this day uses it)
+4. Expand favourite team (home page done; search and sport pages left)
 
 **Tier 3 - worthwhile features**
 5. Recent searches
@@ -339,18 +339,22 @@ empty search box.
 
 - Maybe: **Expand favourite team** — the visitor's team is kept since
   2026-10-15 (favourite-team.js: window.FavouriteTeam - get / set / clear
-  / onChange / allTeams / resolve, in localStorage) and picked and used
-  only by On this day's "Your team" view (combobox.js, the sport pages'
-  team search box). Moved to Tier 2 on 2026-10-09: it lets the home page
-  lead with the visitor's club. Where else it could go:
-  - Upcoming matches: the favourite's next fixture first (or a filter).
-  - The streaks card: a "Your team" view like On this day's, its runs on
-    the line and snapped.
+  / onChange / allTeams / resolve, in localStorage). Moved to Tier 2 on
+  2026-10-09: it lets the home page lead with the visitor's club.
+  Home page done 2026-10-19:
+  - ~~One place to pick it~~ - the top bar's chip (favourite-picker.js),
+    next to the dark mode toggle; On this day keeps its own box too.
+  - ~~Upcoming matches~~ - every day the favourite plays has a starred
+    tab, and on that day its match leads the row (not pinned on other
+    days - decided 2026-10-19).
+  - ~~The streaks card~~ - a third "⭐ <team>" view: its runs on the line,
+    then those it snapped. Picking a team switches this card and On this
+    day to it; removing it switches them back.
+  Still to do:
   - The search: a one-click shortcut to the favourite's dashboard, and
     questions about "my team".
   - The sport pages: Team 1 / Team History / Team Streaks opening on it
-    (only where the club is in that competition).
-  - One place to pick it (the header?) rather than only inside a card.
+    (only where the club is in that competition) - and the chip there too.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter
