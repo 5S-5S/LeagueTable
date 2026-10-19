@@ -391,13 +391,13 @@
     }
 
     // The visitor's favourite team (favourite-team.js, set with the top
-    // bar's chip): its next match in the competitions on show, at any date
-    function favouriteFixture(fixtures) {
+    // bar's chip): its matches in the competitions on show
+    function favouriteFixtures(fixtures) {
         const team = window.FavouriteTeam ? FavouriteTeam.get() : '';
-        return team ? fixtures.find(f => f.homeTeam === team || f.awayTeam === team) || null : null;
+        return new Set(team ? fixtures.filter(f => f.homeTeam === team || f.awayTeam === team) : []);
     }
 
-    // fav: the favourite's next match, starred and first in its day's row
+    // fav: one of the favourite's matches, starred and first in its day's row
     function cardHtml(fixture, { fav = false } = {}) {
         const comp = COMPETITIONS[fixture.div];
         // Crest, the name with its league position underneath, form dots
@@ -434,10 +434,10 @@
         if (!days.some(d => d.key === state.day)) state.day = days.length ? days[0].key : null;
         const day = days.find(d => d.key === state.day);
 
-        // The favourite's next match: its day's tab is starred, and on that
-        // day it leads the row - only there, not on days it isn't playing
-        const fav = favouriteFixture(fixtures);
-        const rowFixtures = day ? (fav && day.fixtures.includes(fav) ? [fav, ...day.fixtures.filter(f => f !== fav)] : day.fixtures) : [];
+        // The favourite's matches: each day it plays has a starred tab, and
+        // on that day its match leads the row - not on days it isn't playing
+        const favs = favouriteFixtures(fixtures);
+        const rowFixtures = day ? [...day.fixtures.filter(f => favs.has(f)), ...day.fixtures.filter(f => !favs.has(f))] : [];
 
         // Positions and form for the competitions on show
         if (day) [...new Set(day.fixtures.map(f => f.div))].forEach(loadSeasonData);
@@ -459,10 +459,10 @@
                 ).join('')}</div>
             </div>
             ${days.length > 1 || waiting ? `<div class="um-days" role="tablist">${days.map(d =>
-                `<button type="button" role="tab" class="um-day-tab${d.key === state.day ? ' active' : ''}" aria-selected="${d.key === state.day}" data-day="${d.key}">${escapeHtml(waiting ? longDay(d.date) : dayLabel(d.date))}${fav && d.fixtures.includes(fav) ? ' <span class="um-fav-star" aria-label="your team plays">⭐</span>' : ''}</button>`
+                `<button type="button" role="tab" class="um-day-tab${d.key === state.day ? ' active' : ''}" aria-selected="${d.key === state.day}" data-day="${d.key}">${escapeHtml(waiting ? longDay(d.date) : dayLabel(d.date))}${d.fixtures.some(f => favs.has(f)) ? ' <span class="um-fav-star" aria-label="your team plays">⭐</span>' : ''}</button>`
             ).join('')}</div>` : ''}
             <p class="um-status">${escapeHtml(status)}</p>
-            ${day ? `<div class="um-row">${rowFixtures.map(f => cardHtml(f, { fav: f === fav })).join('')}</div>` : ''}`;
+            ${day ? `<div class="um-row">${rowFixtures.map(f => cardHtml(f, { fav: favs.has(f) })).join('')}</div>` : ''}`;
         const row = els.strip.querySelector('.um-row');
         if (row) row.scrollLeft = scrollLeft;
     }
