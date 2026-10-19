@@ -22,34 +22,36 @@ empty search box.
 3. API caching (what's left - the outage-preventing parts are done; closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-4. Expand favourite team (home page done; search and sport pages left)
+4. Expand favourite team: the sport pages (home page done; the search part is #6)
 
 **Tier 3 - worthwhile features**
-5. Road to the final
-6. More competitions (depends on the data)
-7. Streak-ending social account (closer to launch)
+5. Team Overview (the Team Dashboard rework - team-overview branch)
+6. Favourite team in search (after Team Overview)
+7. Road to the final
+8. More competitions (depends on the data)
+9. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-8. Trivia mode
-9. Head-to-head by decade
-10. Side-by-side Team Seasons
-11. League History chart
-12. Team Records: bottom / relegated, home / away
-13. A club's title races
-14. Team progression chart (after League History)
-15. "/" to search
-16. Penalty shootout leaderboard (team and head-to-head answers done)
-17. "Won on penalties" in Match Finder
-18. Lighter pages (small gain - see the item)
-19. Knockout Stage bracket view (on hold)
-20. Country vs Country
-21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-22. Review upcoming matches
-23. Phone-width checks in npm run check
-24. Team-colour contrast
-25. Sitemap + Google Search Console
-26. Club names that differ from worldfootball.net
-27. Champions League data fixes (found 2026-10-13)
+10. Trivia mode
+11. Head-to-head by decade
+12. Side-by-side Team Seasons
+13. League History chart
+14. Team Records: bottom / relegated, home / away
+15. A club's title races
+16. Team progression chart (after League History)
+17. "/" to search
+18. Penalty shootout leaderboard (team and head-to-head answers done)
+19. "Won on penalties" in Match Finder
+20. Lighter pages (small gain - see the item)
+21. Knockout Stage bracket view (on hold)
+22. Country vs Country
+23. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+24. Review upcoming matches
+25. Phone-width checks in npm run check
+26. Team-colour contrast
+27. Sitemap + Google Search Console
+28. Club names that differ from worldfootball.net
+29. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -358,10 +360,30 @@ empty search box.
     and the streaks card to the team view; removing the last switches
     them back.
   Still to do:
-  - The search: a one-click shortcut to each favourite's dashboard, and
-    questions about "my team" (the first team, with several).
   - The sport pages: Team 1 / Team History / Team Streaks opening on the
     first team that's in that competition - and the chip there too.
+  (The search part is its own item, Favourite team in search - split off
+  2026-10-19, as it waits for Team Overview.)
+
+- Later: **Favourite team in search** — split from Expand favourite team
+  on 2026-10-19; Tier 3, after Team Overview, which it points to. In the
+  empty search bar's guide, next to Recent: a one-click shortcut to each
+  favourite team's overview ("⭐ Arsenal FC"). Then questions about "my
+  team" ("my team titles", "my team vs Chelsea") - the first team, with
+  several; touches the search's parsing, so its own routing checks.
+
+- Partly done: **Team Overview (the Team Dashboard rework)** — added to
+  the ranking 2026-10-19 (top of Tier 3). Built so far on the
+  `team-overview` branch (463d815, 44dc976 - 2026-10-12), not merged: a
+  lot of work needed before main. The search's "<club>" result opens an
+  in-search overview, index.html?team=<club>&lg=<competition> (team.js,
+  team.css): this season (next two matches, five rows of the table), then
+  for the league or the Champions League the last five seasons, all-time
+  record, titles and finishes, active streaks and biggest wins, each
+  section ending in suggested searches; the old full-page dashboard is
+  linked at the foot. Still to do: layout density, and tables and fonts
+  matching the sport pages' own tabs (Team Seasons, the match view's
+  table) rather than new formats.
 
 - Maybe: **Team Records: more filters search can't reach yet** — noted
   2026-10-06 in the search audit. Questions that parse, but whose filter
