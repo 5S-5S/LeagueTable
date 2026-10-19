@@ -45,7 +45,7 @@ empty search box.
 19. Knockout Stage bracket view (on hold)
 20. Country vs Country
 21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-22. Review upcoming matches
+22. Review upcoming matches (home strip, and the sport pages' strip from 2026-10-19)
 23. Phone-width checks in npm run check
 24. Team-colour contrast
 25. Sitemap + Google Search Console
@@ -213,6 +213,20 @@ empty search box.
   - Phone layouts were checked in Chrome's iPhone emulation and once on
     the user's iPhone; worth another look on a real phone after any
     change.
+  - The sport pages' strip (added 2026-10-19, see Done - Upcoming matches
+    on the sport pages), to review later:
+    - Is the 📅 Matches button found and used? Clicks aren't in the visit
+      log yet - add an event before judging. If nobody turns it on, it
+      can go; if most do, it could start shown.
+    - On the user's iPhone: the phone header (chip and 📅 as icons, the
+      toggle and Search under the title), the strip's top edge growing
+      round the menu / ▼ buttons, and Back from a match.
+    - Page weight: the sport pages now load upcoming.js, team-registry.js,
+      combobox.js and the favourites scripts (~130 KB before gzip) even
+      with the strip hidden - fine for now, but see Lighter pages.
+    - Back from the match view relies on the page writing its Copy Link
+      state into its address; a tab or filter Copy Link doesn't capture
+      comes back at its default.
 
 - Maybe: **Phone-width checks in npm run check** — noted 2026-10-07.
   Open each page (and an upcoming match's view) at iPhone width
@@ -448,6 +462,33 @@ empty search box.
 
 ## Done
 
+- ~~Upcoming matches on the sport pages~~ — done (2026-10-19), the
+  user's idea. The home strip's cards in one row, in a card of its own
+  at the top of each sport page (as the home page's sections are, with no
+  heading and little padding; above the search bar in search mode),
+  hidden until the header's "📅 Matches" button shows it (remembered on
+  the device; nothing is fetched while hidden). It is flush with the top;
+  where a fixed button (menu, ▼, search mode's pinned buttons) sits over
+  it, its top edge grows to hold the button, as the search card's does -
+  measured, so on a wide screen there's none. The
+  next 7 days' matches in the league picked on the page - the search dropdown in
+  search mode (all five for Top 5 Leagues, each card with its flag), else
+  the open tab's league button; the Continental pages the Champions
+  League. No day tabs or chips; each card shows its league, the day and
+  kick-off, and opens the match's view on the home page
+  (index.html?match=), whose Back returns to the sport page as it was
+  (the browser's back - the search query, or the tab and league). A week
+  with none says when the next one is. The favourite teams' chip went
+  in the header too (between Search and the toggle; on phones crest or
+  star only, beside the toggle), and their matches lead the row,
+  starred. upcoming.js mountRow; card styles split into
+  upcoming-cards.css (upcoming.css's copied table rules would override
+  the sport pages' own). team-registry.js and combobox.js now expose
+  TeamRegistry / TeamCombobox instead of global names, which the sport
+  pages declare themselves (the Domestic ones without the Champions
+  League clubs - FavouriteTeam would have dropped a CL-only favourite
+  there).
+
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15
   (favourite-team.js: window.FavouriteTeam - list / get / has / add /
@@ -475,10 +516,11 @@ empty search box.
     them back.
   Dropped 2026-10-19 (the user's call):
   - The sport pages: Team 1 / Team History / Team Streaks opening on the
-    first favourite in that competition, and the chip there too. Too much
-    logic for several teams (which one, per competition, on a league
-    change) for little gain - picking a team in a tab is one click, and
-    the chip alone would only edit a list the home page uses.
+    first favourite in that competition. Too much logic for several teams
+    (which one, per competition, on a league change) for little gain -
+    picking a team in a tab is one click. (The chip did go on the sport
+    pages later that day, with their upcoming matches row - see Upcoming
+    matches on the sport pages.)
   - The search part: "my team" questions ("my team titles") and a
     one-click shortcut to each favourite in the empty bar. Typing the
     club's name is shorter than "my favourite team", and Recent searches
