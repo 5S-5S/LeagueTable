@@ -22,35 +22,35 @@ empty search box.
 3. API caching (what's left - the outage-preventing parts are done; closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-4. Expand favourite team: the sport pages (home page done)
+(none right now - favourite teams closed 2026-10-19)
 
 **Tier 3 - worthwhile features**
-5. Team Overview (the Team Dashboard rework - team-overview branch)
-6. Road to the final
-7. More competitions (depends on the data)
-8. Streak-ending social account (closer to launch)
+4. Team Overview (the Team Dashboard rework - team-overview branch)
+5. Road to the final
+6. More competitions (depends on the data)
+7. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-9. Trivia mode
-10. Head-to-head by decade
-11. Side-by-side Team Seasons
-12. League History chart
-13. Team Records: bottom / relegated, home / away
-14. A club's title races
-15. Team progression chart (after League History)
-16. "/" to search
-17. Penalty shootout leaderboard (team and head-to-head answers done)
-18. "Won on penalties" in Match Finder
-19. Lighter pages (small gain - see the item)
-20. Knockout Stage bracket view (on hold)
-21. Country vs Country
-22. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-23. Review upcoming matches
-24. Phone-width checks in npm run check
-25. Team-colour contrast
-26. Sitemap + Google Search Console
-27. Club names that differ from worldfootball.net
-28. Champions League data fixes (found 2026-10-13)
+8. Trivia mode
+9. Head-to-head by decade
+10. Side-by-side Team Seasons
+11. League History chart
+12. Team Records: bottom / relegated, home / away
+13. A club's title races
+14. Team progression chart (after League History)
+15. "/" to search
+16. Penalty shootout leaderboard (team and head-to-head answers done)
+17. "Won on penalties" in Match Finder
+18. Lighter pages (small gain - see the item)
+19. Knockout Stage bracket view (on hold)
+20. Country vs Country
+21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+22. Review upcoming matches
+23. Phone-width checks in npm run check
+24. Team-colour contrast
+25. Sitemap + Google Search Console
+26. Club names that differ from worldfootball.net
+27. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -333,39 +333,6 @@ empty search box.
   shootout record" - which needs a new all-clubs list. Moved to Tier 4
   on 2026-10-06 (low priority).
 
-- Maybe: **Expand favourite team** — the visitor's team is kept since
-  2026-10-15 (favourite-team.js: window.FavouriteTeam - list / get / has /
-  add / remove / set / clear / onChange / allTeams / resolve, in
-  localStorage). Moved to Tier 2 on 2026-10-09: it lets the home page
-  lead with the visitor's club. Home page done 2026-10-19:
-  - ~~Several teams~~ - any number, in the order added (a friend's
-    suggestion; unlimited to see how it goes). A team stored before
-    (a plain name) reads as a list of one.
-  - ~~One place to pick them~~ - the top bar's chip (favourite-picker.js),
-    next to the dark mode toggle: the first team and "+2"; its panel
-    lists the teams with × each, an "Add another team" box (only clubs
-    not picked yet) and Remove all. On this day's own box is gone - its
-    "⭐ Pick your team" opens the chip's panel, as the streaks card's.
-  - ~~Upcoming matches~~ - every day one of the teams plays has a
-    starred tab, and on that day their matches lead the row (not pinned
-    on other days - decided 2026-10-19).
-  - ~~The streaks card~~ - a third "⭐ <team>" / "⭐ Your teams" view:
-    each team's runs on the line, then those it snapped. With several
-    teams, a heading per team (crest, name, count) that folds its runs
-    away - chevron on the right, remembered on this device
-    (collapsedTeams). A run between two of them comes under the first.
-  - ~~On this day~~ - the teams' matches on the day merged, newest first,
-    each told from its team's side. Picking a team switches this card
-    and the streaks card to the team view; removing the last switches
-    them back.
-  Still to do:
-  - The sport pages: Team 1 / Team History / Team Streaks opening on the
-    first team that's in that competition - and the chip there too.
-  Dropped 2026-10-19: the search part - "my team" questions ("my team
-  titles") and a one-click shortcut to each favourite in the empty bar.
-  Typing the club's name is shorter than "my favourite team", and Recent
-  searches already keeps a club opened from search one click away.
-
 - Partly done: **Team Overview (the Team Dashboard rework)** — added to
   the ranking 2026-10-19 (top of Tier 3). Built so far on the
   `team-overview` branch (463d815, 44dc976 - 2026-10-12), not merged: a
@@ -480,6 +447,42 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
+  dropped. The visitor's teams are kept since 2026-10-15
+  (favourite-team.js: window.FavouriteTeam - list / get / has / add /
+  remove / set / clear / onChange / allTeams / resolve, in localStorage). Moved to Tier 2 on 2026-10-09: it lets the home page
+  lead with the visitor's club. Home page done 2026-10-19:
+  - ~~Several teams~~ - any number, in the order added (a friend's
+    suggestion; unlimited to see how it goes). A team stored before
+    (a plain name) reads as a list of one.
+  - ~~One place to pick them~~ - the top bar's chip (favourite-picker.js),
+    next to the dark mode toggle: the first team and "+2"; its panel
+    lists the teams with × each, an "Add another team" box (only clubs
+    not picked yet) and Remove all. On this day's own box is gone - its
+    "⭐ Pick your team" opens the chip's panel, as the streaks card's.
+  - ~~Upcoming matches~~ - every day one of the teams plays has a
+    starred tab, and on that day their matches lead the row (not pinned
+    on other days - decided 2026-10-19).
+  - ~~The streaks card~~ - a third "⭐ <team>" / "⭐ Your teams" view:
+    each team's runs on the line, then those it snapped. With several
+    teams, a heading per team (crest, name, count) that folds its runs
+    away - chevron on the right, remembered on this device
+    (collapsedTeams). A run between two of them comes under the first.
+  - ~~On this day~~ - the teams' matches on the day merged, newest first,
+    each told from its team's side. Picking a team switches this card
+    and the streaks card to the team view; removing the last switches
+    them back.
+  Dropped 2026-10-19 (the user's call):
+  - The sport pages: Team 1 / Team History / Team Streaks opening on the
+    first favourite in that competition, and the chip there too. Too much
+    logic for several teams (which one, per competition, on a league
+    change) for little gain - picking a team in a tab is one click, and
+    the chip alone would only edit a list the home page uses.
+  - The search part: "my team" questions ("my team titles") and a
+    one-click shortcut to each favourite in the empty bar. Typing the
+    club's name is shorter than "my favourite team", and Recent searches
+    already keeps a club opened from search one click away.
 
 - ~~Recent searches~~ — done (2026-10-19), noted 2026-10-03. The last 5
   answers opened from any search bar (home page and the four sport
