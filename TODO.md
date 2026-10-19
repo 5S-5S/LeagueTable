@@ -22,36 +22,35 @@ empty search box.
 3. API caching (what's left - the outage-preventing parts are done; closer to publication)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-4. Expand favourite team: the sport pages (home page done; the search part is #6)
+4. Expand favourite team: the sport pages (home page done)
 
 **Tier 3 - worthwhile features**
 5. Team Overview (the Team Dashboard rework - team-overview branch)
-6. Favourite team in search (after Team Overview)
-7. Road to the final
-8. More competitions (depends on the data)
-9. Streak-ending social account (closer to launch)
+6. Road to the final
+7. More competitions (depends on the data)
+8. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-10. Trivia mode
-11. Head-to-head by decade
-12. Side-by-side Team Seasons
-13. League History chart
-14. Team Records: bottom / relegated, home / away
-15. A club's title races
-16. Team progression chart (after League History)
-17. "/" to search
-18. Penalty shootout leaderboard (team and head-to-head answers done)
-19. "Won on penalties" in Match Finder
-20. Lighter pages (small gain - see the item)
-21. Knockout Stage bracket view (on hold)
-22. Country vs Country
-23. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-24. Review upcoming matches
-25. Phone-width checks in npm run check
-26. Team-colour contrast
-27. Sitemap + Google Search Console
-28. Club names that differ from worldfootball.net
-29. Champions League data fixes (found 2026-10-13)
+9. Trivia mode
+10. Head-to-head by decade
+11. Side-by-side Team Seasons
+12. League History chart
+13. Team Records: bottom / relegated, home / away
+14. A club's title races
+15. Team progression chart (after League History)
+16. "/" to search
+17. Penalty shootout leaderboard (team and head-to-head answers done)
+18. "Won on penalties" in Match Finder
+19. Lighter pages (small gain - see the item)
+20. Knockout Stage bracket view (on hold)
+21. Country vs Country
+22. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+23. Review upcoming matches
+24. Phone-width checks in npm run check
+25. Team-colour contrast
+26. Sitemap + Google Search Console
+27. Club names that differ from worldfootball.net
+28. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -362,15 +361,10 @@ empty search box.
   Still to do:
   - The sport pages: Team 1 / Team History / Team Streaks opening on the
     first team that's in that competition - and the chip there too.
-  (The search part is its own item, Favourite team in search - split off
-  2026-10-19, as it waits for Team Overview.)
-
-- Later: **Favourite team in search** — split from Expand favourite team
-  on 2026-10-19; Tier 3, after Team Overview, which it points to. In the
-  empty search bar's guide, next to Recent: a one-click shortcut to each
-  favourite team's overview ("⭐ Arsenal FC"). Then questions about "my
-  team" ("my team titles", "my team vs Chelsea") - the first team, with
-  several; touches the search's parsing, so its own routing checks.
+  Dropped 2026-10-19: the search part - "my team" questions ("my team
+  titles") and a one-click shortcut to each favourite in the empty bar.
+  Typing the club's name is shorter than "my favourite team", and Recent
+  searches already keeps a club opened from search one click away.
 
 - Partly done: **Team Overview (the Team Dashboard rework)** — added to
   the ranking 2026-10-19 (top of Tier 3). Built so far on the
