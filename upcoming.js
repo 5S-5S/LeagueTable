@@ -390,14 +390,14 @@
         return { days: all.slice(0, 1), waiting: all.length > 0 };
     }
 
-    // The visitor's favourite team (favourite-team.js, set with the top
-    // bar's chip): its matches in the competitions on show
+    // The visitor's favourite teams (favourite-team.js, set with the top
+    // bar's chip): their matches in the competitions on show
     function favouriteFixtures(fixtures) {
-        const team = window.FavouriteTeam ? FavouriteTeam.get() : '';
-        return new Set(team ? fixtures.filter(f => f.homeTeam === team || f.awayTeam === team) : []);
+        const teams = new Set(window.FavouriteTeam ? FavouriteTeam.list() : []);
+        return new Set(fixtures.filter(f => teams.has(f.homeTeam) || teams.has(f.awayTeam)));
     }
 
-    // fav: one of the favourite's matches, starred and first in its day's row
+    // fav: one of the favourites' matches, starred and first in its day's row
     function cardHtml(fixture, { fav = false } = {}) {
         const comp = COMPETITIONS[fixture.div];
         // Crest, the name with its league position underneath, form dots
@@ -434,8 +434,9 @@
         if (!days.some(d => d.key === state.day)) state.day = days.length ? days[0].key : null;
         const day = days.find(d => d.key === state.day);
 
-        // The favourite's matches: each day it plays has a starred tab, and
-        // on that day its match leads the row - not on days it isn't playing
+        // The favourites' matches: each day one plays has a starred tab, and
+        // on that day their matches lead the row (in kick-off order) - not
+        // on days none of them plays
         const favs = favouriteFixtures(fixtures);
         const rowFixtures = day ? [...day.fixtures.filter(f => favs.has(f)), ...day.fixtures.filter(f => !favs.has(f))] : [];
 
@@ -1036,7 +1037,7 @@
         new MutationObserver(renderAll).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
         // The view's tables have their own phone layout
         phoneQuery.addEventListener('change', renderView);
-        // The favourite's next match leads the strip
+        // The favourites' matches lead the strip
         if (window.FavouriteTeam) FavouriteTeam.onChange(renderStrip);
         state.match = matchFromUrl();
         renderView();

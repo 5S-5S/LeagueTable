@@ -85,11 +85,30 @@
         filterDiv: 'all',
         page: 1,
         open: new Set(),        // keys of expanded entries
-        matches: new Map()      // key -> { status: 'loading' | 'ready' | 'error', ended, run }
+        matches: new Map(),     // key -> { status: 'loading' | 'ready' | 'error', ended, run }
+        collapsed: readCollapsed() // favourite teams whose runs are folded away
     };
     let els = null;
 
     // --- Helpers ----------------------------------------------------------
+
+    // The team view's folded teams, remembered in this browser (or until
+    // the page closes, where storage refuses)
+    function readCollapsed() {
+        try {
+            const list = JSON.parse(localStorage.getItem('collapsedTeams') || '[]');
+            return new Set(Array.isArray(list) ? list : []);
+        } catch (err) {
+            return new Set();
+        }
+    }
+    function writeCollapsed() {
+        try {
+            localStorage.setItem('collapsedTeams', JSON.stringify([...state.collapsed]));
+        } catch (err) {
+            // kept in state
+        }
+    }
 
     const jsonCache = new Map();
     function fetchJson(url) {
@@ -497,15 +516,23 @@
         return state.onTheLine.filter(s => COMPETITIONS[s.div] && new Date(s.fixture.utcDate).getTime() > now - IN_PLAY_HOURS * 3600000);
     }
 
-    // The visitor's favourite team (favourite-team.js, set with the top
-    // bar's chip)
-    const favouriteTeam = () => (window.FavouriteTeam ? FavouriteTeam.get() : '');
+    // The visitor's favourite teams (favourite-team.js, set with the top
+    // bar's chip), in the order they were added
+    const favouriteTeams = () => (window.FavouriteTeam ? FavouriteTeam.list() : []);
 
-    // Its runs, as either side: on the line soonest first, then snapped
-    // newest first
-    function teamList(team, now) {
-        const mine = s => s.team === team || s.opp === team;
-        return [...lineList(now).filter(mine), ...snappedList().filter(mine)];
+    // The first of the teams with this run, as either side
+    const ownerOf = (s, teams) => teams.find(team => s.team === team || s.opp === team) || '';
+
+    // Their runs, team by team: each one's on the line soonest first, then
+    // snapped newest first. A run between two of them comes under the
+    // first.
+    function teamList(teams, now) {
+        const line = lineList(now);
+        const snapped = snappedList();
+        return teams.flatMap(team => {
+            const mine = s => ownerOf(s, teams) === team;
+            return [...line.filter(mine), ...snapped.filter(mine)];
+        });
     }
 
     function render() {
@@ -518,22 +545,33 @@
             return;
         }
         els.section.hidden = false;
-        const team = favouriteTeam();
+        const teams = favouriteTeams();
+        const team = teams[0] || '';
+        const several = teams.length > 1;
         const teamView = state.view === 'team';
         const onLine = state.view === 'line';
-        const all = teamView ? (team ? teamList(team, now) : []) : onLine ? line : snapped;
+        const all = teamView ? teamList(teams, now) : onLine ? line : snapped;
 
         const present = new Set(all.map(s => s.div));
         const chips = [['all', 'All'], ...COMPETITION_ORDER.filter(div => present.has(div)).map(div => [div, `${COMPETITIONS[div].flag} ${COMPETITIONS[div].name}`])];
         const filtered = all.filter(s => state.filterDiv === 'all' || s.div === state.filterDiv);
-        const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+        // Several teams: a folded team keeps only its heading, so the pages
+        // hold the runs still shown
+        const perTeam = new Map(teams.map(t => [t, filtered.filter(s => ownerOf(s, teams) === t)]));
+        const rows = teamView && several
+            ? teams.flatMap(t => {
+                const mine = perTeam.get(t);
+                return mine.length && state.collapsed.has(t) ? [{ collapsedTeam: t, div: mine[0].div }] : mine;
+            })
+            : filtered;
+        const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
         state.page = Math.min(Math.max(1, state.page), totalPages);
         const pageStart = (state.page - 1) * PAGE_SIZE;
-        const pageStreaks = filtered.slice(pageStart, pageStart + PAGE_SIZE);
+        const pageStreaks = rows.slice(pageStart, pageStart + PAGE_SIZE);
         const recentFrom = isoDaysAgo(RECENT_DAYS);
 
         const where = state.filterDiv === 'all' ? '' : ` in ${COMPETITIONS[state.filterDiv].name}`;
-        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${teamView ? 'on the line or snapped' : onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
+        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${teamView ? 'on the line or snapped' : onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 && rows === filtered ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
         // Previous / Page X of Y / Next, as Team Streaks' historic list
         const controls = totalPages > 1 ? `
             <div class="flex items-center justify-center gap-4 py-4">
@@ -542,18 +580,36 @@
                 <button type="button" class="btn btn-secondary" data-page="1" ${state.page >= totalPages ? 'disabled' : ''}>Next</button>
             </div>` : '';
 
-        const views = [['line', 'On the line'], ['snapped', 'Snapped'], ['team', team ? `⭐ ${team}` : '⭐ Your team']];
-        // The team view: a heading before its on the line and its snapped
-        // entries
+        const views = [['line', 'On the line'], ['snapped', 'Snapped'], ['team', several ? '⭐ Your teams' : team ? `⭐ ${team}` : '⭐ Your team']];
+        // The team view: with several teams a heading for each, and within
+        // a team a heading before its on the line and its snapped entries
+        // A team's heading folds its runs away (the chevron on the right),
+        // with how many there are
+        const teamHeadingHtml = (team, div) => {
+            const folded = state.collapsed.has(team);
+            const n = perTeam.get(team).length;
+            return `<h3 class="ss-group ss-group-team${folded ? ' folded' : ''}">
+                <button type="button" class="ss-team-toggle" data-fold="${escapeHtml(team)}" aria-expanded="${!folded}">
+                    ${crest(team, div)}<span class="ss-team-name">${escapeHtml(team)}</span>
+                    <span class="ss-team-count">${n} streak${n === 1 ? '' : 's'}</span>
+                    <span class="ss-chevron" aria-hidden="true">▶</span>
+                </button></h3>`;
+        };
+        const ownerOfRow = s => s.collapsedTeam || ownerOf(s, teams);
         const teamGroups = list => list.map((s, i) => {
-            const heading = (i === 0 || isLive(list[i - 1]) !== isLive(s))
+            if (s.collapsedTeam) return teamHeadingHtml(s.collapsedTeam, s.div);
+            const owner = ownerOf(s, teams);
+            const newTeam = i === 0 || ownerOfRow(list[i - 1]) !== owner;
+            const teamHeading = several && newTeam ? teamHeadingHtml(owner, s.div) : '';
+            const heading = (newTeam || isLive(list[i - 1]) !== isLive(s))
                 ? `<h3 class="ss-group">${isLive(s) ? 'On the line in the next 7 days' : 'Snapped in the last year'}</h3>`
                 : '';
-            return heading + (isLive(s) ? liveEntryHtml(s, now) : entryHtml(s, recentFrom));
+            return teamHeading + heading + (isLive(s) ? liveEntryHtml(s, now) : entryHtml(s, recentFrom));
         }).join('');
-        const title = teamView ? (team ? `${escapeHtml(team)}'s streaks` : 'Your team\'s streaks') : onLine ? 'Streaks on the line' : 'Streaks snapped';
+        const title = teamView ? (several ? 'Your teams\' streaks' : team ? `${escapeHtml(team)}'s streaks` : 'Your team\'s streaks') : onLine ? 'Streaks on the line' : 'Streaks snapped';
         const sub = teamView
-            ? (team ? `${escapeHtml(team)}'s notable runs that a match in the next 7 days could end, and those that ended in the last year. Click one for its matches.`
+            ? (several ? 'Notable runs of your teams that a match in the next 7 days could end, and those that ended in the last year. Click one for its matches.'
+                : team ? `${escapeHtml(team)}'s notable runs that a match in the next 7 days could end, and those that ended in the last year. Click one for its matches.`
                 : 'Pick your team to see its notable runs on the line and the ones it snapped. It\'s remembered on this device.')
             : onLine
                 ? 'Notable runs still going that a match in the next 7 days could end, soonest first. Outlined: the next 24 hours. Click one for its matches so far.'
@@ -589,7 +645,7 @@
             ${pageStreaks.length
                 ? `<div class="ss-list">${teamView ? teamGroups(pageStreaks) : pageStreaks.map(s => onLine ? liveEntryHtml(s, now) : entryHtml(s, recentFrom)).join('')}</div>`
                 : `<p class="ss-empty">${teamView
-                    ? `No notable streaks for ${escapeHtml(team)}${where} on the line in the next 7 days or snapped in the last year.`
+                    ? `No notable streaks for ${several ? 'your teams' : escapeHtml(team)}${where} on the line in the next 7 days or snapped in the last year.`
                     : onLine ? `No notable streaks on the line${where} in the next 7 days.` : `No notable streaks snapped${where} in the last year.`}</p>`}
             ${controls}`;
     }
@@ -617,6 +673,18 @@
         // No favourite yet: the top bar's chip opens its panel
         if (event.target.closest('[data-fav-open]')) {
             if (window.FavouritePicker) FavouritePicker.open();
+            return;
+        }
+        // A team's heading: fold or unfold its runs
+        const fold = event.target.closest('[data-fold]');
+        if (fold) {
+            const team = fold.dataset.fold;
+            if (state.collapsed.has(team)) state.collapsed.delete(team);
+            else state.collapsed.add(team);
+            writeCollapsed();
+            render();
+            const again = [...els.section.querySelectorAll('[data-fold]')].find(b => b.dataset.fold === team);
+            if (again) again.focus();
             return;
         }
         // The fixture's match view, in place (upcoming.js) - a plain link
@@ -669,8 +737,7 @@
         }
         // Opens on the favourite's streaks when it has any, else on what's
         // coming up, unless nothing is
-        const team = favouriteTeam();
-        state.view = team && teamList(team, Date.now()).length ? 'team' : lineList(Date.now()).length ? 'line' : 'snapped';
+        state.view = teamList(favouriteTeams(), Date.now()).length ? 'team' : lineList(Date.now()).length ? 'line' : 'snapped';
         render();
     }
 
@@ -686,9 +753,10 @@
         new MutationObserver(render).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
         phoneQuery.addEventListener('change', render);
         if (window.FavouriteTeam) {
-            // A new pick shows its streaks; removing it leaves the team view
-            FavouriteTeam.onChange(team => {
-                if (team) state.view = 'team';
+            // A new pick shows the teams' streaks; removing the last one
+            // leaves the team view
+            FavouriteTeam.onChange(teams => {
+                if (teams.length) state.view = 'team';
                 else if (state.view === 'team') state.view = lineList(Date.now()).length ? 'line' : 'snapped';
                 state.page = 1;
                 render();

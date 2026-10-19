@@ -249,6 +249,19 @@ async function checkPages(browser, base) {
             if (fav.match !== '2' || !fav.starred || !fav.chip.includes('FC Barcelona')) {
                 fail('pages', `favourite team: first card ${fav.match} (starred ${fav.starred}), chip "${fav.chip}" - expected FC Barcelona's match first`);
             }
+            // A second team: both matches starred, the chip says "+1" and
+            // the panel lists both
+            const two = await page.evaluate(() => {
+                FavouriteTeam.add('Arsenal FC');
+                return {
+                    starred: document.querySelectorAll('#upcomingStrip .um-card-fav').length,
+                    chip: document.querySelector('.fav-chip').textContent,
+                    listed: [...document.querySelectorAll('.fav-team-name')].map(e => e.textContent).join(', ')
+                };
+            });
+            if (two.starred !== 2 || !two.chip.includes('+1') || two.listed !== 'FC Barcelona, Arsenal FC') {
+                fail('pages', `favourite teams: ${two.starred} starred, chip "${two.chip}", panel "${two.listed}" - expected both teams`);
+            }
             await page.evaluate(() => FavouriteTeam.clear());
         }
         errors.forEach(e => fail('pages', `upcoming strip: ${e}`));
