@@ -106,6 +106,36 @@ function compareSnapshot(section, file, questions, noun, run) {
     console.log(`${section}: ${questions.length} ${noun}, ${changed} differ from the snapshot (npm run check:update to accept)`);
 }
 
+// Recent searches (search.js): newest first, the same answer once, at
+// most five, Clear empties the list - in a browser storage of its own
+function checkRecent() {
+    const stored = new Map();
+    const storage = { getItem: k => stored.has(k) ? stored.get(k) : null, setItem: (k, v) => stored.set(k, String(v)), removeItem: k => stored.delete(k) };
+    const s = loadSearch(fs.readFileSync(path.join(ROOT, 'search.js'), 'utf8'), storage);
+    const problems = [];
+    const expect = (what, got, want) => { if (got !== want) problems.push(`${what}: got ${got}, expected ${want}`); };
+    const titles = () => s.readRecent().map(item => item.title).join(', ');
+    const open = (title, href = `DomesticEurope.html?comp=premier-league&t=${title}`) => s.addRecent({ title, detail: 'Head to head', comp: 'premier-league', href });
+    ['A', 'B', 'C'].forEach(t => open(t));
+    expect('newest first', titles(), 'C, B, A');
+    open('A', 'DomesticEurope.html?comp=premier-league&q=typed+differently');
+    expect('same answer moves to the top, once', titles(), 'A, C, B');
+    expect('same answer keeps its latest link', s.readRecent()[0].href, 'DomesticEurope.html?comp=premier-league&q=typed+differently');
+    s.addRecent({ title: 'A', detail: 'Head to head', comp: 'champions-league', href: 'ContinentalEurope.html?t=A' });
+    expect('same title in another competition is its own entry', titles(), 'A, A, C, B');
+    ['D', 'E', 'F'].forEach(t => open(t));
+    expect('at most five', titles(), 'F, E, D, A, A');
+    stored.set('recentSearches', JSON.stringify([{ title: 'X', detail: '', comp: 'premier-league', href: 'javascript:alert(1)' }, { title: 'Y', detail: '', comp: 'nfl', href: 'index.html' }, { title: 'Z', detail: '', comp: 'la-liga', href: 'DomesticEurope.html?comp=la-liga' }]));
+    expect('only our pages and competitions are shown', titles(), 'Z');
+    stored.set('recentSearches', '{not json');
+    expect('a garbled list reads as empty', titles(), '');
+    open('G');
+    s.clearRecent();
+    expect('Clear empties the list', titles(), '');
+    problems.forEach(p => fail('recent', p));
+    console.log(`Recent searches: ${problems.length ? `${problems.length} problem(s)` : 'save, move to top, cap at 5 and Clear as expected'}`);
+}
+
 // --- A static server for the pages ---
 
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.json': 'application/json', '.svg': 'image/svg+xml' };
@@ -462,6 +492,7 @@ async function checkAnswers(browser, base) {
     const started = Date.now();
     checkRouting();
     checkSuggestions();
+    checkRecent();
     if (SEARCH_ONLY) return report(started);
     const server = await startServer();
     const base = `http://127.0.0.1:${server.address().port}`;
