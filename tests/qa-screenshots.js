@@ -111,6 +111,10 @@ function shots(search) {
             from: '#searchModeBar', to: '#tableContainer', max: 1100 },
         { name: 'search-08-champions-league', byHand: true, url: searchUrl(search, 'Liverpool penalty shootouts', 'champions-league'),
             from: '#searchModeBar', to: '#matchHistoryTable', max: 1600 },
+        { name: 'search-09-relegations', byHand: true, url: searchUrl(search, 'Leeds United relegations', 'premier-league'),
+            from: '#searchModeBar', to: '#teamHistoryTable', max: 1100 },
+        { name: 'search-10-points', byHand: true, url: searchUrl(search, 'Arsenal most points in a season', 'premier-league'),
+            from: '#searchModeBar', to: '#teamRecordsTable', max: 1400 },
 
         // Champions League
         { name: 'champions-league-01-one-season', byHand: true, url: `${C}?${q({ view: 'league-filters', lg: 'champions-league', season: '2018-19' })}`,
