@@ -244,11 +244,13 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
 
     // Every run of each kind, all time - for competition records (end:
     // the date it snapped; null, still going)
-    const compRuns = new Map(); // `${kind}|${div}|${type}|${loc}` -> [{ count, end }]
-    const noteRun = (key, count, end) => {
+    // list / first: the run's matches, to count how far along it was on a
+    // given day
+    const compRuns = new Map(); // `${kind}|${div}|${type}|${loc}` -> [{ count, end, list, first }]
+    const noteRun = (key, count, end, list, first) => {
         let arr = compRuns.get(key);
         if (!arr) compRuns.set(key, arr = []);
-        arr.push({ count, end });
+        arr.push({ count, end, list, first });
     };
 
     const addToGroup = (key, count, endDate) => {
@@ -307,7 +309,7 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
                         const end = list[endIndex].date;
                         const start = list[first].date;
                         addToGroup(`club|${g}|${type}|${loc}`, count, end);
-                        noteRun(`club|${g}|${type}|${loc}`, count, end);
+                        noteRun(`club|${g}|${type}|${loc}`, count, end, list, first);
                         noteBest(`${g}|${team}|${loc}|${type}`, count, start, end);
                         const past = history[type] || (history[type] = []);
                         if (end >= from && end <= to) {
@@ -320,7 +322,7 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
                         past.push({ end, count });
                     }, (type, first, count) => {
                         noteBest(`${g}|${team}|${loc}|${type}`, count, list[first].date, null);
-                        noteRun(`club|${g}|${type}|${loc}`, count, null);
+                        noteRun(`club|${g}|${type}|${loc}`, count, null, list, first);
                         const fixture = nextFixture(team, null, loc);
                         if (!fixture) return;
                         const past = history[type] || [];
@@ -347,12 +349,12 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
                     forEachRun(list, team, (type, first, count, endIndex) => {
                         const end = list[endIndex].date;
                         addToGroup(`h2h|${g}|${type}|${loc}`, count, end);
-                        noteRun(`h2h|${g}|${type}|${loc}`, count, end);
+                        noteRun(`h2h|${g}|${type}|${loc}`, count, end, list, first);
                         if (end >= from && end <= to) {
                             candidates.push({ kind: 'h2h', div, stage, team, opp, loc, type, count, start: list[first].date, end, list, first, endIndex });
                         }
                     }, (type, first, count) => {
-                        noteRun(`h2h|${g}|${type}|${loc}`, count, null);
+                        noteRun(`h2h|${g}|${type}|${loc}`, count, null, list, first);
                         const fixture = nextFixture(team, opp, loc);
                         if (!fixture) return;
                         open.push({ kind: 'h2h', div, stage, team, opp, loc, type, count, start: list[first].date, on: fixture.utcDate.slice(0, 10), list, first, fixture });
@@ -373,17 +375,29 @@ export function findStreaks(matchesByDiv, { from, to, fixtures = [] }) {
         const bestSoFar = [];
         done.forEach((r, i) => bestSoFar.push(Math.max(r.count, i ? bestSoFar[i - 1] : 0)));
         const going = runs.filter(r => !r.end).map(r => r.count).sort((a, b) => b - a);
-        records.set(key, { ends, bestSoFar, doneMax: bestSoFar.length ? bestSoFar[bestSoFar.length - 1] : 0, going });
+        records.set(key, { runs, ends, bestSoFar, doneMax: bestSoFar.length ? bestSoFar[bestSoFar.length - 1] : 0, going });
     }
     const recordKey = c => `${c.kind}|${c.stage ? `${c.div}:${c.stage}` : c.div}|${c.type}|${c.loc}`;
-    // A snapped run: longer than every run that snapped before it, and the
-    // longest now if nothing longer has come since
+    // A snapped run: longer than every run that snapped before it and than
+    // every run still going then, as far as it had got by that day (Bayern
+    // v Benfica's 11 unbeaten, going since 1976, was ahead of Real Madrid v
+    // Bayern's 9 when that ended); the longest now if nothing longer has
+    // come since
     function snappedRecord(c) {
         const r = records.get(recordKey(c));
         if (!r) return {};
         const before = countBelow(r.ends, c.end); // runs that snapped earlier
         const prior = before ? r.bestSoFar[before - 1] : 0;
         if (c.count <= prior) return {};
+        for (const run of r.runs) {
+            if (run.count < c.count || (run.list === c.list && run.first === c.first)) continue;
+            if (run.end && run.end < c.end) continue; // over before (counted above)
+            if (run.list[run.first].date > c.end) continue; // not yet begun
+            // its matches up to that day
+            let n = 0;
+            while (n < run.count && run.list[run.first + n].date <= c.end) n++;
+            if (n >= c.count) return {};
+        }
         const now = Math.max(r.doneMax, r.going[0] || 0);
         return { competitionRecord: true, ...(now > c.count ? { competitionRecordNow: now } : {}) };
     }
