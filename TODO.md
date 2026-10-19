@@ -221,9 +221,8 @@ empty search box.
     - Page weight: the sport pages now load upcoming.js, team-registry.js,
       combobox.js and the favourites scripts (~130 KB before gzip) even
       with the strip hidden - fine for now, but see Lighter pages.
-    - Back from the match view relies on the page writing its Copy Link
-      state into its address; a tab or filter Copy Link doesn't capture
-      comes back at its default.
+    - Back from the match view (restores the Copy Link state) checked by
+      the user 2026-10-19: works as intended.
 
 - Maybe: **Phone-width checks in npm run check** — noted 2026-10-07.
   Open each page (and an upcoming match's view) at iPhone width
