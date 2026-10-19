@@ -215,12 +215,9 @@ empty search box.
     change.
   - The sport pages' strip (added 2026-10-19, see Done - Upcoming matches
     on the sport pages), to review later:
-    - Is the 📅 Matches button found and used? Clicks aren't in the visit
-      log yet - add an event before judging. If nobody turns it on, it
-      can go; if most do, it could start shown.
-    - On the user's iPhone: the phone header (chip and 📅 as icons, the
-      toggle and Search under the title), the strip's top edge growing
-      round the menu / ▼ buttons, and Back from a match.
+    - Checked on the user's iPhone 2026-10-19: fine. How often the 📅
+      button is used doesn't matter - it stays as a convenience, so
+      nobody has to go back to the home page to see upcoming matches.
     - Page weight: the sport pages now load upcoming.js, team-registry.js,
       combobox.js and the favourites scripts (~130 KB before gzip) even
       with the strip hidden - fine for now, but see Lighter pages.
