@@ -52,7 +52,7 @@
     const state = {
         streaks: [],
         onTheLine: [],
-        view: 'line',           // 'line' | 'snapped'
+        view: 'line',           // 'line' | 'snapped' | 'team'
         filterDiv: 'all',
         page: 1,
         open: new Set(),        // keys of expanded entries
@@ -434,6 +434,17 @@
         return state.onTheLine.filter(s => COMPETITIONS[s.div] && new Date(s.fixture.utcDate).getTime() > now - IN_PLAY_HOURS * 3600000);
     }
 
+    // The visitor's favourite team (favourite-team.js, set with the top
+    // bar's chip)
+    const favouriteTeam = () => (window.FavouriteTeam ? FavouriteTeam.get() : '');
+
+    // Its runs, as either side: on the line soonest first, then snapped
+    // newest first
+    function teamList(team, now) {
+        const mine = s => s.team === team || s.opp === team;
+        return [...lineList(now).filter(mine), ...snappedList().filter(mine)];
+    }
+
     function render() {
         if (!els) return;
         const now = Date.now();
@@ -444,8 +455,10 @@
             return;
         }
         els.section.hidden = false;
+        const team = favouriteTeam();
+        const teamView = state.view === 'team';
         const onLine = state.view === 'line';
-        const all = onLine ? line : snapped;
+        const all = teamView ? (team ? teamList(team, now) : []) : onLine ? line : snapped;
 
         const present = new Set(all.map(s => s.div));
         const chips = [['all', 'All'], ...COMPETITION_ORDER.filter(div => present.has(div)).map(div => [div, `${COMPETITIONS[div].flag} ${COMPETITIONS[div].name}`])];
@@ -457,7 +470,7 @@
         const recentFrom = isoDaysAgo(RECENT_DAYS);
 
         const where = state.filterDiv === 'all' ? '' : ` in ${COMPETITIONS[state.filterDiv].name}`;
-        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
+        const count = `${filtered.length} streak${filtered.length === 1 ? '' : 's'}${where} ${teamView ? 'on the line or snapped' : onLine ? 'on the line in the next 7 days' : 'in the last year'}${totalPages > 1 ? ` - showing ${pageStart + 1}-${pageStart + pageStreaks.length}` : ''}`;
         // Previous / Page X of Y / Next, as Team Streaks' historic list
         const controls = totalPages > 1 ? `
             <div class="flex items-center justify-center gap-4 py-4">
@@ -466,26 +479,55 @@
                 <button type="button" class="btn btn-secondary" data-page="1" ${state.page >= totalPages ? 'disabled' : ''}>Next</button>
             </div>` : '';
 
-        const views = [['line', 'On the line'], ['snapped', 'Snapped']];
+        const views = [['line', 'On the line'], ['snapped', 'Snapped'], ['team', team ? `⭐ ${team}` : '⭐ Your team']];
+        // The team view: a heading before its on the line and its snapped
+        // entries
+        const teamGroups = list => list.map((s, i) => {
+            const heading = (i === 0 || isLive(list[i - 1]) !== isLive(s))
+                ? `<h3 class="ss-group">${isLive(s) ? 'On the line in the next 7 days' : 'Snapped in the last year'}</h3>`
+                : '';
+            return heading + (isLive(s) ? liveEntryHtml(s, now) : entryHtml(s, recentFrom));
+        }).join('');
+        const title = teamView ? (team ? `${escapeHtml(team)}'s streaks` : 'Your team\'s streaks') : onLine ? 'Streaks on the line' : 'Streaks snapped';
+        const sub = teamView
+            ? (team ? `${escapeHtml(team)}'s notable runs that a match in the next 7 days could end, and those that ended in the last year. Click one for its matches.`
+                : 'Pick your team to see its notable runs on the line and the ones it snapped. It\'s remembered on this device.')
+            : onLine
+                ? 'Notable runs still going that a match in the next 7 days could end, soonest first. Outlined: the next 24 hours. Click one for its matches so far.'
+                : 'Notable runs that ended in the last year, newest first. Outlined: the last 7 days. Click one for its matches.';
+        if (teamView && !team) {
+            els.section.innerHTML = `
+            <div class="ss-head">
+                <div class="ss-title-row">
+                    <h2 class="ss-title">${title}</h2>
+                    <div class="ss-views" role="group" aria-label="Which streaks">
+                        ${views.map(([view, label]) => `<button type="button" class="${state.view === view ? 'active' : ''}" data-view="${view}" aria-pressed="${state.view === view}">${escapeHtml(label)}</button>`).join('')}
+                    </div>
+                </div>
+                <p class="ss-sub">${sub}</p>
+            </div>
+            <div class="ss-pick"><button type="button" class="btn btn-secondary" data-fav-open>⭐ Pick your team</button></div>`;
+            return;
+        }
         els.section.innerHTML = `
             <div class="ss-head">
                 <div class="ss-title-row">
-                    <h2 class="ss-title">${onLine ? 'Streaks on the line' : 'Streaks snapped'}</h2>
+                    <h2 class="ss-title">${title}</h2>
                     <div class="ss-views" role="group" aria-label="Which streaks">
-                        ${views.map(([view, label]) => `<button type="button" class="${state.view === view ? 'active' : ''}" data-view="${view}" aria-pressed="${state.view === view}">${label}</button>`).join('')}
+                        ${views.map(([view, label]) => `<button type="button" class="${state.view === view ? 'active' : ''}" data-view="${view}" aria-pressed="${state.view === view}">${escapeHtml(label)}</button>`).join('')}
                     </div>
                 </div>
-                <p class="ss-sub">${onLine
-                    ? 'Notable runs still going that a match in the next 7 days could end, soonest first. Outlined: the next 24 hours. Click one for its matches so far.'
-                    : 'Notable runs that ended in the last year, newest first. Outlined: the last 7 days. Click one for its matches.'}</p>
+                <p class="ss-sub">${sub}</p>
             </div>
             <div class="um-filters ss-chips">
                 ${chips.map(([div, label]) => `<button type="button" class="um-chip${state.filterDiv === div ? ' active' : ''}" data-div="${div}">${label}</button>`).join('')}
             </div>
             <p class="ss-count">${count}</p>
             ${pageStreaks.length
-                ? `<div class="ss-list">${pageStreaks.map(s => onLine ? liveEntryHtml(s, now) : entryHtml(s, recentFrom)).join('')}</div>`
-                : `<p class="ss-empty">${onLine ? `No notable streaks on the line${where} in the next 7 days.` : `No notable streaks snapped${where} in the last year.`}</p>`}
+                ? `<div class="ss-list">${teamView ? teamGroups(pageStreaks) : pageStreaks.map(s => onLine ? liveEntryHtml(s, now) : entryHtml(s, recentFrom)).join('')}</div>`
+                : `<p class="ss-empty">${teamView
+                    ? `No notable streaks for ${escapeHtml(team)}${where} on the line in the next 7 days or snapped in the last year.`
+                    : onLine ? `No notable streaks on the line${where} in the next 7 days.` : `No notable streaks snapped${where} in the last year.`}</p>`}
             ${controls}`;
     }
 
@@ -507,6 +549,11 @@
             state.view = viewButton.dataset.view;
             state.page = 1;
             render();
+            return;
+        }
+        // No favourite yet: the top bar's chip opens its panel
+        if (event.target.closest('[data-fav-open]')) {
+            if (window.FavouritePicker) FavouritePicker.open();
             return;
         }
         // The fixture's match view, in place (upcoming.js) - a plain link
@@ -557,8 +604,10 @@
             state.streaks = [];
             state.onTheLine = [];
         }
-        // Opens on what's coming up, unless nothing is
-        state.view = lineList(Date.now()).length ? 'line' : 'snapped';
+        // Opens on the favourite's streaks when it has any, else on what's
+        // coming up, unless nothing is
+        const team = favouriteTeam();
+        state.view = team && teamList(team, Date.now()).length ? 'team' : lineList(Date.now()).length ? 'line' : 'snapped';
         render();
     }
 
@@ -573,6 +622,15 @@
         // Team text colors depend on the theme; match lists on the width
         new MutationObserver(render).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
         phoneQuery.addEventListener('change', render);
+        if (window.FavouriteTeam) {
+            // A new pick shows its streaks; removing it leaves the team view
+            FavouriteTeam.onChange(team => {
+                if (team) state.view = 'team';
+                else if (state.view === 'team') state.view = lineList(Date.now()).length ? 'line' : 'snapped';
+                state.page = 1;
+                render();
+            });
+        }
         load();
     }
 

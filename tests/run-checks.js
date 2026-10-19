@@ -238,6 +238,18 @@ async function checkPages(browser, base) {
             const back = await page.waitForFunction(() => !location.search && document.getElementById('matchView').hidden
                 && getComputedStyle(document.querySelector('.search-card')).display !== 'none', { timeout: 10000 }).then(() => true).catch(() => false);
             if (!back) fail('pages', 'upcoming strip: Back did not return to the home page');
+
+            // A favourite team (the top bar's chip) leads the strip: its
+            // match first and starred, and the chip names it
+            const fav = await page.evaluate(() => {
+                FavouriteTeam.set('FC Barcelona');
+                const first = document.querySelector('#upcomingStrip .um-card');
+                return { match: first.dataset.match, starred: first.classList.contains('um-card-fav'), chip: document.querySelector('.fav-chip').textContent };
+            });
+            if (fav.match !== '2' || !fav.starred || !fav.chip.includes('FC Barcelona')) {
+                fail('pages', `favourite team: first card ${fav.match} (starred ${fav.starred}), chip "${fav.chip}" - expected FC Barcelona's match first`);
+            }
+            await page.evaluate(() => FavouriteTeam.clear());
         }
         errors.forEach(e => fail('pages', `upcoming strip: ${e}`));
         await page.close();
@@ -311,6 +323,23 @@ async function checkPages(browser, base) {
                         && document.querySelectorAll('#snappedStreaks .ss-item.open .um-links a').length === 2;
                 }, { timeout: 30000 }, lineGames).then(() => true).catch(() => false);
                 if (!lineOpened) fail('pages', `streaks on the line: the first entry did not open into its ${lineGames} matches so far`);
+            }
+
+            // Picking a favourite team switches both cards to it: the
+            // streaks card lists its runs, On this day its matches
+            const team = await page.evaluate(async () => {
+                const data = await (await fetch('https://leaguetable-api.league-table-api.workers.dev/api/snapped-streaks')).json();
+                return (data.streaks || [])[0]?.team || '';
+            });
+            if (team) {
+                const picked = await page.evaluate(team => {
+                    FavouriteTeam.set(team);
+                    const active = id => document.querySelector(`#${id} .ss-views .active`)?.textContent || '';
+                    return { streaks: active('snappedStreaks'), entries: document.querySelectorAll('#snappedStreaks .ss-item').length, otd: active('onThisDay') };
+                }, team);
+                if (!picked.streaks.includes(team) || !picked.entries) fail('pages', `favourite team: streaks card on "${picked.streaks}" with ${picked.entries} entries after picking ${team}`);
+                if (otdMatches > 0 && !picked.otd.includes(team)) fail('pages', `favourite team: On this day on "${picked.otd}" after picking ${team}`);
+                await page.evaluate(() => FavouriteTeam.clear());
             }
         }
         errors.forEach(e => fail('pages', `snapped streaks: ${e}`));

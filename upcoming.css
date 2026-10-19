@@ -141,6 +141,16 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* The favourite team's next match (favourite-picker.js): first, starred */
+.um-card.um-card-fav {
+    border: 2px solid #f59e0b;
+    padding: calc(0.7rem - 1px) calc(0.85rem - 1px);
+}
+
+.um-fav-star {
+    margin-right: 0.3rem;
+}
+
 .um-card:hover,
 .um-card:focus-visible {
     border-color: #10b981;
@@ -766,7 +776,7 @@ body.um-viewing .search-card {
 [data-theme="dark"] .um-none { color: #9ca3af; }
 [data-theme="dark"] .um-kickoff,
 [data-theme="dark"] .um-view h3 { color: #d1d5db; }
-[data-theme="dark"] .um-card,
+[data-theme="dark"] .um-card:not(.um-card-fav),
 [data-theme="dark"] .um-streaks,
 [data-theme="dark"] .um-view-head { border-color: #444; }
 [data-theme="dark"] .um-view {

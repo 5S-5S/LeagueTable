@@ -431,7 +431,14 @@
         section.addEventListener('keydown', handleKey);
         // Team text colors depend on the theme
         new MutationObserver(render).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
-        FavouriteTeam.onChange(render);
+        // A pick (here or in the top bar's chip) shows its matches;
+        // removing it goes back to the day's notable ones
+        FavouriteTeam.onChange(team => {
+            state.view = team ? 'team' : 'notable';
+            state.shown = team ? TEAM_PAGE : NOTABLE_PAGE;
+            state.open.clear();
+            render();
+        });
         load();
     }
 

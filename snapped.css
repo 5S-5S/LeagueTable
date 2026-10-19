@@ -80,6 +80,29 @@
     margin-bottom: 0.5rem;
 }
 
+/* The team view (favourite team): a heading over its on the line and its
+   snapped entries, across the whole row */
+.ss-group {
+    grid-column: 1 / -1;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #4b5563;
+}
+
+.ss-group:first-child {
+    margin-top: 0;
+}
+
+/* The team view with no team yet: the top bar chip's panel */
+.ss-pick {
+    padding: 0.5rem 0 0.25rem;
+}
+
+[data-theme="dark"] .ss-group { color: #d1d5db; }
+
 /* Two entries a row where they fit at 24rem each, otherwise one */
 .ss-list {
     display: grid;

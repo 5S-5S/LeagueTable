@@ -390,7 +390,16 @@
         return { days: all.slice(0, 1), waiting: all.length > 0 };
     }
 
-    function cardHtml(fixture) {
+    // The visitor's favourite team (favourite-team.js, set with the top
+    // bar's chip): its next match in the competitions on show, at any date
+    function favouriteFixture(fixtures) {
+        const team = window.FavouriteTeam ? FavouriteTeam.get() : '';
+        return team ? fixtures.find(f => f.homeTeam === team || f.awayTeam === team) || null : null;
+    }
+
+    // fav: the favourite's next match, starred and first in the row;
+    // pinned: from another day than the one on show, so it says which
+    function cardHtml(fixture, { fav = false, pinned = false } = {}) {
         const comp = COMPETITIONS[fixture.div];
         // Crest, the name with its league position underneath, form dots
         const teamLine = team => `
@@ -403,10 +412,10 @@
             </span>
             ${formDots(fixture, team)}`;
         return `
-            <button type="button" class="um-card" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fixture.homeTeam} vs ${fixture.awayTeam}, ${kickoffTime(fixture)}`)}">
+            <button type="button" class="um-card${fav ? ' um-card-fav' : ''}" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fav ? 'Your team: ' : ''}${fixture.homeTeam} vs ${fixture.awayTeam}, ${pinned ? `${dayLabel(new Date(fixture.utcDate))} ` : ''}${kickoffTime(fixture)}`)}">
                 <span class="um-card-top">
-                    <span class="um-card-comp">${comp.flag} ${escapeHtml(comp.name)}</span>
-                    <span class="um-kickoff">${escapeHtml(kickoffTime(fixture))}</span>
+                    <span class="um-card-comp">${fav ? '<span class="um-fav-star" aria-hidden="true">⭐</span>' : ''}${comp.flag} ${escapeHtml(comp.name)}</span>
+                    <span class="um-kickoff">${escapeHtml(pinned ? `${dayLabel(new Date(fixture.utcDate))} · ${kickoffTime(fixture)}` : kickoffTime(fixture))}</span>
                 </span>
                 <span class="um-card-teams">
                     ${teamLine(fixture.homeTeam)}
@@ -426,8 +435,14 @@
         if (!days.some(d => d.key === state.day)) state.day = days.length ? days[0].key : null;
         const day = days.find(d => d.key === state.day);
 
+        // The favourite's next match leads the row: moved to the front on
+        // its own day, pinned before the day's matches on any other
+        const fav = favouriteFixture(fixtures);
+        const favPinned = fav && !(day && day.fixtures.includes(fav));
+        const rowFixtures = day ? (fav && !favPinned ? [fav, ...day.fixtures.filter(f => f !== fav)] : day.fixtures) : [];
+
         // Positions and form for the competitions on show
-        if (day) [...new Set(day.fixtures.map(f => f.div))].forEach(loadSeasonData);
+        [...new Set([...rowFixtures, ...(favPinned ? [fav] : [])].map(f => f.div))].forEach(loadSeasonData);
 
         const chips = [['all', 'All'], ...COMPETITION_ORDER.map(div => [div, `${COMPETITIONS[div].flag} ${COMPETITIONS[div].name}`])];
         const status = !day
@@ -449,7 +464,7 @@
                 `<button type="button" role="tab" class="um-day-tab${d.key === state.day ? ' active' : ''}" aria-selected="${d.key === state.day}" data-day="${d.key}">${escapeHtml(waiting ? longDay(d.date) : dayLabel(d.date))}</button>`
             ).join('')}</div>` : ''}
             <p class="um-status">${escapeHtml(status)}</p>
-            ${day ? `<div class="um-row">${day.fixtures.map(cardHtml).join('')}</div>` : ''}`;
+            ${day || favPinned ? `<div class="um-row">${favPinned ? cardHtml(fav, { fav: true, pinned: true }) : ''}${rowFixtures.map(f => cardHtml(f, { fav: f === fav })).join('')}</div>` : ''}`;
         const row = els.strip.querySelector('.um-row');
         if (row) row.scrollLeft = scrollLeft;
     }
@@ -1023,6 +1038,8 @@
         new MutationObserver(renderAll).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
         // The view's tables have their own phone layout
         phoneQuery.addEventListener('change', renderView);
+        // The favourite's next match leads the strip
+        if (window.FavouriteTeam) FavouriteTeam.onChange(renderStrip);
         state.match = matchFromUrl();
         renderView();
         loadFixtures();

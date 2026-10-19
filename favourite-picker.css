@@ -1,0 +1,133 @@
+/* The favourite team's chip and panel (favourite-picker.js): fixed in the
+   top bar, just left of the dark mode toggle (64px wide with its border) */
+.fav-picker {
+    position: fixed;
+    top: 1rem;
+    right: calc(1rem + 64px + 0.6rem);
+    z-index: 1001;
+}
+
+.fav-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    height: 34px;
+    max-width: min(16rem, calc(100vw - 2rem - 64px - 0.6rem - 4.5rem));
+    padding: 0 0.8rem;
+    border: none;
+    border-radius: 17px;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    color: #047857;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.fav-chip:hover {
+    background: #f0fdf4;
+}
+
+.fav-chip img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.fav-chip-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fav-chip.has-team {
+    color: #1f2937;
+}
+
+.fav-chip-arrow {
+    color: #6b7280;
+    font-size: 0.75rem;
+}
+
+.fav-panel {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    width: 20rem;
+    max-width: calc(100vw - 2rem);
+    padding: 0.9rem;
+    border-radius: 0.75rem;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.fav-panel[hidden] {
+    display: none;
+}
+
+/* A phone: the chip is near the middle, so the panel spans the screen */
+@media (max-width: 640px) {
+    .fav-panel {
+        position: fixed;
+        top: calc(1rem + 34px + 0.5rem);
+        left: 1rem;
+        right: 1rem;
+        width: auto;
+        max-width: none;
+    }
+}
+
+.fav-panel-label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #374151;
+}
+
+.fav-panel-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.fav-panel-row .combobox-container {
+    flex: 1;
+    min-width: 0;
+}
+
+.fav-remove {
+    padding: 0.45rem 0.9rem;
+    border: 1px solid #9ca3af;
+    border-radius: 0.75rem;
+    background: transparent;
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.fav-remove:hover {
+    background: #f3f4f6;
+}
+
+.fav-remove[hidden] {
+    display: none;
+}
+
+.fav-panel-note {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .fav-chip { background: var(--bg-white); color: #6ee7b7; }
+[data-theme="dark"] .fav-chip.has-team { color: #f3f4f6; }
+[data-theme="dark"] .fav-chip:hover { background: #3f3f46; }
+[data-theme="dark"] .fav-panel { background: var(--bg-white); }
+[data-theme="dark"] .fav-panel-label { color: #e5e7eb; }
+[data-theme="dark"] .fav-panel-note { color: #9ca3af; }
+[data-theme="dark"] .fav-remove { border-color: #6b7280; color: #d1d5db; }
+[data-theme="dark"] .fav-remove:hover { background: #3f3f46; }

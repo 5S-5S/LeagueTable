@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="snapped.css">
     <link rel="stylesheet" href="combobox.css">
     <link rel="stylesheet" href="onthisday.css">
+    <link rel="stylesheet" href="favourite-picker.css">
 </head>
 <body>
     <!-- Hamburger Menu Button -->
@@ -122,6 +123,7 @@
     <script src="snapped.js"></script>
     <script src="combobox.js"></script>
     <script src="favourite-team.js"></script>
+    <script src="favourite-picker.js"></script>
     <script src="onthisday.js"></script>
     <script>
         function renderSearchExamples(search) {
@@ -218,6 +220,7 @@
             initHamburgerMenu();
             initDarkMode();
             initSearch();
+            FavouritePicker.mount();
             UpcomingMatches.mount({
                 strip: document.getElementById('upcomingStrip'),
                 view: document.getElementById('matchView')
