@@ -454,8 +454,10 @@ empty search box.
   matches in the league picked on the page - the search dropdown in
   search mode (all five for Top 5 Leagues, each card with its flag), else
   the open tab's league button; the Continental pages the Champions
-  League. No day tabs or chips; each card shows the day and kick-off and
-  opens the match's view on the home page (index.html?match=). A week
+  League. No day tabs or chips; each card shows its league, the day and
+  kick-off, and opens the match's view on the home page
+  (index.html?match=), whose Back returns to the sport page as it was
+  (the browser's back - the search query, or the tab and league). A week
   with none says when the next one is. The favourite teams' chip went
   in the header too (between Search and the toggle; on phones crest or
   star only, beside the toggle), and their matches lead the row,

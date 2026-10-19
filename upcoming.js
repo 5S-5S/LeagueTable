@@ -402,10 +402,9 @@
     }
 
     // fav: one of the favourites' matches, starred and first in its day's row.
-    // The sport pages' row (several days, often one league): href makes the
-    // card a link, withDay puts the day before the kick-off and showComp
-    // false leaves out the league.
-    function cardHtml(fixture, { fav = false, href = '', withDay = false, showComp = true } = {}) {
+    // The sport pages' row (several days): href makes the card a link, and
+    // withDay puts the day before the kick-off.
+    function cardHtml(fixture, { fav = false, href = '', withDay = false } = {}) {
         const comp = COMPETITIONS[fixture.div];
         const when = withDay ? `${dayLabel(new Date(fixture.utcDate))} · ${kickoffTime(fixture)}` : kickoffTime(fixture);
         const tag = href ? 'a' : 'button';
@@ -422,7 +421,7 @@
         return `
             <${tag} ${href ? `href="${escapeHtml(href)}"` : 'type="button"'} class="um-card${fav ? ' um-card-fav' : ''}" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fav ? 'Your team: ' : ''}${fixture.homeTeam} vs ${fixture.awayTeam}, ${when}`)}">
                 <span class="um-card-top">
-                    <span class="um-card-comp">${fav ? '<span class="um-fav-star" aria-hidden="true">⭐</span>' : ''}${showComp ? `${comp.flag} ${escapeHtml(comp.name)}` : ''}</span>
+                    <span class="um-card-comp">${fav ? '<span class="um-fav-star" aria-hidden="true">⭐</span>' : ''}${comp.flag} ${escapeHtml(comp.name)}</span>
                     <span class="um-kickoff">${escapeHtml(when)}</span>
                 </span>
                 <span class="um-card-teams">
@@ -971,10 +970,22 @@
         window.scrollTo(0, 0);
     }
 
+    // Opened from a sport page's row (a link from this site, in this tab)
+    function cameFromSportPage() {
+        if (history.length < 2 || !document.referrer) return false;
+        try {
+            const from = new URL(document.referrer);
+            return from.origin === window.location.origin && from.pathname !== window.location.pathname;
+        } catch (err) {
+            return false;
+        }
+    }
+
     function closeMatch() {
-        // Back to the page the visitor came from when that was the strip;
-        // straight to the home page from a shared match link
-        if (pushedView) {
+        // Back to the page the visitor came from when that was the strip or
+        // a sport page (its search or tab as it was); straight to the home
+        // page from a shared match link
+        if (pushedView || cameFromSportPage()) {
             history.back();
             return;
         }
@@ -1121,7 +1132,7 @@
         [...new Set(soon.map(f => f.div))].forEach(loadSeasonData);
         const scrollLeft = el.querySelector('.um-row')?.scrollLeft || 0;
         el.innerHTML = `<div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
-            fav: favs.has(f), href: `index.html?match=${f.matchId}`, withDay: true, showComp: divs.length > 1
+            fav: favs.has(f), href: `index.html?match=${f.matchId}`, withDay: true
         })).join('')}</div>`;
         const list = el.querySelector('.um-row');
         if (list) list.scrollLeft = scrollLeft;

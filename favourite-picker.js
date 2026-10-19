@@ -24,7 +24,9 @@
 
     const crest = team => {
         const logo = TeamRegistry.getTeamLogoUrl(team, 'champions-league');
-        return logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : '<span aria-hidden="true">⭐</span>';
+        // A crest that fails to load becomes the star (on a phone's sport
+        // page the chip shows nothing else)
+        return logo ? `<img src="${logo}" alt="" onerror="this.replaceWith('⭐')">` : '<span aria-hidden="true">⭐</span>';
     };
 
     function render() {
