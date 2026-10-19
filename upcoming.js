@@ -1136,18 +1136,20 @@
         clearFixedButtons(row);
     }
 
-    // The strip starts at the top of the page, as the main card does, and
-    // moves down only as far as a fixed button (menu, ▼, search mode's
-    // Filters / chip / toggle) that would sit on it - on a wide screen they
-    // are beside the page's column, on a phone they are over it. Measured
-    // at the top of the page, where the buttons and the strip meet.
+    // The strip starts at the top of the page, as the main card does; where
+    // a fixed button (menu, ▼, search mode's Filters / 📅 / chip / toggle)
+    // sits over it, its top edge grows to hold the button, as the search
+    // card's does - on a wide screen they are beside the page's column, on
+    // a narrower one over it. Measured at the top of the page, where the
+    // buttons and the strip meet.
     const FIXED_BUTTONS = '#hamburgerBtn, #collapseControlsBtn, .header-actions';
     function clearFixedButtons(row) {
         const el = row.el;
-        el.style.marginTop = '';
+        el.style.paddingTop = '';
         if (el.hidden) return;
         const strip = el.getBoundingClientRect();
         const top = strip.top + window.scrollY;
+        const padding = parseFloat(getComputedStyle(el).paddingTop) || 0;
         let need = 0;
         document.querySelectorAll(FIXED_BUTTONS).forEach(button => {
             if (getComputedStyle(button).position !== 'fixed') return;
@@ -1155,7 +1157,7 @@
             if (!b.width || b.left >= strip.right || b.right <= strip.left) return;
             need = Math.max(need, b.bottom + 8 - top);
         });
-        if (need > 0) el.style.marginTop = `${Math.ceil(need)}px`;
+        if (need > padding) el.style.paddingTop = `${Math.ceil(need)}px`;
     }
 
     function renderRows() {

@@ -453,9 +453,10 @@ empty search box.
   at the top of each sport page (as the home page's sections are, with no
   heading and little padding; above the search bar in search mode),
   hidden until the header's "📅 Matches" button shows it (remembered on
-  the device; nothing is fetched while hidden). It moves down only as far
-  as a fixed button (menu, ▼, search mode's pinned buttons) would sit on
-  it - measured, so on a wide screen it is flush with the top. The
+  the device; nothing is fetched while hidden). It is flush with the top;
+  where a fixed button (menu, ▼, search mode's pinned buttons) sits over
+  it, its top edge grows to hold the button, as the search card's does -
+  measured, so on a wide screen there's none. The
   next 7 days' matches in the league picked on the page - the search dropdown in
   search mode (all five for Top 5 Leagues, each card with its flag), else
   the open tab's league button; the Continental pages the Champions
