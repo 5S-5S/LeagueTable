@@ -45,7 +45,7 @@ empty search box.
 19. Knockout Stage bracket view (on hold)
 20. Country vs Country
 21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-22. Review upcoming matches
+22. Review upcoming matches (home strip, and the sport pages' strip from 2026-10-19)
 23. Phone-width checks in npm run check
 24. Team-colour contrast
 25. Sitemap + Google Search Console
@@ -213,6 +213,20 @@ empty search box.
   - Phone layouts were checked in Chrome's iPhone emulation and once on
     the user's iPhone; worth another look on a real phone after any
     change.
+  - The sport pages' strip (added 2026-10-19, see Done - Upcoming matches
+    on the sport pages), to review later:
+    - Is the 📅 Matches button found and used? Clicks aren't in the visit
+      log yet - add an event before judging. If nobody turns it on, it
+      can go; if most do, it could start shown.
+    - On the user's iPhone: the phone header (chip and 📅 as icons, the
+      toggle and Search under the title), the strip's top edge growing
+      round the menu / ▼ buttons, and Back from a match.
+    - Page weight: the sport pages now load upcoming.js, team-registry.js,
+      combobox.js and the favourites scripts (~130 KB before gzip) even
+      with the strip hidden - fine for now, but see Lighter pages.
+    - Back from the match view relies on the page writing its Copy Link
+      state into its address; a tab or filter Copy Link doesn't capture
+      comes back at its default.
 
 - Maybe: **Phone-width checks in npm run check** — noted 2026-10-07.
   Open each page (and an upcoming match's view) at iPhone width
