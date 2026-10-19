@@ -85,14 +85,16 @@ function isoDaysBefore(isoDate, days) {
 // Each division's latest match date. One MAX(date) per division, not
 // MAX(date) ... GROUP BY div: SQLite answers a lone MAX on the (div, date)
 // index by reading one row, where the GROUP BY read the whole table
-// (~180k rows a day against D1's free 5M read limit).
+// (~180k rows a day against D1's free 5M read limit). One row with a
+// column per division, not a UNION ALL: D1 allows only a few terms in a
+// compound SELECT, and six divisions were already too many.
 async function getWatermarks(divs) {
-    const sql = divs.map(() => 'SELECT ? AS div, (SELECT MAX(date) FROM matches WHERE div = ?) AS max_date').join(' UNION ALL ');
-    const { results } = await runD1Query(sql, divs.flatMap(div => [div, div]));
+    const sql = `SELECT ${divs.map((_, i) => `(SELECT MAX(date) FROM matches WHERE div = ?) AS d${i}`).join(', ')}`;
+    const { results } = await runD1Query(sql, divs);
     const watermarks = new Map();
-    for (const row of results) {
-        if (row.max_date) watermarks.set(row.div, row.max_date);
-    }
+    divs.forEach((div, i) => {
+        if (results[0][`d${i}`]) watermarks.set(div, results[0][`d${i}`]);
+    });
     return watermarks;
 }
 
