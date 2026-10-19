@@ -436,10 +436,11 @@
         const day = days.find(d => d.key === state.day);
 
         // The favourite's next match leads the row: moved to the front on
-        // its own day, pinned before the day's matches on any other
+        // its own day (whose tab is starred), and pinned before the first
+        // tab's matches - what the strip opens on - when it's another day
         const fav = favouriteFixture(fixtures);
-        const favPinned = fav && !(day && day.fixtures.includes(fav));
-        const rowFixtures = day ? (fav && !favPinned ? [fav, ...day.fixtures.filter(f => f !== fav)] : day.fixtures) : [];
+        const favPinned = fav && day === days[0] && !day.fixtures.includes(fav);
+        const rowFixtures = day ? (fav && day.fixtures.includes(fav) ? [fav, ...day.fixtures.filter(f => f !== fav)] : day.fixtures) : [];
 
         // Positions and form for the competitions on show
         [...new Set([...rowFixtures, ...(favPinned ? [fav] : [])].map(f => f.div))].forEach(loadSeasonData);
@@ -461,10 +462,10 @@
                 ).join('')}</div>
             </div>
             ${days.length > 1 || waiting ? `<div class="um-days" role="tablist">${days.map(d =>
-                `<button type="button" role="tab" class="um-day-tab${d.key === state.day ? ' active' : ''}" aria-selected="${d.key === state.day}" data-day="${d.key}">${escapeHtml(waiting ? longDay(d.date) : dayLabel(d.date))}</button>`
+                `<button type="button" role="tab" class="um-day-tab${d.key === state.day ? ' active' : ''}" aria-selected="${d.key === state.day}" data-day="${d.key}">${escapeHtml(waiting ? longDay(d.date) : dayLabel(d.date))}${fav && d.fixtures.includes(fav) ? ' <span class="um-fav-star" aria-label="your team plays">⭐</span>' : ''}</button>`
             ).join('')}</div>` : ''}
             <p class="um-status">${escapeHtml(status)}</p>
-            ${day || favPinned ? `<div class="um-row">${favPinned ? cardHtml(fav, { fav: true, pinned: true }) : ''}${rowFixtures.map(f => cardHtml(f, { fav: f === fav })).join('')}</div>` : ''}`;
+            ${day ? `<div class="um-row">${favPinned ? cardHtml(fav, { fav: true, pinned: true }) : ''}${rowFixtures.map(f => cardHtml(f, { fav: f === fav })).join('')}</div>` : ''}`;
         const row = els.strip.querySelector('.um-row');
         if (row) row.scrollLeft = scrollLeft;
     }
