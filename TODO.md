@@ -2,7 +2,7 @@
 
 Feature ideas, not yet scheduled.
 
-## Priority (ranked 2026-10-03, updated 2026-10-18)
+## Priority (ranked 2026-10-03, updated 2026-10-19)
 
 Most to least important; details are in each item below.
 
@@ -20,37 +20,38 @@ empty search box.
 1. About / sources page (closer to publication, with the crests)
 2. Self-host the club crests (closer to publication)
 3. API caching (what's left - the outage-preventing parts are done; closer to publication)
+4. Q&A gaps (closer to publication, with the About page)
 
 **Tier 2 - high value, soon after launch** (and reasons to come back)
-4. Expand favourite team (On this day uses it)
+5. Expand favourite team (On this day uses it)
 
 **Tier 3 - worthwhile features**
-5. Recent searches
-6. Road to the final
-7. More competitions (depends on the data)
-8. Streak-ending social account (closer to launch)
+6. Recent searches
+7. Road to the final
+8. More competitions (depends on the data)
+9. Streak-ending social account (closer to launch)
 
 **Tier 4 - nice to have**
-9. Trivia mode
-10. Head-to-head by decade
-11. Side-by-side Team Seasons
-12. League History chart
-13. Team Records: bottom / relegated, home / away
-14. A club's title races
-15. Team progression chart (after League History)
-16. "/" to search
-17. Penalty shootout leaderboard (team and head-to-head answers done)
-18. "Won on penalties" in Match Finder
-19. Lighter pages (small gain - see the item)
-20. Knockout Stage bracket view (on hold)
-21. Country vs Country
-22. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-23. Review upcoming matches
-24. Phone-width checks in npm run check
-25. Team-colour contrast
-26. Sitemap + Google Search Console
-27. Club names that differ from worldfootball.net
-28. Champions League data fixes (found 2026-10-13)
+10. Trivia mode
+11. Head-to-head by decade
+12. Side-by-side Team Seasons
+13. League History chart
+14. Team Records: bottom / relegated, home / away
+15. A club's title races
+16. Team progression chart (after League History)
+17. "/" to search
+18. Penalty shootout leaderboard (team and head-to-head answers done)
+19. "Won on penalties" in Match Finder
+20. Lighter pages (small gain - see the item)
+21. Knockout Stage bracket view (on hold)
+22. Country vs Country
+23. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+24. Review upcoming matches
+25. Phone-width checks in npm run check
+26. Team-colour contrast
+27. Sitemap + Google Search Console
+28. Club names that differ from worldfootball.net
+29. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -110,6 +111,23 @@ empty search box.
     hotlinking are the same use of the clubs' trademarks; hotlinking also
     uses s.hs-data.com's bandwidth without permission. Pair with the
     About page's disclaimer (see About / sources page).
+
+- Later (before launch): **Q&A gaps** — found 2026-10-19 in an audit of
+  qa.html against the features added since its last update (the wrong
+  answers, season outcomes and the Home Page section were done then).
+  Still missing:
+  - Team History From / To: "Getting a Team's Historical Seasons" doesn't
+    mention the season-range pickers (only Team Records does).
+  - Search help: typos, half-typed names finished, club short names
+    ("Spurs", "Wednesday", "Madrid"), competitions outside the dropdown.
+  - Privacy: the visit log (page views, searches, errors; no cookies or
+    personal data) - could live on the About page instead.
+  - The 2-points note: the Q&A line is out of date - the note now names
+    the last 2-point season ("2 for a win until 1980-81") and works the
+    other way too (a link back to points as awarded).
+  - Search examples (optional): none shows the newer answers (season
+    outcomes, the 2-points note).
+  Crest screenshots are taken by hand (the user offered).
 
 - Later (before launch): **About / sources page** — noted 2026-10-03.
   Where the data comes from, how often it updates, and that club names
