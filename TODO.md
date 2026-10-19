@@ -45,7 +45,7 @@ empty search box.
 19. Knockout Stage bracket view (on hold)
 20. Country vs Country
 21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-22. Review upcoming matches (home strip, and the sport pages' strip from 2026-10-19)
+22. Review upcoming matches
 23. Phone-width checks in npm run check
 24. Team-colour contrast
 25. Sitemap + Google Search Console
@@ -213,16 +213,6 @@ empty search box.
   - Phone layouts were checked in Chrome's iPhone emulation and once on
     the user's iPhone; worth another look on a real phone after any
     change.
-  - The sport pages' strip (added 2026-10-19, see Done - Upcoming matches
-    on the sport pages), to review later:
-    - Checked on the user's iPhone 2026-10-19: fine. How often the 📅
-      button is used doesn't matter - it stays as a convenience, so
-      nobody has to go back to the home page to see upcoming matches.
-    - Page weight: the added scripts are ~140 KB raw, ~41 KB gzipped and
-      cached after the first visit, against 680-870 KB for the pages
-      themselves - negligible, nothing to do.
-    - Back from the match view (restores the Copy Link state) checked by
-      the user 2026-10-19: works as intended.
 
 - Maybe: **Phone-width checks in npm run check** — noted 2026-10-07.
   Open each page (and an upcoming match's view) at iPhone width
@@ -483,7 +473,10 @@ empty search box.
   TeamRegistry / TeamCombobox instead of global names, which the sport
   pages declare themselves (the Domestic ones without the Champions
   League clubs - FavouriteTeam would have dropped a CL-only favourite
-  there).
+  there). Reviewed by the user the same day: fine on their iPhone,
+  Back from a match restores the page, the added scripts (~41 KB
+  gzipped) are negligible, and the 📅 button stays however often it's
+  used - nothing left to review.
 
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15
