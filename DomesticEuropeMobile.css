@@ -3408,11 +3408,12 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
     padding-bottom: 1.75rem;
 }
 
-/* The upcoming matches card (upcoming.js mountRow) is first on the page:
-   room above its heading for the fixed menu and ▼ buttons, and the search
-   bar under it no longer needs any */
-.league-table-container > .um-sport-row {
-    padding-top: 4.25rem;
+/* The upcoming matches card (upcoming.js mountRow) is first on the page,
+   with no room of its own for the fixed buttons (menu, ▼, and in search
+   mode Filters / the chip / the toggle) - the page starts below them
+   instead, and the search bar under it needs none */
+.league-table-container:has(> .um-sport-row:not([hidden])) {
+    padding-top: 4.5rem !important; /* over the phone width's 0.15rem !important */
 }
 
 html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {

@@ -1114,7 +1114,7 @@
         if (!soon.length) {
             // An international break, or the season's end
             const name = divs.length === 1 ? `${COMPETITIONS[divs[0]].name} ` : '';
-            el.innerHTML = `<h2 class="um-strip-title">Upcoming matches</h2><p class="um-row-status">${escapeHtml(fixtures.length
+            el.innerHTML = `<p class="um-row-status">${escapeHtml(fixtures.length
                 ? `No ${name}matches until ${longDay(new Date(fixtures[0].utcDate))}.`
                 : `No upcoming ${name}matches right now.`)}</p>`;
             return;
@@ -1123,7 +1123,7 @@
         const ordered = [...soon.filter(f => favs.has(f)), ...soon.filter(f => !favs.has(f))];
         [...new Set(soon.map(f => f.div))].forEach(loadSeasonData);
         const scrollLeft = el.querySelector('.um-row')?.scrollLeft || 0;
-        el.innerHTML = `<h2 class="um-strip-title">Upcoming matches</h2><div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
+        el.innerHTML = `<div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
             fav: favs.has(f), href: `index.html?match=${f.matchId}&back=1`, withDay: true
         })).join('')}</div>`;
         const list = el.querySelector('.um-row');

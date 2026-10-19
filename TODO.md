@@ -450,8 +450,9 @@ empty search box.
 
 - ~~Upcoming matches on the sport pages~~ — done (2026-10-19), the
   user's idea. The home strip's cards in one row, a card of its own
-  ("Upcoming matches") above each sport page, as the home page's sections
-  are - above the search bar in search mode: the next 7 days'
+  above each sport page, as the home page's sections
+  are, with no heading and little padding - above the search bar in
+  search mode: the next 7 days'
   matches in the league picked on the page - the search dropdown in
   search mode (all five for Top 5 Leagues, each card with its flag), else
   the open tab's league button; the Continental pages the Champions
