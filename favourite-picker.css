@@ -7,6 +7,22 @@
     z-index: 1001;
 }
 
+/* In the sport pages' header, next to Search (favourite-picker.js
+   mount(container)) */
+.fav-picker-inline {
+    position: relative;
+    top: auto;
+    right: auto;
+    z-index: 1001;
+}
+
+/* ...whose white, centred header text it mustn't inherit */
+.fav-picker-inline .fav-panel {
+    text-align: left;
+    color: #1f2937;
+    font-weight: normal;
+}
+
 .fav-chip {
     display: flex;
     align-items: center;
@@ -191,7 +207,7 @@
 [data-theme="dark"] .fav-chip { background: var(--bg-white); color: #6ee7b7; }
 [data-theme="dark"] .fav-chip.has-team { color: #f3f4f6; }
 [data-theme="dark"] .fav-chip:hover { background: #3f3f46; }
-[data-theme="dark"] .fav-panel { background: var(--bg-white); }
+[data-theme="dark"] .fav-panel { background: var(--bg-white); color: #f3f4f6; }
 [data-theme="dark"] .fav-panel-label { color: #e5e7eb; }
 [data-theme="dark"] .fav-panel-note { color: #9ca3af; }
 [data-theme="dark"] .fav-remove { border-color: #6b7280; color: #d1d5db; }

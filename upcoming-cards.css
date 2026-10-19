@@ -1,0 +1,188 @@
+/* The upcoming-match cards (upcoming.js): the home page's strip and the
+   sport pages' row both use them. Only .um- classes, so the sport pages
+   can load this without upcoming.css (whose copied table rules would
+   override their own). */
+
+/* index.css and the sport pages define --bg-white / --bg-gray-50 the other
+   way round in dark mode; these follow the sport pages, where the copied
+   rules come from */
+:root {
+    --um-bg: #ffffff;
+    --um-bg-alt: #f9fafb;
+    --um-text: #1f2937;
+    --um-positive: #059669;
+}
+
+[data-theme="dark"] {
+    --um-bg: #222222;
+    --um-bg-alt: #333333;
+    --um-text: #ffffff;
+    --um-positive: #34d399;
+}
+
+/* One row of cards, scrolled sideways */
+.um-row {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.1rem 0.6rem;
+    scroll-snap-type: x proximity;
+}
+
+.um-card {
+    flex: 0 0 18.5rem;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background: var(--um-bg);
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* The favourite team's next match (favourite-picker.js): first, starred */
+.um-card.um-card-fav {
+    border: 2px solid #f59e0b;
+    padding: calc(0.7rem - 1px) calc(0.85rem - 1px);
+}
+
+.um-fav-star {
+    margin-right: 0.3rem;
+}
+
+.um-card:hover,
+.um-card:focus-visible {
+    border-color: #10b981;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    outline: none;
+}
+
+.um-card-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.um-card-comp {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.um-kickoff {
+    font-weight: 700;
+    color: #374151;
+    white-space: nowrap;
+}
+
+/* Home team, then away: crest, name, position, and the form dots */
+.um-card-teams {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.35rem 0.6rem;
+}
+
+.um-team {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.um-team img {
+    width: 1.6rem;
+    height: 1.6rem;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.um-team-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+}
+
+.um-team-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.um-position {
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.um-form {
+    display: flex;
+    gap: 0.15rem;
+    flex-shrink: 0;
+}
+
+.um-form-dot {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 9999px;
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 700;
+    line-height: 1rem;
+    text-align: center;
+}
+
+.um-form-dot.W { background: #16a34a; }
+.um-form-dot.D { background: #9ca3af; }
+.um-form-dot.L { background: #dc2626; }
+
+/* The sport pages' row (mountRow): cards are links there */
+a.um-card {
+    text-decoration: none;
+}
+
+.um-sport-row {
+    padding: 1rem 2rem 0;
+    text-align: left;
+}
+
+.um-sport-row[hidden] {
+    display: none;
+}
+
+.um-sport-row .um-row {
+    padding-bottom: 0.25rem;
+}
+
+.um-row-status {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+@media (max-width: 640px) {
+    .um-card {
+        flex-basis: 15.5rem;
+    }
+
+    .um-sport-row {
+        padding: 0.75rem 1rem 0;
+    }
+}
+
+[data-theme="dark"] .um-card-top,
+[data-theme="dark"] .um-row-status { color: #9ca3af; }
+[data-theme="dark"] .um-kickoff { color: #d1d5db; }
+[data-theme="dark"] .um-card:not(.um-card-fav) { border-color: #444; }

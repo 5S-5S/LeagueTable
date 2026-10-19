@@ -2,14 +2,22 @@
 // color, logo number and country across all five domestic leagues and the
 // Champions League, plus the color helpers that go with them.
 //
-// Generated verbatim from getTeamColors() and its helpers in
-// ContinentalEurope.html (whose registry already covers every competition)
-// so logos and colors match the rest of the site exactly. If a team's
-// color/logo changes there, regenerate this file rather than editing it by
-// hand. Existing pages keep their own inline copies.
+// Copied from getTeamColors() and its helpers in ContinentalEurope.html
+// (whose registry already covers every competition) so logos and colors
+// match the rest of the site exactly; a team's color/logo change there
+// belongs here too. The sport pages keep their own inline copies.
+//
+// Exposed as window.TeamRegistry = { getTeamColors, getTeamColor,
+// getTeamLogoUrl, pickTeamTextColor, ... }. The sport pages declare the
+// same names as globals (the Domestic ones without the Champions League
+// clubs), so this file declares none of its own: shared scripts (the
+// favourites, the upcoming matches) call TeamRegistry.*, and on a page
+// without its own copies (the home page) each function is also set as a
+// global under its usual name.
 //
 // pickTeamTextColor() reads document.body's data-theme, so it must run
 // after the page's dark mode has been applied.
+(function () {
 
 let _teamColorsCache = null;
 
@@ -976,3 +984,14 @@ function getContrastColor(hexColor) {
     // Return black for light colors, white for dark colors
     return luminance > 0.5 ? '#000000' : '#FFFFFF';
 }
+
+const registry = {
+    getTeamColors, getTeamLookupIndex, findTeamEntry, getTeamColor, hexToRgb, rgbToHex,
+    relativeLuminance, contrastRatio, ensureReadableOnDark, pickTeamTextColor,
+    getTeamLogoNumber, getTeamLogoUrl, getTeamCountry, getContrastColor
+};
+window.TeamRegistry = registry;
+Object.entries(registry).forEach(([name, fn]) => {
+    if (!(name in window)) window[name] = fn;
+});
+})();

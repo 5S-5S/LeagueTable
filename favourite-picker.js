@@ -6,8 +6,11 @@
 // teams through FavouriteTeam (favourite-team.js) and redraw on its
 // onChange, so a change here shows everywhere at once.
 //
-// Exposes window.FavouritePicker = { mount(), open() } - open() lets a
-// card's "⭐ Your team" button with no team yet hand over to this panel.
+// Exposes window.FavouritePicker = { mount(container?, before?), open() } - open()
+// lets a card's "⭐ Your team" button with no team yet hand over to this
+// panel. With a container (the sport pages' header, next to Search) the
+// chip sits in it, before `before` if given, instead of fixed in the top
+// bar.
 // Needs team-registry.js, combobox.js and favourite-team.js.
 (function () {
     'use strict';
@@ -20,7 +23,7 @@
     }
 
     const crest = team => {
-        const logo = getTeamLogoUrl(team, 'champions-league');
+        const logo = TeamRegistry.getTeamLogoUrl(team, 'champions-league');
         return logo ? `<img src="${logo}" alt="" onerror="this.remove()">` : '<span aria-hidden="true">⭐</span>';
     };
 
@@ -66,9 +69,9 @@
         els.chip.setAttribute('aria-expanded', 'false');
     }
 
-    function mount() {
+    function mount(container, before = null) {
         const root = document.createElement('div');
-        root.className = 'fav-picker';
+        root.className = container ? 'fav-picker fav-picker-inline' : 'fav-picker';
         root.innerHTML = `
             <button type="button" class="fav-chip" aria-expanded="false" aria-controls="favPanel"></button>
             <div class="fav-panel" id="favPanel" role="dialog" aria-label="Your team" hidden>
@@ -82,9 +85,9 @@
                     </div>
                     <button type="button" class="fav-remove" hidden>Remove all</button>
                 </div>
-                <p class="fav-panel-note">Puts your clubs first on the home page. Remembered on this device only.</p>
+                <p class="fav-panel-note">Puts your clubs first in upcoming matches and on the home page. Remembered on this device only.</p>
             </div>`;
-        document.body.appendChild(root);
+        (container || document.body).insertBefore(root, before);
         els = {
             root,
             chip: root.querySelector('.fav-chip'),
@@ -96,7 +99,7 @@
         };
 
         // A pick is added and the panel stays open for the next one
-        combobox = new Combobox('favTeamContainer', 'favTeamInput', 'favTeamDropdown', 'Search for a team', value => {
+        combobox = new TeamCombobox('favTeamContainer', 'favTeamInput', 'favTeamDropdown', 'Search for a team', value => {
             if (!value) return;
             FavouriteTeam.add(value);
         }, { logoLeague: 'champions-league', allowEmpty: false });

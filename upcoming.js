@@ -14,6 +14,10 @@
 // competition (positions, form, the table), and for an opened match the
 // head-to-head and both teams' histories. Streaks follow the Team Streaks
 // tab's rules. Needs team-registry.js (crests and club colors).
+//
+// The sport pages show a thinner version (mountRow): one row of cards for
+// the league picked on the page, no day tabs or chips; a card opens the
+// match's view here on the home page.
 (function () {
     'use strict';
 
@@ -305,13 +309,13 @@
     }
 
     function logoImg(team, div) {
-        const url = getTeamLogoUrl(team, slugOf(div));
+        const url = TeamRegistry.getTeamLogoUrl(team, slugOf(div));
         return url ? `<img src="${url}" alt="" onerror="this.style.display='none'">` : '';
     }
 
     function teamName(team, div, extraClass = '') {
-        const color = getTeamColor(team, slugOf(div));
-        const style = color ? `color: ${pickTeamTextColor(color, '')};` : '';
+        const color = TeamRegistry.getTeamColor(team, slugOf(div));
+        const style = color ? `color: ${TeamRegistry.pickTeamTextColor(color, '')};` : '';
         return `<span class="um-team-name ${extraClass}" style="${style}">${escapeHtml(team)}</span>`;
     }
 
@@ -397,9 +401,14 @@
         return new Set(fixtures.filter(f => teams.has(f.homeTeam) || teams.has(f.awayTeam)));
     }
 
-    // fav: one of the favourites' matches, starred and first in its day's row
-    function cardHtml(fixture, { fav = false } = {}) {
+    // fav: one of the favourites' matches, starred and first in its day's row.
+    // The sport pages' row (several days, often one league): href makes the
+    // card a link, withDay puts the day before the kick-off and showComp
+    // false leaves out the league.
+    function cardHtml(fixture, { fav = false, href = '', withDay = false, showComp = true } = {}) {
         const comp = COMPETITIONS[fixture.div];
+        const when = withDay ? `${dayLabel(new Date(fixture.utcDate))} · ${kickoffTime(fixture)}` : kickoffTime(fixture);
+        const tag = href ? 'a' : 'button';
         // Crest, the name with its league position underneath, form dots
         const teamLine = team => `
             <span class="um-team">
@@ -411,16 +420,16 @@
             </span>
             ${formDots(fixture, team)}`;
         return `
-            <button type="button" class="um-card${fav ? ' um-card-fav' : ''}" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fav ? 'Your team: ' : ''}${fixture.homeTeam} vs ${fixture.awayTeam}, ${kickoffTime(fixture)}`)}">
+            <${tag} ${href ? `href="${escapeHtml(href)}"` : 'type="button"'} class="um-card${fav ? ' um-card-fav' : ''}" data-match="${fixture.matchId}" aria-label="${escapeHtml(`${fav ? 'Your team: ' : ''}${fixture.homeTeam} vs ${fixture.awayTeam}, ${when}`)}">
                 <span class="um-card-top">
-                    <span class="um-card-comp">${fav ? '<span class="um-fav-star" aria-hidden="true">⭐</span>' : ''}${comp.flag} ${escapeHtml(comp.name)}</span>
-                    <span class="um-kickoff">${escapeHtml(kickoffTime(fixture))}</span>
+                    <span class="um-card-comp">${fav ? '<span class="um-fav-star" aria-hidden="true">⭐</span>' : ''}${showComp ? `${comp.flag} ${escapeHtml(comp.name)}` : ''}</span>
+                    <span class="um-kickoff">${escapeHtml(when)}</span>
                 </span>
                 <span class="um-card-teams">
                     ${teamLine(fixture.homeTeam)}
                     ${teamLine(fixture.awayTeam)}
                 </span>
-            </button>`;
+            </${tag}>`;
     }
 
     function renderStrip() {
@@ -503,8 +512,8 @@
 
         const body = rows.map((row, i) => {
             const focus = isFocus(row.team);
-            const color = focus ? getTeamColor(row.team, slugOf(fixture.div)) : null;
-            const nameStyle = focus ? `font-weight: 700; ${color ? `color: ${pickTeamTextColor(color, '')};` : ''}` : 'font-weight: 400;';
+            const color = focus ? TeamRegistry.getTeamColor(row.team, slugOf(fixture.div)) : null;
+            const nameStyle = focus ? `font-weight: 700; ${color ? `color: ${TeamRegistry.pickTeamTextColor(color, '')};` : ''}` : 'font-weight: 400;';
             const gd = row.gf - row.ga;
             const background = rows.length >= 3 && i % 2 === 1 ? 'bg-gray-50' : 'bg-white';
             return `
@@ -560,8 +569,8 @@
         const total = matches.length;
         const segment = (count, team, extraClass = '') => {
             if (!count) return '';
-            const color = team ? getTeamColor(team, slugOf(fixture.div)) : null;
-            const style = color ? `background: ${color}; color: ${getContrastColor(color)};` : (team ? 'background: #374151; color: white;' : '');
+            const color = team ? TeamRegistry.getTeamColor(team, slugOf(fixture.div)) : null;
+            const style = color ? `background: ${color}; color: ${TeamRegistry.getContrastColor(color)};` : (team ? 'background: #374151; color: white;' : '');
             return `<div class="h2h-segment ${extraClass}" style="width: ${count / total * 100}%; ${style}" title="${team ? escapeHtml(team) + ' wins' : 'Draws'}: ${count}">${count}</div>`;
         };
         return `
@@ -603,8 +612,8 @@
         history = history.filter(m => m.HomeTeam === team || m.AwayTeam === team);
         if (!history.length) return '<p class="um-none">No matches yet.</p>';
 
-        const color = getTeamColor(team, slugOf(fixture.div));
-        const winStyle = color ? `background: ${color} !important; color: ${getContrastColor(color)} !important;` : 'background: #059669 !important; color: white !important;';
+        const color = TeamRegistry.getTeamColor(team, slugOf(fixture.div));
+        const winStyle = color ? `background: ${color} !important; color: ${TeamRegistry.getContrastColor(color)} !important;` : 'background: #059669 !important; color: white !important;';
         const bar = (label, matches) => {
             let wins = 0, draws = 0, losses = 0;
             matches.forEach(m => {
@@ -637,10 +646,10 @@
     // column, and the usual team1/team2 highlight pills
     // A team's crest alone (name on hover); the name itself if there's no crest
     function crestOnly(team, div) {
-        const url = getTeamLogoUrl(team, slugOf(div));
+        const url = TeamRegistry.getTeamLogoUrl(team, slugOf(div));
         if (!url) {
-            const color = getTeamColor(team, slugOf(div));
-            return `<span style="font-weight: bold; ${color ? `color: ${pickTeamTextColor(color, '')};` : ''}">${escapeHtml(team)}</span>`;
+            const color = TeamRegistry.getTeamColor(team, slugOf(div));
+            return `<span style="font-weight: bold; ${color ? `color: ${TeamRegistry.pickTeamTextColor(color, '')};` : ''}">${escapeHtml(team)}</span>`;
         }
         return `<img src="${url}" alt="${escapeHtml(team)}" title="${escapeHtml(team)}" onerror="this.replaceWith(Object.assign(document.createElement('span'), { textContent: this.alt, style: 'font-weight: bold' }))">`;
     }
@@ -654,8 +663,8 @@
         const isCL = fixture.div === 'C1';
         const phone = phoneQuery.matches;
         const teamSpan = (team, highlight) => {
-            const color = getTeamColor(team, slug);
-            const style = color ? `color: ${pickTeamTextColor(color, highlight)} !important; font-weight: bold;` : 'font-weight: bold;';
+            const color = TeamRegistry.getTeamColor(team, slug);
+            const style = color ? `color: ${TeamRegistry.pickTeamTextColor(color, highlight)} !important; font-weight: bold;` : 'font-weight: bold;';
             return `<div class="um-cell-team um-cell-center">${logoImg(team, fixture.div)}<span class="${highlight}" style="${style}">${escapeHtml(team)}</span></div>`;
         };
         const rows = streak.matches.map((m, i) => {
@@ -668,8 +677,8 @@
             const highlight = team => team === focus ? 'team1-highlight' : team === opponent ? 'team2-highlight' : 'team-transparent-highlight';
             let result;
             if (winner) {
-                const color = getTeamColor(winner, slug);
-                const style = color ? `color: ${pickTeamTextColor(color, highlight(winner))} !important; font-weight: bold;` : 'color: #059669 !important; font-weight: bold;';
+                const color = TeamRegistry.getTeamColor(winner, slug);
+                const style = color ? `color: ${TeamRegistry.pickTeamTextColor(color, highlight(winner))} !important; font-weight: bold;` : 'color: #059669 !important; font-weight: bold;';
                 result = `<div class="um-cell-team um-cell-center">${logoImg(winner, fixture.div)}<span class="${highlight(winner)}" style="${style}">${escapeHtml(winner)}</span></div>`;
             } else {
                 result = '<span style="color: #9ca3af !important; font-weight: bold;">Draw</span>';
@@ -834,7 +843,7 @@
     }
 
     function viewTeamBlock(fixture, team) {
-        const url = getTeamLogoUrl(team, slugOf(fixture.div));
+        const url = TeamRegistry.getTeamLogoUrl(team, slugOf(fixture.div));
         return `
             <div class="um-view-team">
                 ${url ? `<img src="${url}" alt="" class="um-view-crest" onerror="this.style.display='none'">` : ''}
@@ -937,6 +946,7 @@
 
     function renderAll() {
         renderStrip();
+        renderRows();
         if (state.match !== null) renderView();
     }
 
@@ -1007,6 +1017,12 @@
         pick('streak', key => { state.openStreaks.has(key) ? state.openStreaks.delete(key) : state.openStreaks.add(key); });
     }
 
+    let fixturesLoad = null;
+    function ensureFixtures() {
+        if (!fixturesLoad) fixturesLoad = loadFixtures();
+        return fixturesLoad;
+    }
+
     async function loadFixtures() {
         try {
             const data = await fetchJson(`${API_BASE}/api/upcoming`);
@@ -1041,8 +1057,111 @@
         if (window.FavouriteTeam) FavouriteTeam.onChange(renderStrip);
         state.match = matchFromUrl();
         renderView();
-        loadFixtures();
+        ensureFixtures();
     }
 
-    window.UpcomingMatches = { mount, openMatch };
+    // --- The sport pages' row ---------------------------------------------
+
+    // One row of cards, no day tabs or chips: the next STRIP_DAYS of
+    // matches in the league the page has picked (several for the search's
+    // "Top 5 Leagues"), the favourites' first. Each card links to the
+    // match's view on the home page. The league comes from the page:
+    // in search mode the search bar's dropdown, else the open tab's league
+    // button, else `fallback` (the Continental pages: the Champions League).
+    const DIV_BY_SLUG = Object.fromEntries(Object.entries(COMPETITIONS).map(([div, comp]) => [comp.slug, div]));
+    const DOMESTIC_SLUGS = ['premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'];
+    const rows = [];
+
+    function pageLeagues(fallback) {
+        if (document.documentElement.classList.contains('search-mode')) {
+            const scope = document.querySelector('#searchModeBar .search-scope');
+            if (scope && scope.value) return scope.value === 'domestic' ? DOMESTIC_SLUGS : [scope.value];
+            return fallback;
+        }
+        const button = document.querySelector('.tab-content.active .league-button.active[data-league]');
+        return button ? [button.dataset.league] : fallback;
+    }
+
+    // Under the header, or above the search bar in search mode (where the
+    // header is hidden)
+    function placeRow(row) {
+        const searchMode = document.documentElement.classList.contains('search-mode');
+        const anchor = searchMode ? document.getElementById('searchModeBar') : document.querySelector('.main-card > .header');
+        if (!anchor) return;
+        if (searchMode ? anchor.previousElementSibling !== row.el : anchor.nextElementSibling !== row.el) {
+            if (searchMode) anchor.before(row.el);
+            else anchor.after(row.el);
+        }
+    }
+
+    function renderRow(row) {
+        const { el, divs } = row;
+        if (!state.loaded || !divs.length) {
+            el.hidden = true;
+            return;
+        }
+        const now = Date.now();
+        const fixtures = state.fixtures
+            .filter(f => divs.includes(f.div) && new Date(f.utcDate).getTime() > now)
+            .sort((a, b) => a.utcDate.localeCompare(b.utcDate) || COMPETITION_ORDER.indexOf(a.div) - COMPETITION_ORDER.indexOf(b.div));
+        const today = new Date();
+        const end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + STRIP_DAYS);
+        const soon = fixtures.filter(f => new Date(f.utcDate) < end);
+        el.hidden = false;
+        if (!soon.length) {
+            // An international break, or the season's end
+            const name = divs.length === 1 ? `${COMPETITIONS[divs[0]].name} ` : '';
+            el.innerHTML = `<p class="um-row-status">${escapeHtml(fixtures.length
+                ? `No ${name}matches until ${longDay(new Date(fixtures[0].utcDate))}.`
+                : `No upcoming ${name}matches right now.`)}</p>`;
+            return;
+        }
+        const favs = favouriteFixtures(soon);
+        const ordered = [...soon.filter(f => favs.has(f)), ...soon.filter(f => !favs.has(f))];
+        [...new Set(soon.map(f => f.div))].forEach(loadSeasonData);
+        const scrollLeft = el.querySelector('.um-row')?.scrollLeft || 0;
+        el.innerHTML = `<div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
+            fav: favs.has(f), href: `index.html?match=${f.matchId}`, withDay: true, showComp: divs.length > 1
+        })).join('')}</div>`;
+        const list = el.querySelector('.um-row');
+        if (list) list.scrollLeft = scrollLeft;
+    }
+
+    function renderRows() {
+        rows.forEach(renderRow);
+    }
+
+    // el: the row's element (moved under the header / above the search bar
+    // as the page switches mode). fallback: the leagues when the page
+    // shows none (the Continental pages: ['champions-league']).
+    function mountRow(el, { fallback = [] } = {}) {
+        const row = { el, divs: [] };
+        rows.push(row);
+        el.hidden = true;
+        let queued = false;
+        const update = () => {
+            queued = false;
+            placeRow(row);
+            const divs = pageLeagues(fallback).map(slug => DIV_BY_SLUG[slug]).filter(Boolean);
+            if (divs.join() === row.divs.join()) return;
+            row.divs = divs;
+            renderRow(row);
+        };
+        const queue = () => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(update);
+        };
+        // A tab, league button, dropdown or mode switch: any of them changes
+        // a class or a select somewhere on the page
+        new MutationObserver(queue).observe(document.documentElement, { attributes: true, attributeFilter: ['class'], subtree: true });
+        document.addEventListener('change', queue);
+        // Team text colors depend on the theme; the favourites lead the row
+        new MutationObserver(() => renderRow(row)).observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        if (window.FavouriteTeam) FavouriteTeam.onChange(() => renderRow(row));
+        update();
+        ensureFixtures();
+    }
+
+    window.UpcomingMatches = { mount, mountRow, openMatch };
 })();

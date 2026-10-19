@@ -50,7 +50,7 @@
     function allTeams() {
         if (!teams) {
             const names = new Set();
-            Object.values(getTeamColors()).forEach(list => list.forEach(([name]) => names.add(name)));
+            Object.values(TeamRegistry.getTeamColors()).forEach(list => list.forEach(([name]) => names.add(name)));
             teams = [...names].sort((a, b) => a.localeCompare(b));
         }
         return teams;

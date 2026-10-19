@@ -8,7 +8,12 @@
 // - allowEmpty: false keeps the last pick when the box is left empty
 //   (clicking in clears it for typing) instead of choosing "All Teams" -
 //   for a favourite team, which is removed on purpose, not by a stray click
-// Needs team-registry.js (getTeamLogoUrl); styles in combobox.css.
+// Needs team-registry.js (getTeamLogoUrl); styles in combobox.css (the
+// sport pages style the same classes themselves).
+//
+// Exposed as window.TeamCombobox: the sport pages declare their own
+// class Combobox, so this file declares no global name of its own.
+(function () {
 class Combobox {
     constructor(containerId, inputId, dropdownId, placeholder, onSelect, { logoLeague = 'champions-league', allowEmpty = true } = {}) {
         this.containerId = containerId;
@@ -131,7 +136,7 @@ class Combobox {
         this.dropdown.innerHTML = this.filteredOptions.map((option, index) => {
             // Crests load as they scroll into view - the home page lists
             // every club
-            const logoUrl = option.value ? getTeamLogoUrl(option.value, this.logoLeague) : null;
+            const logoUrl = option.value ? TeamRegistry.getTeamLogoUrl(option.value, this.logoLeague) : null;
             const logoHtml = logoUrl ? `<img src="${logoUrl}" alt="" class="combobox-team-logo" loading="lazy" onerror="this.style.display='none'">` : '';
             return `<div class="combobox-option ${index === this.selectedIndex ? 'highlighted' : ''}"
                       data-value="${escape(option.value)}" data-index="${index}">
@@ -222,7 +227,7 @@ class Combobox {
     // while open, since the field is cleared for typing then
     updateSelectedLogo() {
         const logoUrl = !this.isOpen && this.currentValue
-            ? getTeamLogoUrl(this.currentValue, this.logoLeague)
+            ? TeamRegistry.getTeamLogoUrl(this.currentValue, this.logoLeague)
             : null;
         if (logoUrl && this.selectedLogo.getAttribute('src') !== logoUrl) {
             this.selectedLogo.src = logoUrl;
@@ -230,3 +235,6 @@ class Combobox {
         this.container.classList.toggle('has-logo', !!logoUrl && logoUrl !== this.failedLogoUrl);
     }
 }
+
+window.TeamCombobox = Combobox;
+})();

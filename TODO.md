@@ -448,6 +448,25 @@ empty search box.
 
 ## Done
 
+- ~~Upcoming matches on the sport pages~~ — done (2026-10-19), the
+  user's idea. A thin row of the home strip's cards under each sport
+  page's header (above the search bar in search mode): the next 7 days'
+  matches in the league picked on the page - the search dropdown in
+  search mode (all five for Top 5 Leagues, each card with its flag), else
+  the open tab's league button; the Continental pages the Champions
+  League. No day tabs or chips; each card shows the day and kick-off and
+  opens the match's view on the home page (index.html?match=). A week
+  with none says when the next one is. The favourite teams' chip went
+  in the header too (between Search and the toggle; on phones crest or
+  star only, beside the toggle), and their matches lead the row,
+  starred. upcoming.js mountRow; card styles split into
+  upcoming-cards.css (upcoming.css's copied table rules would override
+  the sport pages' own). team-registry.js and combobox.js now expose
+  TeamRegistry / TeamCombobox instead of global names, which the sport
+  pages declare themselves (the Domestic ones without the Champions
+  League clubs - FavouriteTeam would have dropped a CL-only favourite
+  there).
+
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15
   (favourite-team.js: window.FavouriteTeam - list / get / has / add /
@@ -475,10 +494,11 @@ empty search box.
     them back.
   Dropped 2026-10-19 (the user's call):
   - The sport pages: Team 1 / Team History / Team Streaks opening on the
-    first favourite in that competition, and the chip there too. Too much
-    logic for several teams (which one, per competition, on a league
-    change) for little gain - picking a team in a tab is one click, and
-    the chip alone would only edit a list the home page uses.
+    first favourite in that competition. Too much logic for several teams
+    (which one, per competition, on a league change) for little gain -
+    picking a team in a tab is one click. (The chip did go on the sport
+    pages later that day, with their upcoming matches row - see Upcoming
+    matches on the sport pages.)
   - The search part: "my team" questions ("my team titles") and a
     one-click shortcut to each favourite in the empty bar. Typing the
     club's name is shorter than "my favourite team", and Recent searches
