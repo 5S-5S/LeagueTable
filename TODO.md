@@ -371,7 +371,8 @@ empty search box.
 
 - Partly done: **Team Overview (the Team Dashboard rework)** — added to
   the ranking 2026-10-19 (top of Tier 3). Built so far on the
-  `team-overview` branch (463d815, 44dc976 - 2026-10-12), not merged: a
+  `team-overview` branch (2026-10-12; rebased onto main 2026-10-21 as
+  f73d580, daf6743 and force-pushed), not merged: a
   lot of work needed before main. The search's "<club>" result opens an
   in-search overview, index.html?team=<club>&lg=<competition> (team.js,
   team.css): this season (next two matches, five rows of the table), then
@@ -381,6 +382,10 @@ empty search box.
   linked at the foot. Still to do: layout density, and tables and fonts
   matching the sport pages' own tabs (Team Seasons, the match view's
   table) rather than new formats.
+  Rebase notes: the season-rules files now read overrides and deductions
+  from standings-adjustments.js (index.html loads it first); the home
+  page's On this day card (added since) sits above the overview - decide
+  where it goes. The full npm run check hasn't run on the rebased branch.
 
 - Maybe: **Team Records: home / away** — split 2026-10-21. "Most home
   wins in a season" - season standings are totals; needs home/away splits
