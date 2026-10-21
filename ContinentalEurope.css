@@ -1847,9 +1847,29 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
     padding-bottom: 1.75rem;
 }
 
-/* The upcoming matches strip (upcoming.js mountRow) is first on the page
-   when shown (it keeps clear of the fixed buttons itself), so the search
-   bar under it needs no room for them */
+/* The upcoming matches strip (upcoming.js mountRow), when shown, is part
+   of the green header, under the title (mountRow place) - its cards in a
+   row the width of the header's content */
+.header .um-sport-row {
+    max-width: 1200px;
+    margin: 1.25rem auto -0.75rem;
+    padding: 0 0 0.5rem;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .header .um-sport-row {
+    background: none;
+}
+
+.header .um-row-status {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* In search mode, where the header goes, it is first on the page instead
+   (it keeps clear of the fixed buttons itself), so the search bar under it
+   needs no room for them */
 html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {
     padding-top: 1.75rem;
 }

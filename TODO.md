@@ -524,6 +524,10 @@ empty search box.
   mode, where the buttons float over it (clearButtons: false). The user's
   call: buttons floating over text is fine - tried and dropped: two
   stacks of two, and keeping the cards clear of them (names cut to "…").
+  The same day on desktop too (the user's pick from a preview): the
+  strip, when on, sits in the green header under the title, its cards
+  the width of the header's content; in search mode still its own card
+  above the search bar, clear of the fixed buttons as before.
 
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15
