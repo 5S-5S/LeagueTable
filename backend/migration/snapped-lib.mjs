@@ -28,7 +28,8 @@
 //     runs (winning / unbeaten / winless / losing) in the top 3%, 5+ games
 //     - "first win against Liverpool in 10".
 // Each club appears once per match (its strongest run), and so does each
-// head-to-head meeting.
+// head-to-head meeting - in the Champions League once for the whole
+// competition and once for a stage (see STAGES and bestPerMatch()).
 //
 // A competition record is the longest run of its kind (same type,
 // location, club or head-to-head, competition or stage) by anyone, all
@@ -60,7 +61,9 @@
 // each single knockout round (Final, Semi-Finals, Quarter-Finals, Round of
 // 16) - the Team Streaks tab's Competition Stage options. Each stage is
 // judged against the runs in that stage only, and listed with a `stage`
-// key; one entry per club per match still, across all of them. Qualifiers
+// key; one entry per club per match across all the stages, beside the
+// whole competition's (added 2026-10-21: Arsenal's 17 unbeaten, the
+// club's record, was hidden behind their 14 Group Stage wins). Qualifiers
 // get none. A single round is a few games a season, so its club runs have
 // their own bar: 4+ games and the club's longest of its kind in that round
 // for 10+ years ("Real Madrid have won their last 9 Finals"); no
@@ -197,19 +200,29 @@ function clubHistory(past, count, end) {
 // One per club per match, one per head-to-head meeting: a single
 // knockout round's run first (a few a year, and the most telling - "won
 // their last 9 Finals"), then the league-wide bars, then the rarest, then
-// the longest. matchKey names the match (the date that snapped it, or the
-// fixture on the line).
+// the longest. In the Champions League the whole competition's best and
+// the stages' best can both stand (Arsenal's 17 unbeaten beside their 14
+// Group Stage wins) - unless they are the same type and location, which
+// is mostly the same run counted twice ("conceded in 15", all of them in
+// the Group Stage). matchKey names the match (the date that snapped it,
+// or the fixture on the line).
 function bestPerMatch(picked, matchKey) {
-    const best = new Map();
     const rank = s => (s.stage && STAGES[s.stage].single ? 2 : s.source === 'league' ? 1 : 0);
+    const better = (s, b) => rank(s) > rank(b) || (rank(s) === rank(b) && (s.pct > b.pct || (s.pct === b.pct && s.count > b.count)));
+    const best = new Map(); // match key -> { all, stage }
     for (const s of picked) {
         const key = s.kind === 'club'
             ? `club|${s.div}|${s.team}|${matchKey(s)}`
             : `h2h|${s.div}|${matchKey(s)}|${[s.team, s.opp].sort().join('|')}`;
-        const b = best.get(key);
-        if (!b || rank(s) > rank(b) || (rank(s) === rank(b) && (s.pct > b.pct || (s.pct === b.pct && s.count > b.count)))) best.set(key, s);
+        const slots = best.get(key) || best.set(key, {}).get(key);
+        const scope = s.stage ? 'stage' : 'all';
+        if (!slots[scope] || better(s, slots[scope])) slots[scope] = s;
     }
-    return [...best.values()];
+    return [...best.values()].flatMap(({ all, stage }) => {
+        if (!all || !stage) return [all || stage];
+        if (all.type === stage.type && all.loc === stage.loc) return [better(stage, all) ? stage : all];
+        return [all, stage];
+    });
 }
 
 // Breaks of more than a summer (or two, head-to-head home/away) between
