@@ -41,7 +41,7 @@ empty search box.
 15. "/" to search
 16. Penalty shootout leaderboard (team and head-to-head answers done)
 17. "Won on penalties" in Match Finder
-18. Lighter pages (small gain - see the item)
+18. Lighter pages / shared sport-page code (audited 2026-10-21 - see the item)
 19. Knockout Stage bracket view (on hold)
 20. Country vs Country
 21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
@@ -278,6 +278,42 @@ empty search box.
   page's HTML but not its code, or a visitor opens both Domestic and
   Continental (shared code like search downloaded once) - small gain
   for a big refactor of four large pages.
+  Reframed 2026-10-21: the bigger gain is maintenance - write a fix once
+  instead of on four pages. Audit (acorn parse of every inline script,
+  compared token by token, comments and whitespace ignored): inline JS is
+  594 of 680 KB (Domestic) and 765 of 874 KB (Continental), ~300-330
+  top-level declarations a page.
+  - Identical on all four: ~125 declarations, ~80 KB (finalizeTable,
+    computeLeagueStreaks, findAllHistoricStreaks, handlePositionColors,
+    calculateStreak, applyPointDeductions, ...).
+  - Within 10% on all four: 22, ~62 KB (Combobox, updateSearchAnswer,
+    ExtraTeam2Picker, initDarkMode, initHamburgerMenu, the ensure*Loaded
+    loaders).
+  - Desktop = mobile but Domestic != Continental: ~103, ~266 KB
+    (getTeamColors 55 KB, showTeamHistory, calculateTable,
+    calculateMatchFinder, generateSeasons, ...); plus Domestic-only 34
+    (41 KB) and Continental-only 53 (86 KB: calculateGroupedTable, tie
+    mode, progression) that are the same on desktop and mobile.
+  - Desktop != mobile: ~40, ~330 KB (setupEventListeners, switchTab, the
+    table renderers) - stays on each page for now.
+  Quick wins: the pages still carry their own getTeamColors (55 KB) and
+  Combobox (11 KB) although team-registry.js and combobox.js already load
+  there (since the upcoming strip) - check first that nothing lists teams
+  from the registry, since the Domestic copy has no Champions League
+  clubs.
+  Plan, each step tested on all four pages before committing:
+  1. sport-common.js - the ~125 identical declarations, plus switching to
+     team-registry.js / combobox.js.
+  2. domestic.js and continental.js - what each sport's desktop and mobile
+     share (~390 KB). The biggest maintenance win.
+  3. Maybe later: fold the within-10% ones with a small desktop/mobile
+     switch, case by case.
+  Each page would keep ~150-300 KB of its own code instead of 600-770.
+  Watch: a shared file must load before the inline script that uses it
+  and must not declare a name the page also declares (the "already
+  declared" clash from 2026-10-19); script the move (pick declarations
+  from the AST, check token equality, keep their order) rather than copy
+  by hand; relative <script src> works over file://.
 
 - Passed over: **Team nicknames in search** — considered 2026-10-18, passed
   over this time (the plain club names went in instead - see Done). Fan
