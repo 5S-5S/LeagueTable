@@ -15642,6 +15642,7 @@
         // chip next to Search (their matches lead the row)
         UpcomingMatches.mountRow(document.getElementById('upcomingRow'), { fallback: ['champions-league'], pageQuery: buildShareableFilterUrl,
             toggleIn: document.querySelector('.header-actions'), toggleBefore: document.querySelector('.header-actions .dark-mode-toggle'),
+            leagueChips: true,
             // In the green header, under the title; above the search bar in
             // search mode, where the header goes
             place: el => {
