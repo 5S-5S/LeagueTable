@@ -28,8 +28,9 @@
 //     runs (winning / unbeaten / winless / losing) in the top 3%, 5+ games
 //     - "first win against Liverpool in 10".
 // Each club appears once per match (its strongest run), and so does each
-// head-to-head meeting - in the Champions League once for the whole
-// competition and once for a stage (see STAGES and bestPerMatch()).
+// head-to-head meeting - with its best result run too if that wasn't it,
+// and in the Champions League the same again for a stage (see
+// bestPerMatch()).
 //
 // A competition record is the longest run of its kind (same type,
 // location, club or head-to-head, competition or stage) by anyone, all
@@ -200,28 +201,38 @@ function clubHistory(past, count, end) {
 // One per club per match, one per head-to-head meeting: a single
 // knockout round's run first (a few a year, and the most telling - "won
 // their last 9 Finals"), then the league-wide bars, then the rarest, then
-// the longest. In the Champions League the whole competition's best and
-// the stages' best can both stand (Arsenal's 17 unbeaten beside their 14
-// Group Stage wins) - unless they are the same type and location, which
-// is mostly the same run counted twice ("conceded in 15", all of them in
-// the Group Stage). matchKey names the match (the date that snapped it,
-// or the fixture on the line).
+// the longest. Two more can stand beside it:
+//   - A result run (won, unbeaten, winless, lost) where a goals or draw
+//     run was picked - the best of them (added 2026-10-21: Leipzig's 8
+//     home wins, a club record, were hidden behind scoring in 32 at home).
+//   - In the Champions League, the same again for a stage beside the whole
+//     competition (Arsenal's 17 unbeaten beside their 14 Group Stage wins)
+//     - unless the two are the same type and location, which is mostly the
+//     same run counted twice ("conceded in 15", all in the Group Stage).
+// matchKey names the match (the date that snapped it, or the fixture on
+// the line).
 function bestPerMatch(picked, matchKey) {
     const rank = s => (s.stage && STAGES[s.stage].single ? 2 : s.source === 'league' ? 1 : 0);
     const better = (s, b) => rank(s) > rank(b) || (rank(s) === rank(b) && (s.pct > b.pct || (s.pct === b.pct && s.count > b.count)));
-    const best = new Map(); // match key -> { all, stage }
+    const best = new Map(); // match key -> { all: { top, result }, stage: { top, result } }
     for (const s of picked) {
         const key = s.kind === 'club'
             ? `club|${s.div}|${s.team}|${matchKey(s)}`
             : `h2h|${s.div}|${matchKey(s)}|${[s.team, s.opp].sort().join('|')}`;
-        const slots = best.get(key) || best.set(key, {}).get(key);
-        const scope = s.stage ? 'stage' : 'all';
-        if (!slots[scope] || better(s, slots[scope])) slots[scope] = s;
+        const scopes = best.get(key) || best.set(key, {}).get(key);
+        const slot = scopes[s.stage ? 'stage' : 'all'] ||= {};
+        if (!slot.top || better(s, slot.top)) slot.top = s;
+        if (RESULT_TYPES.has(s.type) && (!slot.result || better(s, slot.result))) slot.result = s;
     }
+    const listed = slot => (slot ? [...new Set([slot.top, slot.result].filter(Boolean))] : []);
     return [...best.values()].flatMap(({ all, stage }) => {
-        if (!all || !stage) return [all || stage];
-        if (all.type === stage.type && all.loc === stage.loc) return [better(stage, all) ? stage : all];
-        return [all, stage];
+        const whole = listed(all);
+        const stages = listed(stage);
+        const twice = (a, b) => a.type === b.type && a.loc === b.loc;
+        return [
+            ...whole.filter(a => !stages.some(b => twice(a, b) && better(b, a))),
+            ...stages.filter(b => !whole.some(a => twice(a, b) && !better(b, a))),
+        ];
     });
 }
 
