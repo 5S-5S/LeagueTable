@@ -492,7 +492,8 @@ empty search box.
   answer says "by a relegated team"; "without being relegated" / "stayed
   up" drop it rather than flip it. "off" joined the search keywords (a
   trailing "play off" had been read as Kickers Offenbach being typed).
-  Not done: "best relegated team ever" / "worst champions ever" still go
+  Checked by the user on their iPhone, 2026-10-21. Not done: "best
+  relegated team ever" / "worst champions ever" still go
   to Team Seasons (no stat word); a "Last" place option wasn't wanted.
 
 - ~~Upcoming matches on the sport pages~~ — done (2026-10-19), the
