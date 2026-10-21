@@ -12359,14 +12359,15 @@
         UpcomingMatches.mountRow(document.getElementById('upcomingRow'), { fallback: ['premier-league', 'la-liga', 'serie-a', 'bundesliga', 'ligue-1'], pageQuery: buildShareableFilterUrl,
             toggleIn: document.body, toggleBefore: document.getElementById('menuOverlay'), clearButtons: false,
             leagueChips: true,
-            // In the green header, under the title; above the search bar in
-            // search mode, where the header goes
+            // In the green header, under the title; at the top of the search
+            // bar's card in search mode, where the header goes
             place: el => {
-                const target = document.documentElement.classList.contains('search-mode')
-                    ? document.querySelector('.league-table-container > .main-card')
-                    : document.querySelector('.main-card > .header');
-                if (target.classList.contains('header') ? el.parentElement !== target : el.nextElementSibling !== target) {
-                    if (target.classList.contains('header')) target.append(el); else target.before(el);
+                if (document.documentElement.classList.contains('search-mode')) {
+                    const card = document.querySelector('.league-table-container > .main-card');
+                    if (card.firstElementChild !== el) card.prepend(el);
+                } else {
+                    const header = document.querySelector('.main-card > .header');
+                    if (el.parentElement !== header) header.append(el);
                 }
             } });
         FavouritePicker.mount(document.getElementById('menuFavourites'), null, { embedded: true });

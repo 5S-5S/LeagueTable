@@ -536,6 +536,11 @@ empty search box.
   dropdown is right there), none on a tab without league buttons.
   Continental shows its one Champions League chip too, ready for more
   competitions.
+  Search mode, also 2026-10-21 (the user's pick from a mock): the strip
+  is at the top of the search bar's card rather than a card of its own
+  (place prepends it to .main-card), the bar's width; on phones under the
+  row of buttons as the header's title is, on desktop clear of the fixed
+  buttons as before.
 
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15
