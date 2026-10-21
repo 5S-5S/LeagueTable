@@ -3813,8 +3813,9 @@ html:not(.search-mode) .header {
     background: none;
 }
 
-/* Hidden while the menu is open (the menu button hides itself too) */
-body:has(.side-menu.open) .floating-btn {
+/* All the floating buttons hide while the menu is open (the menu button
+   hides itself) - 📅 and ▼ sat over the menu's close button */
+body:has(.side-menu.open) :is(.floating-btn, body > .um-row-toggle, #collapseControlsBtn) {
     visibility: hidden;
 }
 
