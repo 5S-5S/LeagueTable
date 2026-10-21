@@ -553,6 +553,29 @@ empty search box.
   v Benfica's 11, going since 1976, was already ahead). Live: 1 on the
   line, 4 snapped in the last year (Leverkusen's 37 away unbeaten, PSG
   conceding in 17 straight quarter-finals, ...).
+  Also 2026-10-21, both found by the user's eye and fixed in
+  snapped-lib.mjs bestPerMatch() (one entry per club per match, the
+  rarest, hid other runs that had passed the bars):
+  - **Whole competition and stage both listed**: Arsenal's 17 unbeaten in
+    the Champions League (the club record) was hidden behind their 14
+    Group Stage wins for Bayern v Arsenal. Now the competition's best and
+    the stages' best can both stand, unless they are the same type and
+    location (mostly the same run counted twice). Live: 10 -> 12 on the
+    line in the Champions League (Arsenal's 17, Bayern scoring in 23);
+    59 -> 64 snapped in the last year.
+  - **A result run beside a goals or draw run**: an audit of every run
+    that passed the bars found ~10 on the line and 34 snapped (past
+    year) hidden behind a run of a different type - mostly wins or losses
+    behind a goals or draw run, several club records (Leipzig's 8 home
+    wins behind scoring in 32 at home; Oviedo's 14 winless behind 5 home
+    draws; Sturm Graz's 8 away defeats). Where the pick is a goals or draw
+    run, the best result run (won, unbeaten, winless, lost) is listed too.
+    Chosen over ranking result runs first (would have dropped Barça
+    scoring in 55) and a slot per family (+23 a year, mostly weak goals
+    runs). On the line 36 -> 39, snapped 314 -> 324 in the past year,
+    nothing removed; On this day ~58 -> 60 streaks per calendar day.
+    Still hidden on purpose: a narrower cut of a listed run ("unbeaten in
+    11 at home" beside "unbeaten in 20"), and a mirror pair counts once.
 
 - ~~Q&A gaps~~ — done (2026-10-19). An audit of qa.html against the
   features added since its last update. Fixed: when results appear
