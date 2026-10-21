@@ -524,6 +524,18 @@ empty search box.
   mode, where the buttons float over it (clearButtons: false). The user's
   call: buttons floating over text is fine - tried and dropped: two
   stacks of two, and keeping the cards clear of them (names cut to "…").
+  The same day on desktop too (the user's pick from a preview): the
+  strip, when on, sits in the green header under the title, its cards
+  the width of the header's content; in search mode still its own card
+  above the search bar, clear of the fixed buttons as before.
+  League chips under the strip's cards (also 2026-10-21, the user's
+  idea - on a phone the league buttons are a scroll away): the open
+  tab's league buttons again as thin pills (mountRow leagueChips); a
+  chip clicks its button, so the strip and the tab always agree. No
+  "All" (search's Top 5 Leagues covers that), none in search mode (its
+  dropdown is right there), none on a tab without league buttons.
+  Continental shows its one Champions League chip too, ready for more
+  competitions.
 
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15

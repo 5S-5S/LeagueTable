@@ -168,6 +168,40 @@ html.search-mode .um-row-toggle[aria-pressed="true"] {
     color: white;
 }
 
+/* The league chips under the sport pages' strip (mountRow leagueChips),
+   on the green header it sits in: outlined white, the picked one filled */
+.um-league-chips {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding: 0.15rem 0.1rem 0.25rem;
+    scrollbar-width: none;
+}
+
+.um-league-chip {
+    flex: none;
+    padding: 0.2rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 999px;
+    background: transparent;
+    color: white;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.um-league-chip:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.um-league-chip.active {
+    background: white;
+    border-color: white;
+    color: #047857;
+}
+
 /* The sport pages' row (mountRow): cards are links there */
 a.um-card {
     text-decoration: none;

@@ -1102,6 +1102,26 @@
         if (card && card.previousElementSibling !== row.el) card.before(row.el);
     }
 
+    // The open tab's league buttons again, as thin chips under the cards
+    // (leagueChips): picking one clicks that button, so the strip and the
+    // tab below always show the same league - on a phone the buttons are a
+    // scroll away. None in search mode (the search bar's dropdown is right
+    // there) or on a tab without league buttons; no "All" (that's search's
+    // Top 5 Leagues).
+    function leagueButtons() {
+        if (document.documentElement.classList.contains('search-mode')) return [];
+        return [...document.querySelectorAll('.tab-content.active .league-button[data-league]')];
+    }
+
+    function chipsHtml(row) {
+        const buttons = row.leagueChips ? leagueButtons() : [];
+        if (!buttons.length) return '';
+        return `<div class="um-league-chips" role="group" aria-label="League">${buttons.map(b => {
+            const active = b.classList.contains('active');
+            return `<button type="button" class="um-league-chip${active ? ' active' : ''}" data-league="${escapeHtml(b.dataset.league)}" aria-pressed="${active}">${escapeHtml(b.textContent.trim())}</button>`;
+        }).join('')}</div>`;
+    }
+
     // Hidden until the visitor turns it on (the Matches button); then the
     // fixtures load
     function renderRow(row) {
@@ -1125,7 +1145,7 @@
             const name = divs.length === 1 ? `${COMPETITIONS[divs[0]].name} ` : '';
             el.innerHTML = `<p class="um-row-status">${escapeHtml(fixtures.length
                 ? `No ${name}matches until ${longDay(new Date(fixtures[0].utcDate))}.`
-                : `No upcoming ${name}matches right now.`)}</p>`;
+                : `No upcoming ${name}matches right now.`)}</p>${chipsHtml(row)}`;
             return;
         }
         const favs = favouriteFixtures(soon);
@@ -1134,7 +1154,7 @@
         const scrollLeft = el.querySelector('.um-row')?.scrollLeft || 0;
         el.innerHTML = `<div class="um-row" role="list" aria-label="Upcoming matches">${ordered.map(f => cardHtml(f, {
             fav: favs.has(f), href: `index.html?match=${f.matchId}&back=1`, withDay: true
-        })).join('')}</div>`;
+        })).join('')}</div>${chipsHtml(row)}`;
         const list = el.querySelector('.um-row');
         if (list) list.scrollLeft = scrollLeft;
         clearFixedButtons(row);
@@ -1178,9 +1198,10 @@
     // clearButtons: false lets the fixed buttons sit over the strip (the
     // phone pages, whose buttons float over everything). place(el): puts
     // the strip somewhere else, run on each change (the phone pages: in the
-    // green header, or above the search bar in search mode).
-    function mountRow(el, { fallback = [], pageQuery = null, toggleIn = null, toggleBefore = null, clearButtons = true, place = null } = {}) {
-        const row = { el, divs: [], shown: false, clearButtons, place };
+    // green header, or above the search bar in search mode). leagueChips:
+    // the league chips under the cards (chipsHtml).
+    function mountRow(el, { fallback = [], pageQuery = null, toggleIn = null, toggleBefore = null, clearButtons = true, place = null, leagueChips = false } = {}) {
+        const row = { el, divs: [], shown: false, clearButtons, place, leagueChips };
         try { row.shown = localStorage.getItem(ROW_SHOWN_KEY) === '1'; } catch (err) { /* storage blocked */ }
         rows.push(row);
         el.hidden = true;
@@ -1209,6 +1230,13 @@
             syncToggle();
         }
 
+        el.addEventListener('click', event => {
+            const chip = event.target.closest('.um-league-chip');
+            if (!chip) return;
+            const button = leagueButtons().find(b => b.dataset.league === chip.dataset.league);
+            if (button && !button.classList.contains('active')) button.click();
+        });
+
         ['click', 'auxclick'].forEach(type => el.addEventListener(type, event => {
             if (!pageQuery || !event.target.closest('a.um-card')) return;
             if (document.documentElement.classList.contains('search-mode')) return;
@@ -1225,11 +1253,14 @@
             queued = false;
             placeRow(row);
             const divs = pageLeagues(fallback).map(slug => DIV_BY_SLUG[slug]).filter(Boolean);
-            if (divs.join() === row.divs.join()) {
+            // The chips come and go with search mode and the tab's buttons
+            const key = `${divs.join()}|${leagueButtons().map(b => b.dataset.league).join()}`;
+            if (key === row.key) {
                 clearFixedButtons(row); // a mode switch moves the buttons
                 return;
             }
             row.divs = divs;
+            row.key = key;
             renderRow(row);
         };
         const queue = () => {
