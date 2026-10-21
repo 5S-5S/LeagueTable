@@ -513,34 +513,31 @@ empty search box.
   Back from a match restores the page, the added scripts (~41 KB
   gzipped) are negligible, and the 📅 button stays however often it's
   used - nothing left to review.
-  Phone header reworked 2026-10-21 (the chip, dark mode toggle, 📅 and
-  Search had crowded it, and the menu button hid "Domestic"): on the two
-  Mobile pages the favourite teams (favourite-picker.js mount(...,
-  { embedded: true }), always open) and dark mode moved to a Settings
-  section in the ☰ menu; 🔍 and 📅 float as icon buttons in one row with
-  ☰ and ▼ (search mode: ⚙️ beside ☰, 📅 in ▼'s corner); the title
-  starts under the row. The strip, when on, is part of the green header
-  under the title (mountRow place), and above the search bar in search
-  mode, where the buttons float over it (clearButtons: false). The user's
-  call: buttons floating over text is fine - tried and dropped: two
-  stacks of two, and keeping the cards clear of them (names cut to "…").
-  The same day on desktop too (the user's pick from a preview): the
-  strip, when on, sits in the green header under the title, its cards
-  the width of the header's content; in search mode still its own card
-  above the search bar, clear of the fixed buttons as before.
-  League chips under the strip's cards (also 2026-10-21, the user's
-  idea - on a phone the league buttons are a scroll away): the open
-  tab's league buttons again as thin pills (mountRow leagueChips); a
-  chip clicks its button, so the strip and the tab always agree. No
-  "All" (search's Top 5 Leagues covers that), none in search mode (its
-  dropdown is right there), none on a tab without league buttons.
-  Continental shows its one Champions League chip too, ready for more
-  competitions.
-  Search mode, also 2026-10-21 (the user's pick from a mock): the strip
-  is at the top of the search bar's card rather than a card of its own
-  (place prepends it to .main-card), the bar's width; on phones under the
-  row of buttons as the header's title is, on desktop clear of the fixed
-  buttons as before.
+  Reworked 2026-10-21, all the user's calls (from previews and mocks):
+  - Phone header: the chip, dark mode toggle, 📅 and Search had crowded
+    it, and the menu button hid "Domestic". On the two Mobile pages the
+    favourite teams (favourite-picker.js mount(..., { embedded: true }),
+    always open) and dark mode moved to a Settings section in the ☰
+    menu; 🔍 and 📅 float as icon buttons in one row with ☰ and ▼
+    (search mode: ⚙️ beside ☰, 📅 in ▼'s corner); the title starts
+    under the row; all four hide while the menu is open (📅 and ▼ had
+    covered its ✕). Buttons floating over text is fine - tried and
+    dropped: two stacks of two, and keeping the cards clear of the
+    buttons (names cut to "…").
+  - Where the strip sits (mountRow place, all four pages): when on, in
+    the green header under the title, its cards the width of the
+    header's content; in search mode, where the header goes, at the top
+    of the search bar's card, the bar's width (on phones under the row
+    of buttons, as the title is; on desktop clear of the fixed buttons,
+    upcoming.js clearFixedButtons - the phones pass clearButtons: false).
+    It started as a card of its own above the page.
+  - League chips under the cards (mountRow leagueChips; on a phone the
+    league buttons are a scroll away): the open tab's league buttons
+    again as thin pills; a chip clicks its button, so the strip and the
+    tab always agree. No "All" (search's Top 5 Leagues covers that),
+    none in search mode (its dropdown is right there) or on a tab
+    without league buttons. Continental shows its one Champions League
+    chip too, ready for more competitions. They hide with the strip.
 
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15
