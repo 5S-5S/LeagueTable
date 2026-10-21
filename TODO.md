@@ -513,6 +513,17 @@ empty search box.
   Back from a match restores the page, the added scripts (~41 KB
   gzipped) are negligible, and the 📅 button stays however often it's
   used - nothing left to review.
+  Phone header reworked 2026-10-21 (the chip, dark mode toggle, 📅 and
+  Search had crowded it, and the menu button hid "Domestic"): on the two
+  Mobile pages the favourite teams (favourite-picker.js mount(...,
+  { embedded: true }), always open) and dark mode moved to a Settings
+  section in the ☰ menu; 🔍 and 📅 float as icon buttons in one row with
+  ☰ and ▼ (search mode: ⚙️ beside ☰, 📅 in ▼'s corner); the title
+  starts under the row. The strip, when on, is part of the green header
+  under the title (mountRow place), and above the search bar in search
+  mode, where the buttons float over it (clearButtons: false). The user's
+  call: buttons floating over text is fine - tried and dropped: two
+  stacks of two, and keeping the cards clear of them (names cut to "…").
 
 - ~~Favourite teams~~ — done (2026-10-19) on the home page; the rest
   dropped. The visitor's teams are kept since 2026-10-15

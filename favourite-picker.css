@@ -16,6 +16,28 @@
     z-index: 1001;
 }
 
+/* Always open in the phone sport pages' menu (mount(container, null,
+   { embedded: true })): no chip, the panel in the flow */
+.fav-picker-embedded {
+    position: static;
+    padding: 0 1.5rem 0.5rem;
+}
+
+.fav-picker-embedded .fav-chip {
+    display: none;
+}
+
+.fav-picker-embedded .fav-panel,
+.fav-picker-embedded .fav-panel:not([hidden]) {
+    position: static;
+    width: auto;
+    max-width: none;
+    padding: 0;
+    box-shadow: none;
+    background: transparent;
+    text-align: left;
+}
+
 /* ...whose white, centred header text it mustn't inherit */
 .fav-picker-inline .fav-panel {
     text-align: left;

@@ -3409,7 +3409,7 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
 }
 
 /* The upcoming matches strip (upcoming.js mountRow) is first on the page
-   when shown (it keeps clear of the fixed buttons itself), so the search
+   when shown (the fixed buttons float over it), so the search
    bar under it needs no room for them */
 html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {
     padding-top: 1.5rem;
@@ -3591,35 +3591,106 @@ html.search-mode body[data-theme="dark"] .search-mode-switch {
     color: #6ee7b7;
 }
 
-/* Phone width: the title needs the row, so the favourite teams' chip
-   (crest or star only) and the toggle share a line, with the Matches (📅
-   only) and Search buttons under them */
-html:not(.search-mode) .header-actions {
-    display: grid;
-    grid-template-columns: auto auto;
-    justify-items: end;
+/* The phone's header keeps only its title: Search (🔍) floats beside the
+   menu button and Matches (📅, upcoming.js mountRow) beside ▼ - one row
+   along the top, styled as them; favourite teams and dark mode are in
+   the menu. Both buttons are 3rem + 2px wide, 2.375rem + 2px tall, as the
+   menu button is. */
+.floating-btn,
+body > .um-row-toggle {
+    position: fixed;
+    top: 1rem;
+    z-index: 1001;
+    display: flex;
     align-items: center;
-    align-self: flex-end; /* low in the header, clear of the pinned ▼ button */
+    justify-content: center;
+    width: calc(3rem + 2px);
+    height: calc(2.375rem + 2px);
+    padding: 0;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    background: var(--bg-white);
+    color: #374151;
+    font-size: 1.1rem;
+    line-height: 1;
 }
 
-html:not(.search-mode) .header-actions #searchModeSwitch {
-    grid-row: 2;
-    grid-column: 2;
+.floating-btn {
+    left: calc(1rem + 3rem + 2px + 0.5rem);
 }
 
-html:not(.search-mode) .header-actions .um-row-toggle {
-    grid-row: 2;
-    grid-column: 1;
+body > .um-row-toggle {
+    right: calc(1rem + 3rem + 2px + 0.5rem);
 }
 
-/* Both modes: the chip and the Matches button as icons, so search mode's
-   pinned buttons fit beside the menu button */
-.header-actions :is(.fav-chip-name, .fav-chip-arrow, .um-row-toggle-text) {
+.floating-btn:hover,
+body > .um-row-toggle:hover {
+    background: #f0fdfa;
+}
+
+body > .um-row-toggle .um-row-toggle-text {
     display: none;
 }
 
-.header-actions .fav-chip {
-    padding: 0 0.6rem;
+/* Pressed while the strip shows: a darker green, ringed in white, to
+   stand out on the green header the strip is part of */
+body > .um-row-toggle[aria-pressed="true"],
+html.search-mode body > .um-row-toggle[aria-pressed="true"] {
+    background: #065f46;
+    border: 2px solid white;
+    color: white;
+}
+
+[data-theme="dark"] .floating-btn,
+[data-theme="dark"] body > .um-row-toggle:not([aria-pressed="true"]) {
+    background: #333333;
+    border-color: #555555;
+    color: #e5e7eb;
+}
+
+/* Search mode: ▼ goes, so 📅 takes its corner. The buttons may sit over
+   the upcoming strip (upcoming.js mountRow clearButtons: false). */
+html.search-mode body > .um-row-toggle {
+    right: 1rem;
+}
+
+/* The title starts under the row of buttons */
+html:not(.search-mode) .header {
+    padding-top: calc(1rem + 2.375rem + 2px + 1rem);
+}
+
+/* The upcoming strip, when shown, is part of the green header (mountRow
+   place): under the title, its cards scrolling edge to edge */
+.header .um-sport-row {
+    max-width: none;
+    margin: 1rem -2rem -1rem;
+    padding: 0 1rem 0.5rem;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+}
+
+.header .um-row-status {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] .header .um-sport-row {
+    background: none;
+}
+
+/* Hidden while the menu is open (the menu button hides itself too) */
+body:has(.side-menu.open) .floating-btn {
+    visibility: hidden;
+}
+
+/* Dark mode in the menu: a row with the switch on the right */
+.menu-setting {
+    cursor: default;
+}
+
+.menu-setting-name {
+    flex: 1;
+    cursor: pointer;
 }
 
 /* Historic streak match lists: the match that ended the run, in its own

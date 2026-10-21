@@ -1092,8 +1092,12 @@
     }
 
     // Its own card, just above the page's main card (as the home page's
-    // sections are)
+    // sections are) - or where the page's place(el) puts it
     function placeRow(row) {
+        if (row.place) {
+            row.place(row.el);
+            return;
+        }
         const card = document.querySelector('.league-table-container > .main-card');
         if (card && card.previousElementSibling !== row.el) card.before(row.el);
     }
@@ -1146,7 +1150,7 @@
     function clearFixedButtons(row) {
         const el = row.el;
         el.style.paddingTop = '';
-        if (el.hidden) return;
+        if (el.hidden || !row.clearButtons) return;
         const strip = el.getBoundingClientRect();
         const top = strip.top + window.scrollY;
         const padding = parseFloat(getComputedStyle(el).paddingTop) || 0;
@@ -1171,8 +1175,12 @@
     // the page as it was even when the browser didn't keep it (search mode
     // has its question in the URL already). toggleIn / toggleBefore: where
     // the Matches button goes (the header's actions, before the toggle).
-    function mountRow(el, { fallback = [], pageQuery = null, toggleIn = null, toggleBefore = null } = {}) {
-        const row = { el, divs: [], shown: false };
+    // clearButtons: false lets the fixed buttons sit over the strip (the
+    // phone pages, whose buttons float over everything). place(el): puts
+    // the strip somewhere else, run on each change (the phone pages: in the
+    // green header, or above the search bar in search mode).
+    function mountRow(el, { fallback = [], pageQuery = null, toggleIn = null, toggleBefore = null, clearButtons = true, place = null } = {}) {
+        const row = { el, divs: [], shown: false, clearButtons, place };
         try { row.shown = localStorage.getItem(ROW_SHOWN_KEY) === '1'; } catch (err) { /* storage blocked */ }
         rows.push(row);
         el.hidden = true;
