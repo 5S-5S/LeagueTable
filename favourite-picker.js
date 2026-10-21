@@ -10,13 +10,15 @@
 // lets a card's "⭐ Your team" button with no team yet hand over to this
 // panel. With a container (the sport pages' header, next to Search) the
 // chip sits in it, before `before` if given, instead of fixed in the top
-// bar.
+// bar. With { embedded: true } (the phone sport pages' menu) there is no
+// chip: the panel is always open in the container.
 // Needs team-registry.js, combobox.js and favourite-team.js.
 (function () {
     'use strict';
 
     let els = null;
     let combobox = null;
+    let embedded = false;
 
     function escapeHtml(text) {
         return String(text).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -67,16 +69,18 @@
     }
 
     function close() {
+        if (embedded) return;
         els.panel.hidden = true;
         els.chip.setAttribute('aria-expanded', 'false');
     }
 
-    function mount(container, before = null) {
+    function mount(container, before = null, options = {}) {
+        embedded = Boolean(options.embedded && container);
         const root = document.createElement('div');
-        root.className = container ? 'fav-picker fav-picker-inline' : 'fav-picker';
+        root.className = embedded ? 'fav-picker fav-picker-embedded' : container ? 'fav-picker fav-picker-inline' : 'fav-picker';
         root.innerHTML = `
-            <button type="button" class="fav-chip" aria-expanded="false" aria-controls="favPanel"></button>
-            <div class="fav-panel" id="favPanel" role="dialog" aria-label="Your team" hidden>
+            <button type="button" class="fav-chip" aria-expanded="false" aria-controls="favPanel"${embedded ? ' hidden' : ''}></button>
+            <div class="fav-panel" id="favPanel" ${embedded ? 'role="group"' : 'role="dialog"'} aria-label="Your team"${embedded ? '' : ' hidden'}>
                 <ul class="fav-teams" hidden></ul>
                 <label class="fav-panel-label" for="favTeamInput">⭐ Your team</label>
                 <div class="fav-panel-row">
@@ -122,7 +126,7 @@
             if (isOpen() && event.target.isConnected && !root.contains(event.target) && !event.target.closest('[data-fav-open]')) close();
         });
         document.addEventListener('keydown', event => {
-            if (event.key === 'Escape' && isOpen()) {
+            if (event.key === 'Escape' && isOpen() && !embedded) {
                 close();
                 els.chip.focus();
             }
