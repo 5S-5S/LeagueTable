@@ -35,7 +35,7 @@ empty search box.
 9. Head-to-head by decade
 10. Side-by-side Team Seasons
 11. League History chart
-12. Team Records: bottom / relegated, home / away
+12. Team Records: home / away
 13. A club's title races
 14. Team progression chart (after League History)
 15. "/" to search
@@ -382,15 +382,10 @@ empty search box.
   matching the sport pages' own tabs (Team Seasons, the match view's
   table) rather than new formats.
 
-- Maybe: **Team Records: more filters search can't reach yet** — noted
-  2026-10-06 in the search audit. Questions that parse, but whose filter
-  Team Records doesn't have, so it's dropped silently (date ranges and
-  season length are done, 2026-10-15):
-  - Bottom / relegated: "most points by a relegated team", "fewest points
-    by a bottom team" - Position is one exact place; "bottom" varies by
-    season (could be a "Last" option), relegation needs data we lack.
-  - Home / away: "most home wins in a season" - season standings are
-    totals; needs home/away splits per club from the Worker.
+- Maybe: **Team Records: home / away** — split 2026-10-21. "Most home
+  wins in a season" - season standings are totals; needs home/away splits
+  per club from the Worker (precomputed, so a search doesn't cost D1
+  reads).
 
 - Maybe: **A club's title races** — noted 2026-10-06. "Arsenal closest
   title races" answers for the whole league - League History has no club
@@ -483,6 +478,22 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~Team Records: Outcome filter and strip, and search for it~~ — done
+  (2026-10-21), split from "more filters search can't reach yet".
+  Domestic pages (desktop and phone): an Outcome dropdown (Champions /
+  Champions League / Relegation play-off / Relegated, Copy Link `out=`)
+  beside Games per team, and season-outcomes.js's strip beside Pos with
+  its key on every Team Records view (the phone's bar on the Pos cell,
+  which gets padding to clear it - the phone tables' !important padding
+  is overridden inline). Search: "most points by a relegated team",
+  "fewest points by a team in a relegation play off", "most points by a
+  team that qualified for the champions league" set the outcome, and the
+  answer says "by a relegated team"; "without being relegated" / "stayed
+  up" drop it rather than flip it. "off" joined the search keywords (a
+  trailing "play off" had been read as Kickers Offenbach being typed).
+  Not done: "best relegated team ever" / "worst champions ever" still go
+  to Team Seasons (no stat word); a "Last" place option wasn't wanted.
 
 - ~~Upcoming matches on the sport pages~~ — done (2026-10-19), the
   user's idea. The home strip's cards in one row, in a card of its own

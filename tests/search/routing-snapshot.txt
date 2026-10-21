@@ -4735,3 +4735,73 @@ premier-league | teams that reached the champions league semi finals since 2010
     team-seasons | All teams · Reached the semi-finals | Team Seasons · 2010-11 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&from=2010-11&pos=Semi-Finals&better=1
 champions-league | teams that reached the champions league semi finals since 2010
     team-seasons | All teams · Reached the semi-finals | Team Seasons · 2010-11 onwards | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&from=2010-11&pos=Semi-Finals&better=1
+domestic | most points by a relegated team
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&out=R
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=most&out=R
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=most&out=R
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=most&out=R
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=most&out=R
+premier-league | most points by a relegated team
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&out=R
+champions-league | most points by a relegated team
+    team-records | All clubs · Most points in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most
+domestic | fewest points by a relegated team
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&out=R
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=fewest&out=R
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=fewest&out=R
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=fewest&out=R
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=fewest&out=R
+premier-league | fewest points by a relegated team
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&out=R
+champions-league | fewest points by a relegated team
+    team-records | All clubs · Fewest points in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=fewest
+domestic | most goals conceded by a relegated team
+    team-records | All clubs · Most goals conceded in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsAgainst&order=most&out=R
+    team-records | All clubs · Most goals conceded in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=goalsAgainst&order=most&out=R
+    team-records | All clubs · Most goals conceded in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=goalsAgainst&order=most&out=R
+    team-records | All clubs · Most goals conceded in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=goalsAgainst&order=most&out=R
+    team-records | All clubs · Most goals conceded in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=goalsAgainst&order=most&out=R
+premier-league | most goals conceded by a relegated team
+    team-records | All clubs · Most goals conceded in a season | Team Records · All seasons · Relegated | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=goalsAgainst&order=most&out=R
+champions-league | most goals conceded by a relegated team
+    team-records | All clubs · Most goals conceded in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=goalsAgainst&order=most
+domestic | most points without being relegated
+    team-records | All clubs · Most points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most
+    team-records | All clubs · Most points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=most
+    team-records | All clubs · Most points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=most
+    team-records | All clubs · Most points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=most
+    team-records | All clubs · Most points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=most
+premier-league | most points without being relegated
+    team-records | All clubs · Most points in a season | Team Records · All seasons | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most
+champions-league | most points without being relegated
+    team-records | All clubs · Most points in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most
+domestic | fewest points by a team in a relegation play off
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegation play-off | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&out=RP
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegation play-off | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=fewest&out=RP
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegation play-off | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=fewest&out=RP
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegation play-off | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=fewest&out=RP
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegation play-off | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=fewest&out=RP
+premier-league | fewest points by a team in a relegation play off
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Relegation play-off | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&out=RP
+champions-league | fewest points by a team in a relegation play off
+    team-records | All clubs · Fewest points in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=fewest
+domestic | most points by a team that qualified for the champions league
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&out=CL
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=most&out=CL
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=most&out=CL
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=most&out=CL
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=most&out=CL
+premier-league | most points by a team that qualified for the champions league
+    team-records | All clubs · Most points in a season | Team Records · All seasons · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=most&out=CL
+champions-league | most points by a team that qualified for the champions league
+    team-records | All clubs · Most points in a campaign | Team Records · All seasons | ContinentalEurope.html?view=team-seasons&lg=champions-league&league=champions-league&sub=records&stat=points&order=most
+domestic | fewest points by a team finishing 4th that qualified for the champions league
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&pos=4&out=CL
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=la-liga&sub=records&stat=points&order=fewest&pos=4&out=CL
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=serie-a&sub=records&stat=points&order=fewest&pos=4&out=CL
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=bundesliga&sub=records&stat=points&order=fewest&pos=4&out=CL
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=ligue-1&sub=records&stat=points&order=fewest&pos=4&out=CL
+premier-league | fewest points by a team finishing 4th that qualified for the champions league
+    team-records | All clubs · Fewest points in a season | Team Records · All seasons · Finished 4th · Qualified for the Champions League | DomesticEurope.html?view=team-seasons&lg=premier-league&sub=records&stat=points&order=fewest&pos=4&out=CL
+champions-league | fewest points by a team finishing 4th that qualified for the champions league
+    message: No results. Try a team, a season like 2003-04, or words like table, vs, streak, last time.

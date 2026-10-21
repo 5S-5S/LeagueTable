@@ -1058,9 +1058,10 @@
         'by via over under through into than their his her its they we our any every which what who how ' +
         'much many times or but not no do does got get getting beat beaten ' +
         // Everyday words, so they're never taken for the start of a team
+        // ("play off" isn't Offenbach being typed)
         'far well good bad did went go goes going reach reaching ever still yet now then also just only ' +
         'more less very really team teams club clubs side sides play plays played playing year years ' +
-        'stats statistics score finish place out knocked eliminated runners up second third fourth ' +
+        'stats statistics score finish place out off knocked eliminated runners up second third fourth ' +
         'show list tell give find me us is are were has have had will would should can could ' +
         // Weekdays ("on a Wednesday" isn't Sheffield Wednesday being typed)
         'monday tuesday wednesday thursday friday saturday sunday ' +
@@ -1708,6 +1709,9 @@
         if (has(/\bworst\b/)) order = badIsMore ? 'most' : 'fewest';
         if (has(/\bbest\b/) && badIsMore) order = 'fewest';
         const finish = detectFinish(text);
+        // "most points without being relegated", "that stayed up" - not
+        // the relegated (Team Records has no "wasn't" filter)
+        if (finish.outcome && has(/\b(without|not|never|avoid(ed|ing)?|escap(ed|ing)|surviv(ed|ing)|stayed up)\b(?=.*\b(relegat|went down|go down|demoted|play ?offs?|play ?outs?|clqualify))/)) finish.outcome = '';
         // "by a champion", "title winners" - one season's winner
         if (!finish.rank && !finish.stage && has(/\b(champion|title winners?|won (the )?(league|title|·))\b/)) {
             finish.rank = '1';
@@ -2400,6 +2404,8 @@
             order: intent.order,
             pos,
             better: better ? '1' : '',
+            // What the season led to ("by a relegated team") - a league's only
+            out: comp.continental ? '' : (finish.outcome || ''),
             season: parsed.eras[comp.key] || '',
             ...recordSeasons(parsed),
             games: comp.continental ? '' : parsed.filters.games,
@@ -2418,6 +2424,7 @@
                 'Team Records',
                 recordSeasonsDetail(parsed, comp),
                 pos ? (comp.continental ? `Reached: ${pos}${better ? ' or further' : ''}` : `Finished ${pos}${ordinalSuffix(Number(pos))}${better ? ' or better' : ''}`) : '',
+                params.out ? { C: 'Champions', CL: 'Qualified for the Champions League', RP: 'Relegation play-off', R: 'Relegated' }[params.out] : '',
                 params.p3 ? '3 points for a win' : ''
             ]),
             href: competitionUrl(comp, 'team-seasons', params)
@@ -3830,7 +3837,7 @@
 
     // Team Records: who holds the record (every rank-1 club-season).
     // ctx.records: { rows (ranked), stat, order, perGame, threePoints,
-    // position, team, continental }
+    // position, outcome, team, continental }
     function describeTeamRecords(ctx, params, { b, competition }) {
         const r = ctx.records;
         if (!r || !r.rows) return null;
@@ -3857,6 +3864,13 @@
                 const pos = Number(r.position);
                 by = pos === 1 ? ' by a champion' : pos === 2 ? ' by a runner-up' : ` by a team finishing ${pos}${ordinalSuffix(pos)}`;
             }
+        }
+        // What the season led to (season-outcomes.js): "by a relegated
+        // team", or with a position "by a team finishing 18th and relegated"
+        if (r.outcome && !r.continental && !(r.outcome === 'C' && r.position === '1')) {
+            by = by
+                ? by + { C: ' and crowned champions', CL: ' and qualifying for the Champions League', RP: ' and in a relegation play-off', R: ' and relegated' }[r.outcome]
+                : { C: ' by a champion', CL: ' by a Champions League qualifier', RP: ' by a team in a relegation play-off', R: ' by a relegated team' }[r.outcome];
         }
         if (!r.rows.length) return { html: `No ${r.continental ? 'campaigns' : 'seasons'} match ${r.team ? `for ${b(r.team)} ` : ''}these filters.` };
 
