@@ -3535,7 +3535,7 @@ html.search-mode .header-actions {
 
 /* Search mode before any question (?search=none, from the Search
    button): the bar only - no answer, no results */
-html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header) {
+html.search-mode[data-search-view="none"] .main-card > :not(.search-mode-bar):not(.header):not(.um-sport-row) {
     display: none !important;
 }
 
@@ -3543,11 +3543,22 @@ html.search-mode[data-search-view="none"] .search-mode-bar {
     padding-bottom: 1.75rem;
 }
 
-/* The upcoming matches strip (upcoming.js mountRow) is first on the page
-   when shown (the fixed buttons float over it), so the search
-   bar under it needs no room for them */
-html.search-mode .league-table-container:has(> .um-sport-row:not([hidden])) .search-mode-bar {
-    padding-top: 1.5rem;
+/* In search mode, where the header goes, the strip is at the top of the
+   search bar's card instead (mountRow place), the width of the bar, under
+   the row of buttons as the header's title is - so the bar under it needs
+   no room for them */
+.main-card > .um-sport-row,
+[data-theme="dark"] .main-card > .um-sport-row {
+    max-width: none;
+    margin: 0;
+    padding: calc(1rem + 2.375rem + 2px + 1rem) 1rem 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+}
+
+html.search-mode .main-card:has(> .um-sport-row:not([hidden])) .search-mode-bar {
+    padding-top: 0.5rem;
 }
 
 html.search-mode #teamDashboardHeader,
