@@ -1133,9 +1133,14 @@ body {
     background: #f3f4f6;
 }
 
+/* Separate (not collapsed) borders: each cell draws its own. With
+   collapsed borders iOS Safari paints the sticky columns' backgrounds over
+   half of their row lines, so the lines under Season / # / Team looked a
+   different thickness from the rest of the row (2026-10-21). */
 .league-table table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .league-table th {

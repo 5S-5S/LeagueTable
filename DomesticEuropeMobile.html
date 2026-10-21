@@ -12312,8 +12312,14 @@
                             } else if (rule === 'special' && headerText === 'Pos') {
                                 const text = cell.textContent.trim();
                                 if (text === '1' || text === '2' || text === '3') {
-                                    cell.style.color = '';
-                                    cell.style.removeProperty('color');
+                                    // Undo only dark mode's own white - a 1st /
+                                    // 2nd / 3rd cell's color is the table's (Team
+                                    // Seasons' gold on pale yellow); clearing it
+                                    // left white text on the pale cell
+                                    if (cell.dataset.darkText) {
+                                        cell.style.color = '';
+                                        delete cell.dataset.darkText;
+                                    }
                                 } else {
                                     cell.style.color = 'white';
                                     cell.dataset.darkText = '1';
