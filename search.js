@@ -4614,7 +4614,7 @@
         container.innerHTML = `
             <form class="search-bar" role="search" autocomplete="off">
                 <select class="search-scope" aria-label="Sport and competition to search">${SCOPE_OPTIONS_HTML}</select>
-                <input type="search" class="search-input" placeholder="Teams, seasons, head to head, streaks..." aria-label="Search">
+                <input type="search" class="search-input" placeholder="Teams, seasons, head to head, streaks..." aria-label="Search" aria-keyshortcuts="/">
                 <button type="submit" class="search-submit" aria-label="Search">🔍</button>
             </form>
             <div class="search-results hidden" role="listbox" aria-label="Search results"></div>`;
@@ -4861,6 +4861,26 @@
             }
         };
     }
+
+    // "/" from anywhere on the page goes to the search bar - not while
+    // typing in a box, or with a modifier key. A sport page in its filters
+    // view has no bar yet: its Search button switches to search mode,
+    // which focuses the bar.
+    document.addEventListener('keydown', (e) => {
+        if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+        const target = e.target;
+        if (target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))) return;
+        const input = [...document.querySelectorAll('.search-input')].find(el => el.offsetParent !== null);
+        const switchButton = document.getElementById('searchModeSwitch');
+        if (input) {
+            e.preventDefault();
+            input.focus();
+            input.select();
+        } else if (switchButton && !document.documentElement.classList.contains('search-mode')) {
+            e.preventDefault();
+            switchButton.click();
+        }
+    });
 
     window.LeagueSearch = { mount, searchFor, suggestFor, renderAnswer, examples, reportHref, bindReportLinks, readRecent, addRecent, clearRecent };
 })();

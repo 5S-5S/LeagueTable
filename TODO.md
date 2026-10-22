@@ -38,19 +38,18 @@ empty search box.
 12. Team Records: home / away
 13. A club's title races
 14. Team progression chart (after League History)
-15. "/" to search
-16. Penalty shootout leaderboard (team and head-to-head answers done)
-17. "Won on penalties" in Match Finder
-18. Lighter pages / shared sport-page code (audited 2026-10-21 - see the item)
-19. Knockout Stage bracket view (on hold)
-20. Country vs Country
-21. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
-22. Review upcoming matches
-23. Phone-width checks in npm run check
-24. Team-colour contrast
-25. Sitemap + Google Search Console
-26. Club names that differ from worldfootball.net
-27. Champions League data fixes (found 2026-10-13)
+15. Penalty shootout leaderboard (team and head-to-head answers done)
+16. "Won on penalties" in Match Finder
+17. Lighter pages / shared sport-page code (audited 2026-10-21 - see the item)
+18. Knockout Stage bracket view (on hold)
+19. Country vs Country
+20. Match Finder: a country's clubs as the subject (on hold - overlaps Country vs Country)
+21. Review upcoming matches
+22. Phone-width checks in npm run check
+23. Team-colour contrast
+24. Sitemap + Google Search Console
+25. Club names that differ from worldfootball.net
+26. Champions League data fixes (found 2026-10-13)
 
 ## Items
 
@@ -327,9 +326,6 @@ empty search box.
   merengues, colchoneros. Never: shared ones (reds, blues, eagles, latics,
   clarets, giallorossi, nerazzurri).
 
-- Maybe: **"/" to search** — noted 2026-10-03. Focus the search bar from
-  anywhere on a page.
-
 - Maybe: **More competitions** — noted 2026-10-03. Europa League /
   Conference League (the code already maps E1 / C2), or more leagues
   (Eredivisie, Primeira Liga, Championship) - depends on the data.
@@ -483,6 +479,12 @@ empty search box.
   UEFA's missing IFK Göteborg v Beşiktaş 1997).
 
 ## Done
+
+- ~~"/" to search~~ — done (2026-10-21). search.js listens on every page
+  with the bar: "/" (no modifier, not while typing in a box) focuses and
+  selects the search bar, or on a sport page's filters view clicks its
+  Search button (search mode, bar focused). aria-keyshortcuts on the
+  input; a line in the Q&A's "How does the search work?".
 
 - ~~Team Records: Outcome filter and strip, and search for it~~ — done
   (2026-10-21), split from "more filters search can't reach yet".
